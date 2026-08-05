@@ -1,0 +1,317 @@
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer Localizer
+@model MusicEncyclopedia.Web.ViewModels.Public.TrackListViewModel
+
+@{
+    var culture = Context.Items["culture"] as string ?? "fa";
+    var dir = Context.Items["dir"] as string ?? "ltr";
+    var isRtl = dir == "rtl";
+    var items = Model.Items;
+}
+
+<!-- ===== Canonical URL ===== -->
+<link rel="canonical" href="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.PathBase}{Context.Request.Path}")" />
+
+<!-- ===== Open Graph ===== -->
+<meta property="og:title" content="@Localizer["Tracks"] - @Localizer["Music Encyclopedia"]" />
+<meta property="og:description" content="@Localizer["Browse the complete track catalog — filter by genre, artist, and more."]" />
+<meta property="og:url" content="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.PathBase}{Context.Request.Path}")" />
+<meta property="og:type" content="website" />
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" dir="@dir">
+    <!-- Page Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-900">@Localizer["Tracks"]</h1>
+        <p class="mt-2 text-gray-600">@Localizer["Browse the complete track catalog"]</p>
+    </div>
+
+    <div class="flex flex-col lg:flex-row gap-8">
+        <!-- ============================================================
+             Filter Sidebar
+             ============================================================ -->
+        <aside class="w-full lg:w-64 flex-shrink-0" role="complementary" aria-label="@Localizer["Filters"]">
+            <form method="get" action="/@culture/tracks" class="space-y-5 bg-white rounded-lg border border-gray-200 p-5 sticky top-4">
+
+                <!-- Search -->
+                <div>
+                    <label for="search" class="block text-sm font-medium text-gray-700 mb-1">@Localizer["Search"]</label>
+                    <input type="text"
+                           id="search"
+                           name="q"
+                           value="@Model.CurrentFilters.SearchQuery"
+                           placeholder="@Localizer["Search tracks..."]"
+                           class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm px-3 py-2 border" />
+                </div>
+
+                <!-- Genre filter -->
+                <div>
+                    <label for="genre" class="block text-sm font-medium text-gray-700 mb-1">@Localizer["Genre"]</label>
+                    <input type="text"
+                           id="genre"
+                           name="genre"
+                           value="@Model.CurrentFilters.GenreSlug"
+                           placeholder="@Localizer["Genre slug..."]"
+                           class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm px-3 py-2 border" />
+                </div>
+
+                <!-- Artist filter -->
+                <div>
+                    <label for="artist" class="block text-sm font-medium text-gray-700 mb-1">@Localizer["Artist"]</label>
+                    <input type="text"
+                           id="artist"
+                           name="artist"
+                           value="@Model.CurrentFilters.ArtistSlug"
+                           placeholder="@Localizer["Artist slug..."]"
+                           class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm px-3 py-2 border" />
+                </div>
+
+                <!-- Filter Actions -->
+                <div class="flex gap-2">
+                    <button type="submit"
+                            class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        @Localizer["Apply Filters"]
+                    </button>
+                    <a href="/@culture/tracks"
+                       class="flex-1 text-center bg-gray-100 text-gray-700 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-200 transition-colors">
+                        @Localizer["Clear"]
+                    </a>
+                </div>
+            </form>
+        </aside>
+
+        <!-- ============================================================
+             Track Grid
+             ============================================================ -->
+        <div class="flex-1 min-w-0">
+            @if (items.Items.Count == 0)
+            {
+                <!-- Empty state -->
+                <div class="text-center py-16">
+                    <svg class="mx-auto h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                              d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z" />
+                    </svg>
+                    <h3 class="mt-4 text-lg font-medium text-gray-900">@Localizer["No tracks found"]</h3>
+                    <p class="mt-2 text-gray-500">@Localizer["Try adjusting your filters or search query."]</p>
+                    <a href="/@culture/tracks"
+                       class="mt-4 inline-block text-blue-600 hover:text-blue-800 font-medium">
+                        @Localizer["Clear all filters"]
+                    </a>
+                </div>
+            }
+            else
+            {
+                <!-- Result count -->
+                <p class="text-sm text-gray-500 mb-4">
+                    @Localizer["Showing {0}–{1} of {2} tracks",
+                        ((items.Page - 1) * items.PageSize) + 1,
+                        Math.Min(items.Page * items.PageSize, items.TotalItems),
+                        items.TotalItems]
+                </p>
+
+                <!-- Track Cards Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
+                    @foreach (var track in items.Items)
+                    {
+                        <article class="group bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                            <a href="/@culture/tracks/@track.Slug" class="block p-4">
+                                <!-- Title -->
+                                <h3 class="font-semibold text-gray-900 text-base leading-tight mb-1 line-clamp-2">
+                                    @track.Title
+                                </h3>
+
+                                @if (!string.IsNullOrWhiteSpace(track.OriginalTitle) && track.OriginalTitle != track.Title)
+                                {
+                                    <p class="text-sm text-gray-500 line-clamp-1" dir="auto">@track.OriginalTitle</p>
+                                }
+
+                                <!-- Badges row -->
+                                <div class="flex flex-wrap items-center gap-1.5 mt-2">
+                                    @if (track.IsInstrumental)
+                                    {
+                                        <span class="inline-block bg-purple-100 text-purple-700 text-xs px-2 py-0.5 rounded-full"
+                                              title="@Localizer["Instrumental"]">
+                                            @Localizer["Instrumental"]
+                                        </span>
+                                    }
+                                    @if (track.IsExplicit)
+                                    {
+                                        <span class="inline-block bg-red-100 text-red-700 text-xs px-2 py-0.5 rounded-full font-bold"
+                                              title="@Localizer["Explicit"]">
+                                            E
+                                        </span>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(track.LyricsAvailabilityName) && track.LyricsAvailabilityName != "NONE")
+                                    {
+                                        <span class="inline-block @(track.LyricsAvailabilityName == "PUBLIC" ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700") text-xs px-2 py-0.5 rounded-full"
+                                              title="@Localizer["Lyrics"]">
+                                            @if (track.LyricsAvailabilityName == "PUBLIC")
+                                            {
+                                                @Localizer["Lyrics"]
+                                            }
+                                            else
+                                            {
+                                                @Localizer["Limited"]
+                                            }
+                                        </span>
+                                    }
+                                </div>
+
+                                <!-- Duration -->
+                                @if (track.DurationSeconds.HasValue)
+                                {
+                                    <p class="text-sm text-gray-500 mt-2 tabular-nums">
+                                        @TimeSpan.FromSeconds(track.DurationSeconds.Value).ToString(@"m\:ss")
+                                    </p>
+                                }
+
+                                <!-- Genres -->
+                                @if (track.Genres.Count > 0)
+                                {
+                                    <div class="flex flex-wrap gap-1 mt-2">
+                                        @foreach (var genre in track.Genres.Take(3))
+                                        {
+                                            <span class="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-0.5 rounded-full">
+                                                @genre.Name
+                                            </span>
+                                        }
+                                        @if (track.Genres.Count > 3)
+                                        {
+                                            <span class="text-xs text-gray-400">+@(track.Genres.Count - 3)</span>
+                                        }
+                                    </div>
+                                }
+
+                                <!-- Moods -->
+                                @if (track.Moods.Count > 0)
+                                {
+                                    <div class="flex flex-wrap gap-1 mt-1">
+                                        @foreach (var mood in track.Moods.Take(2))
+                                        {
+                                            <span class="inline-block bg-indigo-50 text-indigo-700 text-xs px-2 py-0.5 rounded-full">
+                                                @mood.Name
+                                            </span>
+                                        }
+                                        @if (track.Moods.Count > 2)
+                                        {
+                                            <span class="text-xs text-gray-400">+@(track.Moods.Count - 2)</span>
+                                        }
+                                    </div>
+                                }
+
+                                <!-- Release year from first album appearance -->
+                                @{
+                                    var releaseYear = track.Albums
+                                        .Where(a => a.ReleaseDate.HasValue)
+                                        .OrderBy(a => a.ReleaseDate)
+                                        .Select(a => a.ReleaseDate.Value.Year)
+                                        .FirstOrDefault();
+                                }
+                                @if (releaseYear > 0)
+                                {
+                                    <p class="text-xs text-gray-400 mt-2">@releaseYear</p>
+                                }
+                            </a>
+                        </article>
+                    }
+                </div>
+
+                <!-- ============================================================
+                     Pagination
+                     ============================================================ -->
+                @if (items.TotalPages > 1)
+                {
+                    <nav class="mt-10 flex items-center justify-center gap-1" aria-label="@Localizer["Pagination"]">
+                        @if (items.Page > 1)
+                        {
+                            <a href="@GetPageUrl(items.Page - 1)"
+                               class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                               rel="prev">
+                                @Localizer["Previous"]
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="px-3 py-2 text-sm font-medium text-gray-400 bg-gray-50 border border-gray-200 rounded-md cursor-not-allowed">
+                                @Localizer["Previous"]
+                            </span>
+                        }
+
+                        @{
+                            var startPage = Math.Max(1, items.Page - 2);
+                            var endPage = Math.Min(items.TotalPages, items.Page + 2);
+                            if (startPage > 1)
+                            {
+                                <a href="@GetPageUrl(1)" class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">1</a>
+                                if (startPage > 2)
+                                {
+                                    <span class="px-2 py-2 text-sm text-gray-400">...</span>
+                                }
+                            }
+                            for (var p = startPage; p <= endPage; p++)
+                            {
+                                if (p == items.Page)
+                                {
+                                    <span class="px-3 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-md">@p</span>
+                                }
+                                else
+                                {
+                                    <a href="@GetPageUrl(p)"
+                                       class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                                        @p
+                                    </a>
+                                }
+                            }
+                            if (endPage < items.TotalPages)
+                            {
+                                if (endPage < items.TotalPages - 1)
+                                {
+                                    <span class="px-2 py-2 text-sm text-gray-400">...</span>
+                                }
+                                <a href="@GetPageUrl(items.TotalPages)"
+                                   class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                                    @items.TotalPages
+                                </a>
+                            }
+                        }
+
+                        @if (items.Page < items.TotalPages)
+                        {
+                            <a href="@GetPageUrl(items.Page + 1)"
+                               class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                               rel="next">
+                                @Localizer["Next"]
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="px-3 py-2 text-sm font-medium text-gray-400 bg-gray-50 border border-gray-200 rounded-md cursor-not-allowed">
+                                @Localizer["Next"]
+                            </span>
+                        }
+                    </nav>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+@functions {
+    string GetPageUrl(int page)
+    {
+        var queryParams = new List<string>
+        {
+            $"page={page}"
+        };
+
+        if (!string.IsNullOrWhiteSpace(Model.CurrentFilters.GenreSlug))
+            queryParams.Add($"genre={Uri.EscapeDataString(Model.CurrentFilters.GenreSlug)}");
+
+        if (!string.IsNullOrWhiteSpace(Model.CurrentFilters.ArtistSlug))
+            queryParams.Add($"artist={Uri.EscapeDataString(Model.CurrentFilters.ArtistSlug)}");
+
+        if (!string.IsNullOrWhiteSpace(Model.CurrentFilters.SearchQuery))
+            queryParams.Add($"q={Uri.EscapeDataString(Model.CurrentFilters.SearchQuery)}");
+
+        return $"/{Model.Culture}/tracks?{string.Join("&", queryParams)}";
+    }
+}

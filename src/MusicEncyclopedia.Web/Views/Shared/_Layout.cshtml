@@ -1,0 +1,94 @@
+@{
+    Layout = null;
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+    <meta name="description" content="@ViewData["Description"]" />
+
+    <title>@ViewData["Title"] · Music Encyclopedia</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="~/css/site.css" />
+
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+
+<body class="min-h-screen bg-[var(--color-paper)] text-[var(--color-ink)] font-[var(--font-body)] antialiased">
+
+    <!-- Nav · N5 Floating Pill -->
+    <nav class="nav" aria-label="Main navigation">
+        <div class="nav__inner">
+            <a href="/" class="nav__brand">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 18V5l12-2v13" /><circle cx="6" cy="18" r="3" /><circle cx="18" cy="16" r="3" />
+                </svg>
+                Music Encyclopedia
+            </a>
+
+            <ul class="nav__links">
+                <li><a href="/" class="nav__link @(currentAction == "Index" && currentController == "Home" ? "active" : "")">Home</a></li>
+                <li><a href="/Albums" class="nav__link @(currentController == "Albums" ? "active" : "")">Albums</a></li>
+                <li><a href="/Artists" class="nav__link @(currentController == "Artists" ? "active" : "")">Artists</a></li>
+                <li><a href="/Poets" class="nav__link @(currentController == "Poets" ? "active" : "")">Poets</a></li>
+                <li><a href="/People" class="nav__link @(currentController == "People" ? "active" : "")">People</a></li>
+            </ul>
+
+            <div class="nav__actions">
+                <button class="nav__toggle" aria-label="Open menu" onclick="document.querySelector('.nav__mobile').classList.add('is-open')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Nav -->
+    <div class="nav__mobile">
+        <button class="nav__mobile-close" aria-label="Close menu" onclick="this.parentElement.classList.remove('is-open')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        <a href="/">Home</a>
+        <a href="/Albums">Albums</a>
+        <a href="/Artists">Artists</a>
+        <a href="/Poets">Poets</a>
+        <a href="/People">People</a>
+    </div>
+
+    <main class="min-h-[60vh]">
+        @RenderBody()
+    </main>
+
+    <!-- Footer · Ft2 Inline Single Line -->
+    <footer class="footer">
+        <div class="footer__inner">
+            <div class="footer__left">
+                <a href="/" class="footer__brand">Music Encyclopedia</a>
+                <span class="footer__copy">&copy; @DateTime.Now.Year</span>
+            </div>
+            <ul class="footer__links">
+                <li><a href="/Albums">Albums</a></li>
+                <li><a href="/Artists">Artists</a></li>
+                <li><a href="/Poets">Poets</a></li>
+                <li><a href="/People">People</a></li>
+            </ul>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="~/js/site.js"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

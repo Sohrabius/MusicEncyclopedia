@@ -1,0 +1,222 @@
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer Localizer
+@model MusicEncyclopedia.Web.ViewModels.Public.MoodDetailViewModel
+
+@{
+    var culture = Context.Items["culture"] as string ?? "fa";
+    var dir = Context.Items["dir"] as string ?? "ltr";
+    var isRtl = dir == "rtl";
+}
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" dir="@dir">
+
+    <!-- ============================================================
+         Breadcrumb
+         ============================================================ -->
+    <nav aria-label="@Localizer["Breadcrumb"]" class="mb-6">
+        <ol class="flex items-center gap-2 text-sm text-gray-500">
+            <li><a href="/@culture" class="hover:text-blue-600 transition-colors">@Localizer["Home"]</a></li>
+            <li><span class="mx-1">/</span></li>
+            <li><a href="/@culture/moods" class="hover:text-blue-600 transition-colors">@Localizer["Moods"]</a></li>
+            <li><span class="mx-1">/</span></li>
+            <li class="text-gray-900 font-medium truncate max-w-[200px]" aria-current="page">@Model.Name</li>
+        </ol>
+    </nav>
+
+    <!-- ============================================================
+         1. Header
+         ============================================================ -->
+    <div class="mb-10">
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-900">@Model.Name</h1>
+
+        @if (!string.IsNullOrWhiteSpace(Model.Description))
+        {
+            <p class="mt-3 text-gray-600 max-w-3xl">@Model.Description</p>
+        }
+    </div>
+
+    <div class="flex flex-col lg:flex-row gap-8">
+        <!-- ============================================================
+             Main Content
+             ============================================================ -->
+        <div class="flex-1 min-w-0 space-y-10">
+
+            <!-- ============================================================
+                 2. Albums with this Mood
+                 ============================================================ -->
+            @if (Model.Albums.Count > 0)
+            {
+                <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">
+                        @Localizer["Albums"] (@Model.Albums.Count)
+                    </h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                        @foreach (var album in Model.Albums)
+                        {
+                            <a href="/@culture/albums/@album.Slug"
+                               class="block bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow">
+                                <h3 class="font-medium text-blue-600 hover:text-blue-800">@album.Title</h3>
+                                @if (album.ReleaseDate.HasValue)
+                                {
+                                    <span class="text-sm text-gray-500">@album.ReleaseDate.Value.Year</span>
+                                }
+                            </a>
+                        }
+                    </div>
+                </section>
+            }
+
+            <!-- ============================================================
+                 3. Tracks with this Mood
+                 ============================================================ -->
+            @if (Model.Tracks.Count > 0)
+            {
+                <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">
+                        @Localizer["Tracks"] (@Model.Tracks.Count)
+                    </h2>
+                    <div class="space-y-2">
+                        @foreach (var track in Model.Tracks)
+                        {
+                            <a href="/@culture/tracks/@track.Slug"
+                               class="flex items-center justify-between bg-white rounded-lg border border-gray-200 px-4 py-2 hover:bg-gray-50 transition-colors">
+                                <span class="text-sm font-medium text-blue-600 hover:text-blue-800">@track.Title</span>
+                                @if (track.DurationSeconds.HasValue)
+                                {
+                                    <span class="text-xs text-gray-500 tabular-nums">
+                                        @TimeSpan.FromSeconds(track.DurationSeconds.Value).ToString(@"m\:ss")
+                                    </span>
+                                }
+                            </a>
+                        }
+                    </div>
+                </section>
+            }
+
+            <!-- ============================================================
+                 4. Media Gallery
+                 ============================================================ -->
+            @if (Model.Media.Count > 0)
+            {
+                var images = Model.Media.Where(m => m.MediaType == "IMAGE" || m.MediaType == "image").ToList();
+                var videos = Model.Media.Where(m => m.MediaType == "VIDEO" || m.MediaType == "video").ToList();
+
+                <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["Media"]</h2>
+
+                    @if (images.Count > 0)
+                    {
+                        <h3 class="text-lg font-semibold text-gray-700 mb-2">@Localizer["Images"]</h3>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-6">
+                            @foreach (var media in images)
+                            {
+                                <a href="@media.Url"
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   class="block aspect-square bg-gray-100 rounded-lg overflow-hidden hover:opacity-90 transition-opacity">
+                                    <img src="@(media.ThumbnailUrl ?? media.Url)"
+                                         alt="@(media.Description ?? "")"
+                                         class="w-full h-full object-cover"
+                                         loading="lazy" />
+                                </a>
+                            }
+                        </div>
+                    }
+
+                    @if (videos.Count > 0)
+                    {
+                        <h3 class="text-lg font-semibold text-gray-700 mb-2">@Localizer["Videos"]</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                            @foreach (var media in videos)
+                            {
+                                <div class="aspect-video bg-gray-100 rounded-lg overflow-hidden">
+                                    @if (media.Url.Contains("youtube") || media.Url.Contains("youtu.be"))
+                                    {
+                                        <iframe src="@media.Url"
+                                                class="w-full h-full"
+                                                allowfullscreen
+                                                loading="lazy"
+                                                title="@(media.Description ?? "")"></iframe>
+                                    }
+                                    else
+                                    {
+                                        <video src="@media.Url"
+                                               class="w-full h-full object-cover"
+                                               controls
+                                               preload="none"></video>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    }
+                </section>
+            }
+
+            <!-- ============================================================
+                 5. Tags
+                 ============================================================ -->
+            @if (Model.Tags.Count > 0)
+            {
+                <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["Tags"]</h2>
+                    <div class="flex flex-wrap gap-2">
+                        @foreach (var tag in Model.Tags)
+                        {
+                            <a href="/@culture/tags/@tag.Slug"
+                               class="inline-block bg-gray-100 text-gray-700 text-xs px-2.5 py-1 rounded-full hover:bg-gray-200 transition-colors">
+                                #@tag.Name
+                            </a>
+                        }
+                    </div>
+                </section>
+            }
+        </div>
+
+        <!-- ============================================================
+             Sidebar
+             ============================================================ -->
+        <aside class="w-full lg:w-72 flex-shrink-0" role="complementary" aria-label="@Localizer["Mood metadata"]">
+            <div class="bg-gray-50 rounded-lg border border-gray-200 p-5 space-y-4 sticky top-4">
+                <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider">@Localizer["Details"]</h3>
+
+                <div>
+                    <h4 class="text-xs font-medium text-gray-500 uppercase">@Localizer["Name"]</h4>
+                    <p class="mt-1 text-sm text-gray-700">@Model.Name</p>
+                </div>
+
+                <div>
+                    <h4 class="text-xs font-medium text-gray-500 uppercase">@Localizer["Albums"]</h4>
+                    <p class="mt-1 text-sm text-gray-700">@Model.Albums.Count</p>
+                </div>
+
+                <div>
+                    <h4 class="text-xs font-medium text-gray-500 uppercase">@Localizer["Tracks"]</h4>
+                    <p class="mt-1 text-sm text-gray-700">@Model.Tracks.Count</p>
+                </div>
+
+                @if (Model.Tags.Count > 0)
+                {
+                    <div>
+                        <h4 class="text-xs font-medium text-gray-500 uppercase">@Localizer["Tags"]</h4>
+                        <p class="mt-1 text-sm text-gray-700">@Model.Tags.Count</p>
+                    </div>
+                }
+            </div>
+        </aside>
+    </div>
+</div>
+
+<!-- ============================================================
+     JSON-LD Structured Data
+     ============================================================ -->
+<script type="application/ld+json">
+{
+    "@@context": "https://schema.org",
+    "@@type": "DefinedTerm",
+    "name": "@Model.Name",
+    @if (!string.IsNullOrWhiteSpace(Model.Description))
+    {
+        <text>"description": "@Model.Description",</text>
+    }
+    "inDefinedTermSet": "@($"{Context.Request.Scheme}://{Context.Request.Host}/{culture}/moods")"
+}
+</script>

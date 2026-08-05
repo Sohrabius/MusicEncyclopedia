@@ -1,0 +1,89 @@
+@model LocationEditViewModel
+@{
+    ViewData["Title"] = "Create Location";
+    ViewData["ActiveMenu"] = "Locations";
+}
+
+<form method="post" action="/admin/locations/Create">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="mb-4 px-4 py-3 rounded-md bg-red-50 border border-red-200 text-red-800 text-sm" role="alert"></div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 space-y-6">
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Basic Information</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label asp-for="Name" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                        <input asp-for="Name" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                        <span asp-validation-for="Name" class="text-xs text-red-600"></span>
+                    </div>
+                    <div>
+                        <label asp-for="Slug" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                        <input asp-for="Slug" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="location-slug" />
+                        <span asp-validation-for="Slug" class="text-xs text-red-600"></span>
+                    </div>
+                    <div>
+                        <label asp-for="LocationTypeId" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                        <select asp-for="LocationTypeId" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">-- Select Type --</option>
+                            @foreach (var lt in Model.LocationTypes)
+                            {
+                                <option value="@lt.LocationTypeId">@lt.Name</option>
+                            }
+                        </select>
+                        <span asp-validation-for="LocationTypeId" class="text-xs text-red-600"></span>
+                    </div>
+                    <div>
+                        <label asp-for="ParentLocationId" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                        <select asp-for="ParentLocationId" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">-- None --</option>
+                            @foreach (var pl in Model.ParentLocations)
+                            {
+                                <option value="@pl.LocationId">@pl.Name</option>
+                            }
+                        </select>
+                        <span asp-validation-for="ParentLocationId" class="text-xs text-red-600"></span>
+                    </div>
+                    <div>
+                        <label asp-for="CountryId" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                        <select asp-for="CountryId" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">-- Select Country --</option>
+                            @foreach (var c in Model.Countries)
+                            {
+                                <option value="@c.CountryId">@c.Name</option>
+                            }
+                        </select>
+                        <span asp-validation-for="CountryId" class="text-xs text-red-600"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Coordinates</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label asp-for="Latitude" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                        <input asp-for="Latitude" type="number" step="any" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                        <span asp-validation-for="Latitude" class="text-xs text-red-600"></span>
+                    </div>
+                    <div>
+                        <label asp-for="Longitude" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                        <input asp-for="Longitude" type="number" step="any" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                        <span asp-validation-for="Longitude" class="text-xs text-red-600"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-6">
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Publish</h2>
+                <button type="submit" class="w-full px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"><i class="fas fa-save"></i> Create Location</button>
+                <a href="/admin/locations" class="w-full block text-center mt-3 px-4 py-2.5 text-sm text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">Cancel</a>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

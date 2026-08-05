@@ -1,0 +1,824 @@
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer Localizer
+@model MusicEncyclopedia.Web.ViewModels.Public.TrackDetailViewModel
+
+@{
+    var culture = Context.Items["culture"] as string ?? "fa";
+    var dir = Context.Items["dir"] as string ?? "ltr";
+    var isRtl = dir == "rtl";
+    var track = Model.Track;
+
+    // Group credits by role
+    var creditsByRole = track.Credits
+        .OrderBy(c => c.RoleDisplayOrder)
+        .ThenBy(c => c.DisplayOrder)
+        .ThenBy(c => c.PersonFullName ?? c.CompanyName)
+        .GroupBy(c => c.RoleName)
+        .ToList();
+
+    // Separate artist-type credits
+    var artistCredits = track.Credits
+        .Where(c => c.RoleCode is "PRIMARY_ARTIST" or "FEATURED_ARTIST" or "GUEST_ARTIST" or "COLLABORATION"
+                    || c.IsPrimary)
+        .OrderBy(c => c.RoleCode == "PRIMARY_ARTIST" ? 0 : 1)
+        .ThenBy(c => c.DisplayOrder)
+        .ToList();
+}
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" dir="@dir">
+
+    <!-- ============================================================
+         Breadcrumb
+         ============================================================ -->
+    <nav aria-label="@Localizer["Breadcrumb"]" class="mb-6">
+        <ol class="flex items-center gap-2 text-sm text-gray-500">
+            <li><a href="/@culture" class="hover:text-blue-600 transition-colors">@Localizer["Home"]</a></li>
+            <li><span class="mx-1">/</span></li>
+            <li><a href="/@culture/tracks" class="hover:text-blue-600 transition-colors">@Localizer["Tracks"]</a></li>
+            <li><span class="mx-1">/</span></li>
+            <li class="text-gray-900 font-medium truncate max-w-[200px]" aria-current="page">@track.Title</li>
+        </ol>
+    </nav>
+
+    <!-- ============================================================
+         1. Header
+         ============================================================ -->
+    <div class="mb-10">
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-900">@track.Title</h1>
+
+        @if (!string.IsNullOrWhiteSpace(track.OriginalTitle) && track.OriginalTitle != track.Title)
+        {
+            <p class="text-xl text-gray-500 mt-1" dir="auto">@track.OriginalTitle</p>
+        }
+        @if (!string.IsNullOrWhiteSpace(track.EnglishTitle) && track.EnglishTitle != track.Title && track.EnglishTitle != track.OriginalTitle)
+        {
+            <p class="text-lg text-gray-400 mt-0.5" dir="ltr">@track.EnglishTitle</p>
+        }
+
+        <!-- Badges row -->
+        <div class="flex flex-wrap items-center gap-2 mt-3">
+            @if (track.IsInstrumental)
+            {
+                <span class="inline-flex items-center gap-1 bg-purple-100 text-purple-700 text-xs font-medium px-2.5 py-1 rounded-full">
+                    @Localizer["Instrumental"]
+                </span>
+            }
+            @if (track.IsExplicit)
+            {
+                <span class="inline-flex items-center gap-1 bg-red-100 text-red-700 text-xs font-bold px-2.5 py-1 rounded-full"
+                      title="@Localizer["Explicit content"]">
+                    E
+                </span>
+            }
+            @if (!string.IsNullOrWhiteSpace(track.LyricsAvailabilityName))
+            {
+                <span class="inline-flex items-center gap-1 bg-green-100 text-green-700 text-xs font-medium px-2.5 py-1 rounded-full">
+                    @track.LyricsAvailabilityName
+                </span>
+            }
+        </div>
+
+        <!-- Metadata row -->
+        <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-4 text-sm text-gray-600">
+            @if (track.DurationSeconds.HasValue)
+            {
+                <span class="tabular-nums">
+                    @TimeSpan.FromSeconds(track.DurationSeconds.Value).ToString(@"m\:ss")
+                </span>
+            }
+            @if (!string.IsNullOrWhiteSpace(track.Isrc))
+            {
+                <span class="font-mono text-xs">@Localizer["ISRC"]: @track.Isrc</span>
+            }
+            @if (track.Bpm.HasValue)
+            {
+                <span>@track.Bpm.Value @Localizer["BPM"]</span>
+            }
+            @if (!string.IsNullOrWhiteSpace(track.MusicalKeyName))
+            {
+                <span>@Localizer["Key"]: @track.MusicalKeyName</span>
+            }
+            @if (!string.IsNullOrWhiteSpace(track.VocalStyleName))
+            {
+                <span>@Localizer["Vocal"]: @track.VocalStyleName</span>
+            }
+        </div>
+
+        <!-- Artists -->
+        @if (artistCredits.Count > 0)
+        {
+            <div class="mt-4">
+                <h2 class="text-sm font-medium text-gray-700">@Localizer["Artists"]</h2>
+                <div class="flex flex-wrap gap-2 mt-1">
+                    @foreach (var artist in artistCredits)
+                    {
+                        <a href="/@culture/people/@(artist.PersonSlug ?? artist.CompanySlug)"
+                           class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                            @(artist.PersonFullName ?? artist.CompanyName)
+                        </a>
+                        @if (!string.IsNullOrWhiteSpace(artist.RoleCode) && artist.RoleCode != "PRIMARY_ARTIST")
+                        {
+                            <span class="text-xs text-gray-400">(@artist.RoleName)</span>
+                        }
+                    }
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="flex flex-col lg:flex-row gap-8">
+        <!-- ============================================================
+             Main Content
+             ============================================================ -->
+        <div class="flex-1 min-w-0 space-y-10">
+
+            <!-- ============================================================
+                 2. Album Appearances
+                 ============================================================ -->
+            @if (track.Albums.Count > 0)
+            {
+                <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["Album Appearances"]</h2>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="border-b border-gray-200 text-gray-500 text-xs uppercase tracking-wider">
+                                    <th class="text-start py-2 pe-4">@Localizer["Album"]</th>
+                                    <th class="text-start py-2 pe-4">@Localizer["Category"]</th>
+                                    <th class="text-center py-2 px-2">@Localizer["Disc"]</th>
+                                    <th class="text-center py-2 px-2">@Localizer["Track"]</th>
+                                    <th class="text-center py-2 px-2">@Localizer["Year"]</th>
+                                    <th class="text-end py-2 ps-4">@Localizer["Duration"]</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var appearance in track.Albums.OrderBy(a => a.ReleaseDate).ThenBy(a => a.DiscNumber).ThenBy(a => a.SequenceNumber))
+                                {
+                                    <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                                        <td class="py-2 pe-4">
+                                            <a href="/@culture/albums/@appearance.AlbumSlug"
+                                               class="text-blue-600 hover:text-blue-800 font-medium">
+                                                @appearance.AlbumTitle
+                                            </a>
+                                        </td>
+                                        <td class="py-2 pe-4 text-gray-600">@(appearance.CategoryName ?? "—")</td>
+                                        <td class="py-2 px-2 text-center text-gray-600">@appearance.DiscNumber</td>
+                                        <td class="py-2 px-2 text-center text-gray-600">@appearance.TrackNumber</td>
+                                        <td class="py-2 px-2 text-center text-gray-600">
+                                            @if (appearance.ReleaseDate.HasValue)
+                                            {
+                                                @appearance.ReleaseDate.Value.Year
+                                            }
+                                            else
+                                            {
+                                                <span class="text-gray-300">—</span>
+                                            }
+                                        </td>
+                                        <td class="py-2 ps-4 text-end text-gray-500 tabular-nums">
+                                            @if (appearance.DurationSecondsOverride.HasValue)
+                                            {
+                                                @TimeSpan.FromSeconds(appearance.DurationSecondsOverride.Value).ToString(@"m\:ss")
+                                                <span class="text-xs text-gray-400 ms-1" title="@Localizer["Override"]">*</span>
+                                            }
+                                            else if (track.DurationSeconds.HasValue)
+                                            {
+                                                @TimeSpan.FromSeconds(track.DurationSeconds.Value).ToString(@"m\:ss")
+                                            }
+                                            else
+                                            {
+                                                <span class="text-gray-300">—</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            }
+
+            <!-- ============================================================
+                 4. Genres and Moods
+                 ============================================================ -->
+            @if (track.Genres.Count > 0 || track.Moods.Count > 0)
+            {
+                <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["Genres & Moods"]</h2>
+                    <div class="flex flex-wrap gap-6">
+                        @if (track.Genres.Count > 0)
+                        {
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-500 mb-2">@Localizer["Genres"]</h3>
+                                <div class="flex flex-wrap gap-2">
+                                    @foreach (var genre in track.Genres)
+                                    {
+                                        <a href="/@culture/genres/@genre.Slug"
+                                           class="inline-block bg-blue-50 text-blue-700 text-xs px-2.5 py-1 rounded-full hover:bg-blue-100 transition-colors">
+                                            @genre.Name
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                        }
+                        @if (track.Moods.Count > 0)
+                        {
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-500 mb-2">@Localizer["Moods"]</h3>
+                                <div class="flex flex-wrap gap-2">
+                                    @foreach (var mood in track.Moods)
+                                    {
+                                        <a href="/@culture/moods/@mood.Slug"
+                                           class="inline-block bg-indigo-50 text-indigo-700 text-xs px-2.5 py-1 rounded-full hover:bg-indigo-100 transition-colors">
+                                            @mood.Name
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            }
+
+            <!-- ============================================================
+                 5. Instruments & 6. Musicians
+                 ============================================================ -->
+            @if (track.Instruments.Count > 0 || track.Musicians.Count > 0)
+            {
+                <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["Instruments & Musicians"]</h2>
+
+                    @if (track.Instruments.Count > 0)
+                    {
+                        <div class="mb-4">
+                            <h3 class="text-sm font-medium text-gray-500 mb-2">@Localizer["Instruments"]</h3>
+                            <div class="flex flex-wrap gap-2">
+                                @foreach (var instrument in track.Instruments)
+                                {
+                                    <a href="/@culture/instruments/@instrument.Slug"
+                                       class="inline-block bg-amber-50 text-amber-700 text-xs px-2.5 py-1 rounded-full hover:bg-amber-100 transition-colors">
+                                        @instrument.Name
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    @if (track.Musicians.Count > 0)
+                    {
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-500 mb-2">@Localizer["Musicians"]</h3>
+                            <ul class="space-y-1.5">
+                                @foreach (var musician in track.Musicians)
+                                {
+                                    <li class="text-sm text-gray-700">
+                                        <a href="/@culture/people/@musician.PersonSlug"
+                                           class="text-blue-600 hover:text-blue-800 font-medium">
+                                            @musician.PersonFullName
+                                        </a>
+                                        @if (!string.IsNullOrWhiteSpace(musician.InstrumentName))
+                                        {
+                                            <span class="text-gray-500"> — @musician.InstrumentName</span>
+                                        }
+                                        @if (!string.IsNullOrWhiteSpace(musician.Notes))
+                                        {
+                                            <span class="text-gray-400 text-xs ms-1">(@musician.Notes)</span>
+                                        }
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                </section>
+            }
+
+            <!-- ============================================================
+                 3. Credits (non-artist, non-musician)
+                 ============================================================ -->
+            @{
+                var otherCredits = creditsByRole
+                    .Where(g => g.Key != "PRIMARY_ARTIST" && g.Key != "FEATURED_ARTIST" && g.Key != "GUEST_ARTIST"
+                                && g.Key != "MUSICIAN" && g.Key != "COLLABORATION")
+                    .ToList();
+            }
+            @if (otherCredits.Count > 0)
+            {
+                <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["Credits"]</h2>
+                    <div class="space-y-5">
+                        @foreach (var roleGroup in otherCredits)
+                        {
+                            <div>
+                                <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">@roleGroup.Key</h3>
+                                <ul class="space-y-1.5">
+                                    @foreach (var credit in roleGroup)
+                                    {
+                                        <li class="text-sm text-gray-700">
+                                            @if (credit.PersonId.HasValue)
+                                            {
+                                                <a href="/@culture/people/@credit.PersonSlug"
+                                                   class="text-blue-600 hover:text-blue-800 font-medium">
+                                                    @credit.PersonFullName
+                                                </a>
+                                            }
+                                            else if (credit.CompanyId.HasValue)
+                                            {
+                                                <a href="/@culture/companies/@credit.CompanySlug"
+                                                   class="text-blue-600 hover:text-blue-800 font-medium">
+                                                    @credit.CompanyName
+                                                </a>
+                                            }
+                                            @if (!string.IsNullOrWhiteSpace(credit.Notes))
+                                            {
+                                                <span class="text-gray-400 text-xs ms-1">(@credit.Notes)</span>
+                                            }
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+                    </div>
+                </section>
+            }
+
+            <!-- ============================================================
+                 7. Lyrics
+                 ============================================================ -->
+            <section>
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["Lyrics"]</h2>
+                @if (Model.LyricsSectionVisible)
+                {
+                    <div class="prose prose-gray max-w-none bg-gray-50 rounded-lg border border-gray-200 p-6">
+                        @* Lyrics text would be rendered here from TrackLyricDto when available.
+                           Currently the TrackDetailDto does not include lyric text in this DTO version. *@
+                        <p class="text-gray-500 italic">
+                            @Localizer["Lyrics content will be displayed here when available."]
+                        </p>
+                    </div>
+                }
+                else if (!string.IsNullOrWhiteSpace(Model.LyricsMessage))
+                {
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm text-yellow-800">
+                        @Model.LyricsMessage
+                    </div>
+                }
+            </section>
+
+            <!-- ============================================================
+                 14. Awards & Certifications
+                 ============================================================ -->
+            @if (track.Awards.Count > 0)
+            {
+                <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["Awards"]</h2>
+                    <div class="space-y-3">
+                        @foreach (var award in track.Awards.OrderByDescending(a => a.AwardDate))
+                        {
+                            <div class="flex items-start gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                <div class="flex-1 min-w-0">
+                                    <a href="/@culture/awards/@award.AwardSlug"
+                                       class="text-blue-600 hover:text-blue-800 font-medium">
+                                        @award.AwardName
+                                    </a>
+                                    @if (!string.IsNullOrWhiteSpace(award.Category))
+                                    {
+                                        <span class="text-gray-500"> — @award.Category</span>
+                                    }
+                                    <div class="text-sm text-gray-500 mt-0.5">
+                                        @if (award.AwardDate.HasValue)
+                                        {
+                                            <span>@award.AwardDate.Value.ToString("yyyy")</span>
+                                        }
+                                        @if (!string.IsNullOrWhiteSpace(award.Result))
+                                        {
+                                            <span class="ms-2 font-medium @(award.Result == "Winner" ? "text-green-600" : "text-gray-600")">
+                                                @award.Result
+                                            </span>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            }
+
+            @if (track.Certifications.Count > 0)
+            {
+                <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["Certifications"]</h2>
+                    <div class="space-y-3">
+                        @foreach (var cert in track.Certifications.OrderByDescending(c => c.CertificationDate))
+                        {
+                            <div class="flex items-center gap-3 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                                <div class="flex-1">
+                                    <span class="font-medium text-gray-900">@cert.CertificationName</span>
+                                    @if (!string.IsNullOrWhiteSpace(cert.Country))
+                                    {
+                                        <span class="text-gray-500 text-sm ms-2">(@cert.Country)</span>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            }
+
+            <!-- ============================================================
+                 15. Chart History
+                 ============================================================ -->
+            @if (track.ChartEntries.Count > 0)
+            {
+                <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["Chart History"]</h2>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="border-b border-gray-200 text-gray-500 text-xs uppercase tracking-wider">
+                                    <th class="text-start py-2 pe-4">@Localizer["Chart"]</th>
+                                    <th class="text-start py-2 pe-4">@Localizer["Date"]</th>
+                                    <th class="text-center py-2 px-2">@Localizer["Position"]</th>
+                                    <th class="text-center py-2 px-2">@Localizer["Previous"]</th>
+                                    <th class="text-center py-2 px-2">@Localizer["Weeks"]</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var entry in track.ChartEntries.OrderByDescending(e => e.Date))
+                                {
+                                    <tr class="border-b border-gray-100">
+                                        <td class="py-2 pe-4">
+                                            <a href="/@culture/charts/@entry.ChartSlug"
+                                               class="text-blue-600 hover:text-blue-800">
+                                                @entry.ChartName
+                                            </a>
+                                        </td>
+                                        <td class="py-2 pe-4 text-gray-600">@entry.Date.ToString("yyyy-MM-dd")</td>
+                                        <td class="py-2 px-2 text-center font-semibold text-gray-900">@entry.Position</td>
+                                        <td class="py-2 px-2 text-center text-gray-500">
+                                            @if (entry.PreviousPosition.HasValue)
+                                            {
+                                                @entry.PreviousPosition.Value
+                                            }
+                                            else
+                                            {
+                                                <span class="text-gray-300">—</span>
+                                            }
+                                        </td>
+                                        <td class="py-2 px-2 text-center text-gray-500">
+                                            @if (entry.WeeksOnChart.HasValue)
+                                            {
+                                                @entry.WeeksOnChart.Value
+                                            }
+                                            else
+                                            {
+                                                <span class="text-gray-300">—</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            }
+
+            <!-- ============================================================
+                 16. Media (Audio preview, video, PDF, score)
+                 ============================================================ -->
+            @{
+                var audioMedia = track.Media.Where(m => m.MediaType == "AUDIO").ToList();
+                var videoMedia = track.Media.Where(m => m.MediaType == "VIDEO").ToList();
+                var pdfMedia = track.Media.Where(m => m.MediaType == "PDF").ToList();
+                var imageMedia = track.Media.Where(m => m.MediaType == "IMAGE").ToList();
+            }
+            @if (audioMedia.Count > 0 || videoMedia.Count > 0 || pdfMedia.Count > 0 || imageMedia.Count > 0)
+            {
+                <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["Media"]</h2>
+
+                    @if (audioMedia.Count > 0)
+                    {
+                        <div class="mb-6">
+                            <h3 class="text-sm font-medium text-gray-500 mb-2">@Localizer["Audio Preview"]</h3>
+                            <div class="space-y-2">
+                                @foreach (var media in audioMedia)
+                                {
+                                    <audio src="@media.Url"
+                                           controls
+                                           preload="none"
+                                           class="w-full"
+                                           aria-label="@(media.Description ?? "")">
+                                        @Localizer["Your browser does not support the audio element."]
+                                    </audio>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    @if (videoMedia.Count > 0)
+                    {
+                        <div class="mb-6">
+                            <h3 class="text-sm font-medium text-gray-500 mb-2">@Localizer["Music Video"]</h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                @foreach (var media in videoMedia)
+                                {
+                                    <div class="aspect-video bg-gray-100 rounded-lg overflow-hidden">
+                                        @if (media.Url.Contains("youtube") || media.Url.Contains("youtu.be"))
+                                        {
+                                            <iframe src="@media.Url"
+                                                    class="w-full h-full"
+                                                    allowfullscreen
+                                                    loading="lazy"
+                                                    title="@(media.Description ?? "")"></iframe>
+                                        }
+                                        else
+                                        {
+                                            <video src="@media.Url"
+                                                   class="w-full h-full object-cover"
+                                                   controls
+                                                   preload="none"></video>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    @if (pdfMedia.Count > 0)
+                    {
+                        <div class="mb-6">
+                            <h3 class="text-sm font-medium text-gray-500 mb-2">@Localizer["Lyric Sheets & Scores"]</h3>
+                            <div class="flex flex-wrap gap-3">
+                                @foreach (var media in pdfMedia)
+                                {
+                                    <a href="@media.Url"
+                                       target="_blank"
+                                       rel="noopener noreferrer"
+                                       class="inline-flex items-center gap-2 bg-red-50 text-red-700 text-sm font-medium px-4 py-2 rounded-lg border border-red-200 hover:bg-red-100 transition-colors">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                        </svg>
+                                        @(media.Description ?? Localizer["PDF"].ToString())
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    @if (imageMedia.Count > 0)
+                    {
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-500 mb-2">@Localizer["Images"]</h3>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                                @foreach (var media in imageMedia)
+                                {
+                                    <a href="@media.Url"
+                                       target="_blank"
+                                       rel="noopener noreferrer"
+                                       class="block aspect-square bg-gray-100 rounded-lg overflow-hidden hover:opacity-90 transition-opacity">
+                                        <img src="@(media.ThumbnailUrl ?? media.Url)"
+                                             alt="@(media.Description ?? "")"
+                                             class="w-full h-full object-cover"
+                                             loading="lazy" />
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    }
+                </section>
+            }
+
+            <!-- ============================================================
+                 17. Links
+                 ============================================================ -->
+            @if (track.Links.Count > 0)
+            {
+                <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["Links"]</h2>
+                    <ul class="space-y-1.5">
+                        @foreach (var link in track.Links)
+                        {
+                            <li>
+                                <a href="@link.Url"
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                    @(!string.IsNullOrWhiteSpace(link.Title) ? link.Title : link.Url)
+                                </a>
+                                @if (!string.IsNullOrWhiteSpace(link.LinkType))
+                                {
+                                    <span class="text-gray-400 text-xs ms-1">[@link.LinkType]</span>
+                                }
+                            </li>
+                        }
+                    </ul>
+                </section>
+            }
+
+            <!-- ============================================================
+                 18. References / Citations
+                 ============================================================ -->
+            @if (track.Citations.Count > 0)
+            {
+                <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["References"]</h2>
+                    <ol class="space-y-3 list-decimal list-inside">
+                        @foreach (var citation in track.Citations)
+                        {
+                            <li class="text-sm text-gray-700">
+                                @if (!string.IsNullOrWhiteSpace(citation.Quote))
+                                {
+                                    <span class="font-medium">"@citation.Quote"</span>
+                                    <br />
+                                }
+                                <span class="text-gray-500">
+                                    @if (!string.IsNullOrWhiteSpace(citation.SourceName))
+                                    {
+                                        <a href="/@culture/sources/@citation.SourceSlug"
+                                           class="text-blue-600 hover:text-blue-800">
+                                            @citation.SourceName
+                                        </a>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(citation.PageNumber))
+                                    {
+                                        <span>, @Localizer["p."] @citation.PageNumber</span>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(citation.Url))
+                                    {
+                                        <a href="@citation.Url"
+                                           target="_blank"
+                                           rel="noopener noreferrer"
+                                           class="text-blue-600 hover:text-blue-800 ms-1">
+                                            @Localizer["Source"]
+                                        </a>
+                                    }
+                                </span>
+                            </li>
+                        }
+                    </ol>
+                </section>
+            }
+
+            <!-- ============================================================
+                 19. Tags
+                 ============================================================ -->
+            @if (track.Tags.Count > 0)
+            {
+                <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["Tags"]</h2>
+                    <div class="flex flex-wrap gap-2">
+                        @foreach (var tag in track.Tags)
+                        {
+                            <a href="/@culture/tags/@tag.Slug"
+                               class="inline-block bg-gray-100 text-gray-700 text-xs px-2.5 py-1 rounded-full hover:bg-gray-200 transition-colors">
+                                #@tag.Name
+                            </a>
+                        }
+                    </div>
+                </section>
+            }
+
+            <!-- ============================================================
+                 20. Aliases
+                 ============================================================ -->
+            @if (track.Aliases.Count > 0)
+            {
+                <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["Also Known As"]</h2>
+                    <ul class="space-y-1.5">
+                        @foreach (var alias in track.Aliases)
+                        {
+                            <li class="text-sm text-gray-700">
+                                <span dir="auto">@alias.AliasName</span>
+                                @if (!string.IsNullOrWhiteSpace(alias.Language))
+                                {
+                                    <span class="text-gray-400 text-xs ms-2">(@alias.Language)</span>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(alias.AliasType))
+                                {
+                                    <span class="text-gray-400 text-xs ms-1">[@alias.AliasType]</span>
+                                }
+                            </li>
+                        }
+                    </ul>
+                </section>
+            }
+        </div>
+
+        <!-- ============================================================
+             Sidebar
+             ============================================================ -->
+        <aside class="w-full lg:w-72 flex-shrink-0" role="complementary" aria-label="@Localizer["Track metadata"]">
+            <div class="bg-gray-50 rounded-lg border border-gray-200 p-5 space-y-4 sticky top-4">
+
+                <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider">@Localizer["Details"]</h3>
+
+                <!-- Duration -->
+                @if (track.DurationSeconds.HasValue)
+                {
+                    <div>
+                        <h4 class="text-xs font-medium text-gray-500 uppercase">@Localizer["Duration"]</h4>
+                        <p class="mt-1 text-sm text-gray-700 tabular-nums">
+                            @TimeSpan.FromSeconds(track.DurationSeconds.Value).ToString(@"m\:ss")
+                        </p>
+                    </div>
+                }
+
+                <!-- ISRC -->
+                @if (!string.IsNullOrWhiteSpace(track.Isrc))
+                {
+                    <div>
+                        <h4 class="text-xs font-medium text-gray-500 uppercase">ISRC</h4>
+                        <p class="mt-1 text-sm text-gray-700 font-mono">@track.Isrc</p>
+                    </div>
+                }
+
+                <!-- BPM -->
+                @if (track.Bpm.HasValue)
+                {
+                    <div>
+                        <h4 class="text-xs font-medium text-gray-500 uppercase">BPM</h4>
+                        <p class="mt-1 text-sm text-gray-700 tabular-nums">@track.Bpm.Value</p>
+                    </div>
+                }
+
+                <!-- Musical Key -->
+                @if (!string.IsNullOrWhiteSpace(track.MusicalKeyName))
+                {
+                    <div>
+                        <h4 class="text-xs font-medium text-gray-500 uppercase">@Localizer["Key"]</h4>
+                        <p class="mt-1 text-sm text-gray-700">@track.MusicalKeyName</p>
+                    </div>
+                }
+
+                <!-- Vocal Style -->
+                @if (!string.IsNullOrWhiteSpace(track.VocalStyleName))
+                {
+                    <div>
+                        <h4 class="text-xs font-medium text-gray-500 uppercase">@Localizer["Vocal Style"]</h4>
+                        <p class="mt-1 text-sm text-gray-700">@track.VocalStyleName</p>
+                    </div>
+                }
+
+                <!-- Lyrics Availability -->
+                @if (!string.IsNullOrWhiteSpace(track.LyricsAvailabilityName))
+                {
+                    <div>
+                        <h4 class="text-xs font-medium text-gray-500 uppercase">@Localizer["Lyrics"]</h4>
+                        <p class="mt-1 text-sm text-gray-700">@track.LyricsAvailabilityName</p>
+                    </div>
+                }
+            </div>
+        </aside>
+    </div>
+</div>
+
+<!-- ============================================================
+     JSON-LD Structured Data: MusicRecording
+     ============================================================ -->
+<script type="application/ld+json">
+{
+    "@@context": "https://schema.org",
+    "@@type": "MusicRecording",
+    "name": "@track.Title",
+    @if (!string.IsNullOrWhiteSpace(track.OriginalTitle))
+    {
+        <text>"alternateName": "@track.OriginalTitle",</text>
+    }
+    @if (track.DurationSeconds.HasValue)
+    {
+        <text>"duration": "PT@(TimeSpan.FromSeconds(track.DurationSeconds.Value).Minutes)M@(TimeSpan.FromSeconds(track.DurationSeconds.Value).Seconds)S",</text>
+    }
+    @if (!string.IsNullOrWhiteSpace(track.Isrc))
+    {
+        <text>"isrcCode": "@track.Isrc",</text>
+    }
+    "byArtist": [
+        @foreach (var artist in artistCredits)
+        {
+            <text>
+            {
+                "@@type": "@(artist.PersonId.HasValue ? "Person" : "Organization")",
+                "name": "@(artist.PersonFullName ?? artist.CompanyName)"
+            }@(artist != artistCredits.Last() ? "," : "")
+            </text>
+        }
+    ],
+    "inAlbum": [
+        @foreach (var appearance in track.Albums)
+        {
+            <text>
+            {
+                "@@type": "MusicAlbum",
+                "name": "@appearance.AlbumTitle"
+            }@(appearance != track.Albums.Last() ? "," : "")
+            </text>
+        }
+    ],
+    "genre": [
+        @foreach (var genre in track.Genres)
+        {
+            <text>"@genre.Name"@(genre != track.Genres.Last() ? "," : "")</text>
+        }
+    ]
+}
+</script>

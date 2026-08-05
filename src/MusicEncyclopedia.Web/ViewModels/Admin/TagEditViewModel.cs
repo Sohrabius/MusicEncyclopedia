@@ -1,0 +1,28 @@
+using System.ComponentModel.DataAnnotations;
+
+namespace MusicEncyclopedia.Web.ViewModels.Admin;
+
+/// <summary>
+/// View model for the tag create/edit form.
+/// Maps to/from the <see cref="Data.Entities.Tag"/> entity.
+/// </summary>
+public sealed class TagEditViewModel
+{
+    public int TagId { get; set; }
+
+    [Required(ErrorMessage = "Name is required.")]
+    [StringLength(255, ErrorMessage = "Name must not exceed 255 characters.")]
+    [Display(Name = "Name")]
+    public string Name { get; set; } = "";
+
+    [Display(Name = "Description")]
+    public string? Description { get; set; }
+
+    [Required(ErrorMessage = "Slug is required.")]
+    [StringLength(255, ErrorMessage = "Slug must not exceed 255 characters.")]
+    [RegularExpression(@"^[a-z0-9\-]+$", ErrorMessage = "Slug may only contain lowercase letters, digits, and hyphens.")]
+    [Display(Name = "Slug")]
+    public string Slug { get; set; } = "";
+
+    public byte[]? RowVersion { get; set; }
+}

@@ -1,0 +1,515 @@
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer Localizer
+@model MusicEncyclopedia.Web.ViewModels.Public.SungVersionDetailViewModel
+
+@{
+    var culture = Context.Items["culture"] as string ?? "fa";
+    var dir = Context.Items["dir"] as string ?? "ltr";
+    var isRtl = dir == "rtl";
+    dynamic sv = Model.SungVersion;
+
+    // Helper: safely get a string value from a dynamic object
+    string? SafeString(dynamic obj, string prop)
+    {
+        try
+        {
+            var val = (object?)obj.GetType().GetProperty(prop)?.GetValue(obj, null);
+            return val?.ToString();
+        }
+        catch { return null; }
+    }
+
+    List<dynamic> SafeList(dynamic obj, string prop)
+    {
+        try
+        {
+            var val = (object?)obj.GetType().GetProperty(prop)?.GetValue(obj, null);
+            if (val is System.Collections.IEnumerable enumerable)
+            {
+                var list = new List<dynamic>();
+                foreach (var item in enumerable) list.Add(item);
+                return list;
+            }
+        }
+        catch { }
+        return new List<dynamic>();
+    }
+
+    dynamic? SafeObject(dynamic obj, string prop)
+    {
+        try
+        {
+            return (object?)obj.GetType().GetProperty(prop)?.GetValue(obj, null);
+        }
+        catch { return null; }
+    }
+
+    // Extract properties
+    var title = SafeString(sv, "Title") ?? "";
+    var text = SafeString(sv, "Text");
+    var notes = SafeString(sv, "Notes");
+    var isCanonical = false;
+    try { isCanonical = (bool)sv.IsCanonical; } catch { }
+    var vocalStyleName = SafeString(sv, "VocalStyleName");
+
+    var poem = SafeObject(sv, "Poem");
+    var poemTitle = poem is not null ? SafeString(poem, "Title") : null;
+    var poemSlug = poem is not null ? SafeString(poem, "Slug") : null;
+    var poemCanonicalText = poem is not null ? SafeString(poem, "CanonicalText") : null;
+
+    var poet = SafeObject(sv, "Poet");
+    var poetName = poet is not null ? SafeString(poet, "FullName") ?? SafeString(poet, "Name") : null;
+    var poetSlug = poet is not null ? SafeString(poet, "Slug") : null;
+
+    var tracks = SafeList(sv, "Tracks");
+    var media = SafeList(sv, "Media");
+    var links = SafeList(sv, "Links");
+    var citations = SafeList(sv, "Citations");
+    var tags = SafeList(sv, "Tags");
+}
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" dir="@dir">
+
+    <!-- ============================================================
+         Breadcrumb
+         ============================================================ -->
+    <nav aria-label="@Localizer["Breadcrumb"]" class="mb-6">
+        <ol class="flex items-center gap-2 text-sm text-gray-500">
+            <li><a href="/@culture" class="hover:text-blue-600 transition-colors">@Localizer["Home"]</a></li>
+            <li><span class="mx-1">/</span></li>
+            <li><a href="/@culture/poems" class="hover:text-blue-600 transition-colors">@Localizer["Poems"]</a></li>
+            <li><span class="mx-1">/</span></li>
+            @if (!string.IsNullOrWhiteSpace(poemSlug))
+            {
+                <li><a href="/@culture/poems/@poemSlug" class="hover:text-blue-600 transition-colors">@poemTitle</a></li>
+                <li><span class="mx-1">/</span></li>
+            }
+            <li class="text-gray-900 font-medium truncate max-w-[200px]" aria-current="page">@title</li>
+        </ol>
+    </nav>
+
+    <!-- ============================================================
+         1. Header
+         ============================================================ -->
+    <div class="mb-10">
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-900">@title</h1>
+
+        <!-- Poet -->
+        @if (!string.IsNullOrWhiteSpace(poetName))
+        {
+            <p class="text-lg text-gray-500 mt-1">
+                @Localizer["by"]
+                @if (!string.IsNullOrWhiteSpace(poetSlug))
+                {
+                    <a href="/@culture/poets/@poetSlug" class="text-blue-600 hover:text-blue-800 font-medium">@poetName</a>
+                }
+                else
+                {
+                    <span class="font-medium">@poetName</span>
+                }
+            </p>
+        }
+
+        <!-- Original Poem link -->
+        @if (!string.IsNullOrWhiteSpace(poemSlug))
+        {
+            <p class="mt-1">
+                <span class="text-gray-500 text-sm">@Localizer["Based on poem:"]</span>
+                <a href="/@culture/poems/@poemSlug" class="text-blue-600 hover:text-blue-800 text-sm font-medium">@poemTitle</a>
+            </p>
+        }
+
+        <!-- Badges -->
+        <div class="flex flex-wrap items-center gap-2 mt-3">
+            @if (isCanonical)
+            {
+                <span class="inline-flex items-center gap-1 bg-green-100 text-green-700 text-xs font-medium px-2.5 py-1 rounded-full">
+                    @Localizer["Canonical"]
+                </span>
+            }
+            @if (!string.IsNullOrWhiteSpace(vocalStyleName))
+            {
+                <span class="inline-flex items-center gap-1 bg-purple-100 text-purple-700 text-xs font-medium px-2.5 py-1 rounded-full">
+                    @vocalStyleName
+                </span>
+            }
+            <span class="inline-block bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                @Localizer["Sung Version"]
+            </span>
+        </div>
+    </div>
+
+    <div class="flex flex-col lg:flex-row gap-8">
+        <!-- ============================================================
+             Main Content
+             ============================================================ -->
+        <div class="flex-1 min-w-0 space-y-10">
+
+            <!-- ============================================================
+                 2. Sung Text
+                 ============================================================ -->
+            @if (!string.IsNullOrWhiteSpace(text))
+            {
+                <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["Sung Text"]</h2>
+                    <div class="prose prose-gray max-w-none text-gray-700 leading-relaxed whitespace-pre-line font-serif text-lg">
+                        @text
+                    </div>
+                </section>
+            }
+
+            <!-- ============================================================
+                 3. Differences from Original Poem
+                 ============================================================ -->
+            @if (!string.IsNullOrWhiteSpace(text) && !string.IsNullOrWhiteSpace(poemCanonicalText) && text != poemCanonicalText)
+            {
+                <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["Differences from Original"]</h2>
+                    <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-amber-800">
+                        <p>@Localizer["The sung version text differs from the original poem canonical text."]</p>
+                        <a href="/@culture/poems/@poemSlug#canonical-text"
+                           class="text-blue-600 hover:text-blue-800 font-medium mt-2 inline-block">
+                            @Localizer["View original poem"] &rarr;
+                        </a>
+                    </div>
+                </section>
+            }
+
+            <!-- ============================================================
+                 4. Notes
+                 ============================================================ -->
+            @if (!string.IsNullOrWhiteSpace(notes))
+            {
+                <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["Notes"]</h2>
+                    <div class="text-gray-700 leading-relaxed">@notes</div>
+                </section>
+            }
+
+            <!-- ============================================================
+                 5. Tracks
+                 ============================================================ -->
+            @if (tracks.Count > 0)
+            {
+                <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["Tracks Using This Version"]</h2>
+                    <div class="space-y-2">
+                        @foreach (var track in tracks)
+                        {
+                            string? trackTitle = null;
+                            string? trackSlug = null;
+                            int? duration = null;
+                            try { trackTitle = (string?)track.Title; } catch { }
+                            try { trackSlug = (string?)track.Slug; } catch { }
+                            try { duration = (int?)track.DurationSeconds; } catch { }
+
+                            <div class="flex items-center justify-between bg-white rounded-lg p-3 border border-gray-200">
+                                @if (!string.IsNullOrWhiteSpace(trackSlug))
+                                {
+                                    <a href="/@culture/tracks/@trackSlug"
+                                       class="font-medium text-blue-600 hover:text-blue-800">
+                                        @trackTitle
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="font-medium text-gray-700">@trackTitle</span>
+                                }
+                                @if (duration.HasValue)
+                                {
+                                    <span class="text-sm text-gray-400 tabular-nums">
+                                        @TimeSpan.FromSeconds(duration.Value).ToString(@"m\:ss")
+                                    </span>
+                                }
+                            </div>
+                        }
+                    </div>
+                </section>
+            }
+
+            <!-- ============================================================
+                 6. Media Gallery
+                 ============================================================ -->
+            @if (media.Count > 0)
+            {
+                var images = new List<dynamic>();
+                var videos = new List<dynamic>();
+                foreach (var m in media)
+                {
+                    string? mediaType = null;
+                    try { mediaType = (string?)m.MediaType ?? (string?)m.Type; } catch { }
+                    if (string.Equals(mediaType, "IMAGE", StringComparison.OrdinalIgnoreCase)) images.Add(m);
+                    else if (string.Equals(mediaType, "VIDEO", StringComparison.OrdinalIgnoreCase)) videos.Add(m);
+                }
+
+                <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["Media"]</h2>
+
+                    @if (images.Count > 0)
+                    {
+                        <h3 class="text-lg font-semibold text-gray-700 mb-2">@Localizer["Images"]</h3>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-6">
+                            @foreach (var img in images)
+                            {
+                                string? imgUrl = null;
+                                string? thumbUrl = null;
+                                string? imgDesc = null;
+                                try { imgUrl = (string?)img.Url; } catch { }
+                                try { thumbUrl = (string?)img.ThumbnailUrl ?? imgUrl; } catch { }
+                                try { imgDesc = (string?)img.Description; } catch { }
+
+                                <a href="@imgUrl"
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   class="block aspect-square bg-gray-100 rounded-lg overflow-hidden hover:opacity-90 transition-opacity">
+                                    <img src="@(thumbUrl ?? imgUrl)"
+                                         alt="@(imgDesc ?? "")"
+                                         class="w-full h-full object-cover"
+                                         loading="lazy" />
+                                </a>
+                            }
+                        </div>
+                    }
+
+                    @if (videos.Count > 0)
+                    {
+                        <h3 class="text-lg font-semibold text-gray-700 mb-2">@Localizer["Videos"]</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                            @foreach (var vid in videos)
+                            {
+                                string? vidUrl = null;
+                                string? vidDesc = null;
+                                try { vidUrl = (string?)vid.Url; } catch { }
+                                try { vidDesc = (string?)vid.Description; } catch { }
+
+                                <div class="aspect-video bg-gray-100 rounded-lg overflow-hidden">
+                                    @if (vidUrl is not null && (vidUrl.Contains("youtube") || vidUrl.Contains("youtu.be")))
+                                    {
+                                        <iframe src="@vidUrl"
+                                                class="w-full h-full"
+                                                allowfullscreen
+                                                loading="lazy"
+                                                title="@(vidDesc ?? "")"></iframe>
+                                    }
+                                    else if (vidUrl is not null)
+                                    {
+                                        <video src="@vidUrl"
+                                               class="w-full h-full object-cover"
+                                               controls
+                                               preload="none"></video>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    }
+                </section>
+            }
+
+            <!-- ============================================================
+                 7. References / Citations
+                 ============================================================ -->
+            @if (citations.Count > 0)
+            {
+                <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["References"]</h2>
+                    <ol class="space-y-3 list-decimal list-inside">
+                        @foreach (var citation in citations)
+                        {
+                            string? quote = null;
+                            string? sourceName = null;
+                            string? sourceSlug = null;
+                            string? pageNumber = null;
+                            string? citationUrl = null;
+                            try { quote = (string?)citation.Quote; } catch { }
+                            try { sourceName = (string?)citation.SourceName; } catch { }
+                            try { sourceSlug = (string?)citation.SourceSlug; } catch { }
+                            try { pageNumber = (string?)citation.PageNumber; } catch { }
+                            try { citationUrl = (string?)citation.Url; } catch { }
+
+                            <li class="text-sm text-gray-700">
+                                @if (!string.IsNullOrWhiteSpace(quote))
+                                {
+                                    <span class="font-medium">"@quote"</span>
+                                    <br />
+                                }
+                                <span class="text-gray-500">
+                                    @if (!string.IsNullOrWhiteSpace(sourceSlug))
+                                    {
+                                        <a href="/@culture/sources/@sourceSlug"
+                                           class="text-blue-600 hover:text-blue-800">@sourceName</a>
+                                    }
+                                    else if (!string.IsNullOrWhiteSpace(sourceName))
+                                    {
+                                        <span>@sourceName</span>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(pageNumber))
+                                    {
+                                        <span>, @Localizer["p."] @pageNumber</span>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(citationUrl))
+                                    {
+                                        <a href="@citationUrl"
+                                           target="_blank"
+                                           rel="noopener noreferrer"
+                                           class="text-blue-600 hover:text-blue-800 ms-1">@Localizer["Source"]</a>
+                                    }
+                                </span>
+                            </li>
+                        }
+                    </ol>
+                </section>
+            }
+
+            <!-- ============================================================
+                 8. External Links
+                 ============================================================ -->
+            @if (links.Count > 0)
+            {
+                <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["External Links"]</h2>
+                    <ul class="space-y-1.5">
+                        @foreach (var link in links)
+                        {
+                            string? linkUrl = null;
+                            string? linkTitle = null;
+                            string? linkType = null;
+                            try { linkUrl = (string?)link.Url; } catch { }
+                            try { linkTitle = (string?)link.Title ?? (string?)link.Name; } catch { }
+                            try { linkType = (string?)link.LinkType ?? (string?)link.Type; } catch { }
+
+                            <li>
+                                <a href="@linkUrl"
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                    @(!string.IsNullOrWhiteSpace(linkTitle) ? linkTitle : linkUrl)
+                                </a>
+                                @if (!string.IsNullOrWhiteSpace(linkType))
+                                {
+                                    <span class="text-gray-400 text-xs ms-1">[@linkType]</span>
+                                }
+                            </li>
+                        }
+                    </ul>
+                </section>
+            }
+
+            <!-- ============================================================
+                 9. Tags
+                 ============================================================ -->
+            @if (tags.Count > 0)
+            {
+                <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["Tags"]</h2>
+                    <div class="flex flex-wrap gap-2">
+                        @foreach (var tag in tags)
+                        {
+                            string? tagName = null;
+                            string? tagSlug = null;
+                            try { tagName = (string?)tag.Name; } catch { }
+                            try { tagSlug = (string?)tag.Slug; } catch { }
+
+                            <a href="/@culture/tags/@tagSlug"
+                               class="inline-block bg-gray-100 text-gray-700 text-xs px-2.5 py-1 rounded-full hover:bg-gray-200 transition-colors">
+                                #@tagName
+                            </a>
+                        }
+                    </div>
+                </section>
+            }
+
+        </div>
+
+        <!-- ============================================================
+             Sidebar — Quick info
+             ============================================================ -->
+        <aside class="w-full lg:w-72 flex-shrink-0" role="complementary" aria-label="@Localizer["Sung version metadata"]">
+            <div class="bg-gray-50 rounded-lg border border-gray-200 p-5 space-y-4 sticky top-4">
+                <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider">@Localizer["Details"]</h3>
+
+                @if (!string.IsNullOrWhiteSpace(vocalStyleName))
+                {
+                    <div>
+                        <h4 class="text-xs font-medium text-gray-500 uppercase">@Localizer["Vocal Style"]</h4>
+                        <p class="mt-1 text-sm text-gray-700">@vocalStyleName</p>
+                    </div>
+                }
+
+                @if (isCanonical)
+                {
+                    <div>
+                        <h4 class="text-xs font-medium text-gray-500 uppercase">@Localizer["Status"]</h4>
+                        <p class="mt-1 text-sm text-green-700 font-medium">@Localizer["Canonical Version"]</p>
+                    </div>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(poetName))
+                {
+                    <div>
+                        <h4 class="text-xs font-medium text-gray-500 uppercase">@Localizer["Poet"]</h4>
+                        <p class="mt-1 text-sm text-gray-700">
+                            @if (!string.IsNullOrWhiteSpace(poetSlug))
+                            {
+                                <a href="/@culture/poets/@poetSlug" class="text-blue-600 hover:text-blue-800">@poetName</a>
+                            }
+                            else
+                            {
+                                @poetName
+                            }
+                        </p>
+                    </div>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(poemTitle))
+                {
+                    <div>
+                        <h4 class="text-xs font-medium text-gray-500 uppercase">@Localizer["Original Poem"]</h4>
+                        <p class="mt-1 text-sm text-gray-700">
+                            @if (!string.IsNullOrWhiteSpace(poemSlug))
+                            {
+                                <a href="/@culture/poems/@poemSlug" class="text-blue-600 hover:text-blue-800">@poemTitle</a>
+                            }
+                            else
+                            {
+                                @poemTitle
+                            }
+                        </p>
+                    </div>
+                }
+
+                @if (tracks.Count > 0)
+                {
+                    <div>
+                        <h4 class="text-xs font-medium text-gray-500 uppercase">@Localizer["Tracks"]</h4>
+                        <p class="mt-1 text-sm text-gray-700">@tracks.Count</p>
+                    </div>
+                }
+            </div>
+        </aside>
+    </div>
+</div>
+
+<!-- ============================================================
+     JSON-LD Structured Data
+     ============================================================ -->
+<script type="application/ld+json">
+{
+    "@@context": "https://schema.org",
+    "@@type": "MusicRecording",
+    "name": "@title",
+    @if (!string.IsNullOrWhiteSpace(poetName))
+    {
+        <text>"byArtist": {
+            "@@type": "Person",
+            "name": "@poetName"
+        },</text>
+    }
+    @if (!string.IsNullOrWhiteSpace(poemTitle))
+    {
+        <text>"recordedAs": {
+            "@@type": "CreativeWork",
+            "name": "@poemTitle"
+        },</text>
+    }
+    "inLanguage": "@culture"
+}
+</script>

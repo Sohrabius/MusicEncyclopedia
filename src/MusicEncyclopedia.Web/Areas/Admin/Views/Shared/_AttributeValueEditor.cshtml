@@ -1,0 +1,127 @@
+@model AttributeValueListViewModel
+@{
+    // Partial view for the attribute value editor (spec 10.15).
+}
+
+<div class="attribute-value-editor" data-entity-type-id="@Model.EntityTypeId" data-entity-id="@Model.EntityId">
+    <div class="flex items-center justify-between mb-3">
+        <h3 class="text-sm font-semibold text-gray-700">Attribute Values</h3>
+        <button type="button" class="btn-add-attr-value px-3 py-1.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+            <i class="fas fa-plus"></i> Add Attribute Value
+        </button>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead class="bg-gray-50 border-b border-gray-200">
+                <tr>
+                    <th class="text-start px-3 py-2 font-medium text-gray-600">Definition</th>
+                    <th class="text-start px-3 py-2 font-medium text-gray-600">Value</th>
+                    <th class="text-start px-3 py-2 font-medium text-gray-600">Language</th>
+                    <th class="text-end px-3 py-2 font-medium text-gray-600">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                @if (Model.AttributeValues.Count == 0)
+                {
+                    <tr class="empty-row"><td colspan="4" class="px-3 py-6 text-center text-gray-500 text-xs">No attribute values yet.</td></tr>
+                }
+                else
+                {
+                    @foreach (var av in Model.AttributeValues)
+                    {
+                        <tr data-attr-value-id="@av.AttributeValueId">
+                            <td class="px-3 py-2">@av.AttributeDefinitionId</td>
+                            <td class="px-3 py-2">@av.ValueString</td>
+                            <td class="px-3 py-2">@av.LanguageId</td>
+                            <td class="px-3 py-2 text-end">
+                                <button type="button" class="btn-delete-attr-value text-red-600 hover:text-red-800 text-xs"><i class="fas fa-trash-alt"></i></button>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="attr-value-form hidden mt-3 p-3 bg-gray-50 rounded-md border border-gray-200">
+        <input type="hidden" class="attr-value-id" value="0" />
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Definition</label>
+                <select class="attribute-definition-id w-full text-xs px-2 py-1.5 border border-gray-300 rounded">
+                    <option value="">-- Select --</option>
+                    @foreach (var def in Model.AttributeDefinitions) { <option value="@def.AttributeDefinitionId">@def.Name</option> }
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Value (string)</label>
+                <input type="text" class="value-string w-full text-xs px-2 py-1.5 border border-gray-300 rounded" />
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Language</label>
+                <select class="language-id w-full text-xs px-2 py-1.5 border border-gray-300 rounded">
+                    <option value="">-- Select --</option>
+                    @foreach (var lang in Model.Languages) { <option value="@lang.LanguageId">@lang.Name</option> }
+                </select>
+            </div>
+        </div>
+        <div class="flex items-center gap-2 mt-3">
+            <button type="button" class="btn-save-attr-value px-3 py-1.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700">Save</button>
+            <button type="button" class="btn-cancel-attr-value px-3 py-1.5 text-xs text-gray-600 bg-gray-200 rounded-md hover:bg-gray-300">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.querySelectorAll('.attribute-value-editor').forEach(function(editor) {
+        var addBtn = editor.querySelector('.btn-add-attr-value');
+        var form = editor.querySelector('.attr-value-form');
+        var cancelBtn = editor.querySelector('.btn-cancel-attr-value');
+        var saveBtn = editor.querySelector('.btn-save-attr-value');
+
+        addBtn.addEventListener('click', function() {
+            form.querySelector('.attr-value-id').value = '0';
+            form.querySelector('.attribute-definition-id').value = '';
+            form.querySelector('.value-string').value = '';
+            form.querySelector('.language-id').value = '';
+            form.classList.remove('hidden');
+        });
+
+        cancelBtn.addEventListener('click', function() { form.classList.add('hidden'); });
+
+        saveBtn.addEventListener('click', function() {
+            var data = new FormData();
+            data.append('attributeValueId', form.querySelector('.attr-value-id').value);
+            data.append('attributeDefinitionId', form.querySelector('.attribute-definition-id').value || '0');
+            data.append('valueString', form.querySelector('.value-string').value);
+            data.append('languageId', form.querySelector('.language-id').value || '');
+            data.append('entityTypeId', editor.dataset.entityTypeId);
+            data.append('entityId', editor.dataset.entityId);
+            data.append('__RequestVerificationToken', document.querySelector('input[name="__RequestVerificationToken"]').value);
+
+            fetch('/admin/attribute-values/save', { method: 'POST', body: data })
+                .then(function(r) { return r.json(); })
+                .then(function(result) {
+                    if (result.success) { location.reload(); }
+                    else { alert('Error: ' + (result.errors || []).join(', ')); }
+                });
+        });
+
+        editor.querySelectorAll('.btn-delete-attr-value').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                if (!confirm('Delete this attribute value?')) return;
+                var row = this.closest('tr');
+                var attrValueId = row.dataset.attrValueId;
+                var data = new FormData();
+                data.append('__RequestVerificationToken', document.querySelector('input[name="__RequestVerificationToken"]').value);
+                fetch('/admin/attribute-values/delete/' + attrValueId, { method: 'POST', body: data })
+                    .then(function(r) { return r.json(); })
+                    .then(function(result) {
+                        if (result.success) { location.reload(); }
+                        else { alert('Error: ' + (result.errors || []).join(', ')); }
+                    });
+            });
+        });
+    });
+</script>

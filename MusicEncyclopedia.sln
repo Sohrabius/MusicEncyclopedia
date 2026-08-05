@@ -1,0 +1,92 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{E386AADF-74DE-4D37-9901-D3B736066F59}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicEncyclopedia.Core", "src\MusicEncyclopedia.Core\MusicEncyclopedia.Core.csproj", "{802CE481-48F8-4929-BCBF-DA1D6CB9DBE1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicEncyclopedia.Data", "src\MusicEncyclopedia.Data\MusicEncyclopedia.Data.csproj", "{BAAF54FA-1A2F-4C48-B186-B75200F1324B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicEncyclopedia.Services", "src\MusicEncyclopedia.Services\MusicEncyclopedia.Services.csproj", "{858E6C1B-2F6F-44A6-B65B-8F0BBBBBFC85}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicEncyclopedia.Search", "src\MusicEncyclopedia.Search\MusicEncyclopedia.Search.csproj", "{2694D1AC-4CF0-4429-BAC3-A380F824DA7E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicEncyclopedia.Media", "src\MusicEncyclopedia.Media\MusicEncyclopedia.Media.csproj", "{37726552-7F60-42FC-8D63-EED167A0BDAA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicEncyclopedia.Web", "src\MusicEncyclopedia.Web\MusicEncyclopedia.Web.csproj", "{1267532D-0ED6-402F-9007-75D50CE08767}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{ABFA7B90-1944-44E5-9912-81AAFDC34D53}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicEncyclopedia.Core.Tests", "tests\MusicEncyclopedia.Core.Tests\MusicEncyclopedia.Core.Tests.csproj", "{CD743E66-099E-4B42-B6D7-AD83AE3528E6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicEncyclopedia.Data.Tests", "tests\MusicEncyclopedia.Data.Tests\MusicEncyclopedia.Data.Tests.csproj", "{9CEC9BA6-9AF3-4F1E-8256-D20988AD1A4D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicEncyclopedia.Services.Tests", "tests\MusicEncyclopedia.Services.Tests\MusicEncyclopedia.Services.Tests.csproj", "{13A19040-32F4-48ED-87C6-AE57363F6F5F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicEncyclopedia.Web.Tests", "tests\MusicEncyclopedia.Web.Tests\MusicEncyclopedia.Web.Tests.csproj", "{3461D761-C1CC-4476-80F1-452EBDC7B7EE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{802CE481-48F8-4929-BCBF-DA1D6CB9DBE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{802CE481-48F8-4929-BCBF-DA1D6CB9DBE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{802CE481-48F8-4929-BCBF-DA1D6CB9DBE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{802CE481-48F8-4929-BCBF-DA1D6CB9DBE1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BAAF54FA-1A2F-4C48-B186-B75200F1324B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BAAF54FA-1A2F-4C48-B186-B75200F1324B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BAAF54FA-1A2F-4C48-B186-B75200F1324B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BAAF54FA-1A2F-4C48-B186-B75200F1324B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{858E6C1B-2F6F-44A6-B65B-8F0BBBBBFC85}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{858E6C1B-2F6F-44A6-B65B-8F0BBBBBFC85}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{858E6C1B-2F6F-44A6-B65B-8F0BBBBBFC85}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{858E6C1B-2F6F-44A6-B65B-8F0BBBBBFC85}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2694D1AC-4CF0-4429-BAC3-A380F824DA7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2694D1AC-4CF0-4429-BAC3-A380F824DA7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2694D1AC-4CF0-4429-BAC3-A380F824DA7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2694D1AC-4CF0-4429-BAC3-A380F824DA7E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{37726552-7F60-42FC-8D63-EED167A0BDAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37726552-7F60-42FC-8D63-EED167A0BDAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37726552-7F60-42FC-8D63-EED167A0BDAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37726552-7F60-42FC-8D63-EED167A0BDAA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1267532D-0ED6-402F-9007-75D50CE08767}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1267532D-0ED6-402F-9007-75D50CE08767}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1267532D-0ED6-402F-9007-75D50CE08767}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1267532D-0ED6-402F-9007-75D50CE08767}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD743E66-099E-4B42-B6D7-AD83AE3528E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD743E66-099E-4B42-B6D7-AD83AE3528E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD743E66-099E-4B42-B6D7-AD83AE3528E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD743E66-099E-4B42-B6D7-AD83AE3528E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9CEC9BA6-9AF3-4F1E-8256-D20988AD1A4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9CEC9BA6-9AF3-4F1E-8256-D20988AD1A4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9CEC9BA6-9AF3-4F1E-8256-D20988AD1A4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9CEC9BA6-9AF3-4F1E-8256-D20988AD1A4D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{13A19040-32F4-48ED-87C6-AE57363F6F5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13A19040-32F4-48ED-87C6-AE57363F6F5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13A19040-32F4-48ED-87C6-AE57363F6F5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13A19040-32F4-48ED-87C6-AE57363F6F5F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3461D761-C1CC-4476-80F1-452EBDC7B7EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3461D761-C1CC-4476-80F1-452EBDC7B7EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3461D761-C1CC-4476-80F1-452EBDC7B7EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3461D761-C1CC-4476-80F1-452EBDC7B7EE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{802CE481-48F8-4929-BCBF-DA1D6CB9DBE1} = {E386AADF-74DE-4D37-9901-D3B736066F59}
+		{BAAF54FA-1A2F-4C48-B186-B75200F1324B} = {E386AADF-74DE-4D37-9901-D3B736066F59}
+		{858E6C1B-2F6F-44A6-B65B-8F0BBBBBFC85} = {E386AADF-74DE-4D37-9901-D3B736066F59}
+		{2694D1AC-4CF0-4429-BAC3-A380F824DA7E} = {E386AADF-74DE-4D37-9901-D3B736066F59}
+		{37726552-7F60-42FC-8D63-EED167A0BDAA} = {E386AADF-74DE-4D37-9901-D3B736066F59}
+		{1267532D-0ED6-402F-9007-75D50CE08767} = {E386AADF-74DE-4D37-9901-D3B736066F59}
+		{CD743E66-099E-4B42-B6D7-AD83AE3528E6} = {ABFA7B90-1944-44E5-9912-81AAFDC34D53}
+		{9CEC9BA6-9AF3-4F1E-8256-D20988AD1A4D} = {ABFA7B90-1944-44E5-9912-81AAFDC34D53}
+		{13A19040-32F4-48ED-87C6-AE57363F6F5F} = {ABFA7B90-1944-44E5-9912-81AAFDC34D53}
+		{3461D761-C1CC-4476-80F1-452EBDC7B7EE} = {ABFA7B90-1944-44E5-9912-81AAFDC34D53}
+	EndGlobalSection
+EndGlobal

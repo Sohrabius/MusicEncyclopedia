@@ -1,0 +1,293 @@
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer Localizer
+@model MusicEncyclopedia.Web.ViewModels.Public.AlbumListViewModel
+
+@{
+    var culture = Context.Items["culture"] as string ?? "fa";
+    var dir = Context.Items["dir"] as string ?? "ltr";
+    var isRtl = dir == "rtl";
+    var items = Model.Items;
+}
+
+<!-- Canonical URL -->
+<link rel="canonical" href="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.PathBase}{Context.Request.Path}")" />
+
+<!-- Open Graph -->
+<meta property="og:title" content="@Localizer["Albums"] - @Localizer["Music Encyclopedia"]" />
+<meta property="og:description" content="@Localizer["Browse the complete album catalog — filter by genre, mood, year, and more."]" />
+<meta property="og:url" content="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.PathBase}{Context.Request.Path}")" />
+<meta property="og:type" content="website" />
+
+<!-- JSON-LD ItemList -->
+<script type="application/ld+json">
+{
+    "@@context": "https://schema.org",
+    "@@type": "ItemList",
+    "itemListElement": [
+        @for (var i = 0; i < items.Items.Count; i++)
+        {
+            var item = items.Items[i];
+            <text>
+            {
+                "@@type": "ListItem",
+                "position": @(i + 1 + (items.Page - 1) * items.PageSize),
+                "item": {
+                    "@@type": "MusicAlbum",
+                    "name": "@item.Title",
+                    "image": "@(item.CoverUrl ?? "")",
+                    "url": "@($"{Context.Request.Scheme}://{Context.Request.Host}/{culture}/albums/{item.Slug}")"
+                }
+            }@(i < items.Items.Count - 1 ? "," : "")
+            </text>
+        }
+    ],
+    "numberOfItems": @items.TotalItems,
+    "name": "@Localizer["Albums"]"
+}
+</script>
+
+<!-- Breadcrumb -->
+<nav class="section" style="padding-bottom: 0;">
+    <div class="section__inner">
+        <ol class="breadcrumb">
+            <li><a href="/@culture">Home</a></li>
+            <li class="breadcrumb__sep">/</li>
+            <li class="breadcrumb__current">@Localizer["Albums"]</li>
+        </ol>
+    </div>
+</nav>
+
+<!-- Header -->
+<section class="section" style="padding-top: 0; padding-bottom: var(--space-lg);">
+    <div class="section__inner">
+        <h1 class="section__title" style="font-size: var(--text-2xl);">@Localizer["Albums"]</h1>
+        <p class="mt-2" style="color: var(--color-ink-2); font-size: var(--text-sm);">@Localizer["Browse the complete album catalog"]</p>
+    </div>
+</section>
+
+<!-- Content -->
+<section class="section" style="padding-top: 0;">
+    <div class="section__inner">
+        <div style="display: flex; gap: var(--space-2xl);">
+
+            <!-- Filter Sidebar -->
+            <aside style="width: 240px; flex-shrink: 0;" role="complementary" aria-label="@Localizer["Filters"]">
+                <form method="get" action="/@culture/albums" class="filter">
+
+                    <div class="filter__field">
+                        <label for="search" class="filter__label">@Localizer["Search"]</label>
+                        <input type="text" id="search" name="q" value="@Model.CurrentFilters.SearchQuery"
+                               placeholder="@Localizer["Search albums..."]" class="filter__input" />
+                    </div>
+
+                    <div class="filter__field">
+                        <label for="genre" class="filter__label">@Localizer["Genre"]</label>
+                        <select id="genre" name="genre" class="filter__select">
+                            <option value="">@Localizer["All Genres"]</option>
+                            @foreach (var g in Model.Genres)
+                            {
+                                <option value="@g.Slug" selected="@(Model.CurrentFilters.GenreSlug == g.Slug)">@g.Name</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="filter__field">
+                        <label for="mood" class="filter__label">@Localizer["Mood"]</label>
+                        <select id="mood" name="mood" class="filter__select">
+                            <option value="">@Localizer["All Moods"]</option>
+                            @foreach (var m in Model.Moods)
+                            {
+                                <option value="@m.Slug" selected="@(Model.CurrentFilters.MoodSlug == m.Slug)">@m.Name</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="filter__field">
+                        <label for="year" class="filter__label">@Localizer["Year"]</label>
+                        <input type="number" id="year" name="year" value="@Model.CurrentFilters.Year"
+                               placeholder="e.g. 2024" min="1900" max="2100" class="filter__input" />
+                    </div>
+
+                    <div class="filter__field">
+                        <label for="sort" class="filter__label">@Localizer["Sort By"]</label>
+                        <select id="sort" name="sort" class="filter__select">
+                            <option value="releaseDate" selected="@(Model.CurrentFilters.Sort == "releaseDate")">@Localizer["Release Date"]</option>
+                            <option value="title" selected="@(Model.CurrentFilters.Sort == "title")">@Localizer["Title"]</option>
+                            <option value="duration" selected="@(Model.CurrentFilters.Sort == "duration")">@Localizer["Duration"]</option>
+                            <option value="createdAt" selected="@(Model.CurrentFilters.Sort == "createdAt")">@Localizer["Newest First"]</option>
+                        </select>
+                    </div>
+
+                    <div class="filter__actions">
+                        <button type="submit" class="btn btn--primary">@Localizer["Apply"]</button>
+                        <a href="/@culture/albums" class="btn btn--secondary">@Localizer["Clear"]</a>
+                    </div>
+                </form>
+            </aside>
+
+            <!-- Album Grid -->
+            <div style="flex: 1; min-width: 0;">
+                @if (items.Items.Count == 0)
+                {
+                    <div class="empty">
+                        <svg class="empty__icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                  d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z" />
+                        </svg>
+                        <h3 class="empty__title">@Localizer["No albums found"]</h3>
+                        <p class="empty__text">@Localizer["Try adjusting your filters or search query."]</p>
+                        <a href="/@culture/albums" class="empty__link">@Localizer["Clear all filters"]</a>
+                    </div>
+                }
+                else
+                {
+                    <p style="font-size: var(--text-xs); color: var(--color-ink-3); margin-bottom: var(--space-lg);">
+                        @Localizer["Showing {0}–{1} of {2} albums",
+                            ((items.Page - 1) * items.PageSize) + 1,
+                            Math.Min(items.Page * items.PageSize, items.TotalItems),
+                            items.TotalItems]
+                    </p>
+
+                    <div class="card-grid">
+                        @foreach (var album in items.Items)
+                        {
+                            <a href="/@culture/albums/@album.Slug" class="card">
+                                <div class="card__image relative">
+                                    @if (!string.IsNullOrWhiteSpace(album.CoverUrl))
+                                    {
+                                        <img src="@album.CoverUrl" alt="@album.Title" loading="lazy" />
+                                    }
+                                    else
+                                    {
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                                  d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z" />
+                                        </svg>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(album.CategoryName))
+                                    {
+                                        <span class="card__badge">@album.CategoryName</span>
+                                    }
+                                </div>
+                                <div class="card__body">
+                                    <h3 class="card__title">@album.Title</h3>
+                                    @if (!string.IsNullOrWhiteSpace(album.OriginalTitle) && album.OriginalTitle != album.Title)
+                                    {
+                                        <p class="card__meta" dir="auto">@album.OriginalTitle</p>
+                                    }
+                                    @if (album.PrimaryArtists.Count > 0)
+                                    {
+                                        <p class="card__meta">@string.Join(", ", album.PrimaryArtists)</p>
+                                    }
+                                    @if (album.ReleaseDate.HasValue)
+                                    {
+                                        <p class="card__meta">@album.ReleaseDate.Value.Year</p>
+                                    }
+                                    @if (album.Genres.Count > 0)
+                                    {
+                                        <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: var(--space-xs);">
+                                            @foreach (var genreName in album.Genres.Take(3))
+                                            {
+                                                <span class="tag">@genreName</span>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            </a>
+                        }
+                    </div>
+
+                    @if (items.TotalPages > 1)
+                    {
+                        <nav class="pagination" aria-label="@Localizer["Pagination"]">
+                            @if (items.Page > 1)
+                            {
+                                <a href="@GetPageUrl(items.Page - 1)" rel="prev">
+                                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                                    </svg>
+                                </a>
+                            }
+                            else
+                            {
+                                <span style="opacity: 0.3;">
+                                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                                    </svg>
+                                </span>
+                            }
+
+                            @{
+                                var startPage = Math.Max(1, items.Page - 2);
+                                var endPage = Math.Min(items.TotalPages, items.Page + 2);
+                                if (startPage > 1)
+                                {
+                                    <a href="@GetPageUrl(1)">1</a>
+                                    if (startPage > 2)
+                                    {
+                                        <span style="padding: 0 4px; color: var(--color-ink-3);">...</span>
+                                    }
+                                }
+                                for (var p = startPage; p <= endPage; p++)
+                                {
+                                    if (p == items.Page)
+                                    {
+                                        <span class="active">@p</span>
+                                    }
+                                    else
+                                    {
+                                        <a href="@GetPageUrl(p)">@p</a>
+                                    }
+                                }
+                                if (endPage < items.TotalPages)
+                                {
+                                    if (endPage < items.TotalPages - 1)
+                                    {
+                                        <span style="padding: 0 4px; color: var(--color-ink-3);">...</span>
+                                    }
+                                    <a href="@GetPageUrl(items.TotalPages)">@items.TotalPages</a>
+                                }
+                            }
+
+                            @if (items.Page < items.TotalPages)
+                            {
+                                <a href="@GetPageUrl(items.Page + 1)" rel="next">
+                                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </a>
+                            }
+                            else
+                            {
+                                <span style="opacity: 0.3;">
+                                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </span>
+                            }
+                        </nav>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+@functions {
+    string GetPageUrl(int page)
+    {
+        var queryParams = new List<string> { $"page={page}" };
+
+        if (!string.IsNullOrWhiteSpace(Model.CurrentFilters.GenreSlug))
+            queryParams.Add($"genre={Uri.EscapeDataString(Model.CurrentFilters.GenreSlug)}");
+        if (!string.IsNullOrWhiteSpace(Model.CurrentFilters.MoodSlug))
+            queryParams.Add($"mood={Uri.EscapeDataString(Model.CurrentFilters.MoodSlug)}");
+        if (Model.CurrentFilters.Year.HasValue)
+            queryParams.Add($"year={Model.CurrentFilters.Year.Value}");
+        if (!string.IsNullOrWhiteSpace(Model.CurrentFilters.SearchQuery))
+            queryParams.Add($"q={Uri.EscapeDataString(Model.CurrentFilters.SearchQuery)}");
+        if (!string.IsNullOrWhiteSpace(Model.CurrentFilters.Sort) && Model.CurrentFilters.Sort != "releaseDate")
+            queryParams.Add($"sort={Uri.EscapeDataString(Model.CurrentFilters.Sort)}");
+
+        return $"/{Model.Culture}/albums?{string.Join("&", queryParams)}";
+    }
+}

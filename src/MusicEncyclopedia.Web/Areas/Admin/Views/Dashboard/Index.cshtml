@@ -1,0 +1,223 @@
+@model AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+    ViewData["ActiveMenu"] = "Dashboard";
+}
+
+<!-- ============================================================
+     Stats Cards Row
+     ============================================================ -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+    <!-- Albums -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5 flex items-center gap-4">
+        <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-xl">
+            <i class="fas fa-compact-disc"></i>
+        </div>
+        <div>
+            <p class="text-sm text-gray-500">Albums</p>
+            <p class="text-2xl font-bold text-gray-900">@Model.AlbumCount.ToString("N0")</p>
+        </div>
+    </div>
+
+    <!-- Tracks -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5 flex items-center gap-4">
+        <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-xl">
+            <i class="fas fa-music"></i>
+        </div>
+        <div>
+            <p class="text-sm text-gray-500">Tracks</p>
+            <p class="text-2xl font-bold text-gray-900">@Model.TrackCount.ToString("N0")</p>
+        </div>
+    </div>
+
+    <!-- People -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5 flex items-center gap-4">
+        <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 text-xl">
+            <i class="fas fa-users"></i>
+        </div>
+        <div>
+            <p class="text-sm text-gray-500">People</p>
+            <p class="text-2xl font-bold text-gray-900">@Model.PersonCount.ToString("N0")</p>
+        </div>
+    </div>
+
+    <!-- Companies -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5 flex items-center gap-4">
+        <div class="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600 text-xl">
+            <i class="fas fa-building"></i>
+        </div>
+        <div>
+            <p class="text-sm text-gray-500">Companies</p>
+            <p class="text-2xl font-bold text-gray-900">@Model.CompanyCount.ToString("N0")</p>
+        </div>
+    </div>
+
+    <!-- Poems -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5 flex items-center gap-4">
+        <div class="w-12 h-12 rounded-full bg-rose-100 flex items-center justify-center text-rose-600 text-xl">
+            <i class="fas fa-feather-alt"></i>
+        </div>
+        <div>
+            <p class="text-sm text-gray-500">Poems</p>
+            <p class="text-2xl font-bold text-gray-900">@Model.PoemCount.ToString("N0")</p>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================
+     Quick Links (Spec 10.3 — Admin Navigation)
+     ============================================================ -->
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5 mb-8">
+    <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+        <i class="fas fa-link text-blue-500"></i> Quick Links
+    </h2>
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+        <a href="/admin/albums" class="flex items-center gap-2 px-3 py-2 bg-gray-50 hover:bg-blue-50 rounded-md text-sm text-gray-700 hover:text-blue-600 transition-colors">
+            <i class="fas fa-compact-disc text-blue-500 w-4 text-center"></i> Albums
+        </a>
+        <a href="/admin/tracks" class="flex items-center gap-2 px-3 py-2 bg-gray-50 hover:bg-blue-50 rounded-md text-sm text-gray-700 hover:text-blue-600 transition-colors">
+            <i class="fas fa-music text-green-500 w-4 text-center"></i> Tracks
+        </a>
+        <a href="/admin/people" class="flex items-center gap-2 px-3 py-2 bg-gray-50 hover:bg-blue-50 rounded-md text-sm text-gray-700 hover:text-blue-600 transition-colors">
+            <i class="fas fa-users text-purple-500 w-4 text-center"></i> People
+        </a>
+        <a href="/admin/companies" class="flex items-center gap-2 px-3 py-2 bg-gray-50 hover:bg-blue-50 rounded-md text-sm text-gray-700 hover:text-blue-600 transition-colors">
+            <i class="fas fa-building text-yellow-500 w-4 text-center"></i> Companies
+        </a>
+        <a href="/admin/genres" class="flex items-center gap-2 px-3 py-2 bg-gray-50 hover:bg-blue-50 rounded-md text-sm text-gray-700 hover:text-blue-600 transition-colors">
+            <i class="fas fa-tag text-indigo-500 w-4 text-center"></i> Genres
+        </a>
+        <a href="/admin/moods" class="flex items-center gap-2 px-3 py-2 bg-gray-50 hover:bg-blue-50 rounded-md text-sm text-gray-700 hover:text-blue-600 transition-colors">
+            <i class="fas fa-smile text-pink-500 w-4 text-center"></i> Moods
+        </a>
+        <a href="/admin/instruments" class="flex items-center gap-2 px-3 py-2 bg-gray-50 hover:bg-blue-50 rounded-md text-sm text-gray-700 hover:text-blue-600 transition-colors">
+            <i class="fas fa-guitar text-orange-500 w-4 text-center"></i> Instruments
+        </a>
+        <a href="/admin/poems" class="flex items-center gap-2 px-3 py-2 bg-gray-50 hover:bg-blue-50 rounded-md text-sm text-gray-700 hover:text-blue-600 transition-colors">
+            <i class="fas fa-feather-alt text-rose-500 w-4 text-center"></i> Poems
+        </a>
+        <a href="/admin/awards" class="flex items-center gap-2 px-3 py-2 bg-gray-50 hover:bg-blue-50 rounded-md text-sm text-gray-700 hover:text-blue-600 transition-colors">
+            <i class="fas fa-trophy text-yellow-500 w-4 text-center"></i> Awards
+        </a>
+        <a href="/admin/charts" class="flex items-center gap-2 px-3 py-2 bg-gray-50 hover:bg-blue-50 rounded-md text-sm text-gray-700 hover:text-blue-600 transition-colors">
+            <i class="fas fa-chart-line text-cyan-500 w-4 text-center"></i> Charts
+        </a>
+        <a href="/admin/citations" class="flex items-center gap-2 px-3 py-2 bg-gray-50 hover:bg-blue-50 rounded-md text-sm text-gray-700 hover:text-blue-600 transition-colors">
+            <i class="fas fa-quote-right text-teal-500 w-4 text-center"></i> Citations
+        </a>
+        <a href="/admin/users" class="flex items-center gap-2 px-3 py-2 bg-gray-50 hover:bg-blue-50 rounded-md text-sm text-gray-700 hover:text-blue-600 transition-colors">
+            <i class="fas fa-user-shield text-gray-500 w-4 text-center"></i> Users
+        </a>
+    </div>
+</div>
+
+<!-- ============================================================
+     Recent Additions
+     ============================================================ -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <!-- Recent Albums -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <i class="fas fa-compact-disc text-blue-500"></i> Recent Albums
+        </h2>
+        @if (Model.RecentAlbums.Count == 0)
+        {
+            <p class="text-sm text-gray-500">No albums yet.</p>
+        }
+        else
+        {
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="text-left text-gray-500 border-b border-gray-100">
+                            <th class="pb-2 font-medium">Title</th>
+                            <th class="pb-2 font-medium">Category</th>
+                            <th class="pb-2 font-medium">Release Date</th>
+                            <th class="pb-2 font-medium text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var album in Model.RecentAlbums)
+                        {
+                            <tr class="border-b border-gray-50 hover:bg-gray-50">
+                                <td class="py-2">
+                                    <a href="/admin/albums/@album.AlbumId/Edit" class="text-blue-600 hover:underline font-medium">
+                                        @album.Title
+                                    </a>
+                                </td>
+                                <td class="py-2 text-gray-500">@album.CategoryName</td>
+                                <td class="py-2 text-gray-500">@album.ReleaseDate?.ToString("yyyy-MM-dd")</td>
+                                <td class="py-2 text-end">
+                                    <a href="/admin/albums/@album.AlbumId/Edit" class="text-blue-600 hover:text-blue-800" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="mt-3 text-end">
+                <a href="/admin/albums" class="text-sm text-blue-600 hover:underline">
+                    View all albums <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+        }
+    </div>
+
+    <!-- Recent Tracks -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <i class="fas fa-music text-green-500"></i> Recent Tracks
+        </h2>
+        @if (Model.RecentTracks.Count == 0)
+        {
+            <p class="text-sm text-gray-500">No tracks yet.</p>
+        }
+        else
+        {
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="text-left text-gray-500 border-b border-gray-100">
+                            <th class="pb-2 font-medium">Title</th>
+                            <th class="pb-2 font-medium">Album</th>
+                            <th class="pb-2 font-medium">Duration</th>
+                            <th class="pb-2 font-medium text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var track in Model.RecentTracks)
+                        {
+                            <tr class="border-b border-gray-50 hover:bg-gray-50">
+                                <td class="py-2">
+                                    <a href="/admin/tracks/@track.TrackId/Edit" class="text-blue-600 hover:underline font-medium">
+                                        @track.Title
+                                    </a>
+                                </td>
+                                <td class="py-2 text-gray-500">@track.AlbumTitle</td>
+                                <td class="py-2 text-gray-500">
+                                    @if (track.DurationSeconds.HasValue)
+                                    {
+                                        var ts = TimeSpan.FromSeconds(track.DurationSeconds.Value);
+                                        @string.Format("{0}:{1:D2}", (int)ts.TotalMinutes, ts.Seconds)
+                                    }
+                                </td>
+                                <td class="py-2 text-end">
+                                    <a href="/admin/tracks/@track.TrackId/Edit" class="text-blue-600 hover:text-blue-800" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="mt-3 text-end">
+                <a href="/admin/tracks" class="text-sm text-blue-600 hover:underline">
+                    View all tracks <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+        }
+    </div>
+</div>

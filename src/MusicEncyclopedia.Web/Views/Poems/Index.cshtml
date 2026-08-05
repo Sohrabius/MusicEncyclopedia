@@ -1,0 +1,193 @@
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer Localizer
+@model MusicEncyclopedia.Web.ViewModels.Public.PoemListViewModel
+
+@{
+    var culture = Context.Items["culture"] as string ?? "fa";
+    var dir = Context.Items["dir"] as string ?? "ltr";
+    var isRtl = dir == "rtl";
+    var items = Model.Items;
+}
+
+<!-- ===== Canonical URL ===== -->
+<link rel="canonical" href="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.PathBase}{Context.Request.Path}")" />
+
+<!-- ===== Open Graph ===== -->
+<meta property="og:title" content="@Localizer["Poems"] - @Localizer["Music Encyclopedia"]" />
+<meta property="og:description" content="@Localizer["Browse the complete catalog of poems."]" />
+<meta property="og:url" content="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.PathBase}{Context.Request.Path}")" />
+<meta property="og:type" content="website" />
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" dir="@dir">
+    <!-- Page Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-900">@Localizer["Poems"]</h1>
+        <p class="mt-2 text-gray-600">@Localizer["Browse the complete catalog of poems"]</p>
+    </div>
+
+    @if (items.Items.Count == 0)
+    {
+        <!-- Empty state -->
+        <div class="text-center py-16">
+            <svg class="mx-auto h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                      d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+            <h3 class="mt-4 text-lg font-medium text-gray-900">@Localizer["No poems found"]</h3>
+            <p class="mt-2 text-gray-500">@Localizer["Check back later for new additions."]</p>
+        </div>
+    }
+    else
+    {
+        <!-- Result count -->
+        <p class="text-sm text-gray-500 mb-4">
+            @Localizer["Showing {0}–{1} of {2} poems",
+                ((items.Page - 1) * items.PageSize) + 1,
+                Math.Min(items.Page * items.PageSize, items.TotalItems),
+                items.TotalItems]
+        </p>
+
+        <!-- Poem Cards Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            @foreach (var poem in items.Items)
+            {
+                <article class="group bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                    <a href="/@culture/poems/@poem.Slug" class="block p-5">
+                        <!-- Title -->
+                        <h3 class="font-semibold text-gray-900 text-lg leading-tight mb-2 line-clamp-2">
+                            @poem.Title
+                        </h3>
+
+                        <!-- Poet -->
+                        @if (!string.IsNullOrWhiteSpace(poem.PoetName))
+                        {
+                            <p class="text-sm text-gray-500 mb-1">
+                                <span class="text-gray-400">@Localizer["by"]</span>
+                                @if (!string.IsNullOrWhiteSpace(poem.PoetSlug))
+                                {
+                                    <a href="/@culture/poets/@poem.PoetSlug"
+                                       class="text-blue-600 hover:text-blue-800 font-medium">
+                                        @poem.PoetName
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="font-medium text-gray-700">@poem.PoetName</span>
+                                }
+                            </p>
+                        }
+
+                        <!-- Publication -->
+                        @if (!string.IsNullOrWhiteSpace(poem.PublicationName))
+                        {
+                            <p class="text-xs text-gray-400">
+                                @Localizer["in"]
+                                @if (!string.IsNullOrWhiteSpace(poem.PublicationSlug))
+                                {
+                                    <a href="/@culture/publications/@poem.PublicationSlug"
+                                       class="text-blue-500 hover:text-blue-700">
+                                        @poem.PublicationName
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span>@poem.PublicationName</span>
+                                }
+                            </p>
+                        }
+
+                        <!-- Badge -->
+                        <span class="inline-block bg-amber-100 text-amber-800 text-xs font-medium px-2 py-0.5 rounded-full mt-3">
+                            @Localizer["Poem"]
+                        </span>
+                    </a>
+                </article>
+            }
+        </div>
+
+        <!-- ============================================================
+             Pagination
+             ============================================================ -->
+        @if (items.TotalPages > 1)
+        {
+            <nav class="mt-10 flex items-center justify-center gap-1" aria-label="@Localizer["Pagination"]">
+                <!-- Previous page -->
+                @if (items.Page > 1)
+                {
+                    <a href="@GetPageUrl(items.Page - 1)"
+                       class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                       rel="prev">
+                        @Localizer["Previous"]
+                    </a>
+                }
+                else
+                {
+                    <span class="px-3 py-2 text-sm font-medium text-gray-400 bg-gray-50 border border-gray-200 rounded-md cursor-not-allowed">
+                        @Localizer["Previous"]
+                    </span>
+                }
+
+                <!-- Page numbers -->
+                @{
+                    var startPage = Math.Max(1, items.Page - 2);
+                    var endPage = Math.Min(items.TotalPages, items.Page + 2);
+                    if (startPage > 1)
+                    {
+                        <a href="@GetPageUrl(1)" class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">1</a>
+                        if (startPage > 2)
+                        {
+                            <span class="px-2 py-2 text-sm text-gray-400">...</span>
+                        }
+                    }
+                    for (var p = startPage; p <= endPage; p++)
+                    {
+                        if (p == items.Page)
+                        {
+                            <span class="px-3 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-md">@p</span>
+                        }
+                        else
+                        {
+                            <a href="@GetPageUrl(p)"
+                               class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                                @p
+                            </a>
+                        }
+                    }
+                    if (endPage < items.TotalPages)
+                    {
+                        if (endPage < items.TotalPages - 1)
+                        {
+                            <span class="px-2 py-2 text-sm text-gray-400">...</span>
+                        }
+                        <a href="@GetPageUrl(items.TotalPages)"
+                           class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                            @items.TotalPages
+                        </a>
+                    }
+                }
+
+                <!-- Next page -->
+                @if (items.Page < items.TotalPages)
+                {
+                    <a href="@GetPageUrl(items.Page + 1)"
+                       class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                       rel="next">
+                        @Localizer["Next"]
+                    </a>
+                }
+                else
+                {
+                    <span class="px-3 py-2 text-sm font-medium text-gray-400 bg-gray-50 border border-gray-200 rounded-md cursor-not-allowed">
+                        @Localizer["Next"]
+                    </span>
+                }
+            </nav>
+        }
+    }
+</div>
+
+@functions {
+    string GetPageUrl(int page)
+    {
+        return $"/{Model.Culture}/poems?page={page}";
+    }
+}

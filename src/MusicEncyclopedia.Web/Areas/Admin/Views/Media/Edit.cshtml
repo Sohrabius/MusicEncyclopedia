@@ -1,0 +1,224 @@
+@using Microsoft.EntityFrameworkCore
+@using MusicEncyclopedia.Data
+@model MediaEditViewModel
+@inject AppDbContext _db
+@{
+    ViewData["Title"] = $"Edit: {Model.FileName}";
+    ViewData["ActiveMenu"] = "Media";
+
+    // Load assignments for display
+    var assignments = await _db.MediaAssignments
+        .Include(ma => ma.MediaRoleType)
+        .Where(ma => ma.MediaId == Model.MediaId)
+        .OrderBy(ma => ma.EntityTypeId)
+        .ThenBy(ma => ma.EntityId)
+        .ToListAsync();
+}
+
+<form method="post" action="/admin/media/@Model.MediaId/Edit">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="MediaId" />
+    <input type="hidden" asp-for="FilePath" />
+    <input type="hidden" asp-for="ThumbnailUrl150" />
+    <input type="hidden" asp-for="ThumbnailUrl300" />
+    <input type="hidden" asp-for="ThumbnailUrl600" />
+    <input type="hidden" asp-for="ThumbnailUrl1200" />
+
+    <div asp-validation-summary="ModelOnly" class="mb-4 px-4 py-3 rounded-md bg-red-50 border border-red-200 text-red-800 text-sm" role="alert"></div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Preview -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Preview</h2>
+                @if (!string.IsNullOrEmpty(Model.ThumbnailUrl600))
+                {
+                    <img src="@Model.ThumbnailUrl600" alt="@Model.FileName" class="max-w-full h-auto rounded-md max-h-64 object-contain" />
+                }
+                else if (!string.IsNullOrEmpty(Model.Url))
+                {
+                    <div class="bg-gray-100 rounded-md p-4 flex items-center justify-center">
+                        <a href="@Model.Url" target="_blank" rel="noopener" class="text-blue-600 hover:underline">
+                            <i class="fas fa-external-link-alt me-1"></i> View full file
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-sm text-gray-500">No preview available.</p>
+                }
+            </div>
+
+            <!-- Metadata -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">File Metadata</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="md:col-span-2">
+                        <label asp-for="FileName" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                        <input asp-for="FileName" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                        <span asp-validation-for="FileName" class="text-xs text-red-600"></span>
+                    </div>
+                    <div>
+                        <label asp-for="MediaTypeId" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                        <select asp-for="MediaTypeId" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">-- Select Type --</option>
+                            @foreach (var mt in Model.MediaTypes)
+                            {
+                                <option value="@mt.MediaTypeId">@mt.Name</option>
+                            }
+                        </select>
+                        <span asp-validation-for="MediaTypeId" class="text-xs text-red-600"></span>
+                    </div>
+                    <div>
+                        <label asp-for="MimeType" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                        <input asp-for="MimeType" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                        <span asp-validation-for="MimeType" class="text-xs text-red-600"></span>
+                    </div>
+                    <div>
+                        <label asp-for="Url" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                        <input asp-for="Url" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                        <span asp-validation-for="Url" class="text-xs text-red-600"></span>
+                    </div>
+                    <div>
+                        <label asp-for="FileSize" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                        <input asp-for="FileSize" type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                        <span asp-validation-for="FileSize" class="text-xs text-red-600"></span>
+                    </div>
+                    <div>
+                        <label asp-for="Width" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                        <input asp-for="Width" type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                        <span asp-validation-for="Width" class="text-xs text-red-600"></span>
+                    </div>
+                    <div>
+                        <label asp-for="Height" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                        <input asp-for="Height" type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                        <span asp-validation-for="Height" class="text-xs text-red-600"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Replace File -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Replace File</h2>
+                <p class="text-xs text-gray-500 mb-3">Upload a new file to replace the current one. The old file will be deleted.</p>
+                <div class="flex items-center gap-3">
+                    <input type="file" name="file" id="replace-file" class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm" />
+                    <button type="submit" formaction="/admin/media/@Model.MediaId/ReplaceFile" formmethod="post" class="px-4 py-2 bg-orange-600 text-white text-sm rounded-md hover:bg-orange-700 transition-colors">
+                        <i class="fas fa-exchange-alt me-1"></i> Replace
+                    </button>
+                </div>
+            </div>
+
+            <!-- Assignments -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Entity Assignments</h2>
+                @if (assignments.Count == 0)
+                {
+                    <p class="text-sm text-gray-500">This media is not assigned to any entity yet.</p>
+                }
+                else
+                {
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-xs">
+                            <thead>
+                                <tr class="border-b border-gray-200">
+                                    <th class="text-start px-2 py-2 text-gray-500">Entity Type</th>
+                                    <th class="text-start px-2 py-2 text-gray-500">Entity ID</th>
+                                    <th class="text-start px-2 py-2 text-gray-500">Role</th>
+                                    <th class="text-center px-2 py-2 text-gray-500">Primary</th>
+                                    <th class="text-center px-2 py-2 text-gray-500">Order</th>
+                                    <th class="text-end px-2 py-2 text-gray-500">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var a in assignments)
+                                {
+                                    <tr class="border-b border-gray-100">
+                                        <td class="px-2 py-2">@a.EntityTypeId</td>
+                                        <td class="px-2 py-2">@a.EntityId</td>
+                                        <td class="px-2 py-2">@(a.MediaRoleType?.Name ?? "—")</td>
+                                        <td class="px-2 py-2 text-center">@(a.IsPrimary ? "✓" : "")</td>
+                                        <td class="px-2 py-2 text-center">@a.DisplayOrder</td>
+                                        <td class="px-2 py-2 text-end">
+                                            <form method="post" action="/admin/media/RemoveAssignment/@a.MediaAssignmentId" class="inline" onsubmit="return confirm('Remove this assignment?');">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="text-red-600 hover:text-red-800"><i class="fas fa-unlink"></i></button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+
+                <hr class="border-gray-200 my-4" />
+                <h3 class="text-sm font-semibold text-gray-700 mb-3">Assign to Entity</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                        <label for="assign-entity-type" class="block text-xs font-medium text-gray-600 mb-1">Entity Type</label>
+                        <select id="assign-entity-type" name="EntityTypeId" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">-- Select --</option>
+                            @foreach (var et in await _db.EntityTypes.OrderBy(e => e.Name).ToListAsync())
+                            {
+                                <option value="@et.EntityTypeId">@et.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div>
+                        <label for="assign-entity-id" class="block text-xs font-medium text-gray-600 mb-1">Entity ID</label>
+                        <input type="number" id="assign-entity-id" name="EntityId" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Entity ID" />
+                    </div>
+                    <div>
+                        <label for="assign-media-role" class="block text-xs font-medium text-gray-600 mb-1">Media Role</label>
+                        <select id="assign-media-role" name="MediaRoleTypeId" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">-- Select --</option>
+                            @foreach (var mrt in await _db.MediaRoleTypes.OrderBy(m => m.Name).ToListAsync())
+                            {
+                                <option value="@mrt.MediaRoleTypeId">@mrt.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="flex items-end gap-3">
+                        <label class="inline-flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" name="IsPrimary" value="true" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                            <span class="text-xs text-gray-600">Primary</span>
+                        </label>
+                        <button type="submit" formaction="/admin/media/Assign" formmethod="post" class="px-3 py-2 bg-blue-600 text-white text-xs rounded-md hover:bg-blue-700 transition-colors">
+                            <i class="fas fa-link me-1"></i> Assign
+                        </button>
+                    </div>
+                    <input type="hidden" name="MediaId" value="@Model.MediaId" />
+                    <input type="hidden" name="DisplayOrder" value="0" />
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-6">
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Actions</h2>
+                <button type="submit" class="w-full px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"><i class="fas fa-save"></i> Save Changes</button>
+                <a href="/admin/media" class="w-full block text-center mt-3 px-4 py-2.5 text-sm text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"><i class="fas fa-arrow-left me-1"></i> Back to List</a>
+                <hr class="border-gray-200 my-3" />
+                <form method="post" action="/admin/media/@Model.MediaId/Delete" onsubmit="return confirm('Are you sure you want to soft-delete this media file?');">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="w-full px-4 py-2 text-sm text-red-600 border border-red-200 rounded-md hover:bg-red-50 transition-colors flex items-center justify-center gap-2"><i class="fas fa-trash-alt"></i> Delete Media</button>
+                </form>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
+                <h2 class="text-sm font-semibold text-gray-700 mb-3">File Info</h2>
+                <dl class="space-y-2 text-xs">
+                    <div class="flex justify-between"><dt class="text-gray-500">ID</dt><dd class="text-gray-900 font-mono">@Model.MediaId</dd></div>
+                    <div class="flex justify-between"><dt class="text-gray-500">Path</dt><dd class="text-gray-900 font-mono truncate max-w-[140px]" title="@Model.FilePath">@Model.FilePath</dd></div>
+                    <div class="flex justify-between"><dt class="text-gray-500">MIME</dt><dd class="text-gray-900">@Model.MimeType</dd></div>
+                </dl>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.21.0/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/4.1.0/jquery.validate.unobtrusive.min.js"></script>
+}

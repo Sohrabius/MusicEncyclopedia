@@ -1,0 +1,636 @@
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer Localizer
+@model MusicEncyclopedia.Web.ViewModels.Public.CompanyDetailViewModel
+
+@{
+    var culture = Context.Items["culture"] as string ?? "fa";
+    var dir = Context.Items["dir"] as string ?? "ltr";
+    var isRtl = dir == "rtl";
+    dynamic company = Model.Company;
+
+    // Helper: safely get a string value from a dynamic object
+    string? SafeString(dynamic obj, string prop)
+    {
+        try
+        {
+            var val = (object?)obj.GetType().GetProperty(prop)?.GetValue(obj, null);
+            return val?.ToString();
+        }
+        catch { return null; }
+    }
+
+    // Helper: get a list from a dynamic object
+    List<dynamic> SafeList(dynamic obj, string prop)
+    {
+        try
+        {
+            var val = (object?)obj.GetType().GetProperty(prop)?.GetValue(obj, null);
+            if (val is System.Collections.IEnumerable enumerable)
+            {
+                var list = new List<dynamic>();
+                foreach (var item in enumerable) list.Add(item);
+                return list;
+            }
+        }
+        catch { }
+        return new List<dynamic>();
+    }
+
+    // Extract properties safely
+    var name = SafeString(company, "Name") ?? SafeString(company, "CompanyName") ?? "";
+    var logoUrl = SafeString(company, "LogoUrl") ?? SafeString(company, "Logo");
+    var companyType = SafeString(company, "CompanyType") ?? SafeString(company, "Type");
+    var country = SafeString(company, "Country");
+    var website = SafeString(company, "Website") ?? SafeString(company, "WebSite");
+    var history = SafeString(company, "History");
+
+    var albumsAsLabel = SafeList(company, "AlbumsAsLabel");
+    var albumsAsPublisher = SafeList(company, "AlbumsAsPublisher");
+    var albumsAsDistributor = SafeList(company, "AlbumsAsDistributor");
+    var albumsAsProduction = SafeList(company, "AlbumsAsProduction");
+    var albumsAsStudio = SafeList(company, "AlbumsAsStudio");
+    var trackCredits = SafeList(company, "TrackCredits");
+    var publications = SafeList(company, "Publications");
+    var media = SafeList(company, "Media");
+    var links = SafeList(company, "Links") ?? SafeList(company, "ExternalLinks");
+    var citations = SafeList(company, "Citations") ?? SafeList(company, "References");
+
+    // Helper to extract common album info from a dynamic album object
+    string? AlbumTitle(dynamic album)
+    {
+        try { return (string?)album.Title ?? (string?)album.Name; } catch { return null; }
+    }
+    string? AlbumSlug(dynamic album)
+    {
+        try { return (string?)album.Slug; } catch { return null; }
+    }
+    string? AlbumCover(dynamic album)
+    {
+        try { return (string?)album.CoverUrl ?? (string?)album.Cover; } catch { return null; }
+    }
+    string? AlbumYear(dynamic album)
+    {
+        try
+        {
+            var date = (object?)album.ReleaseDate;
+            if (date is DateTime dt) return dt.Year.ToString();
+            if (date is not null) return date.ToString()?.Length >= 4 ? date.ToString()?[..4] : null;
+        }
+        catch { }
+        return null;
+    }
+
+    // Helper to render an album card list
+    void RenderAlbumList(List<dynamic> albums, string sectionTitle)
+    {
+        if (albums.Count == 0) return;
+
+        <section>
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">@sectionTitle</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+                @foreach (var album in albums)
+                {
+                    var albumTitle = AlbumTitle(album);
+                    var albumSlug = AlbumSlug(album);
+                    var albumCover = AlbumCover(album);
+                    var albumYear = AlbumYear(album);
+
+                    <div class="group bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                        <a href="/@culture/albums/@albumSlug" class="block">
+                            <div class="aspect-square bg-gray-100 overflow-hidden">
+                                @if (!string.IsNullOrWhiteSpace(albumCover))
+                                {
+                                    <img src="@albumCover"
+                                         alt="@albumTitle"
+                                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                         loading="lazy" />
+                                }
+                                else
+                                {
+                                    <div class="w-full h-full flex items-center justify-center text-gray-400">
+                                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                                  d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z" />
+                                        </svg>
+                                    </div>
+                                }
+                            </div>
+                            <div class="p-3">
+                                <h3 class="font-semibold text-gray-900 text-sm leading-tight line-clamp-2">@albumTitle</h3>
+                                @if (!string.IsNullOrWhiteSpace(albumYear))
+                                {
+                                    <p class="text-xs text-gray-500 mt-1">@albumYear</p>
+                                }
+                            </div>
+                        </a>
+                    </div>
+                }
+            </div>
+        </section>
+    }
+
+    // Helper to render track credits table
+    void RenderTrackCredits(List<dynamic> credits)
+    {
+        if (credits.Count == 0) return;
+
+        <section>
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["Track Credits"]</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b border-gray-200 text-gray-500 text-xs uppercase tracking-wider">
+                            <th class="text-start py-2 pe-4">@Localizer["Track"]</th>
+                            <th class="text-start py-2 pe-4">@Localizer["Album"]</th>
+                            <th class="text-start py-2 pe-4">@Localizer["Role"]</th>
+                            <th class="text-start py-2 pe-4">@Localizer["Artist"]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var credit in credits)
+                        {
+                            string? trackTitle = null;
+                            string? trackSlug = null;
+                            string? albumTitle = null;
+                            string? albumSlug = null;
+                            string? roleName = null;
+                            string? artistName = null;
+                            try { trackTitle = (string?)credit.TrackTitle ?? (string?)credit.Title; } catch { }
+                            try { trackSlug = (string?)credit.TrackSlug; } catch { }
+                            try { albumTitle = (string?)credit.AlbumTitle; } catch { }
+                            try { albumSlug = (string?)credit.AlbumSlug; } catch { }
+                            try { roleName = (string?)credit.RoleName ?? (string?)credit.Role; } catch { }
+                            try { artistName = (string?)credit.ArtistName ?? (string?)credit.PersonName; } catch { }
+
+                            <tr class="border-b border-gray-100">
+                                <td class="py-2 pe-4">
+                                    @if (!string.IsNullOrWhiteSpace(trackSlug))
+                                    {
+                                        <a href="/@culture/tracks/@trackSlug" class="text-blue-600 hover:text-blue-800">@trackTitle</a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-gray-700">@trackTitle</span>
+                                    }
+                                </td>
+                                <td class="py-2 pe-4">
+                                    @if (!string.IsNullOrWhiteSpace(albumSlug))
+                                    {
+                                        <a href="/@culture/albums/@albumSlug" class="text-blue-600 hover:text-blue-800">@albumTitle</a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-gray-600">@albumTitle</span>
+                                    }
+                                </td>
+                                <td class="py-2 pe-4 text-gray-600">@roleName</td>
+                                <td class="py-2 pe-4 text-gray-600">@artistName</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    }
+}
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" dir="@dir">
+
+    <!-- ============================================================
+         Breadcrumb
+         ============================================================ -->
+    <nav aria-label="@Localizer["Breadcrumb"]" class="mb-6">
+        <ol class="flex items-center gap-2 text-sm text-gray-500">
+            <li><a href="/@culture" class="hover:text-blue-600 transition-colors">@Localizer["Home"]</a></li>
+            <li><span class="mx-1">/</span></li>
+            <li><a href="/@culture/companies" class="hover:text-blue-600 transition-colors">@Localizer["Companies"]</a></li>
+            <li><span class="mx-1">/</span></li>
+            <li class="text-gray-900 font-medium truncate max-w-[200px]" aria-current="page">@name</li>
+        </ol>
+    </nav>
+
+    <!-- ============================================================
+         1. Header — Logo, Name, Type, Country, Website
+         ============================================================ -->
+    <div class="flex flex-col md:flex-row gap-8 mb-10">
+        <!-- Logo -->
+        <div class="w-full md:w-72 flex-shrink-0">
+            <div class="aspect-square bg-gray-100 rounded-lg overflow-hidden shadow-lg flex items-center justify-center">
+                @if (!string.IsNullOrWhiteSpace(logoUrl))
+                {
+                    <img src="@logoUrl"
+                         alt="@name"
+                         class="w-full h-full object-contain p-4"
+                         width="400"
+                         height="400" />
+                }
+                else
+                {
+                    <svg class="w-24 h-24 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                }
+            </div>
+        </div>
+
+        <!-- Company Info -->
+        <div class="flex-1 min-w-0">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900">@name</h1>
+
+            <div class="flex flex-wrap items-center gap-2 mt-3">
+                @if (!string.IsNullOrWhiteSpace(companyType))
+                {
+                    <span class="inline-block bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                        @companyType
+                    </span>
+                }
+                @if (!string.IsNullOrWhiteSpace(country))
+                {
+                    <span class="inline-block bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                        @country
+                    </span>
+                }
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(website))
+            {
+                <div class="mt-3">
+                    <a href="@website"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-800 text-sm font-medium">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                        @website
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="flex flex-col lg:flex-row gap-8">
+        <!-- ============================================================
+             Main Content
+             ============================================================ -->
+        <div class="flex-1 min-w-0 space-y-10">
+
+            <!-- ============================================================
+                 2. History
+                 ============================================================ -->
+            @if (!string.IsNullOrWhiteSpace(history))
+            {
+                <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["History"]</h2>
+                    <div class="prose prose-gray max-w-none text-gray-700 leading-relaxed">
+                        @history
+                    </div>
+                </section>
+            }
+
+            <!-- ============================================================
+                 3. Albums as Label
+                 ============================================================ -->
+            @{ RenderAlbumList(albumsAsLabel, Localizer["Albums as Label"].Value); }
+
+            <!-- ============================================================
+                 4. Albums as Publisher
+                 ============================================================ -->
+            @{ RenderAlbumList(albumsAsPublisher, Localizer["Albums as Publisher"].Value); }
+
+            <!-- ============================================================
+                 5. Albums as Distributor
+                 ============================================================ -->
+            @{ RenderAlbumList(albumsAsDistributor, Localizer["Albums as Distributor"].Value); }
+
+            <!-- ============================================================
+                 6. Albums as Production Company
+                 ============================================================ -->
+            @{ RenderAlbumList(albumsAsProduction, Localizer["Albums as Production Company"].Value); }
+
+            <!-- ============================================================
+                 7. Albums as Studio
+                 ============================================================ -->
+            @{ RenderAlbumList(albumsAsStudio, Localizer["Albums as Studio"].Value); }
+
+            <!-- ============================================================
+                 8. Track Credits
+                 ============================================================ -->
+            @{ RenderTrackCredits(trackCredits); }
+
+            <!-- ============================================================
+                 9. Publications
+                 ============================================================ -->
+            @if (publications.Count > 0)
+            {
+                <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["Publications"]</h2>
+                    <div class="space-y-4">
+                        @foreach (var pub in publications)
+                        {
+                            string? pubTitle = null;
+                            string? pubDate = null;
+                            string? pubType = null;
+                            try { pubTitle = (string?)pub.Title ?? (string?)pub.Name; } catch { }
+                            try { pubDate = (string?)pub.PublicationDate?.ToString() ?? (string?)pub.Year?.ToString(); } catch { }
+                            try { pubType = (string?)pub.Type ?? (string?)pub.PublicationType; } catch { }
+
+                            <div class="p-4 bg-white rounded-lg border border-gray-200">
+                                <h3 class="font-medium text-gray-900">@pubTitle</h3>
+                                @if (!string.IsNullOrWhiteSpace(pubDate) || !string.IsNullOrWhiteSpace(pubType))
+                                {
+                                    <p class="text-sm text-gray-500 mt-1">
+                                        @pubDate
+                                        @if (!string.IsNullOrWhiteSpace(pubType))
+                                        {
+                                            <span class="ms-1">· @pubType</span>
+                                        }
+                                    </p>
+                                }
+                            </div>
+                        }
+                    </div>
+                </section>
+            }
+
+            <!-- ============================================================
+                 10. Media Gallery
+                 ============================================================ -->
+            @if (media.Count > 0)
+            {
+                var images = new List<dynamic>();
+                var videos = new List<dynamic>();
+                foreach (var m in media)
+                {
+                    string? mediaType = null;
+                    try { mediaType = (string?)m.MediaType ?? (string?)m.Type; } catch { }
+                    if (mediaType == "IMAGE" || mediaType == "image") images.Add(m);
+                    else if (mediaType == "VIDEO" || mediaType == "video") videos.Add(m);
+                }
+
+                <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["Media"]</h2>
+
+                    @if (images.Count > 0)
+                    {
+                        <h3 class="text-lg font-semibold text-gray-700 mb-2">@Localizer["Images"]</h3>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-6">
+                            @foreach (var img in images)
+                            {
+                                string? imgUrl = null;
+                                string? thumbUrl = null;
+                                string? imgDesc = null;
+                                try { imgUrl = (string?)img.Url; } catch { }
+                                try { thumbUrl = (string?)img.ThumbnailUrl ?? imgUrl; } catch { }
+                                try { imgDesc = (string?)img.Description; } catch { }
+
+                                <a href="@imgUrl"
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   class="block aspect-square bg-gray-100 rounded-lg overflow-hidden hover:opacity-90 transition-opacity">
+                                    <img src="@(thumbUrl ?? imgUrl)"
+                                         alt="@(imgDesc ?? "")"
+                                         class="w-full h-full object-cover"
+                                         loading="lazy" />
+                                </a>
+                            }
+                        </div>
+                    }
+
+                    @if (videos.Count > 0)
+                    {
+                        <h3 class="text-lg font-semibold text-gray-700 mb-2">@Localizer["Videos"]</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                            @foreach (var vid in videos)
+                            {
+                                string? vidUrl = null;
+                                string? vidDesc = null;
+                                try { vidUrl = (string?)vid.Url; } catch { }
+                                try { vidDesc = (string?)vid.Description; } catch { }
+
+                                <div class="aspect-video bg-gray-100 rounded-lg overflow-hidden">
+                                    @if (vidUrl is not null && (vidUrl.Contains("youtube") || vidUrl.Contains("youtu.be")))
+                                    {
+                                        <iframe src="@vidUrl"
+                                                class="w-full h-full"
+                                                allowfullscreen
+                                                loading="lazy"
+                                                title="@(vidDesc ?? "")"></iframe>
+                                    }
+                                    else if (vidUrl is not null)
+                                    {
+                                        <video src="@vidUrl"
+                                               class="w-full h-full object-cover"
+                                               controls
+                                               preload="none"></video>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    }
+                </section>
+            }
+
+            <!-- ============================================================
+                 11. References
+                 ============================================================ -->
+            @if (citations.Count > 0)
+            {
+                <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["References"]</h2>
+                    <ol class="space-y-3 list-decimal list-inside">
+                        @foreach (var citation in citations)
+                        {
+                            string? quote = null;
+                            string? sourceName = null;
+                            string? sourceSlug = null;
+                            string? pageNumber = null;
+                            string? citationUrl = null;
+                            try { quote = (string?)citation.Quote; } catch { }
+                            try { sourceName = (string?)citation.SourceName; } catch { }
+                            try { sourceSlug = (string?)citation.SourceSlug; } catch { }
+                            try { pageNumber = (string?)citation.PageNumber; } catch { }
+                            try { citationUrl = (string?)citation.Url; } catch { }
+
+                            <li class="text-sm text-gray-700">
+                                @if (!string.IsNullOrWhiteSpace(quote))
+                                {
+                                    <span class="font-medium">"@quote"</span>
+                                    <br />
+                                }
+                                <span class="text-gray-500">
+                                    @if (!string.IsNullOrWhiteSpace(sourceSlug))
+                                    {
+                                        <a href="/@culture/sources/@sourceSlug"
+                                           class="text-blue-600 hover:text-blue-800">
+                                            @sourceName
+                                        </a>
+                                    }
+                                    else if (!string.IsNullOrWhiteSpace(sourceName))
+                                    {
+                                        <span>@sourceName</span>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(pageNumber))
+                                    {
+                                        <span>, @Localizer["p."] @pageNumber</span>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(citationUrl))
+                                    {
+                                        <a href="@citationUrl"
+                                           target="_blank"
+                                           rel="noopener noreferrer"
+                                           class="text-blue-600 hover:text-blue-800 ms-1">
+                                            @Localizer["Source"]
+                                        </a>
+                                    }
+                                </span>
+                            </li>
+                        }
+                    </ol>
+                </section>
+            }
+
+            <!-- ============================================================
+                 12. External Links
+                 ============================================================ -->
+            @if (links.Count > 0)
+            {
+                <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["External Links"]</h2>
+                    <ul class="space-y-1.5">
+                        @foreach (var link in links)
+                        {
+                            string? linkUrl = null;
+                            string? linkTitle = null;
+                            string? linkType = null;
+                            try { linkUrl = (string?)link.Url; } catch { }
+                            try { linkTitle = (string?)link.Title ?? (string?)link.Name; } catch { }
+                            try { linkType = (string?)link.LinkType ?? (string?)link.Type; } catch { }
+
+                            @* Skip the website link since it's already shown in the header *@
+                            if (linkUrl == website) { continue; }
+
+                            <li>
+                                <a href="@linkUrl"
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                    @(!string.IsNullOrWhiteSpace(linkTitle) ? linkTitle : linkUrl)
+                                </a>
+                                @if (!string.IsNullOrWhiteSpace(linkType))
+                                {
+                                    <span class="text-gray-400 text-xs ms-1">[@linkType]</span>
+                                }
+                            </li>
+                        }
+                    </ul>
+                </section>
+            }
+        </div>
+
+        <!-- ============================================================
+             Sidebar — Summary metadata
+             ============================================================ -->
+        <aside class="w-full lg:w-72 flex-shrink-0" role="complementary" aria-label="@Localizer["Company metadata"]">
+            <div class="bg-gray-50 rounded-lg border border-gray-200 p-5 space-y-4 sticky top-4">
+                <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider">@Localizer["Details"]</h3>
+
+                @if (!string.IsNullOrWhiteSpace(companyType))
+                {
+                    <div>
+                        <h4 class="text-xs font-medium text-gray-500 uppercase">@Localizer["Type"]</h4>
+                        <p class="mt-1 text-sm text-gray-700">@companyType</p>
+                    </div>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(country))
+                {
+                    <div>
+                        <h4 class="text-xs font-medium text-gray-500 uppercase">@Localizer["Country"]</h4>
+                        <p class="mt-1 text-sm text-gray-700">@country</p>
+                    </div>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(website))
+                {
+                    <div>
+                        <h4 class="text-xs font-medium text-gray-500 uppercase">@Localizer["Website"]</h4>
+                        <a href="@website"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="mt-1 text-sm text-blue-600 hover:text-blue-800 break-all">@website</a>
+                    </div>
+                }
+            </div>
+        </aside>
+    </div>
+</div>
+
+<!-- ============================================================
+     JSON-LD Structured Data: Organization
+     ============================================================ -->
+@section StructuredData {
+@{
+    // Extract company properties safely from dynamic object
+    string? _compName = null; string? _compLogo = null; string? _compWebsite = null;
+    string? _compHistory = null; string? _compCountry = null;
+    try { _compName = (string?)Model.Company.Name ?? (string?)Model.Company.CompanyName; } catch { }
+    try { _compLogo = (string?)Model.Company.LogoUrl ?? (string?)Model.Company.Logo; } catch { }
+    try { _compWebsite = (string?)Model.Company.Website ?? (string?)Model.Company.WebSite; } catch { }
+    try { _compHistory = (string?)Model.Company.History; } catch { }
+    try { _compCountry = (string?)Model.Company.Country; } catch { }
+
+    // Extract links for sameAs
+    var _compLinks = new List<dynamic>();
+    try
+    {
+        var _rawLinks = (System.Collections.IEnumerable?)Model.Company.Links
+                       ?? (System.Collections.IEnumerable?)Model.Company.ExternalLinks;
+        if (_rawLinks is not null) { foreach (var _l in _rawLinks) _compLinks.Add(_l); }
+    }
+    catch { }
+}
+<script type="application/ld+json">
+{
+    "@@context": "https://schema.org",
+    "@@type": "Organization",
+    "name": "@_compName",
+    @if (!string.IsNullOrWhiteSpace(_compLogo))
+    {
+        <text>"logo": "@_compLogo",</text>
+    }
+    @if (!string.IsNullOrWhiteSpace(_compWebsite))
+    {
+        <text>"url": "@_compWebsite",</text>
+    }
+    @if (!string.IsNullOrWhiteSpace(_compHistory))
+    {
+        <text>"description": "@_compHistory",</text>
+    }
+    @if (!string.IsNullOrWhiteSpace(_compCountry))
+    {
+        <text>"address": {
+            "@@type": "PostalAddress",
+            "addressCountry": "@_compCountry"
+        },</text>
+    }
+    "sameAs": [
+        @{
+            bool _first = true;
+            foreach (var _link in _compLinks)
+            {
+                string? _linkUrl = null;
+                try { _linkUrl = (string?)_link.Url; } catch { }
+                if (!string.IsNullOrWhiteSpace(_linkUrl) && _linkUrl != _compWebsite)
+                {
+                    if (!_first) { <text>, </text> }
+                    _first = false;
+                    <text>"@_linkUrl"</text>
+                }
+            }
+        }
+    ]
+}
+</script>
+}

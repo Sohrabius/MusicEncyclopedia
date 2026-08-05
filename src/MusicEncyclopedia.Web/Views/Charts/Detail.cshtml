@@ -1,0 +1,133 @@
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer Localizer
+@model MusicEncyclopedia.Web.ViewModels.Public.ChartDetailViewModel
+
+@{
+    var culture = Context.Items["culture"] as string ?? "fa";
+    var dir = Context.Items["dir"] as string ?? "ltr";
+    var chart = Model.Chart;
+}
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" dir="@dir">
+    <nav aria-label="@Localizer["Breadcrumb"]" class="mb-6">
+        <ol class="flex items-center gap-2 text-sm text-gray-500">
+            <li><a href="/@culture" class="hover:text-blue-600">@Localizer["Home"]</a></li>
+            <li><a href="/@culture/charts" class="hover:text-blue-600 ms-1">@Localizer["Charts"]</a></li>
+            <li><span class="mx-1">/</span></li>
+            <li class="text-gray-900 font-medium truncate max-w-[200px]" aria-current="page">@chart.Name</li>
+        </ol>
+    </nav>
+
+    <div class="flex flex-col lg:flex-row gap-8">
+        <div class="flex-1 min-w-0 space-y-8">
+            <section>
+                <h1 class="text-3xl font-bold text-gray-900">@chart.Name</h1>
+                <div class="flex flex-wrap gap-3 mt-3">
+                    @if (!string.IsNullOrWhiteSpace(chart.Publisher))
+                    {
+                        <span class="text-sm text-gray-600"><i class="fas fa-building text-gray-400 me-1"></i> @chart.Publisher</span>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(chart.CountryName))
+                    {
+                        <span class="text-sm text-gray-600"><i class="fas fa-globe text-gray-400 me-1"></i> @chart.CountryName</span>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(chart.Frequency))
+                    {
+                        <span class="inline-block bg-orange-100 text-orange-800 text-sm font-medium px-3 py-1 rounded-full">@chart.Frequency</span>
+                    }
+                </div>
+            </section>
+
+            @if (chart.Entries.Count > 0)
+            {
+                <section>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-3">@Localizer["Chart Entries"]</h2>
+                    <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                        <table class="w-full text-sm">
+                            <thead class="bg-gray-50 border-b border-gray-200">
+                                <tr>
+                                    <th class="text-start px-4 py-2 font-medium text-gray-600">@Localizer["Date"]</th>
+                                    <th class="text-start px-4 py-2 font-medium text-gray-600">@Localizer["Entity"]</th>
+                                    <th class="text-center px-4 py-2 font-medium text-gray-600">@Localizer["Position"]</th>
+                                    <th class="text-center px-4 py-2 font-medium text-gray-600">@Localizer["Prev"]</th>
+                                    <th class="text-center px-4 py-2 font-medium text-gray-600">@Localizer["Weeks"]</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                @foreach (var entry in chart.Entries)
+                                {
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-4 py-2 text-gray-500 whitespace-nowrap">@entry.Date.ToString("yyyy-MM-dd")</td>
+                                        <td class="px-4 py-2">
+                                            @if (!string.IsNullOrWhiteSpace(entry.EntitySlug))
+                                            {
+                                                <a href="/@culture/@(entry.EntityTypeId == 1 ? "albums" : entry.EntityTypeId == 2 ? "tracks" : "people")/@entry.EntitySlug"
+                                                   class="text-blue-600 hover:text-blue-800 font-medium">@entry.EntityTitle</a>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-gray-900">@entry.EntityTitle ?? "Unknown"</span>
+                                            }
+                                        </td>
+                                        <td class="px-4 py-2 text-center font-bold text-gray-900">#@entry.Position</td>
+                                        <td class="px-4 py-2 text-center text-gray-500">
+                                            @if (entry.PreviousPosition.HasValue)
+                                            {
+                                                var diff = entry.PreviousPosition.Value - entry.Position;
+                                                if (diff > 0) { <span class="text-green-600">▲@diff</span> }
+                                                else if (diff < 0) { <span class="text-red-600">▼@(-diff)</span> }
+                                                else { <span class="text-gray-400">—</span> }
+                                            }
+                                            else { <span class="text-gray-400">—</span> }
+                                        </td>
+                                        <td class="px-4 py-2 text-center text-gray-500">@(entry.WeeksOnChart?.ToString() ?? "—")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            }
+        </div>
+
+        <aside class="w-full lg:w-72 space-y-4">
+            <div class="bg-white rounded-lg border border-gray-200 p-4">
+                <h3 class="text-sm font-semibold text-gray-700 mb-2">@Localizer["Chart Info"]</h3>
+                <dl class="space-y-1 text-sm">
+                    <div class="flex justify-between"><dt class="text-gray-500">@Localizer["Publisher"]</dt><dd class="text-gray-900">@(chart.Publisher ?? "—")</dd></div>
+                    <div class="flex justify-between"><dt class="text-gray-500">@Localizer["Country"]</dt><dd class="text-gray-900">@(chart.CountryName ?? "—")</dd></div>
+                    <div class="flex justify-between"><dt class="text-gray-500">@Localizer["Frequency"]</dt><dd class="text-gray-900">@(chart.Frequency ?? "—")</dd></div>
+                    <div class="flex justify-between"><dt class="text-gray-500">@Localizer["Entries"]</dt><dd class="text-gray-900">@chart.Entries.Count</dd></div>
+                </dl>
+            </div>
+        </aside>
+    </div>
+</div>
+
+<!-- ============================================================
+     JSON-LD Structured Data: CreativeWork (Chart)
+     ============================================================ -->
+@section StructuredData {
+<script type="application/ld+json">
+{
+    "@@context": "https://schema.org",
+    "@@type": "CreativeWork",
+    "name": "@Model.Chart.Name",
+    @if (!string.IsNullOrWhiteSpace(Model.Chart.Publisher))
+    {
+        <text>"publisher": {
+            "@@type": "Organization",
+            "name": "@Model.Chart.Publisher"
+        },</text>
+    }
+    @if (!string.IsNullOrWhiteSpace(Model.Chart.Frequency))
+    {
+        <text>"description": "@Model.Chart.Frequency",</text>
+    }
+    @if (!string.IsNullOrWhiteSpace(Model.Chart.CountryName))
+    {
+        <text>"contentLocation": "@Model.Chart.CountryName",</text>
+    }
+    "url": "@($"{Context.Request.Scheme}://{Context.Request.Host}/{culture}/charts/{Model.Chart.Slug}")"
+}
+</script>
+}

@@ -1,0 +1,114 @@
+2026-08-05 12:39:42.779 +03:30 [INF] Starting Music Encyclopedia Web application
+2026-08-05 12:39:48.806 +03:30 [WRN] Entity 'Album' has a global query filter defined and is the required end of a relationship with the entity 'AlbumCompany'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+2026-08-05 12:39:48.812 +03:30 [WRN] Entity 'Album' has a global query filter defined and is the required end of a relationship with the entity 'AlbumCountry'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+2026-08-05 12:39:48.837 +03:30 [WRN] Entity 'Album' has a global query filter defined and is the required end of a relationship with the entity 'AlbumGenre'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+2026-08-05 12:39:48.839 +03:30 [WRN] Entity 'Album' has a global query filter defined and is the required end of a relationship with the entity 'AlbumIdentifier'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+2026-08-05 12:39:48.842 +03:30 [WRN] Entity 'Album' has a global query filter defined and is the required end of a relationship with the entity 'AlbumLanguage'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+2026-08-05 12:39:48.844 +03:30 [WRN] Entity 'Album' has a global query filter defined and is the required end of a relationship with the entity 'AlbumMood'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+2026-08-05 12:39:48.847 +03:30 [WRN] Entity 'Album' has a global query filter defined and is the required end of a relationship with the entity 'AlbumRelation'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+2026-08-05 12:39:48.850 +03:30 [WRN] Entity 'Album' has a global query filter defined and is the required end of a relationship with the entity 'AlbumTrack'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+2026-08-05 12:39:48.854 +03:30 [WRN] Entity 'Award' has a global query filter defined and is the required end of a relationship with the entity 'AwardAssignment'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+2026-08-05 12:39:48.857 +03:30 [WRN] Entity 'Certification' has a global query filter defined and is the required end of a relationship with the entity 'CertificationAssignment'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+2026-08-05 12:39:48.859 +03:30 [WRN] Entity 'Chart' has a global query filter defined and is the required end of a relationship with the entity 'ChartEntry'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+2026-08-05 12:39:48.862 +03:30 [WRN] Entity 'Media' has a global query filter defined and is the required end of a relationship with the entity 'MediaAssignment'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+2026-08-05 12:39:48.864 +03:30 [WRN] Entity 'Instrument' has a global query filter defined and is the required end of a relationship with the entity 'MusicianInstrument'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+2026-08-05 12:39:48.866 +03:30 [WRN] Entity 'Album' has a global query filter defined and is the required end of a relationship with the entity 'PerformanceEventAlbum'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+2026-08-05 12:39:48.869 +03:30 [WRN] Entity 'PerformanceEvent' has a global query filter defined and is the required end of a relationship with the entity 'PerformanceEventTrack'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+2026-08-05 12:39:48.872 +03:30 [WRN] Entity 'Person' has a global query filter defined and is the required end of a relationship with the entity 'PersonTypeAssignment'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+2026-08-05 12:39:48.874 +03:30 [WRN] Entity 'Album' has a global query filter defined and is the required end of a relationship with the entity 'RecordingSessionAlbum'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+2026-08-05 12:39:48.876 +03:30 [WRN] Entity 'RecordingSession' has a global query filter defined and is the required end of a relationship with the entity 'RecordingSessionTrack'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+2026-08-05 12:39:48.878 +03:30 [WRN] Entity 'Tag' has a global query filter defined and is the required end of a relationship with the entity 'TagAssignment'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+2026-08-05 12:39:48.881 +03:30 [WRN] Entity 'Genre' has a global query filter defined and is the required end of a relationship with the entity 'TrackGenre'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+2026-08-05 12:39:48.883 +03:30 [WRN] Entity 'Instrument' has a global query filter defined and is the required end of a relationship with the entity 'TrackInstrument'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+2026-08-05 12:39:48.885 +03:30 [WRN] Entity 'Mood' has a global query filter defined and is the required end of a relationship with the entity 'TrackMood'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+2026-08-05 12:39:48.888 +03:30 [WRN] Entity 'Track' has a global query filter defined and is the required end of a relationship with the entity 'TrackRelation'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+2026-08-05 12:39:48.890 +03:30 [WRN] Entity 'SungVersion' has a global query filter defined and is the required end of a relationship with the entity 'TrackSungVersion'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+2026-08-05 12:39:48.892 +03:30 [WRN] Entity 'Track' has a global query filter defined and is the required end of a relationship with the entity 'TrackVersionTypeAssignment'. This may lead to unexpected results when the required entity is filtered out. Either configure the navigation as optional, or define matching query filters for both entities in the navigation. See https://go.microsoft.com/fwlink/?linkid=2131316 for more information.
+2026-08-05 12:39:49.486 +03:30 [INF] Executed DbCommand (43ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT COUNT(*) FROM "sqlite_master" WHERE "type" = 'table' AND "rootpage" IS NOT NULL;
+2026-08-05 12:39:49.694 +03:30 [INF] Executed DbCommand (3ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT EXISTS (
+    SELECT 1
+    FROM "MediaType" AS "m")
+2026-08-05 12:39:50.137 +03:30 [INF] Application configured, starting web host
+2026-08-05 12:39:50.198 +03:30 [INF] User profile is available. Using 'C:\Users\sohrabi\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2026-08-05 12:39:50.762 +03:30 [INF] Now listening on: http://localhost:5240
+2026-08-05 12:39:50.830 +03:30 [INF] Application started. Press Ctrl+C to shut down.
+2026-08-05 12:39:50.833 +03:30 [INF] Hosting environment: Development
+2026-08-05 12:39:50.834 +03:30 [INF] Content root path: E:\git\MusicEncy\src\MusicEncyclopedia.Web
+2026-08-05 12:39:51.467 +03:30 [INF] Request starting HTTP/1.1 GET http://localhost:5240/ - null null
+2026-08-05 12:39:51.884 +03:30 [INF] No cached response available for this request.
+2026-08-05 12:39:52.064 +03:30 [INF] The response could not be cached for this request.
+2026-08-05 12:39:52.083 +03:30 [INF] Request finished HTTP/1.1 GET http://localhost:5240/ - 404 null null 627.9609ms
+2026-08-05 12:39:52.097 +03:30 [INF] Request reached the end of the middleware pipeline without being handled by application code. Request path: GET http://localhost:5240/, Response status code: 404
+2026-08-05 12:40:00.152 +03:30 [INF] Request starting HTTP/1.1 GET http://localhost:5240/fa - null null
+2026-08-05 12:40:00.169 +03:30 [INF] No cached response available for this request.
+2026-08-05 12:40:00.185 +03:30 [INF] Executing endpoint 'MusicEncyclopedia.Web.Controllers.HomeController.Index (MusicEncyclopedia.Web)'
+2026-08-05 12:40:00.218 +03:30 [INF] Route matched with {action = "Index", controller = "Home", area = ""}. Executing controller action with signature Microsoft.AspNetCore.Mvc.IActionResult Index(System.String) on controller MusicEncyclopedia.Web.Controllers.HomeController (MusicEncyclopedia.Web).
+2026-08-05 12:40:00.242 +03:30 [DBG] Home page requested for culture: fa
+2026-08-05 12:40:00.277 +03:30 [INF] Executing ViewResult, running view Index.
+2026-08-05 12:40:00.381 +03:30 [INF] Executed ViewResult - view Index executed in 129.6259ms.
+2026-08-05 12:40:00.389 +03:30 [INF] Executed action MusicEncyclopedia.Web.Controllers.HomeController.Index (MusicEncyclopedia.Web) in 166.7463ms
+2026-08-05 12:40:00.395 +03:30 [INF] Executed endpoint 'MusicEncyclopedia.Web.Controllers.HomeController.Index (MusicEncyclopedia.Web)'
+2026-08-05 12:40:00.398 +03:30 [INF] The response has been cached.
+2026-08-05 12:40:00.409 +03:30 [INF] Request starting HTTP/1.1 GET http://localhost:5240/js/site.js - null null
+2026-08-05 12:40:00.409 +03:30 [INF] Request starting HTTP/1.1 GET http://localhost:5240/_framework/aspnetcore-browser-refresh.js - null null
+2026-08-05 12:40:00.409 +03:30 [INF] Request starting HTTP/1.1 GET http://localhost:5240/css/site.css - null null
+2026-08-05 12:40:00.414 +03:30 [INF] Request finished HTTP/1.1 GET http://localhost:5240/fa - 200 null text/html; charset=utf-8 262.3174ms
+2026-08-05 12:40:00.430 +03:30 [INF] Request finished HTTP/1.1 GET http://localhost:5240/_framework/aspnetcore-browser-refresh.js - 200 14946 application/javascript; charset=utf-8 20.6994ms
+2026-08-05 12:40:00.487 +03:30 [INF] Sending file. Request path: '/css/site.css'. Physical path: 'E:\git\MusicEncy\src\MusicEncyclopedia.Web\wwwroot\css\site.css'
+2026-08-05 12:40:00.492 +03:30 [INF] Request finished HTTP/1.1 GET http://localhost:5240/css/site.css - 200 26882 text/css 82.4869ms
+2026-08-05 12:40:00.787 +03:30 [INF] Sending file. Request path: '/js/site.js'. Physical path: 'E:\git\MusicEncy\src\MusicEncyclopedia.Web\wwwroot\js\site.js'
+2026-08-05 12:40:00.791 +03:30 [INF] Request finished HTTP/1.1 GET http://localhost:5240/js/site.js - 200 4843 text/javascript 381.4261ms
+2026-08-05 12:40:00.796 +03:30 [INF] Request starting HTTP/1.1 GET http://localhost:5240/_vs/browserLink - null null
+2026-08-05 12:40:00.868 +03:30 [INF] Request finished HTTP/1.1 GET http://localhost:5240/_vs/browserLink - 200 null text/javascript; charset=UTF-8 71.3188ms
+2026-08-05 12:40:01.215 +03:30 [INF] Request starting HTTP/1.1 GET http://localhost:5240/favicon.ico - null null
+2026-08-05 12:40:01.282 +03:30 [INF] Sending file. Request path: '/favicon.ico'. Physical path: 'E:\git\MusicEncy\src\MusicEncyclopedia.Web\wwwroot\favicon.ico'
+2026-08-05 12:40:01.290 +03:30 [INF] Request finished HTTP/1.1 GET http://localhost:5240/favicon.ico - 200 5430 image/x-icon 75.1768ms
+2026-08-05 12:40:08.670 +03:30 [INF] Request starting HTTP/1.1 GET http://localhost:5240/fa/genres - null null
+2026-08-05 12:40:08.678 +03:30 [INF] No cached response available for this request.
+2026-08-05 12:40:08.686 +03:30 [INF] Executing endpoint 'MusicEncyclopedia.Web.Controllers.GenresController.Index (MusicEncyclopedia.Web)'
+2026-08-05 12:40:08.699 +03:30 [INF] Route matched with {action = "Index", controller = "Genres", area = ""}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Index(System.String, Int32, System.String, System.Threading.CancellationToken) on controller MusicEncyclopedia.Web.Controllers.GenresController (MusicEncyclopedia.Web).
+2026-08-05 12:40:08.944 +03:30 [DBG] Genre list requested: culture=fa, page=1, q=null
+2026-08-05 12:40:09.265 +03:30 [INF] Executed action MusicEncyclopedia.Web.Controllers.GenresController.Index (MusicEncyclopedia.Web) in 561.1951ms
+2026-08-05 12:40:09.269 +03:30 [INF] Executed endpoint 'MusicEncyclopedia.Web.Controllers.GenresController.Index (MusicEncyclopedia.Web)'
+2026-08-05 12:40:09.356 +03:30 [ERR] An unhandled exception has occurred while executing the request.
+Microsoft.Data.Sqlite.SqliteException (0x80004005): SQLite Error 1: 'near "OFFSET": syntax error'.
+   at Microsoft.Data.Sqlite.SqliteException.ThrowExceptionForRC(Int32 rc, sqlite3 db)
+   at Microsoft.Data.Sqlite.SqliteCommand.PrepareAndEnumerateStatements()+MoveNext()
+   at Microsoft.Data.Sqlite.SqliteCommand.GetStatements()+MoveNext()
+   at Microsoft.Data.Sqlite.SqliteDataReader.NextResult()
+   at Microsoft.Data.Sqlite.SqliteCommand.ExecuteReader(CommandBehavior behavior)
+   at Microsoft.Data.Sqlite.SqliteCommand.ExecuteReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+   at Microsoft.Data.Sqlite.SqliteCommand.ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+   at Dapper.SqlMapper.QueryAsync[T](IDbConnection cnn, Type effectiveType, CommandDefinition command) in /_/Dapper/SqlMapper.Async.cs:line 434
+   at MusicEncyclopedia.Web.Controllers.GenresController.Index(String culture, Int32 page, String q, CancellationToken cancellationToken) in E:\git\MusicEncy\src\MusicEncyclopedia.Web\Controllers\GenresController.cs:line 57
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.InvokeInnerFilterAsync()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeNextResourceFilter>g__Awaited|25_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResourceExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.InvokeFilterPipelineAsync()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Routing.EndpointMiddleware.<Invoke>g__AwaitRequestTask|7_0(Endpoint endpoint, Task requestTask, ILogger logger)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at MusicEncyclopedia.Web.Middleware.CultureMiddleware.InvokeAsync(HttpContext context) in E:\git\MusicEncy\src\MusicEncyclopedia.Web\Middleware\CultureMiddleware.cs:line 43
+   at Microsoft.AspNetCore.Localization.RequestLocalizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.ResponseCaching.ResponseCachingMiddleware.Invoke(HttpContext httpContext)
+   at AspNetCoreRateLimit.RateLimitMiddleware`1.Invoke(HttpContext context) in C:\Users\User\Documents\Github\AspNetCoreRateLimit\src\AspNetCoreRateLimit\Middleware\RateLimitMiddleware.cs:line 124
+   at Program.<>c.<<<Main>$>b__0_9>d.MoveNext() in E:\git\MusicEncy\src\MusicEncyclopedia.Web\Program.cs:line 293
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Diagnostics.DeveloperExceptionPageMiddlewareImpl.Invoke(HttpContext context)
+2026-08-05 12:40:09.550 +03:30 [INF] Request finished HTTP/1.1 GET http://localhost:5240/fa/genres - 500 null text/html; charset=utf-8 880.2474ms
+2026-08-05 12:40:09.585 +03:30 [INF] Request starting HTTP/1.1 GET http://localhost:5240/_framework/aspnetcore-browser-refresh.js - null null
+2026-08-05 12:40:09.585 +03:30 [INF] Request starting HTTP/1.1 GET http://localhost:5240/_vs/browserLink - null null
+2026-08-05 12:40:09.592 +03:30 [INF] Request finished HTTP/1.1 GET http://localhost:5240/_framework/aspnetcore-browser-refresh.js - 200 14946 application/javascript; charset=utf-8 6.9498ms
+2026-08-05 12:40:09.619 +03:30 [INF] Request finished HTTP/1.1 GET http://localhost:5240/_vs/browserLink - 200 null text/javascript; charset=UTF-8 33.8588ms

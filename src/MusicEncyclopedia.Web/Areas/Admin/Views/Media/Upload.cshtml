@@ -1,0 +1,146 @@
+@model MediaUploadViewModel
+@{
+    ViewData["Title"] = "Upload Media";
+    ViewData["ActiveMenu"] = "Media";
+}
+
+<form method="post" action="/admin/media/Upload" enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="mb-4 px-4 py-3 rounded-md bg-red-50 border border-red-200 text-red-800 text-sm" role="alert"></div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 space-y-6">
+            <!-- File Upload Area -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Select File</h2>
+                <div id="drop-zone" class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition-colors cursor-pointer" onclick="document.getElementById('file-input').click()">
+                    <i class="fas fa-cloud-upload-alt text-4xl text-gray-300 mb-3 block"></i>
+                    <p class="text-sm text-gray-500 mb-1">Drag and drop a file here, or click to select</p>
+                    <p class="text-xs text-gray-400">Allowed: JPEG, PNG, GIF, WebP, SVG, MP3, WAV, FLAC, AAC, MP4, WebM, PDF (max 200 MB)</p>
+                    <input type="file" id="file-input" asp-for="File" class="hidden" onchange="handleFileSelect(event)" />
+                    <span asp-validation-for="File" class="text-xs text-red-600"></span>
+                </div>
+                <div id="file-preview" class="hidden mt-4 p-3 bg-gray-50 rounded-md">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-file text-2xl text-blue-500"></i>
+                        <div class="flex-1 min-w-0">
+                            <p id="file-name" class="text-sm font-medium text-gray-900 truncate"></p>
+                            <p id="file-size" class="text-xs text-gray-500"></p>
+                        </div>
+                        <button type="button" onclick="clearFileSelection()" class="text-red-500 hover:text-red-700">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Metadata -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Media Metadata</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label asp-for="MediaTypeId" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                        <select asp-for="MediaTypeId" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">-- Auto-detect --</option>
+                            @foreach (var mt in Model.MediaTypes)
+                            {
+                                <option value="@mt.MediaTypeId">@mt.Name</option>
+                            }
+                        </select>
+                        <span asp-validation-for="MediaTypeId" class="text-xs text-red-600"></span>
+                    </div>
+                    <div>
+                        <label asp-for="FileName" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                        <input asp-for="FileName" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Leave empty to use original name" />
+                        <span asp-validation-for="FileName" class="text-xs text-red-600"></span>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label asp-for="AltText" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                        <input asp-for="AltText" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Descriptive text for accessibility" />
+                        <span asp-validation-for="AltText" class="text-xs text-red-600"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-6">
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Upload</h2>
+                <button type="submit" id="btn-upload" class="w-full px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
+                    <i class="fas fa-upload"></i> Upload File
+                </button>
+                <a href="/admin/media" class="w-full block text-center mt-3 px-4 py-2.5 text-sm text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">Cancel</a>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
+                <h2 class="text-sm font-semibold text-gray-700 mb-2">Upload Guidelines</h2>
+                <ul class="text-xs text-gray-500 space-y-1 list-disc list-inside">
+                    <li>Maximum file size: 200 MB</li>
+                    <li>Supported image formats: JPEG, PNG, GIF, WebP, SVG</li>
+                    <li>Supported audio formats: MP3, WAV, FLAC, AAC</li>
+                    <li>Supported video formats: MP4, WebM, AVI</li>
+                    <li>PDF documents are also supported</li>
+                    <li>Files are stored in /uploads/media/</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.21.0/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/4.1.0/jquery.validate.unobtrusive.min.js"></script>
+    <script>
+        var dropZone = document.getElementById('drop-zone');
+        var fileInput = document.getElementById('file-input');
+        var filePreview = document.getElementById('file-preview');
+        var fileNameDisplay = document.getElementById('file-name');
+        var fileSizeDisplay = document.getElementById('file-size');
+
+        // Drag and drop support
+        dropZone.addEventListener('dragover', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.classList.add('border-blue-500', 'bg-blue-50');
+        });
+
+        dropZone.addEventListener('dragleave', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.classList.remove('border-blue-500', 'bg-blue-50');
+        });
+
+        dropZone.addEventListener('drop', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.classList.remove('border-blue-500', 'bg-blue-50');
+            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                fileInput.files = e.dataTransfer.files;
+                updatePreview(e.dataTransfer.files[0]);
+            }
+        });
+
+        function handleFileSelect(event) {
+            if (event.target.files && event.target.files.length > 0) {
+                updatePreview(event.target.files[0]);
+            }
+        }
+
+        function updatePreview(file) {
+            fileNameDisplay.textContent = file.name;
+            fileSizeDisplay.textContent = formatFileSize(file.size);
+            filePreview.classList.remove('hidden');
+        }
+
+        function clearFileSelection() {
+            fileInput.value = '';
+            filePreview.classList.add('hidden');
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / 1048576).toFixed(1) + ' MB';
+        }
+    </script>
+}

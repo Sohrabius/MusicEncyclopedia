@@ -1,0 +1,207 @@
+@model CreditListViewModel
+@{
+    // Partial view for the credit editor (spec 10.7).
+    // Renders a table of credits with inline add/edit/delete capabilities via AJAX.
+}
+
+<div class="credit-editor" data-entity-type-id="@Model.EntityTypeId" data-entity-id="@Model.EntityId">
+    <div class="flex items-center justify-between mb-3">
+        <h3 class="text-sm font-semibold text-gray-700">Credits</h3>
+        <button type="button" class="btn-add-credit px-3 py-1.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+            <i class="fas fa-plus"></i> Add Credit
+        </button>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead class="bg-gray-50 border-b border-gray-200">
+                <tr>
+                    <th class="text-start px-3 py-2 font-medium text-gray-600">Role</th>
+                    <th class="text-start px-3 py-2 font-medium text-gray-600">Scope</th>
+                    <th class="text-start px-3 py-2 font-medium text-gray-600">Person</th>
+                    <th class="text-start px-3 py-2 font-medium text-gray-600">Company</th>
+                    <th class="text-start px-3 py-2 font-medium text-gray-600">Instrument</th>
+                    <th class="text-center px-3 py-2 font-medium text-gray-600">Order</th>
+                    <th class="text-center px-3 py-2 font-medium text-gray-600">Primary</th>
+                    <th class="text-end px-3 py-2 font-medium text-gray-600">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                @if (Model.Credits.Count == 0)
+                {
+                    <tr class="empty-row">
+                        <td colspan="8" class="px-3 py-6 text-center text-gray-500 text-xs">
+                            No credits yet. Click "Add Credit" to add one.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var credit in Model.Credits)
+                    {
+                        <tr data-credit-id="@credit.CreditId">
+                            <td class="px-3 py-2">@credit.CreditRoleId</td>
+                            <td class="px-3 py-2">@credit.RoleScopeTypeId</td>
+                            <td class="px-3 py-2">@credit.PersonId</td>
+                            <td class="px-3 py-2">@credit.CompanyId</td>
+                            <td class="px-3 py-2">@credit.InstrumentId</td>
+                            <td class="px-3 py-2 text-center">@credit.DisplayOrder</td>
+                            <td class="px-3 py-2 text-center">@if(credit.IsPrimary){<i class="fas fa-check text-green-500"></i>}</td>
+                            <td class="px-3 py-2 text-end">
+                                <button type="button" class="btn-edit-credit text-blue-600 hover:text-blue-800 text-xs me-2"><i class="fas fa-edit"></i></button>
+                                <button type="button" class="btn-delete-credit text-red-600 hover:text-red-800 text-xs"><i class="fas fa-trash-alt"></i></button>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Inline edit form (hidden, shown on add/edit) -->
+    <div class="credit-form hidden mt-3 p-3 bg-gray-50 rounded-md border border-gray-200">
+        <input type="hidden" class="credit-id" value="0" />
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Role</label>
+                <select class="credit-role-id w-full text-xs px-2 py-1.5 border border-gray-300 rounded">
+                    <option value="">-- Select --</option>
+                    @foreach (var role in Model.CreditRoles)
+                    {
+                        <option value="@role.CreditRoleId">@role.Name</option>
+                    }
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Scope</label>
+                <select class="role-scope-type-id w-full text-xs px-2 py-1.5 border border-gray-300 rounded">
+                    <option value="">-- Select --</option>
+                    @foreach (var scope in Model.RoleScopeTypes)
+                    {
+                        <option value="@scope.RoleScopeTypeId">@scope.Name</option>
+                    }
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Person</label>
+                <select class="person-id w-full text-xs px-2 py-1.5 border border-gray-300 rounded">
+                    <option value="">-- Select --</option>
+                    @foreach (var person in Model.People)
+                    {
+                        <option value="@person.PersonId">@person.FullName</option>
+                    }
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Company</label>
+                <select class="company-id w-full text-xs px-2 py-1.5 border border-gray-300 rounded">
+                    <option value="">-- Select --</option>
+                    @foreach (var company in Model.Companies)
+                    {
+                        <option value="@company.CompanyId">@company.Name</option>
+                    }
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Instrument</label>
+                <select class="instrument-id w-full text-xs px-2 py-1.5 border border-gray-300 rounded">
+                    <option value="">-- Select --</option>
+                    @foreach (var inst in Model.Instruments)
+                    {
+                        <option value="@inst.InstrumentId">@inst.Name</option>
+                    }
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Display Order</label>
+                <input type="number" class="display-order w-full text-xs px-2 py-1.5 border border-gray-300 rounded" value="0" />
+            </div>
+            <div class="flex items-end pb-1">
+                <label class="inline-flex items-center gap-1 cursor-pointer">
+                    <input type="checkbox" class="is-primary rounded border-gray-300 text-blue-600" />
+                    <span class="text-xs text-gray-600">Primary</span>
+                </label>
+            </div>
+        </div>
+        <div class="mt-2">
+            <label class="block text-xs font-medium text-gray-600 mb-1">Notes</label>
+            <input type="text" class="notes w-full text-xs px-2 py-1.5 border border-gray-300 rounded" />
+        </div>
+        <div class="flex items-center gap-2 mt-3">
+            <button type="button" class="btn-save-credit px-3 py-1.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700">Save</button>
+            <button type="button" class="btn-cancel-credit px-3 py-1.5 text-xs text-gray-600 bg-gray-200 rounded-md hover:bg-gray-300">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Credit editor JavaScript (simplified inline version)
+    document.querySelectorAll('.credit-editor').forEach(function(editor) {
+        var addBtn = editor.querySelector('.btn-add-credit');
+        var form = editor.querySelector('.credit-form');
+        var cancelBtn = editor.querySelector('.btn-cancel-credit');
+        var saveBtn = editor.querySelector('.btn-save-credit');
+
+        addBtn.addEventListener('click', function() {
+            form.querySelector('.credit-id').value = '0';
+            form.querySelector('.credit-role-id').value = '';
+            form.querySelector('.role-scope-type-id').value = '';
+            form.querySelector('.person-id').value = '';
+            form.querySelector('.company-id').value = '';
+            form.querySelector('.instrument-id').value = '';
+            form.querySelector('.display-order').value = '0';
+            form.querySelector('.is-primary').checked = false;
+            form.querySelector('.notes').value = '';
+            form.classList.remove('hidden');
+        });
+
+        cancelBtn.addEventListener('click', function() {
+            form.classList.add('hidden');
+        });
+
+        saveBtn.addEventListener('click', function() {
+            var creditId = form.querySelector('.credit-id').value;
+            var data = new FormData();
+            data.append('creditId', creditId);
+            data.append('creditRoleId', form.querySelector('.credit-role-id').value);
+            data.append('roleScopeTypeId', form.querySelector('.role-scope-type-id').value);
+            data.append('personId', form.querySelector('.person-id').value || '');
+            data.append('companyId', form.querySelector('.company-id').value || '');
+            data.append('instrumentId', form.querySelector('.instrument-id').value || '');
+            data.append('displayOrder', form.querySelector('.display-order').value);
+            data.append('isPrimary', form.querySelector('.is-primary').checked ? 'true' : 'false');
+            data.append('notes', form.querySelector('.notes').value);
+            data.append('entityTypeId', editor.dataset.entityTypeId);
+            data.append('entityId', editor.dataset.entityId);
+            data.append('__RequestVerificationToken', document.querySelector('input[name="__RequestVerificationToken"]').value);
+
+            fetch('/admin/credits/save', { method: 'POST', body: data })
+                .then(function(r) { return r.json(); })
+                .then(function(result) {
+                    if (result.success) {
+                        location.reload();
+                    } else {
+                        alert('Error: ' + (result.errors || []).join(', '));
+                    }
+                });
+        });
+
+        // Delete buttons
+        editor.querySelectorAll('.btn-delete-credit').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                if (!confirm('Delete this credit?')) return;
+                var row = this.closest('tr');
+                var creditId = row.dataset.creditId;
+                var data = new FormData();
+                data.append('__RequestVerificationToken', document.querySelector('input[name="__RequestVerificationToken"]').value);
+
+                fetch('/admin/credits/delete/' + creditId, { method: 'POST', body: data })
+                    .then(function(r) { return r.json(); })
+                    .then(function(result) {
+                        if (result.success) { location.reload(); }
+                        else { alert('Error: ' + (result.errors || []).join(', ')); }
+                    });
+            });
+        });
+    });
+</script>

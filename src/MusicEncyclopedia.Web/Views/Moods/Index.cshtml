@@ -1,0 +1,200 @@
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer Localizer
+@model MusicEncyclopedia.Web.ViewModels.Public.MoodListViewModel
+
+@{
+    var culture = Context.Items["culture"] as string ?? "fa";
+    var dir = Context.Items["dir"] as string ?? "ltr";
+    var isRtl = dir == "rtl";
+    var items = Model.Items;
+    var canonicalUrl = string.Concat(Context.Request.Scheme, "://", Context.Request.Host, Context.Request.PathBase, Context.Request.Path);
+}
+
+<!-- ===== Canonical URL ===== -->
+<link rel="canonical" href="@canonicalUrl" />
+
+<!-- ===== Open Graph ===== -->
+<meta property="og:title" content="@Localizer["Moods"] - @Localizer["Music Encyclopedia"]" />
+<meta property="og:description" content="@Localizer["Browse all music moods — from upbeat and energetic to calm and reflective."]" />
+<meta property="og:url" content="@canonicalUrl" />
+<meta property="og:type" content="website" />
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" dir="@dir">
+    <!-- Page Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-900">@Localizer["Moods"]</h1>
+        <p class="mt-2 text-gray-600">@Localizer["Browse all music moods"]</p>
+    </div>
+
+    <div class="flex flex-col lg:flex-row gap-8">
+        <!-- ============================================================
+             Filter Sidebar
+             ============================================================ -->
+        <aside class="w-full lg:w-64 flex-shrink-0" role="complementary" aria-label="@Localizer["Filters"]">
+            <form method="get" action="/@culture/moods" class="space-y-5 bg-white rounded-lg border border-gray-200 p-5 sticky top-4">
+                <!-- Search -->
+                <div>
+                    <label for="search" class="block text-sm font-medium text-gray-700 mb-1">@Localizer["Search"]</label>
+                    <input type="text"
+                           id="search"
+                           name="q"
+                           value="@Model.SearchQuery"
+                           placeholder="@Localizer["Search moods..."]"
+                           class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm px-3 py-2 border" />
+                </div>
+
+                <!-- Filter Actions -->
+                <div class="flex gap-2">
+                    <button type="submit"
+                            class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        @Localizer["Search"]
+                    </button>
+                    <a href="/@culture/moods"
+                       class="flex-1 text-center bg-gray-100 text-gray-700 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-200 transition-colors">
+                        @Localizer["Clear"]
+                    </a>
+                </div>
+            </form>
+        </aside>
+
+        <!-- ============================================================
+             Mood Grid
+             ============================================================ -->
+        <div class="flex-1 min-w-0">
+            @if (items.Items.Count == 0)
+            {
+                <!-- Empty state -->
+                <div class="text-center py-16">
+                    <svg class="mx-auto h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                              d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z" />
+                    </svg>
+                    <h3 class="mt-4 text-lg font-medium text-gray-900">@Localizer["No moods found"]</h3>
+                    <p class="mt-2 text-gray-500">@Localizer["Try adjusting your search query."]</p>
+                    <a href="/@culture/moods"
+                       class="mt-4 inline-block text-blue-600 hover:text-blue-800 font-medium">
+                        @Localizer["Clear search"]
+                    </a>
+                </div>
+            }
+            else
+            {
+                <!-- Result count -->
+                <p class="text-sm text-gray-500 mb-4">
+                    @Localizer["Showing {0}–{1} of {2} moods",
+                        ((items.Page - 1) * items.PageSize) + 1,
+                        Math.Min(items.Page * items.PageSize, items.TotalItems),
+                        items.TotalItems]
+                </p>
+
+                <!-- Mood Badges Grid -->
+                <div class="flex flex-wrap gap-3">
+                    @foreach (var mood in items.Items)
+                    {
+                        <a href="/@culture/moods/@mood.Slug"
+                           class="inline-flex items-center gap-2 bg-white border border-gray-200 rounded-full px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 hover:border-indigo-200 shadow-sm hover:shadow transition-all">
+                            <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+                            @mood.Name
+                        </a>
+                    }
+                </div>
+
+                <!-- ============================================================
+                     Pagination
+                     ============================================================ -->
+                @if (items.TotalPages > 1)
+                {
+                    <nav class="mt-10 flex items-center justify-center gap-1" aria-label="@Localizer["Pagination"]">
+                        <!-- Previous page -->
+                        @if (items.Page > 1)
+                        {
+                            <a href="@GetPageUrl(items.Page - 1)"
+                               class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                               rel="prev">
+                                @Localizer["Previous"]
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="px-3 py-2 text-sm font-medium text-gray-400 bg-gray-50 border border-gray-200 rounded-md cursor-not-allowed">
+                                @Localizer["Previous"]
+                            </span>
+                        }
+
+                        <!-- Page numbers -->
+                        @{
+                            var startPage = Math.Max(1, items.Page - 2);
+                            var endPage = Math.Min(items.TotalPages, items.Page + 2);
+                            if (startPage > 1)
+                            {
+                                <a href="@GetPageUrl(1)" class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">1</a>
+                                if (startPage > 2)
+                                {
+                                    <span class="px-2 py-2 text-sm text-gray-400">...</span>
+                                }
+                            }
+                            for (var p = startPage; p <= endPage; p++)
+                            {
+                                if (p == items.Page)
+                                {
+                                    <span class="px-3 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-md">@p</span>
+                                }
+                                else
+                                {
+                                    <a href="@GetPageUrl(p)"
+                                       class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                                        @p
+                                    </a>
+                                }
+                            }
+                            if (endPage < items.TotalPages)
+                            {
+                                if (endPage < items.TotalPages - 1)
+                                {
+                                    <span class="px-2 py-2 text-sm text-gray-400">...</span>
+                                }
+                                <a href="@GetPageUrl(items.TotalPages)"
+                                   class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                                    @items.TotalPages
+                                </a>
+                            }
+                        }
+
+                        <!-- Next page -->
+                        @if (items.Page < items.TotalPages)
+                        {
+                            <a href="@GetPageUrl(items.Page + 1)"
+                               class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                               rel="next">
+                                @Localizer["Next"]
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="px-3 py-2 text-sm font-medium text-gray-400 bg-gray-50 border border-gray-200 rounded-md cursor-not-allowed">
+                                @Localizer["Next"]
+                            </span>
+                        }
+                    </nav>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+@functions {
+    /// <summary>
+    /// Builds a page URL that preserves all current query parameters.
+    /// </summary>
+    string GetPageUrl(int page)
+    {
+        var queryParams = new List<string>
+        {
+            $"page={page}"
+        };
+
+        if (!string.IsNullOrWhiteSpace(Model.SearchQuery))
+            queryParams.Add($"q={Uri.EscapeDataString(Model.SearchQuery)}");
+
+        return $"/{Model.Culture}/moods?{string.Join("&", queryParams)}";
+    }
+}

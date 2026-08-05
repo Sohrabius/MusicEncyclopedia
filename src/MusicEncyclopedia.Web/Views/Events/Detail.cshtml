@@ -1,0 +1,191 @@
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer Localizer
+@model MusicEncyclopedia.Web.ViewModels.Public.EventDetailViewModel
+
+@{
+    var culture = Context.Items["culture"] as string ?? "fa";
+    var dir = Context.Items["dir"] as string ?? "ltr";
+    var evt = Model.Event;
+}
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" dir="@dir">
+    <nav aria-label="@Localizer["Breadcrumb"]" class="mb-6">
+        <ol class="flex items-center gap-2 text-sm text-gray-500">
+            <li><a href="/@culture" class="hover:text-blue-600">@Localizer["Home"]</a></li>
+            <li><span class="mx-1">/</span></li>
+            <li><a href="/@culture/events" class="hover:text-blue-600">@Localizer["Events"]</a></li>
+            <li><span class="mx-1">/</span></li>
+            <li class="text-gray-900 font-medium truncate max-w-[200px]" aria-current="page">@evt.Slug</li>
+        </ol>
+    </nav>
+
+    <div class="flex flex-col lg:flex-row gap-8">
+        <div class="flex-1 min-w-0 space-y-8">
+            <section>
+                <h1 class="text-3xl font-bold text-gray-900">@Localizer["Performance Event"]: @evt.Slug</h1>
+                <div class="flex flex-wrap gap-3 mt-3">
+                    @if (!string.IsNullOrWhiteSpace(evt.EventTypeName))
+                    {
+                        <span class="inline-block bg-purple-100 text-purple-800 text-sm font-medium px-3 py-1 rounded-full">@evt.EventTypeName</span>
+                    }
+                    @if (evt.Date.HasValue)
+                    {
+                        <span class="text-sm text-gray-600"><i class="fas fa-calendar text-gray-400 me-1"></i> @evt.Date.Value.ToString("yyyy-MM-dd HH:mm")</span>
+                    }
+                </div>
+            </section>
+
+            @if (evt.LocationId.HasValue)
+            {
+                <section class="bg-gray-50 rounded-lg p-5 border border-gray-200">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-2">@Localizer["Venue"]</h2>
+                    <a href="/@culture/locations/@evt.VenueSlug" class="text-blue-600 hover:text-blue-800">
+                        <i class="fas fa-map-marker-alt me-1"></i> @evt.VenueName
+                    </a>
+                </section>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(evt.AudienceInfo))
+            {
+                <section class="bg-white rounded-lg p-5 border border-gray-200">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-2">@Localizer["Audience"]</h2>
+                    <p class="text-gray-700">@evt.AudienceInfo</p>
+                </section>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(evt.PerformanceNotes))
+            {
+                <section class="bg-white rounded-lg p-5 border border-gray-200">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-2">@Localizer["Performance Notes"]</h2>
+                    <div class="text-gray-700 whitespace-pre-line">@evt.PerformanceNotes</div>
+                </section>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(evt.ImprovisationNotes))
+            {
+                <section class="bg-white rounded-lg p-5 border border-gray-200">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-2">@Localizer["Improvisation Notes"]</h2>
+                    <div class="text-gray-700 whitespace-pre-line">@evt.ImprovisationNotes</div>
+                </section>
+            }
+
+            @if (evt.Albums.Count > 0)
+            {
+                <section>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-3">@Localizer["Albums Performed"]</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        @foreach (var album in evt.Albums)
+                        {
+                            <a href="/@culture/albums/@album.Slug" class="flex items-center gap-3 bg-white rounded-lg border border-gray-200 p-3 hover:shadow-sm">
+                                <div class="w-12 h-12 bg-gray-100 rounded flex-shrink-0 flex items-center justify-center text-gray-400"><i class="fas fa-compact-disc"></i></div>
+                                <span class="font-medium text-gray-900">@album.Title</span>
+                            </a>
+                        }
+                    </div>
+                </section>
+            }
+
+            @if (evt.Tracks.Count > 0)
+            {
+                <section>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-3">@Localizer["Tracks Performed"]</h2>
+                    <div class="bg-white rounded-lg border border-gray-200 divide-y">
+                        @foreach (var track in evt.Tracks)
+                        {
+                            <a href="/@culture/tracks/@track.Slug" class="flex items-center justify-between p-3 hover:bg-gray-50">
+                                <span class="text-gray-900 font-medium">@track.Title</span>
+                                @if (track.DurationSeconds.HasValue)
+                                {
+                                    <span class="text-sm text-gray-500">@TimeSpan.FromSeconds(track.DurationSeconds.Value).ToString(@"m\:ss")</span>
+                                }
+                            </a>
+                        }
+                    </div>
+                </section>
+            }
+
+            @if (evt.Media.Count > 0)
+            {
+                <section>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-3">@Localizer["Media"]</h2>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                        @foreach (var media in evt.Media)
+                        {
+                            <div class="bg-gray-100 rounded-lg aspect-square overflow-hidden">
+                                @if (!string.IsNullOrWhiteSpace(media.Url))
+                                {
+                                    <img src="@media.Url" alt="@media.FileName" class="w-full h-full object-cover" loading="lazy" />
+                                }
+                            </div>
+                        }
+                    </div>
+                </section>
+            }
+
+            @if (evt.Citations.Count > 0)
+            {
+                <section>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-3">@Localizer["References"]</h2>
+                    <ul class="space-y-2">
+                        @foreach (var citation in evt.Citations)
+                        {
+                            <li class="bg-white rounded-lg border border-gray-200 p-3 text-sm text-gray-700">
+                                @if (!string.IsNullOrWhiteSpace(citation.Quote))
+                                {
+                                    <blockquote class="italic border-s-4 border-gray-300 ps-3 mb-1">@citation.Quote</blockquote>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(citation.SourceName))
+                                {
+                                    <p class="text-xs text-gray-500">— @citation.SourceName</p>
+                                }
+                            </li>
+                        }
+                    </ul>
+                </section>
+            }
+        </div>
+
+        <aside class="w-full lg:w-72 space-y-4">
+            <div class="bg-white rounded-lg border border-gray-200 p-4">
+                <h3 class="text-sm font-semibold text-gray-700 mb-2">@Localizer["Event Info"]</h3>
+                <dl class="space-y-1 text-sm">
+                    <div class="flex justify-between"><dt class="text-gray-500">@Localizer["Type"]</dt><dd class="text-gray-900">@(evt.EventTypeName ?? "—")</dd></div>
+                    <div class="flex justify-between"><dt class="text-gray-500">@Localizer["Date"]</dt><dd class="text-gray-900">@(evt.Date?.ToString("yyyy-MM-dd") ?? "—")</dd></div>
+                    <div class="flex justify-between"><dt class="text-gray-500">@Localizer["Venue"]</dt><dd class="text-gray-900">@(evt.VenueName ?? "—")</dd></div>
+                </dl>
+            </div>
+        </aside>
+    </div>
+</div>
+
+<!-- ============================================================
+     JSON-LD Structured Data: Event
+     ============================================================ -->
+@section StructuredData {
+<script type="application/ld+json">
+{
+    "@@context": "https://schema.org",
+    "@@type": "Event",
+    "name": "@Model.Event.Slug",
+    @if (Model.Event.Date.HasValue)
+    {
+        <text>"startDate": "@Model.Event.Date.Value.ToString("yyyy-MM-ddTHH:mm:ss")",</text>
+    }
+    @if (!string.IsNullOrWhiteSpace(Model.Event.PerformanceNotes))
+    {
+        <text>"description": "@Model.Event.PerformanceNotes",</text>
+    }
+    @if (Model.Event.LocationId.HasValue && !string.IsNullOrWhiteSpace(Model.Event.VenueName))
+    {
+        <text>"location": {
+            "@@type": "Place",
+            "name": "@Model.Event.VenueName"
+        },</text>
+    }
+    @if (!string.IsNullOrWhiteSpace(Model.Event.EventTypeName))
+    {
+        <text>"eventType": "@Model.Event.EventTypeName",</text>
+    }
+    "url": "@($"{Context.Request.Scheme}://{Context.Request.Host}/{culture}/events/{Model.Event.Slug}")"
+}
+</script>
+}

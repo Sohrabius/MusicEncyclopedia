@@ -1,0 +1,76 @@
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer Localizer
+@model MusicEncyclopedia.Web.ViewModels.Public.SourceListViewModel
+
+@{
+    var culture = Context.Items["culture"] as string ?? "fa";
+    var dir = Context.Items["dir"] as string ?? "ltr";
+    var items = Model.Items;
+}
+
+<link rel="canonical" href="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.PathBase}{Context.Request.Path}")" />
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" dir="@dir">
+    <div class="mb-8">
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-900">@Localizer["Sources"]</h1>
+        <p class="mt-2 text-gray-600">@Localizer["Browse sources and references"]</p>
+    </div>
+
+    @if (items.Items.Count == 0)
+    {
+        <div class="text-center py-16">
+            <i class="fas fa-book text-5xl text-gray-300 mb-4 block"></i>
+            <h3 class="text-lg font-medium text-gray-900">@Localizer["No sources found"]</h3>
+        </div>
+    }
+    else
+    {
+        <p class="text-sm text-gray-500 mb-4">
+            @Localizer["Showing {0}–{1} of {2} sources",
+                ((items.Page - 1) * items.PageSize) + 1,
+                Math.Min(items.Page * items.PageSize, items.TotalItems),
+                items.TotalItems]
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @foreach (var source in items.Items)
+            {
+                <article class="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                    <a href="/@culture/sources/@source.Slug" class="block p-5">
+                        <h3 class="font-semibold text-gray-900">@source.Title</h3>
+                        <div class="flex flex-wrap gap-2 mt-2">
+                            @if (!string.IsNullOrWhiteSpace(source.SourceTypeName))
+                            {
+                                <span class="inline-block bg-teal-100 text-teal-800 text-xs font-medium px-2 py-0.5 rounded-full">@source.SourceTypeName</span>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(source.Author))
+                            {
+                                <span class="text-sm text-gray-600"><i class="fas fa-user text-gray-400 me-1"></i>@source.Author</span>
+                            }
+                        </div>
+                        @if (!string.IsNullOrWhiteSpace(source.PublisherName))
+                        {
+                            <p class="text-sm text-gray-500 mt-1"><i class="fas fa-building text-gray-400 me-1"></i>@source.PublisherName</p>
+                        }
+                        @if (source.PublicationDate.HasValue)
+                        {
+                            <p class="text-xs text-gray-400 mt-1">@source.PublicationDate.Value.ToString("yyyy-MM-dd")</p>
+                        }
+                    </a>
+                </article>
+            }
+        </div>
+        if (items.TotalPages > 1)
+        {
+            <nav class="mt-10 flex items-center justify-center gap-1">
+                @if (items.Page > 1)
+                {
+                    <a href="/@culture/sources?page=@(items.Page - 1)" class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50" rel="prev">@Localizer["Previous"]</a>
+                }
+                <span class="px-3 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-md">@items.Page</span>
+                @if (items.Page < items.TotalPages)
+                {
+                    <a href="/@culture/sources?page=@(items.Page + 1)" class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50" rel="next">@Localizer["Next"]</a>
+                }
+            </nav>
+        }
+    }
+</div>

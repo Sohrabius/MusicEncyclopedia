@@ -1,0 +1,431 @@
+@model AlbumEditViewModel
+@{
+    ViewData["Title"] = $"Edit: {Model.Title}";
+    ViewData["ActiveMenu"] = "Albums";
+}
+
+<!-- ============================================================
+     Edit Album Form (spec 10.5)
+     ============================================================ -->
+<form method="post" action="/admin/albums/@Model.AlbumId/Edit">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="AlbumId" />
+    <input type="hidden" asp-for="RowVersion" />
+
+    <!-- Validation Summary -->
+    <div asp-validation-summary="ModelOnly" class="mb-4 px-4 py-3 rounded-md bg-red-50 border border-red-200 text-red-800 text-sm" role="alert"></div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- ============================================================
+             Main Column (Left / Center)
+             ============================================================ -->
+        <div class="lg:col-span-2 space-y-6">
+
+            <!-- Basic Information -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Basic Information</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="md:col-span-2">
+                        <label asp-for="Title" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                        <input asp-for="Title" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                        <span asp-validation-for="Title" class="text-xs text-red-600"></span>
+                    </div>
+
+                    <div>
+                        <label asp-for="TitleSort" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                        <input asp-for="TitleSort" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                        <span asp-validation-for="TitleSort" class="text-xs text-red-600"></span>
+                    </div>
+
+                    <div>
+                        <label asp-for="Slug" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                        <input asp-for="Slug" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                        <span asp-validation-for="Slug" class="text-xs text-red-600"></span>
+                    </div>
+
+                    <div>
+                        <label asp-for="OriginalTitle" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                        <input asp-for="OriginalTitle" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                        <span asp-validation-for="OriginalTitle" class="text-xs text-red-600"></span>
+                    </div>
+
+                    <div>
+                        <label asp-for="EnglishTitle" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                        <input asp-for="EnglishTitle" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                        <span asp-validation-for="EnglishTitle" class="text-xs text-red-600"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Classification -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Classification</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label asp-for="AlbumCategoryId" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                        <select asp-for="AlbumCategoryId" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">-- Select Category --</option>
+                            @foreach (var cat in Model.Categories)
+                            {
+                                <option value="@cat.AlbumCategoryId">@cat.Name</option>
+                            }
+                        </select>
+                        <span asp-validation-for="AlbumCategoryId" class="text-xs text-red-600"></span>
+                    </div>
+
+                    <div class="flex items-end pb-2">
+                        <label class="inline-flex items-center gap-2 cursor-pointer">
+                            <input asp-for="IsOfficial" type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                            <span class="text-sm text-gray-700">@Html.DisplayNameFor(m => m.IsOfficial)</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dates -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Dates</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label asp-for="ReleaseDate" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                        <input asp-for="ReleaseDate" type="date" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                        <span asp-validation-for="ReleaseDate" class="text-xs text-red-600"></span>
+                    </div>
+
+                    <div>
+                        <label asp-for="ReleaseDatePrecision" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                        <select asp-for="ReleaseDatePrecision" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">-- Precision --</option>
+                            <option value="day">Day</option>
+                            <option value="month">Month</option>
+                            <option value="year">Year</option>
+                        </select>
+                        <span asp-validation-for="ReleaseDatePrecision" class="text-xs text-red-600"></span>
+                    </div>
+
+                    <div>
+                        <label asp-for="RecordingStartDate" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                        <input asp-for="RecordingStartDate" type="date" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                        <span asp-validation-for="RecordingStartDate" class="text-xs text-red-600"></span>
+                    </div>
+
+                    <div>
+                        <label asp-for="RecordingEndDate" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                        <input asp-for="RecordingEndDate" type="date" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                        <span asp-validation-for="RecordingEndDate" class="text-xs text-red-600"></span>
+                    </div>
+
+                    <div>
+                        <label asp-for="RecordingDatePrecision" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                        <select asp-for="RecordingDatePrecision" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">-- Precision --</option>
+                            <option value="day">Day</option>
+                            <option value="month">Month</option>
+                            <option value="year">Year</option>
+                        </select>
+                        <span asp-validation-for="RecordingDatePrecision" class="text-xs text-red-600"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Description & Media -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Description & Media</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label asp-for="Description" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                        <textarea asp-for="Description" rows="5" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                        <span asp-validation-for="Description" class="text-xs text-red-600"></span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label asp-for="CoverMediaId" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                            <input asp-for="CoverMediaId" type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Media ID" />
+                            <span asp-validation-for="CoverMediaId" class="text-xs text-red-600"></span>
+                        </div>
+
+                        <div>
+                            <label asp-for="DurationSeconds" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                            <input asp-for="DurationSeconds" type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Duration in seconds" />
+                            <span asp-validation-for="DurationSeconds" class="text-xs text-red-600"></span>
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label asp-for="CopyrightNotice" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                            <input asp-for="CopyrightNotice" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                            <span asp-validation-for="CopyrightNotice" class="text-xs text-red-600"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================
+                 Related Editors Tabs (spec 10.5 placeholder sections)
+                 ============================================================ -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                <div class="border-b border-gray-200">
+                    <nav class="flex overflow-x-auto" aria-label="Related editors tabs">
+                        <button type="button" class="tab-btn active px-4 py-3 text-sm font-medium text-blue-600 border-b-2 border-blue-600 whitespace-nowrap" data-tab="tab-genres">
+                            <i class="fas fa-tag me-1"></i> Genres
+                        </button>
+                        <button type="button" class="tab-btn px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700 whitespace-nowrap" data-tab="tab-moods">
+                            <i class="fas fa-smile me-1"></i> Moods
+                        </button>
+                        <button type="button" class="tab-btn px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700 whitespace-nowrap" data-tab="tab-languages">
+                            <i class="fas fa-language me-1"></i> Languages
+                        </button>
+                        <button type="button" class="tab-btn px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700 whitespace-nowrap" data-tab="tab-countries">
+                            <i class="fas fa-globe me-1"></i> Countries
+                        </button>
+                        <button type="button" class="tab-btn px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700 whitespace-nowrap" data-tab="tab-companies">
+                            <i class="fas fa-building me-1"></i> Companies
+                        </button>
+                        <button type="button" class="tab-btn px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700 whitespace-nowrap" data-tab="tab-identifiers">
+                            <i class="fas fa-barcode me-1"></i> Identifiers
+                        </button>
+                        <button type="button" class="tab-btn px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700 whitespace-nowrap" data-tab="tab-tracklist">
+                            <i class="fas fa-list me-1"></i> Tracklist
+                        </button>
+                        <button type="button" class="tab-btn px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700 whitespace-nowrap" data-tab="tab-credits">
+                            <i class="fas fa-users me-1"></i> Credits
+                        </button>
+                        <button type="button" class="tab-btn px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700 whitespace-nowrap" data-tab="tab-aliases">
+                            <i class="fas fa-tag me-1"></i> Aliases
+                        </button>
+                        <button type="button" class="tab-btn px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700 whitespace-nowrap" data-tab="tab-localizations">
+                            <i class="fas fa-language me-1"></i> Localizations
+                        </button>
+                        <button type="button" class="tab-btn px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700 whitespace-nowrap" data-tab="tab-tags">
+                            <i class="fas fa-hashtag me-1"></i> Tags
+                        </button>
+                        <button type="button" class="tab-btn px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700 whitespace-nowrap" data-tab="tab-links">
+                            <i class="fas fa-link me-1"></i> Links
+                        </button>
+                        <button type="button" class="tab-btn px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700 whitespace-nowrap" data-tab="tab-media">
+                            <i class="fas fa-photo-video me-1"></i> Media
+                        </button>
+                        <button type="button" class="tab-btn px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700 whitespace-nowrap" data-tab="tab-citations">
+                            <i class="fas fa-quote-right me-1"></i> Citations
+                        </button>
+                        <button type="button" class="tab-btn px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700 whitespace-nowrap" data-tab="tab-attributes">
+                            <i class="fas fa-list-ul me-1"></i> Attributes
+                        </button>
+                    </nav>
+                </div>
+
+                <!-- Tab Content Panels (Placeholders) -->
+                <div class="p-5">
+                    <!-- Genres -->
+                    <div id="tab-genres" class="tab-panel">
+                        <p class="text-sm text-gray-500">
+                            <i class="fas fa-tag text-blue-400 me-1"></i>
+                            Genre assignments for this album. <em>(Coming soon)</em>
+                        </p>
+                    </div>
+
+                    <!-- Moods -->
+                    <div id="tab-moods" class="tab-panel hidden">
+                        <p class="text-sm text-gray-500">
+                            <i class="fas fa-smile text-yellow-400 me-1"></i>
+                            Mood assignments for this album. <em>(Coming soon)</em>
+                        </p>
+                    </div>
+
+                    <!-- Languages -->
+                    <div id="tab-languages" class="tab-panel hidden">
+                        <p class="text-sm text-gray-500">
+                            <i class="fas fa-language text-green-400 me-1"></i>
+                            Language assignments for this album. <em>(Coming soon)</em>
+                        </p>
+                    </div>
+
+                    <!-- Countries -->
+                    <div id="tab-countries" class="tab-panel hidden">
+                        <p class="text-sm text-gray-500">
+                            <i class="fas fa-globe text-purple-400 me-1"></i>
+                            Country associations for this album. <em>(Coming soon)</em>
+                        </p>
+                    </div>
+
+                    <!-- Companies -->
+                    <div id="tab-companies" class="tab-panel hidden">
+                        <p class="text-sm text-gray-500">
+                            <i class="fas fa-building text-orange-400 me-1"></i>
+                            Companies (labels, publishers, distributors) for this album. <em>(Coming soon)</em>
+                        </p>
+                    </div>
+
+                    <!-- Identifiers -->
+                    <div id="tab-identifiers" class="tab-panel hidden">
+                        <p class="text-sm text-gray-500">
+                            <i class="fas fa-barcode text-teal-400 me-1"></i>
+                            Album identifiers (UPC, barcode, catalog numbers). <em>(Coming soon)</em>
+                        </p>
+                    </div>
+
+                    <!-- Tracklist -->
+                    <div id="tab-tracklist" class="tab-panel hidden">
+                        <p class="text-sm text-gray-500">
+                            <i class="fas fa-list text-indigo-400 me-1"></i>
+                            Track listing for this album with ordering, durations, and disc numbers. <em>(Coming soon)</em>
+                        </p>
+                    </div>
+
+                    <!-- Credits -->
+                    <div id="tab-credits" class="tab-panel hidden">
+                        <p class="text-sm text-gray-500">
+                            <i class="fas fa-users text-rose-400 me-1"></i>
+                            Credits (musicians, producers, engineers, etc.) for this album. <em>(Coming soon)</em>
+                        </p>
+                    </div>
+
+                    <!-- Aliases -->
+                    <div id="tab-aliases" class="tab-panel hidden">
+                        <p class="text-sm text-gray-500">
+                            <i class="fas fa-tag text-cyan-400 me-1"></i>
+                            Alternative titles and aliases for this album. <em>(Coming soon)</em>
+                        </p>
+                    </div>
+
+                    <!-- Localizations -->
+                    <div id="tab-localizations" class="tab-panel hidden">
+                        <p class="text-sm text-gray-500">
+                            <i class="fas fa-language text-pink-400 me-1"></i>
+                            Localized field values for this album. <em>(Coming soon)</em>
+                        </p>
+                    </div>
+
+                    <!-- Tags -->
+                    <div id="tab-tags" class="tab-panel hidden">
+                        <p class="text-sm text-gray-500">
+                            <i class="fas fa-hashtag text-violet-400 me-1"></i>
+                            Tags attached to this album. <em>(Coming soon)</em>
+                        </p>
+                    </div>
+
+                    <!-- Links -->
+                    <div id="tab-links" class="tab-panel hidden">
+                        <p class="text-sm text-gray-500">
+                            <i class="fas fa-link text-sky-400 me-1"></i>
+                            External links related to this album. <em>(Coming soon)</em>
+                        </p>
+                    </div>
+
+                    <!-- Media -->
+                    <div id="tab-media" class="tab-panel hidden">
+                        <p class="text-sm text-gray-500">
+                            <i class="fas fa-photo-video text-emerald-400 me-1"></i>
+                            Media items (images, audio, video) attached to this album. <em>(Coming soon)</em>
+                        </p>
+                    </div>
+
+                    <!-- Citations -->
+                    <div id="tab-citations" class="tab-panel hidden">
+                        <p class="text-sm text-gray-500">
+                            <i class="fas fa-quote-right text-amber-400 me-1"></i>
+                            Citations and references for this album. <em>(Coming soon)</em>
+                        </p>
+                    </div>
+
+                    <!-- Attributes -->
+                    <div id="tab-attributes" class="tab-panel hidden">
+                        <p class="text-sm text-gray-500">
+                            <i class="fas fa-list-ul text-gray-400 me-1"></i>
+                            Custom attribute values for this album. <em>(Coming soon)</em>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+             Sidebar Column (Right)
+             ============================================================ -->
+        <div class="space-y-6">
+
+            <!-- Save / Actions -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Actions</h2>
+                <div class="space-y-3">
+                    <button type="submit"
+                            class="w-full px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                    <a href="/admin/albums"
+                       class="w-full block text-center px-4 py-2.5 text-sm text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">
+                        <i class="fas fa-arrow-left me-1"></i> Back to List
+                    </a>
+
+                    <hr class="border-gray-200" />
+
+                    <!-- Delete (Soft) -->
+                    <form method="post" action="/admin/albums/@Model.AlbumId/Delete"
+                          onsubmit="return confirm('Are you sure you want to delete this album? It will be soft-deleted and can be restored later.');">
+                        @Html.AntiForgeryToken()
+                        <button type="submit"
+                                class="w-full px-4 py-2 text-sm text-red-600 border border-red-200 rounded-md hover:bg-red-50 transition-colors flex items-center justify-center gap-2">
+                            <i class="fas fa-trash-alt"></i> Delete Album
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Album Info -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
+                <h2 class="text-sm font-semibold text-gray-700 mb-3">Album Info</h2>
+                <dl class="space-y-2 text-xs">
+                    <div class="flex justify-between">
+                        <dt class="text-gray-500">ID</dt>
+                        <dd class="text-gray-900 font-mono">@Model.AlbumId</dd>
+                    </div>
+                    <div class="flex justify-between">
+                        <dt class="text-gray-500">Created</dt>
+                        <dd class="text-gray-900">—</dd>
+                    </div>
+                    <div class="flex justify-between">
+                        <dt class="text-gray-500">Modified</dt>
+                        <dd class="text-gray-900">—</dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.21.0/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/4.1.0/jquery.validate.unobtrusive.min.js"></script>
+    <script>
+        // Tab switching for related editors
+        document.addEventListener('DOMContentLoaded', function () {
+            var tabBtns = document.querySelectorAll('.tab-btn');
+            var panels = document.querySelectorAll('.tab-panel');
+
+            tabBtns.forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    // Deactivate all tabs
+                    tabBtns.forEach(function (b) {
+                        b.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600');
+                        b.classList.add('text-gray-500');
+                    });
+                    // Activate this tab
+                    this.classList.remove('text-gray-500');
+                    this.classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
+
+                    // Hide all panels
+                    panels.forEach(function (p) { p.classList.add('hidden'); });
+
+                    // Show the target panel
+                    var targetId = this.getAttribute('data-tab');
+                    var targetPanel = document.getElementById(targetId);
+                    if (targetPanel) {
+                        targetPanel.classList.remove('hidden');
+                    }
+                });
+            });
+        });
+    </script>
+}

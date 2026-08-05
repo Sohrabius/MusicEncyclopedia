@@ -1,0 +1,341 @@
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer Localizer
+@model MusicEncyclopedia.Web.ViewModels.Public.SearchIndexViewModel
+
+@{
+    var culture = Context.Items["culture"] as string ?? "fa";
+    var dir = Context.Items["dir"] as string ?? "ltr";
+    var isRtl = dir == "rtl";
+    var results = Model.Results;
+    var hasQuery = !string.IsNullOrWhiteSpace(Model.Query);
+    var knownEntityTypes = new[] { "Album", "Track", "Person", "Poem", "SungVersion", "Company", "Genre", "Mood", "Instrument" };
+}
+
+<!-- ===== Canonical URL ===== -->
+<link rel="canonical" href="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.PathBase}{Context.Request.Path}")" />
+
+<!-- ===== Open Graph ===== -->
+<meta property="og:title" content="@Localizer["Search"] - @Localizer["Music Encyclopedia"]" />
+<meta property="og:description" content="@Localizer["Search the Music Encyclopedia — albums, tracks, people, poems, and more."]" />
+<meta property="og:url" content="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.PathBase}{Context.Request.Path}")" />
+<meta property="og:type" content="website" />
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" dir="@dir">
+    <!-- Page Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-900">@Localizer["Search"]</h1>
+        <p class="mt-2 text-gray-600">@Localizer["Search the Music Encyclopedia"]</p>
+    </div>
+
+    <!-- ============================================================
+         Search Box & Filters
+         ============================================================ -->
+    <div class="bg-white rounded-lg border border-gray-200 p-6 mb-8">
+        <form method="get" action="/@culture/search" class="space-y-4">
+            <!-- Search input row -->
+            <div class="flex flex-col sm:flex-row gap-3">
+                <div class="flex-1">
+                    <label for="search-input" class="sr-only">@Localizer["Search"]</label>
+                    <input type="text"
+                           id="search-input"
+                           name="q"
+                           value="@Model.Query"
+                           placeholder="@Localizer["Search albums, tracks, people, poems..."]"
+                           class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base px-4 py-3 border"
+                           autofocus="@(hasQuery ? null : "autofocus")" />
+                </div>
+                <button type="submit"
+                        class="bg-blue-600 text-white px-6 py-3 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                    @Localizer["Search"]
+                </button>
+            </div>
+
+            <!-- Entity type filter pills -->
+            <div class="flex flex-wrap items-center gap-2">
+                <span class="text-sm text-gray-500 mr-1">@Localizer["Type:"]</span>
+                <a href="/@culture/search?q=@(Uri.EscapeDataString(Model.Query ?? ""))"
+                   class="inline-block px-3 py-1.5 text-sm rounded-full border transition-colors @(string.IsNullOrWhiteSpace(Model.EntityType) ? "bg-blue-600 text-white border-blue-600" : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50")">
+                    @Localizer["All"]
+                </a>
+                @foreach (var et in knownEntityTypes)
+                {
+                    var isActive = string.Equals(Model.EntityType, et, StringComparison.OrdinalIgnoreCase);
+                    <a href="/@culture/search?q=@(Uri.EscapeDataString(Model.Query ?? ""))&type=@et"
+                       class="inline-block px-3 py-1.5 text-sm rounded-full border transition-colors @(isActive ? "bg-blue-600 text-white border-blue-600" : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50")">
+                        @Localizer[et]
+                    </a>
+                }
+            </div>
+
+            <!-- Faceted filters: Genre, Mood, Instrument -->
+            <div class="flex flex-wrap items-center gap-3 pt-3 border-t border-gray-100">
+                <span class="text-sm text-gray-500">@Localizer["More filters:"]</span>
+
+                <select name="genre" id="filter-genre" class="px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-white" onchange="this.form.submit()">
+                    <option value="">@Localizer["Genre"]</option>
+                    @foreach (var g in Model.Genres)
+                    {
+                        <option value="@g.Slug" selected="@(string.Equals(Model.Genre, g.Slug, StringComparison.OrdinalIgnoreCase) ? true : null)">@g.Name</option>
+                    }
+                </select>
+
+                <select name="mood" id="filter-mood" class="px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-white" onchange="this.form.submit()">
+                    <option value="">@Localizer["Mood"]</option>
+                    @foreach (var m in Model.Moods)
+                    {
+                        <option value="@m.Slug" selected="@(string.Equals(Model.Mood, m.Slug, StringComparison.OrdinalIgnoreCase) ? true : null)">@m.Name</option>
+                    }
+                </select>
+
+                <select name="instrument" id="filter-instrument" class="px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-white" onchange="this.form.submit()">
+                    <option value="">@Localizer["Instrument"]</option>
+                    @foreach (var inst in Model.Instruments)
+                    {
+                        <option value="@inst.Slug" selected="@(string.Equals(Model.Instrument, inst.Slug, StringComparison.OrdinalIgnoreCase) ? true : null)">@inst.Name</option>
+                    }
+                </select>
+            </div>
+        </form>
+    </div>
+
+    @if (hasQuery)
+    {
+        if (results is null || results.Items.Count == 0)
+        {
+            <!-- Empty results -->
+            <div class="text-center py-16">
+                <svg class="mx-auto h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <h3 class="mt-4 text-lg font-medium text-gray-900">@Localizer["No results found"]</h3>
+                <p class="mt-2 text-gray-500">
+                    @Localizer["No results for \"{0}\". Try adjusting your search terms.", Model.Query]
+                </p>
+            </div>
+        }
+        else
+        {
+            <!-- Results count -->
+            <p class="text-sm text-gray-500 mb-4">
+                @Localizer["Showing {0}–{1} of {2} results for \"{3}\"",
+                    ((results.Page - 1) * results.PageSize) + 1,
+                    Math.Min(results.Page * results.PageSize, results.TotalItems),
+                    results.TotalItems,
+                    Model.Query]
+            </p>
+
+            <!-- Result Cards -->
+            <div class="space-y-4">
+                @foreach (var item in results.Items)
+                {
+                    <article class="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                        <a href="/@culture/@item.Url.TrimStart('/')" class="flex items-start gap-4 p-4">
+                            <!-- Image -->
+                            <div class="w-20 h-20 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
+                                @if (!string.IsNullOrWhiteSpace(item.ImageUrl))
+                                {
+                                    <img src="@item.ImageUrl"
+                                         alt="@item.Title"
+                                         class="w-full h-full object-cover"
+                                         loading="lazy" />
+                                }
+                                else
+                                {
+                                    <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                              d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                    </svg>
+                                }
+                            </div>
+
+                            <!-- Content -->
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <!-- Entity type badge -->
+                                    <span class="inline-block text-xs font-medium px-2 py-0.5 rounded-full @GetBadgeClass(item.EntityType)">
+                                        @Localizer[item.EntityType]
+                                    </span>
+                                </div>
+
+                                <!-- Title -->
+                                <h3 class="font-semibold text-gray-900 text-base leading-tight line-clamp-1">
+                                    @item.Title
+                                </h3>
+
+                                <!-- Subtitle -->
+                                @if (!string.IsNullOrWhiteSpace(item.Subtitle))
+                                {
+                                    <p class="text-sm text-gray-500 mt-0.5 line-clamp-1">@item.Subtitle</p>
+                                }
+
+                                <!-- Description -->
+                                @if (!string.IsNullOrWhiteSpace(item.Description))
+                                {
+                                    <p class="text-sm text-gray-600 mt-1 line-clamp-2">
+                                        @TrimDescription(item.Description, 200)
+                                    </p>
+                                }
+                            </div>
+
+                            <!-- Arrow -->
+                            <svg class="w-5 h-5 text-gray-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                @if (isRtl)
+                                {
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                                }
+                                else
+                                {
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                }
+                            </svg>
+                        </a>
+                    </article>
+                }
+            </div>
+
+            <!-- ============================================================
+                 Pagination
+                 ============================================================ -->
+            if (results.TotalPages > 1)
+            {
+                <nav class="mt-10 flex items-center justify-center gap-1" aria-label="@Localizer["Pagination"]">
+                    <!-- Previous page -->
+                    @if (results.Page > 1)
+                    {
+                        <a href="@GetPageUrl(results.Page - 1)"
+                           class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                           rel="prev">
+                            @Localizer["Previous"]
+                        </a>
+                    }
+                    else
+                    {
+                        <span class="px-3 py-2 text-sm font-medium text-gray-400 bg-gray-50 border border-gray-200 rounded-md cursor-not-allowed">
+                            @Localizer["Previous"]
+                        </span>
+                    }
+
+                    <!-- Page numbers -->
+                    @{
+                        var startPage = Math.Max(1, results.Page - 2);
+                        var endPage = Math.Min(results.TotalPages, results.Page + 2);
+                        if (startPage > 1)
+                        {
+                            <a href="@GetPageUrl(1)" class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">1</a>
+                            if (startPage > 2)
+                            {
+                                <span class="px-2 py-2 text-sm text-gray-400">...</span>
+                            }
+                        }
+                        for (var p = startPage; p <= endPage; p++)
+                        {
+                            if (p == results.Page)
+                            {
+                                <span class="px-3 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-md">@p</span>
+                            }
+                            else
+                            {
+                                <a href="@GetPageUrl(p)"
+                                   class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                                    @p
+                                </a>
+                            }
+                        }
+                        if (endPage < results.TotalPages)
+                        {
+                            if (endPage < results.TotalPages - 1)
+                            {
+                                <span class="px-2 py-2 text-sm text-gray-400">...</span>
+                            }
+                            <a href="@GetPageUrl(results.TotalPages)"
+                               class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                                @results.TotalPages
+                            </a>
+                        }
+                    }
+
+                    <!-- Next page -->
+                    @if (results.Page < results.TotalPages)
+                    {
+                        <a href="@GetPageUrl(results.Page + 1)"
+                           class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                           rel="next">
+                            @Localizer["Next"]
+                        </a>
+                    }
+                    else
+                    {
+                        <span class="px-3 py-2 text-sm font-medium text-gray-400 bg-gray-50 border border-gray-200 rounded-md cursor-not-allowed">
+                            @Localizer["Next"]
+                        </span>
+                    }
+                </nav>
+            }
+        }
+    }
+    else
+    {
+        <!-- Initial state (no query yet) -->
+        <div class="text-center py-16">
+            <svg class="mx-auto h-20 w-20 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <h3 class="mt-4 text-lg font-medium text-gray-500">@Localizer["Search across the encyclopedia"]</h3>
+            <p class="mt-2 text-gray-400">@Localizer["Enter a search term above to find albums, tracks, people, poems, and more."]</p>
+        </div>
+    }
+</div>
+
+@functions {
+    /// <summary>
+    /// Returns a Tailwind badge color class for the given entity type.
+    /// </summary>
+    string GetBadgeClass(string entityType)
+    {
+        return entityType?.ToLowerInvariant() switch
+        {
+            "album" => "bg-blue-100 text-blue-800",
+            "track" => "bg-green-100 text-green-800",
+            "person" => "bg-purple-100 text-purple-800",
+            "poem" => "bg-amber-100 text-amber-800",
+            "sungversion" => "bg-indigo-100 text-indigo-800",
+            "company" => "bg-gray-100 text-gray-800",
+            "genre" => "bg-pink-100 text-pink-800",
+            "mood" => "bg-teal-100 text-teal-800",
+            "instrument" => "bg-orange-100 text-orange-800",
+            _ => "bg-gray-100 text-gray-800"
+        };
+    }
+
+    /// <summary>
+    /// Truncates a description to a maximum length.
+    /// </summary>
+    string TrimDescription(string text, int maxLength)
+    {
+        if (string.IsNullOrWhiteSpace(text) || text.Length <= maxLength)
+            return text ?? "";
+        return text[..maxLength] + "...";
+    }
+
+    string GetPageUrl(int page)
+    {
+        var queryParams = new List<string>
+        {
+            $"q={Uri.EscapeDataString(Model.Query ?? "")}"
+        };
+
+        if (!string.IsNullOrWhiteSpace(Model.EntityType))
+            queryParams.Add($"type={Uri.EscapeDataString(Model.EntityType)}");
+        if (!string.IsNullOrWhiteSpace(Model.Genre))
+            queryParams.Add($"genre={Uri.EscapeDataString(Model.Genre)}");
+        if (!string.IsNullOrWhiteSpace(Model.Mood))
+            queryParams.Add($"mood={Uri.EscapeDataString(Model.Mood)}");
+        if (!string.IsNullOrWhiteSpace(Model.Instrument))
+            queryParams.Add($"instrument={Uri.EscapeDataString(Model.Instrument)}");
+
+        queryParams.Add($"page={page}");
+
+        return $"/{Model.Culture}/search?{string.Join("&", queryParams)}";
+    }
+}
