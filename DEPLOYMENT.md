@@ -63,10 +63,13 @@ On first boot the app:
 1. waits for SQL Server to be healthy (compose dependency),
 2. applies EF migrations (`MigrateAsync` — idempotent),
 3. seeds lookup data (`Seed:OnStartup=true`, `Seed:SampleContent=false` → no demo content),
-4. seeds roles + Administrator permissions and — if `ADMIN_EMAIL`/`ADMIN_PASSWORD`
-   are set — creates the first admin user.
+4. seeds roles + Administrator permissions and creates the first admin user —
+   `ADMIN_EMAIL`/`ADMIN_PASSWORD` when set; otherwise the built-in seed default
+   (`admin@example.com` / `Admin@123456`) only when `SEED_ADMIN_USER=true`
+   (the SQLite/dev default — keep false in production).
 
-Log in at `/auth/login` with the configured admin credentials.
+Log in at `/auth/login` with the configured admin credentials (or the seeded
+default on a dev database; change its password after first login).
 
 ---
 
@@ -80,6 +83,7 @@ Log in at `/auth/login` with the configured admin credentials.
 | `MSSQL_PID` | `Express` | Edition: Express / Developer / Standard / Enterprise |
 | `ADMIN_EMAIL` | *(empty)* | When set, the first administrator is created on boot (the email is also the login name) |
 | `ADMIN_PASSWORD` | *(empty)* | Must satisfy the app password policy (10+ chars, digit, upper, lower, symbol) |
+| `SEED_ADMIN_USER` | `false` (prod) / `true` (dev) | When `ADMIN_EMAIL` is empty and this is `true`, a built-in default admin is seeded: `admin@example.com` / `Admin@123456` (change after first login) |
 | `SITE_BASE_URL` | `https://example.com` | Canonical base URL (sitemap, hreflang, canonical tags) |
 | `CDN_BASE_URL` | *(empty)* | Media CDN prefix; empty = served by the app |
 | `BEHIND_PROXY` | `false` | `true` when TLS terminates at an upstream proxy (honors X-Forwarded-For / X-Forwarded-Proto) |

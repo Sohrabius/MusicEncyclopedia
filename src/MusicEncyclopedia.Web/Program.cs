@@ -298,15 +298,19 @@ try
     }
 
     // ---- First-run admin bootstrap ----
-    // Seeds roles + Administrator permissions and creates the configured admin
-    // user (Admin:Email/UserName/Password). Fully idempotent; safe every boot.
+    // Seeds roles + Administrator permissions and creates an admin user:
+    // Admin:Email/Admin:Password when configured, otherwise the built-in seed
+    // default (admin@example.com) on the SQLite/dev path. Seed:AdminUser
+    // defaults to true for SQLite (dev convenience) and false for SQL Server
+    // (production must supply Admin:Email/Admin:Password). Fully idempotent.
     try
     {
+        var seedDefaultAdmin = builder.Configuration.GetValue("Seed:AdminUser", isSqlite);
         var bootstrapLogger = app.Services
             .GetRequiredService<ILoggerFactory>()
             .CreateLogger("AdminBootstrap");
         await AdminBootstrap.SeedRolesAndAdminAsync(
-            app.Services, builder.Configuration, bootstrapLogger);
+            app.Services, builder.Configuration, bootstrapLogger, seedDefaultAdmin);
     }
     catch (Exception ex)
     {

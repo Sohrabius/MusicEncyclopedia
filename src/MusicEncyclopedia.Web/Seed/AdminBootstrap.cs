@@ -13,8 +13,11 @@ namespace MusicEncyclopedia.Web.Seed;
 ///     MediaManager, UserManager) if missing.
 ///  2. Grants the Administrator role every permission claim so a freshly
 ///     bootstrapped admin can use the whole admin area without manual setup.
-///  3. If <c>Admin:Email</c> (plus <c>Admin:Password</c>) is configured, creates
-///     that user and assigns the Administrator role.
+///  3. Creates an admin user and assigns the Administrator role. Precedence:
+///     <c>Admin:Email</c> (plus <c>Admin:Password</c>) when configured; otherwise,
+///     when <paramref name="seedDefaultAdmin"/> is true (the SQLite/dev path),
+///     the built-in seed default (admin@example.com / Admin@123456) so a fresh
+///     dev database has a usable administrator with no env setup.
 ///
 /// Each step runs in its own DbContext scope. Permission claims and the user-role
 /// link are written through the DbSet directly rather than
@@ -34,10 +37,21 @@ public static class AdminBootstrap
 {
     private const string PermissionClaimType = "Permission";
 
+    /// <summary>Built-in seed default administrator (used when no Admin:Email is configured).</summary>
+    private const string DefaultAdminEmail = "admin@example.com";
+
+    /// <summary>
+    /// Meets the app password policy (10+ chars, digit, upper, lower, symbol).
+    /// Only used on the dev/default path — operators should set their own via
+    /// Admin:Password or change it after first login.
+    /// </summary>
+    private const string DefaultAdminPassword = "Admin@123456";
+
     public static async Task SeedRolesAndAdminAsync(
         IServiceProvider services,
         IConfiguration configuration,
-        ILogger logger)
+        ILogger logger,
+        bool seedDefaultAdmin)
     {
         // 1) Roles ----------------------------------------------------------
         using (var scope = services.CreateScope())
@@ -99,11 +113,25 @@ public static class AdminBootstrap
             }
         }
 
-        // 3) Configured admin user -----------------------------------------
+        // 3) Admin user -----------------------------------------------------
+        // Precedence: the operator-configured Admin:Email/Admin:Password wins;
+        // when those are absent and seedDefaultAdmin is enabled (the dev/SQLite
+        // path, config Seed:AdminUser), fall back to the built-in seed default
+        // so a fresh dev database has a usable administrator out of the box.
         var adminEmail = configuration["Admin:Email"];
+        var password = configuration["Admin:Password"];
+        var usesSeedDefault = false;
+
         if (string.IsNullOrWhiteSpace(adminEmail))
         {
-            return; // No admin requested — roles/permissions are still seeded.
+            if (!seedDefaultAdmin)
+            {
+                return; // No admin requested — roles/permissions are still seeded.
+            }
+
+            adminEmail = configuration["Seed:AdminEmail"] ?? DefaultAdminEmail;
+            password = configuration["Seed:AdminPassword"] ?? DefaultAdminPassword;
+            usesSeedDefault = true;
         }
 
         using (var scope = services.CreateScope())
@@ -114,12 +142,20 @@ public static class AdminBootstrap
             var adminUser = await userManager.FindByEmailAsync(adminEmail);
             if (adminUser is null)
             {
-                var password = configuration["Admin:Password"];
                 if (string.IsNullOrEmpty(password))
                 {
                     logger.LogWarning(
                         "Admin:Email is set but Admin:Password is missing — skipping admin user creation.");
                     return;
+                }
+
+                if (usesSeedDefault)
+                {
+                    logger.LogWarning(
+                        "No Admin:Email configured — seeding the built-in default administrator " +
+                        "{Email}. Change the password after first login, or set " +
+                        "Seed:AdminUser=false in production.",
+                        adminEmail);
                 }
 
                 // Username mirrors the email exactly — the login form posts the

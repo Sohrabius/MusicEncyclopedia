@@ -1,6 +1,7 @@
 using System.Data;
 using Dapper;
 using Microsoft.AspNetCore.Mvc;
+using MusicEncyclopedia.Core.Constants;
 using MusicEncyclopedia.Core.Infrastructure;
 using MusicEncyclopedia.Core.Interfaces;
 using MusicEncyclopedia.Services.Infrastructure;
@@ -24,6 +25,23 @@ public sealed class HomeController : Controller
         _db = db;
         _logger = logger;
         _cache = cache;
+    }
+
+    /// <summary>
+    /// Root redirect: forwards "/" (and bare /Home /Home/Index) to the
+    /// default-culture home page so visitors never need to type "/fa" in the
+    /// address bar. The culture middleware and route constraints keep every
+    /// other page culture-prefixed; this is the only exception.
+    /// </summary>
+    [HttpGet]
+    [Route("~/")]
+    [Route("~/Home")]
+    [Route("~/Home/Index")]
+    public IActionResult Root()
+    {
+        // Redirect to the clean /{culture} URL — Index's attribute route "" under
+        // the class prefix makes /fa resolve to the same home page.
+        return Redirect($"/{CultureConstants.DefaultCulture}");
     }
 
     /// <summary>
