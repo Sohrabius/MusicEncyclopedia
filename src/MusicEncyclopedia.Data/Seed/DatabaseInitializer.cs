@@ -13,17 +13,564 @@ public static class DatabaseInitializer
     {
         if (isSqlite)
         {
-            // Create the schema for SQLite (migrations handle SQL Server)
+            // Create the schema for SQLite (migrations handle SQL Server).
+            // EnsureCreated does not alter an existing database, so tables added
+            // after the initial schema creation are created explicitly here.
             await context.Database.EnsureCreatedAsync();
+
+            await context.Database.ExecuteSqlRawAsync(
+                """
+                CREATE TABLE IF NOT EXISTS "AuditLog" (
+                    "AuditLogId" INTEGER NOT NULL CONSTRAINT "PK_AuditLog" PRIMARY KEY AUTOINCREMENT,
+                    "Timestamp" TEXT NOT NULL,
+                    "UserName" TEXT NOT NULL,
+                    "Action" TEXT NOT NULL,
+                    "EntityType" TEXT NULL,
+                    "EntityId" INTEGER NULL,
+                    "IsSuccess" INTEGER NOT NULL,
+                    "Details" TEXT NULL,
+                    "IpAddress" TEXT NULL
+                )
+                """);
+        }
+        else
+        {
+            // SQL Server: EnsureCreated does not alter an existing database, so the
+            // AuditLog table is created explicitly when missing (matches EF's mapping:
+            // DateTime → datetime2, bool → bit, strings → nvarchar with lengths).
+            await context.Database.ExecuteSqlRawAsync(
+                """
+                IF OBJECT_ID(N'[AuditLog]', N'U') IS NULL
+                BEGIN
+                    CREATE TABLE [AuditLog] (
+                        [AuditLogId] int NOT NULL IDENTITY(1,1) CONSTRAINT [PK_AuditLog] PRIMARY KEY,
+                        [Timestamp] datetime2 NOT NULL,
+                        [UserName] nvarchar(255) NOT NULL,
+                        [Action] nvarchar(255) NOT NULL,
+                        [EntityType] nvarchar(100) NULL,
+                        [EntityId] int NULL,
+                        [IsSuccess] bit NOT NULL,
+                        [Details] nvarchar(4000) NULL,
+                        [IpAddress] nvarchar(100) NULL
+                    )
+                END
+                """);
         }
 
         // Check if data already exists (using MediaTypes as a sentinel table)
         if (await context.MediaTypes.AnyAsync())
         {
-            return; // Already seeded
+            await SeedSampleContentAsync(context);
+            await SeedLocalizationsAsync(context);
+            return; // Lookup data already seeded
         }
 
         await SeedLookupDataAsync(context);
+
+        await SeedSampleContentAsync(context);
+
+        await SeedLocalizationsAsync(context);
+    }
+
+    /// <summary>
+    /// Seeds the en/ar/fr Language rows (fresh and existing databases) and a small
+    /// set of sample Persian (fa) localizations for the seeded content. The Persian
+    /// overlays demonstrate the spec 7.3 fallback chain: fa pages show Persian text,
+    /// while other cultures fall back to the English base columns.
+    /// Every section is guarded so re-runs never duplicate data.
+    /// </summary>
+    private static async Task SeedLocalizationsAsync(AppDbContext context)
+    {
+        // Languages (idempotent — existing databases won't have en/ar/fr)
+        if (!await context.Languages.AnyAsync(l => l.Code == "en"))
+        {
+            context.Languages.AddRange(
+                new Language { LanguageId = 2, Code = "en", Name = "English" },
+                new Language { LanguageId = 3, Code = "ar", Name = "Arabic" },
+                new Language { LanguageId = 4, Code = "fr", Name = "French" }
+            );
+            await context.SaveChangesAsync();
+        }
+
+        // Guard: seed sample localizations only once
+        if (await context.Localizations.AnyAsync())
+            return;
+
+        var fa = await context.Languages.FirstAsync(l => l.Code == "fa");
+
+        var albumEntity = await context.Entities.FirstOrDefaultAsync(e => e.Slug == "midnight-garden");
+        if (albumEntity is not null)
+        {
+            context.Localizations.AddRange(
+                new Localization
+                {
+                    EntityTypeId = 1, // Album
+                    EntityId = albumEntity.EntityId,
+                    LanguageId = fa.LanguageId,
+                    FieldName = "Title",
+                    LocalizedText = "باغ نیمه‌شب"
+                },
+                new Localization
+                {
+                    EntityTypeId = 1,
+                    EntityId = albumEntity.EntityId,
+                    LanguageId = fa.LanguageId,
+                    FieldName = "Description",
+                    LocalizedText = "سفری شبانه در لایه‌های سازهای زهی و ملودی‌های آرام؛ " +
+                                     "ضبط‌شده در استودیوی اختصاصی گروه در تهران."
+                }
+            );
+        }
+
+        var trackEntity = await context.Entities.FirstOrDefaultAsync(e => e.Slug == "garden-of-stars");
+        if (trackEntity is not null)
+        {
+            context.Localizations.Add(new Localization
+            {
+                EntityTypeId = 2, // Track
+                EntityId = trackEntity.EntityId,
+                LanguageId = fa.LanguageId,
+                FieldName = "Title",
+                LocalizedText = "باغ ستارگان"
+            });
+        }
+
+        var personEntity = await context.Entities.FirstOrDefaultAsync(e => e.Slug == "darya-ensemble");
+        if (personEntity is not null)
+        {
+            context.Localizations.AddRange(
+                new Localization
+                {
+                    EntityTypeId = 3, // Person
+                    EntityId = personEntity.EntityId,
+                    LanguageId = fa.LanguageId,
+                    FieldName = "Name",
+                    LocalizedText = "گروه دریا"
+                },
+                new Localization
+                {
+                    EntityTypeId = 3,
+                    EntityId = personEntity.EntityId,
+                    LanguageId = fa.LanguageId,
+                    FieldName = "Biography",
+                    LocalizedText = "گروه دریا گروهی معاصر است که سنت‌های موسیقی کلاسیک ایرانی را " +
+                                     "با تنظیم‌های مدرن در هم می‌آمیزد. این گروه در تهران بنیان‌گذاری شد " +
+                                     "و به‌خاطر خط‌های ظریف سنتور، آواز شاعرانه و تصنیف‌های مراقبه‌گونه شناخته می‌شود."
+                }
+            );
+        }
+
+        await context.SaveChangesAsync();
+    }
+
+    /// <summary>
+    /// Seeds genres, moods, instruments, and a small set of sample encyclopedia
+    /// content (artist, albums, tracks, poems, and credits) so the public pages
+    /// are browsable out of the box. Each section is guarded independently so
+    /// re-runs never duplicate data.
+    /// </summary>
+    private static async Task SeedSampleContentAsync(AppDbContext context)
+    {
+        // ── Genres / Moods / Instruments (lookup content missing from the original seed) ──
+        Dictionary<string, int> genreIds;
+        Dictionary<string, int> moodIds;
+        Dictionary<string, int> instrumentIds;
+
+        if (!await context.Genres.AnyAsync())
+        {
+            genreIds = await SeedGenresAsync(context);
+        }
+        else
+        {
+            genreIds = await context.Genres.ToDictionaryAsync(g => g.Slug, g => g.GenreId);
+        }
+
+        if (!await context.Moods.AnyAsync())
+        {
+            moodIds = await SeedMoodsAsync(context);
+        }
+        else
+        {
+            moodIds = await context.Moods.ToDictionaryAsync(m => m.Slug, m => m.MoodId);
+        }
+
+        if (!await context.Instruments.AnyAsync())
+        {
+            instrumentIds = await SeedInstrumentsAsync(context);
+        }
+        else
+        {
+            instrumentIds = await context.Instruments.ToDictionaryAsync(i => i.Slug, i => i.InstrumentId);
+        }
+
+        // ── Sample content (skipped once albums exist) ──
+        if (await context.Albums.AnyAsync())
+        {
+            return;
+        }
+
+        var now = DateTime.UtcNow;
+
+        // Artist person
+        var artistEntity = await CreateEntityAsync(context, 3, "darya-ensemble");
+        var artist = new Person
+        {
+            EntityId = artistEntity.EntityId,
+            FullName = "Darya Ensemble",
+            FullNameSort = "Darya Ensemble",
+            EnglishName = "Darya Ensemble",
+            PersonKindId = 2, // Group
+            NationalityCountryId = 1,
+            Biography = "Darya Ensemble is a contemporary ensemble blending Persian classical traditions " +
+                         "with modern arrangements. Founded in Tehran, the group is known for its " +
+                         "intricate santur lines, poetic vocals, and meditative compositions.",
+            RowVersion = new byte[8],
+            Slug = "darya-ensemble",
+            CreatedBy = "seed",
+            CreatedAt = now
+        };
+        context.People.Add(artist);
+        await context.SaveChangesAsync();
+        context.PersonTypeAssignments.Add(new PersonTypeAssignment { PersonId = artist.PersonId, PersonTypeId = 1 });
+
+        // Poet person
+        var poetEntity = await CreateEntityAsync(context, 3, "niloofar-rahimi");
+        var poet = new Person
+        {
+            EntityId = poetEntity.EntityId,
+            FullName = "Niloofar Rahimi",
+            FullNameSort = "Rahimi, Niloofar",
+            EnglishName = "Niloofar Rahimi",
+            PersonKindId = 1, // Individual
+            NationalityCountryId = 1,
+            Biography = "Niloofar Rahimi is a contemporary poet whose verses explore memory, " +
+                         "light, and the quiet rhythms of everyday life.",
+            RowVersion = new byte[8],
+            Slug = "niloofar-rahimi",
+            CreatedBy = "seed",
+            CreatedAt = now
+        };
+        context.People.Add(poet);
+        await context.SaveChangesAsync();
+        context.PersonTypeAssignments.Add(new PersonTypeAssignment { PersonId = poet.PersonId, PersonTypeId = 2 });
+
+        // ── Tracks ──
+        async Task<Track> AddTrackAsync(string slug, string title, int durationSeconds,
+            int[] genreSlugIds, int[] moodSlugIds, int[] instrumentSlugIds)
+        {
+            var entity = await CreateEntityAsync(context, 2, slug);
+            var track = new Track
+            {
+                EntityId = entity.EntityId,
+                Title = title,
+                TitleSort = title,
+                EnglishTitle = title,
+                DurationSeconds = durationSeconds,
+                LyricsAvailabilityTypeId = 2, // Public
+                RowVersion = new byte[8],
+                Slug = slug,
+                CreatedBy = "seed",
+                CreatedAt = now
+            };
+            context.Tracks.Add(track);
+            await context.SaveChangesAsync();
+
+            foreach (var genreId in genreSlugIds)
+            {
+                context.TrackGenres.Add(new TrackGenre { TrackId = track.TrackId, GenreId = genreId });
+            }
+            foreach (var moodId in moodSlugIds)
+            {
+                context.TrackMoods.Add(new TrackMood { TrackId = track.TrackId, MoodId = moodId });
+            }
+            foreach (var instrumentId in instrumentSlugIds)
+            {
+                context.TrackInstruments.Add(new TrackInstrument { TrackId = track.TrackId, InstrumentId = instrumentId });
+            }
+            await context.SaveChangesAsync();
+
+            return track;
+        }
+
+        var gardenTracks = new List<Track>
+        {
+            await AddTrackAsync("garden-of-stars", "Garden of Stars", 214,
+                [genreIds["classical"], genreIds["folk"]], [moodIds["calm"]], [instrumentIds["santur"], instrumentIds["setar"]]),
+            await AddTrackAsync("velvet-dusk", "Velvet Dusk", 187,
+                [genreIds["folk"]], [moodIds["melancholic"]], [instrumentIds["violin"]]) ,
+            await AddTrackAsync("moonlit-mirror", "Moonlit Mirror", 245,
+                [genreIds["classical"]], [moodIds["romantic"]], [instrumentIds["piano"]]) ,
+            await AddTrackAsync("silent-petals", "Silent Petals", 198,
+                [genreIds["folk"], genreIds["classical"]], [moodIds["calm"], moodIds["melancholic"]], [instrumentIds["santur"]]) ,
+            await AddTrackAsync("nightingale-whisper", "Nightingale Whisper", 233,
+                [genreIds["folk"]], [moodIds["romantic"]], [instrumentIds["setar"], instrumentIds["tombak"]]) ,
+        };
+
+        var riverTracks = new List<Track>
+        {
+            await AddTrackAsync("river-of-memories", "River of Memories", 261,
+                [genreIds["classical"]], [moodIds["melancholic"]], [instrumentIds["piano"]]),
+            await AddTrackAsync("drifting-leaves", "Drifting Leaves", 205,
+                [genreIds["folk"]], [moodIds["calm"]], [instrumentIds["santur"]]),
+            await AddTrackAsync("glassy-surface", "Glassy Surface", 178,
+                [genreIds["classical"], genreIds["jazz"]], [moodIds["calm"]], [instrumentIds["piano"]]),
+            await AddTrackAsync("undertow", "Undertow", 224,
+                [genreIds["folk"]], [moodIds["melancholic"], moodIds["energetic"]], [instrumentIds["tombak"]]),
+        };
+
+        var dawnTracks = new List<Track>
+        {
+            await AddTrackAsync("first-light", "First Light", 241,
+                [genreIds["classical"]], [moodIds["joyful"]], [instrumentIds["violin"]]),
+            await AddTrackAsync("amber-sky", "Amber Sky", 196,
+                [genreIds["folk"]], [moodIds["calm"], moodIds["romantic"]], [instrumentIds["setar"]]),
+            await AddTrackAsync("horizon-line", "Horizon Line", 212,
+                [genreIds["classical"], genreIds["jazz"]], [moodIds["energetic"]], [instrumentIds["piano"], instrumentIds["guitar"]]),
+            await AddTrackAsync("awakening", "Awakening", 254,
+                [genreIds["folk"], genreIds["classical"]], [moodIds["joyful"]], [instrumentIds["santur"], instrumentIds["tombak"]]),
+        };
+
+        // ── Albums ──
+        async Task AddAlbumAsync(string slug, string title, DateOnly releaseDate, string description,
+            int[] albumGenreIds, int[] albumMoodIds, IReadOnlyList<Track> albumTracks, DateTime createdAt)
+        {
+            var entity = await CreateEntityAsync(context, 1, slug);
+            var album = new Album
+            {
+                EntityId = entity.EntityId,
+                Title = title,
+                TitleSort = title,
+                EnglishTitle = title,
+                AlbumCategoryId = 1, // Studio
+                ReleaseDate = releaseDate,
+                ReleaseDatePrecision = "day",
+                Description = description,
+                Slug = slug,
+                IsOfficial = true,
+                DurationSeconds = albumTracks.Sum(t => t.DurationSeconds ?? 0),
+                RowVersion = new byte[8],
+                CreatedBy = "seed",
+                CreatedAt = createdAt
+            };
+            context.Albums.Add(album);
+            await context.SaveChangesAsync();
+
+            foreach (var genreId in albumGenreIds)
+            {
+                context.AlbumGenres.Add(new AlbumGenre { AlbumId = album.AlbumId, GenreId = genreId });
+            }
+            foreach (var moodId in albumMoodIds)
+            {
+                context.AlbumMoods.Add(new AlbumMood { AlbumId = album.AlbumId, MoodId = moodId });
+            }
+            for (var i = 0; i < albumTracks.Count; i++)
+            {
+                context.AlbumTracks.Add(new AlbumTrack
+                {
+                    AlbumId = album.AlbumId,
+                    TrackId = albumTracks[i].TrackId,
+                    DiscNumber = 1,
+                    TrackNumber = i + 1,
+                    SequenceNumber = i + 1
+                });
+            }
+
+            // Primary artist credit + composer credit
+            context.Credits.Add(new Credit
+            {
+                EntityTypeId = 1, // Album
+                EntityId = album.EntityId,
+                CreditRoleId = 1, // Primary Artist
+                RoleScopeTypeId = 1,
+                PersonId = artist.PersonId,
+                DisplayOrder = 1,
+                IsPrimary = true,
+                CreatedBy = "seed",
+                CreatedAt = now
+            });
+            context.Credits.Add(new Credit
+            {
+                EntityTypeId = 1, // Album
+                EntityId = album.EntityId,
+                CreditRoleId = 5, // Composer
+                RoleScopeTypeId = 1,
+                PersonId = artist.PersonId,
+                DisplayOrder = 2,
+                IsPrimary = false,
+                CreatedBy = "seed",
+                CreatedAt = now
+            });
+
+            await context.SaveChangesAsync();
+        }
+
+        await AddAlbumAsync(
+            "midnight-garden", "Midnight Garden", new DateOnly(2022, 6, 15),
+            "A nocturnal journey through layered strings and hushed melodies, " +
+            "recorded in the ensemble's own Tehran studio.",
+            [genreIds["classical"], genreIds["folk"]], [moodIds["calm"], moodIds["melancholic"]],
+            gardenTracks, now.AddDays(-2));
+
+        await AddAlbumAsync(
+            "the-silent-river", "The Silent River", new DateOnly(2024, 3, 20),
+            "An intimate set exploring stillness and flow, featuring solo piano " +
+            "interludes against the ensemble's santur-led arrangements.",
+            [genreIds["classical"]], [moodIds["melancholic"], moodIds["calm"]],
+            riverTracks, now.AddDays(-1));
+
+        await AddAlbumAsync(
+            "echoes-of-dawn", "Echoes of Dawn", new DateOnly(2020, 10, 8),
+            "The ensemble's debut — bright, celebratory compositions that announce " +
+            "a fresh voice in contemporary Persian instrumental music.",
+            [genreIds["folk"], genreIds["jazz"]], [moodIds["joyful"], moodIds["energetic"]],
+            dawnTracks, now);
+
+        // ── Poems ──
+        var poem1Entity = await CreateEntityAsync(context, 8, "the-garden-of-quiet");
+        context.Poems.Add(new Poem
+        {
+            EntityId = poem1Entity.EntityId,
+            Title = "The Garden of Quiet",
+            EnglishTitle = "The Garden of Quiet",
+            PersonId = poet.PersonId,
+            CanonicalText = "Under the still trees, the day lays down its instruments.\n" +
+                            "A single leaf rehearses the sound of arrival.\n" +
+                            "I count the syllables of the evening, and they are few.\n" +
+                            "The garden keeps no account of my patience.",
+            RowVersion = new byte[8],
+            Slug = "the-garden-of-quiet",
+            CreatedBy = "seed",
+            CreatedAt = now.AddHours(-6)
+        });
+
+        var poem2Entity = await CreateEntityAsync(context, 8, "a-letter-to-the-dawn");
+        context.Poems.Add(new Poem
+        {
+            EntityId = poem2Entity.EntityId,
+            Title = "A Letter to the Dawn",
+            EnglishTitle = "A Letter to the Dawn",
+            PersonId = poet.PersonId,
+            CanonicalText = "Morning, forgive my lateness: I was arranging yesterday's\n" +
+                            "unopened light into something smaller than a wish.\n" +
+                            "Here is my reply — a window left ajar,\n" +
+                            "and the first bird already rehearsing its answer.",
+            RowVersion = new byte[8],
+            Slug = "a-letter-to-the-dawn",
+            CreatedBy = "seed",
+            CreatedAt = now.AddHours(-4)
+        });
+
+        await context.SaveChangesAsync();
+    }
+
+    private static async Task<Entity> CreateEntityAsync(AppDbContext context, int entityTypeId, string slug)
+    {
+        var entity = new Entity
+        {
+            EntityTypeId = entityTypeId,
+            Slug = slug,
+            IsDeleted = false,
+            RowVersion = new byte[8], // SQLite has no server-generated rowversion
+            CreatedBy = "seed",
+            CreatedAt = DateTime.UtcNow
+        };
+        context.Entities.Add(entity);
+        await context.SaveChangesAsync();
+        return entity;
+    }
+
+    private static async Task<Dictionary<string, int>> SeedGenresAsync(AppDbContext context)
+    {
+        var ids = new Dictionary<string, int>();
+        foreach (var (slug, name, description) in new[]
+        {
+            ("pop", "Pop", "Mainstream popular music with catchy hooks and broad appeal."),
+            ("rock", "Rock", "Guitar-driven popular music with roots in blues and rhythm & blues."),
+            ("classical", "Classical", "Art music rooted in formal traditions and written compositions."),
+            ("folk", "Folk", "Traditional music passed down through generations and regional styles."),
+            ("jazz", "Jazz", "Improvisational music originating in early 20th-century America."),
+            ("electronic", "Electronic", "Music created primarily with synthesizers and digital instruments.")
+        })
+        {
+            var entity = await CreateEntityAsync(context, 5, slug);
+            var genre = new Genre
+            {
+                EntityId = entity.EntityId,
+                Name = name,
+                RowVersion = new byte[8],
+                Slug = slug,
+                Description = description,
+                CreatedBy = "seed",
+                CreatedAt = DateTime.UtcNow
+            };
+            context.Genres.Add(genre);
+            await context.SaveChangesAsync();
+            ids[slug] = genre.GenreId;
+        }
+        return ids;
+    }
+
+    private static async Task<Dictionary<string, int>> SeedMoodsAsync(AppDbContext context)
+    {
+        var ids = new Dictionary<string, int>();
+        foreach (var (slug, name, description) in new[]
+        {
+            ("joyful", "Joyful", "Bright and uplifting."),
+            ("melancholic", "Melancholic", "Somber and reflective."),
+            ("romantic", "Romantic", "Warm and affectionate."),
+            ("energetic", "Energetic", "Fast-paced and invigorating."),
+            ("calm", "Calm", "Peaceful and soothing.")
+        })
+        {
+            var entity = await CreateEntityAsync(context, 6, slug);
+            var mood = new Mood
+            {
+                EntityId = entity.EntityId,
+                Name = name,
+                RowVersion = new byte[8],
+                Slug = slug,
+                Description = description,
+                CreatedBy = "seed",
+                CreatedAt = DateTime.UtcNow
+            };
+            context.Moods.Add(mood);
+            await context.SaveChangesAsync();
+            ids[slug] = mood.MoodId;
+        }
+        return ids;
+    }
+
+    private static async Task<Dictionary<string, int>> SeedInstrumentsAsync(AppDbContext context)
+    {
+        var ids = new Dictionary<string, int>();
+        foreach (var (slug, name, familyId, countryId, description) in new[]
+        {
+            ("piano", "Piano", (int?)5, (int?)null, "A keyboard instrument with hammers striking strings."),
+            ("guitar", "Guitar", (int?)1, (int?)null, "A plucked string instrument with a fretted neck."),
+            ("violin", "Violin", (int?)1, (int?)null, "A bowed string instrument, highest in the violin family."),
+            ("santur", "Santur", (int?)8, (int?)1, "A Persian hammered dulcimer with trapezoid-shaped soundbox."),
+            ("setar", "Setar", (int?)8, (int?)1, "A Persian four-stringed instrument played with the fingertip."),
+            ("tombak", "Tombak", (int?)4, (int?)1, "The principal percussion instrument of Persian classical music.")
+        })
+        {
+            var entity = await CreateEntityAsync(context, 7, slug);
+            var instrument = new Instrument
+            {
+                EntityId = entity.EntityId,
+                Name = name,
+                RowVersion = new byte[8],
+                Slug = slug,
+                Description = description,
+                InstrumentFamilyId = familyId,
+                CountryId = countryId,
+                CreatedBy = "seed",
+                CreatedAt = DateTime.UtcNow
+            };
+            context.Instruments.Add(instrument);
+            await context.SaveChangesAsync();
+            ids[slug] = instrument.InstrumentId;
+        }
+        return ids;
     }
 
     private static async Task SeedLookupDataAsync(AppDbContext context)
@@ -56,7 +603,10 @@ public static class DatabaseInitializer
         // Language (1)
         // ──────────────────────────────────────────────
         context.Languages.AddRange(
-            new Language { LanguageId = 1, Code = "fa", Name = "Persian" }
+            new Language { LanguageId = 1, Code = "fa", Name = "Persian" },
+            new Language { LanguageId = 2, Code = "en", Name = "English" },
+            new Language { LanguageId = 3, Code = "ar", Name = "Arabic" },
+            new Language { LanguageId = 4, Code = "fr", Name = "French" }
         );
 
         // ──────────────────────────────────────────────

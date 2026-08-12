@@ -95,6 +95,9 @@ public sealed class TrackEditViewModel
     /// <summary>Track ID (0 for create, >0 for edit).</summary>
     public int TrackId { get; set; }
 
+    /// <summary>The polymorphic EntityType id for tracks (used by related-editor tabs).</summary>
+    public int EntityTypeId => 2;
+
     // ──────────────────────────────────────────────
     // Dropdown Data
     // ──────────────────────────────────────────────

@@ -1,4 +1,5 @@
 using System.Data;
+using MusicEncyclopedia.Services.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Dapper;
 using MusicEncyclopedia.Web.ViewModels.Public;
@@ -10,7 +11,7 @@ namespace MusicEncyclopedia.Web.Controllers;
 /// Routes: /{culture}/sources
 /// Spec reference: 9.19
 /// </summary>
-[Route("{culture:regex(^(fa)$)}/sources")]
+[Route("{culture:regex(^(fa|en|ar|fr)$)}/sources")]
 public sealed class SourcesController : Controller
 {
     private readonly IDbConnection _db;
@@ -51,7 +52,7 @@ public sealed class SourcesController : Controller
             LEFT JOIN Company cp ON s.PublisherId = cp.CompanyId
             WHERE s.IsDeleted = 0
             ORDER BY s.Title
-            OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
+            " + SqlDialect.Pagination(SqlDialect.IsSqliteConnection(_db));
 
         var items = (await _db.QueryAsync<SourceListItemDto>(sql, new { Offset = offset, PageSize = pageSize })).ToList();
         var result = MusicEncyclopedia.Core.DTOs.PagedResult<SourceListItemDto>.Create(items.AsReadOnly(), page, pageSize, totalItems);

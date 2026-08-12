@@ -9,7 +9,7 @@ namespace MusicEncyclopedia.Web.Controllers;
 /// Routes: /{culture}/people and /{culture}/people/{slug}
 /// Spec references: 8.1 (routes), 9.6 (detail page)
 /// </summary>
-[Route("{culture:regex(^(fa)$)}/people")]
+[Route("{culture:regex(^(fa|en|ar|fr)$)}/people")]
 public sealed class PeopleController : Controller
 {
     private readonly IPersonQueryService _personQueryService;

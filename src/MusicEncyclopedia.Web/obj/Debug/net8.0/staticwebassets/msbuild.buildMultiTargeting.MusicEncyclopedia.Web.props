@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\build\MusicEncyclopedia.Web.props" />
-</Project>

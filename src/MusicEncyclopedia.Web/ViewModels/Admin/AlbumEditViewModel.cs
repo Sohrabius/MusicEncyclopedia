@@ -83,6 +83,9 @@ public sealed class AlbumEditViewModel
     /// <summary>Album ID (0 for create, >0 for edit).</summary>
     public int AlbumId { get; set; }
 
+    /// <summary>The polymorphic EntityType id for albums (used by related-editor tabs).</summary>
+    public int EntityTypeId => 1;
+
     // ──────────────────────────────────────────────
     // Dropdown Data
     // ──────────────────────────────────────────────

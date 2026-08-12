@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using MusicEncyclopedia.Data.Entities;
 
 namespace MusicEncyclopedia.Data;
@@ -76,6 +77,7 @@ public class AppDbContext : DbContext
     public DbSet<ChartEntry> ChartEntries => Set<ChartEntry>();
     public DbSet<AttributeDefinition> AttributeDefinitions => Set<AttributeDefinition>();
     public DbSet<AttributeValue> AttributeValues => Set<AttributeValue>();
+    public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
 
     // Join/association tables
     public DbSet<AlbumGenre> AlbumGenres => Set<AlbumGenre>();
@@ -100,6 +102,23 @@ public class AppDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        // SQLite has no server-generated rowversion type. EF Core's convention marks
+        // byte[] RowVersion properties as ValueGeneratedOnAddOrUpdate, which omits them
+        // from INSERT statements (expecting the database to fill them). On SQLite that
+        // leaves the NOT NULL column unset and every insert fails, so tell EF to persist
+        // the explicitly-provided values instead.
+        if (Database.IsSqlite())
+        {
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                var rowVersion = entityType.FindProperty("RowVersion");
+                if (rowVersion is not null && rowVersion.ClrType == typeof(byte[]))
+                {
+                    rowVersion.ValueGenerated = ValueGenerated.Never;
+                }
+            }
+        }
 
         ConfigureLookupTables(modelBuilder);
         ConfigureCoreEntities(modelBuilder);
@@ -437,6 +456,13 @@ public class AppDbContext : DbContext
             entity.HasIndex(ce => ce.ChartId).HasDatabaseName("IX_ChartEntry_ChartId");
             entity.HasIndex(ce => new { ce.EntityTypeId, ce.EntityId }).HasDatabaseName("IX_ChartEntry_EntityTypeId_EntityId");
             entity.HasIndex(ce => new { ce.ChartId, ce.Date, ce.EntityTypeId, ce.EntityId }).IsUnique().HasDatabaseName("IX_ChartEntry_Unique");
+        });
+
+        // ---- AuditLog ----
+        modelBuilder.Entity<AuditLog>(entity =>
+        {
+            entity.HasIndex(al => al.Timestamp).HasDatabaseName("IX_AuditLog_Timestamp");
+            entity.HasIndex(al => new { al.EntityType, al.EntityId }).HasDatabaseName("IX_AuditLog_EntityType_EntityId");
         });
     }
 

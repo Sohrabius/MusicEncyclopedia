@@ -1,4 +1,5 @@
 using System.Data;
+using MusicEncyclopedia.Services.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Dapper;
 using MusicEncyclopedia.Web.ViewModels.Public;
@@ -10,7 +11,7 @@ namespace MusicEncyclopedia.Web.Controllers;
 /// Routes: /{culture}/charts
 /// Spec reference: 9.18
 /// </summary>
-[Route("{culture:regex(^(fa)$)}/charts")]
+[Route("{culture:regex(^(fa|en|ar|fr)$)}/charts")]
 public sealed class ChartsController : Controller
 {
     private readonly IDbConnection _db;
@@ -49,7 +50,7 @@ public sealed class ChartsController : Controller
             LEFT JOIN Country co ON c.CountryId = co.CountryId
             WHERE c.IsDeleted = 0
             ORDER BY c.Name
-            OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
+            " + SqlDialect.Pagination(SqlDialect.IsSqliteConnection(_db));
 
         var items = (await _db.QueryAsync<ChartListItemDto>(sql, new { Offset = offset, PageSize = pageSize })).ToList();
         var result = MusicEncyclopedia.Core.DTOs.PagedResult<ChartListItemDto>.Create(items.AsReadOnly(), page, pageSize, totalItems);

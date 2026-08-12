@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Brand.Name" xml:space="preserve">
+    <value>موسوعة الموسيقى</value>
+  </data>
+  <data name="Nav.Home" xml:space="preserve">
+    <value>الرئيسية</value>
+  </data>
+  <data name="Nav.Albums" xml:space="preserve">
+    <value>الألبومات</value>
+  </data>
+  <data name="Nav.Artists" xml:space="preserve">
+    <value>الفنانون</value>
+  </data>
+  <data name="Nav.Poets" xml:space="preserve">
+    <value>الشعراء</value>
+  </data>
+  <data name="Nav.People" xml:space="preserve">
+    <value>الأشخاص</value>
+  </data>
+  <data name="Nav.MainNavigation" xml:space="preserve">
+    <value>التنقل الرئيسي</value>
+  </data>
+  <data name="Nav.OpenMenu" xml:space="preserve">
+    <value>فتح القائمة</value>
+  </data>
+  <data name="Nav.CloseMenu" xml:space="preserve">
+    <value>إغلاق القائمة</value>
+  </data>
+  <data name="Nav.Language" xml:space="preserve">
+    <value>اللغة</value>
+  </data>
+  <data name="Footer.Copyright" xml:space="preserve">
+    <value>© {0}</value>
+  </data>
+</root>

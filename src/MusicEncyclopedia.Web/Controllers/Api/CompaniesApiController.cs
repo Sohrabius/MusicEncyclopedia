@@ -97,15 +97,18 @@ public sealed class CompaniesApiController : BaseApiController
                 a.Title,
                 a.OriginalTitle,
                 a.EnglishTitle,
-                a.CategoryName,
+                cat.Name AS CategoryName,
                 a.ReleaseDate,
                 a.DurationSeconds,
-                a.CoverUrl,
-                ac.CompanyRole,
+                m.Url AS CoverUrl,
+                crt.Name AS CompanyRole,
                 ac.CatalogNumber,
                 ac.Barcode
             FROM AlbumCompany ac
             INNER JOIN Album a ON a.AlbumId = ac.AlbumId
+            LEFT JOIN AlbumCategory cat ON cat.AlbumCategoryId = a.AlbumCategoryId
+            LEFT JOIN Media m ON m.MediaId = a.CoverMediaId
+            LEFT JOIN CompanyRoleType crt ON crt.CompanyRoleTypeId = ac.CompanyRoleTypeId
             WHERE ac.CompanyId = @CompanyId AND a.IsDeleted = 0
             ORDER BY a.ReleaseDate DESC";
 
@@ -134,7 +137,7 @@ public sealed class CompaniesApiController : BaseApiController
         const string sql = @"
             SELECT
                 c.CreditId,
-                c.EntityTypeCode,
+                et.Code AS EntityTypeCode,
                 c.EntityId,
                 cr.Name AS RoleName,
                 cr.Code AS RoleCode,
@@ -142,6 +145,8 @@ public sealed class CompaniesApiController : BaseApiController
                 c.IsPrimary,
                 c.Notes
             FROM Credit c
+            INNER JOIN Entity e ON e.EntityId = c.EntityId
+            INNER JOIN EntityType et ON et.EntityTypeId = e.EntityTypeId
             LEFT JOIN CreditRole cr ON cr.CreditRoleId = c.CreditRoleId
             WHERE c.CompanyId = @CompanyId
             ORDER BY c.DisplayOrder";

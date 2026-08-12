@@ -1,0 +1,178 @@
+@model RelatedItemsEditorViewModel
+@{
+    // Generic AJAX related-items editor used by album/track edit tabs.
+    var editorId = $"ri-{Model.Kind}-{Model.EntityId}";
+}
+
+<div class="related-items-editor" id="@editorId"
+     data-kind="@Model.Kind"
+     data-entity-id="@Model.EntityId"
+     data-uses-dropdown="@(Model.UsesDropdown ? "1" : "0")">
+
+    <div class="flex items-center justify-between mb-3">
+        <h3 class="text-sm font-semibold text-gray-700">@Model.Title</h3>
+        <span class="ri-count text-xs text-gray-500">@Model.Items.Count assigned</span>
+    </div>
+
+    @if (Model.Items.Count == 0)
+    {
+        <p class="ri-empty text-xs text-gray-500 mb-3">
+            <i class="fas fa-info-circle text-blue-400 me-1"></i>
+            No @Model.Title.ToLower() assigned yet.
+        </p>
+    }
+
+    <ul class="ri-list space-y-1.5 mb-3">
+        @foreach (var item in Model.Items)
+        {
+            <li class="flex items-center justify-between gap-2 px-3 py-2 bg-gray-50 rounded-md border border-gray-200 text-sm"
+                data-id="@item.Id">
+                <span class="text-gray-800 truncate">
+                    @item.Label
+                    @if (!string.IsNullOrWhiteSpace(item.Extra))
+                    {
+                        <span class="text-gray-500 text-xs">(@item.Extra)</span>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(item.RoleLabel))
+                    {
+                        <span class="inline-block ms-1 px-1.5 py-0.5 bg-blue-50 text-blue-700 text-xs rounded">@item.RoleLabel</span>
+                    }
+                </span>
+                <button type="button"
+                        class="ri-remove text-red-600 hover:text-red-800 text-xs shrink-0"
+                        title="Remove"
+                        data-id="@item.Id">
+                    <i class="fas fa-times"></i>
+                </button>
+            </li>
+        }
+    </ul>
+
+    <!-- Add form -->
+    <div class="ri-add-form flex flex-wrap items-end gap-2">
+        @if (Model.UsesDropdown)
+        {
+            <div class="flex-1 min-w-[180px]">
+                <label class="block text-xs font-medium text-gray-600 mb-1">Add</label>
+                <select class="ri-option w-full text-xs px-2 py-1.5 border border-gray-300 rounded">
+                    <option value="">-- Select --</option>
+                    @foreach (var option in Model.Options)
+                    {
+                        <option value="@option.Id">@option.Label</option>
+                    }
+                </select>
+            </div>
+        }
+        else
+        {
+            <div class="flex-1 min-w-[180px]">
+                <label class="block text-xs font-medium text-gray-600 mb-1">@Model.ExtraFieldLabel</label>
+                <input type="text" class="ri-extra w-full text-xs px-2 py-1.5 border border-gray-300 rounded"
+                       placeholder="@Model.ExtraFieldPlaceholder" />
+            </div>
+        }
+
+        @if (Model.HasRoleField)
+        {
+            <div class="min-w-[140px]">
+                <label class="block text-xs font-medium text-gray-600 mb-1">@Model.RoleFieldLabel</label>
+                <select class="ri-role w-full text-xs px-2 py-1.5 border border-gray-300 rounded">
+                    <option value="">-- Select --</option>
+                    @foreach (var role in Model.RoleOptions)
+                    {
+                        <option value="@role.Id">@role.Label</option>
+                    }
+                </select>
+            </div>
+        }
+
+        @if (Model.UsesDropdown && Model.HasExtraField)
+        {
+            <div class="min-w-[140px]">
+                <label class="block text-xs font-medium text-gray-600 mb-1">@Model.ExtraFieldLabel</label>
+                <input type="text" class="ri-extra w-full text-xs px-2 py-1.5 border border-gray-300 rounded"
+                       placeholder="@Model.ExtraFieldPlaceholder" />
+            </div>
+        }
+
+        <button type="button"
+                class="ri-add px-3 py-1.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+            <i class="fas fa-plus"></i> Add
+        </button>
+    </div>
+
+    <div class="ri-error mt-2 hidden">
+        <p class="text-xs text-red-600 bg-red-50 border border-red-200 rounded px-2 py-1.5"></p>
+    </div>
+</div>
+
+<script>
+    (function () {
+        var editor = document.getElementById('@editorId');
+        if (!editor) return;
+
+        function antiForgeryToken() {
+            var el = document.querySelector('input[name="__RequestVerificationToken"]');
+            return el ? el.value : '';
+        }
+
+        function showError(msg) {
+            var box = editor.querySelector('.ri-error');
+            box.querySelector('p').textContent = msg;
+            box.classList.remove('hidden');
+        }
+
+        function hideError() {
+            editor.querySelector('.ri-error').classList.add('hidden');
+        }
+
+        editor.querySelector('.ri-add').addEventListener('click', function () {
+            hideError();
+            var form = new FormData();
+            form.append('kind', editor.dataset.kind);
+            form.append('entityId', editor.dataset.entityId);
+
+            var usesDropdown = editor.dataset.usesDropdown === '1';
+            var option = editor.querySelector('.ri-option');
+            var extraInput = editor.querySelector('.ri-extra');
+            var role = editor.querySelector('.ri-role');
+
+            if (usesDropdown) {
+                form.append('optionId', option ? option.value : '');
+            }
+            if (extraInput) {
+                form.append('extra', extraInput.value);
+            }
+            if (role) {
+                form.append('roleId', role.value);
+            }
+            form.append('__RequestVerificationToken', antiForgeryToken());
+
+            fetch('/admin/related-items/add', { method: 'POST', body: form })
+                .then(function (r) { return r.json(); })
+                .then(function (result) {
+                    if (result.success) {
+                        location.reload();
+                    } else {
+                        showError((result.errors || []).join(', '));
+                    }
+                })
+                .catch(function () { showError('Request failed. Please try again.'); });
+        });
+
+        editor.querySelectorAll('.ri-remove').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                if (!confirm('Remove this item?')) return;
+                var form = new FormData();
+                form.append('__RequestVerificationToken', antiForgeryToken());
+                fetch('/admin/related-items/remove/' + editor.dataset.kind + '/' + btn.dataset.id, { method: 'POST', body: form })
+                    .then(function (r) { return r.json(); })
+                    .then(function (result) {
+                        if (result.success) { location.reload(); }
+                        else { showError((result.errors || []).join(', ')); }
+                    })
+                    .catch(function () { showError('Request failed. Please try again.'); });
+            });
+        });
+    })();
+</script>

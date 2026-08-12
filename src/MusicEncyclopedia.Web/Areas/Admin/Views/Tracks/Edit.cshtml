@@ -233,36 +233,144 @@
                     </nav>
                 </div>
                 <div class="p-5">
-                    @foreach (var tab in new[] {
-                        ("tab-album-appearances", "Album appearances for this track."),
-                        ("tab-artist-credits", "Artist credits for this track."),
-                        ("tab-genres", "Genre assignments for this track."),
-                        ("tab-moods", "Mood assignments for this track."),
-                        ("tab-instruments", "Instrument assignments for this track."),
-                        ("tab-musician-credits", "Musician credits for this track."),
-                        ("tab-sung-version", "Sung version assignments for this track."),
-                        ("tab-original-poem", "Original poem associated with this track."),
-                        ("tab-version-type", "Version type assignments for this track."),
-                        ("tab-related-tracks", "Related tracks for this track."),
-                        ("tab-recording-session", "Recording sessions for this track."),
-                        ("tab-live-performance", "Live performance events for this track."),
-                        ("tab-aliases", "Alternative titles and aliases for this track."),
-                        ("tab-localization", "Localized field values for this track."),
-                        ("tab-tags", "Tags attached to this track."),
-                        ("tab-links", "External links related to this track."),
-                        ("tab-media", "Media items attached to this track."),
-                        ("tab-citations", "Citations and references for this track."),
-                        ("tab-attributes", "Custom attribute values for this track.")
-                    })
-                    {
-                        var isFirst = tab.Item1 == "tab-album-appearances";
-                        <div id="@tab.Item1" class="tab-panel @(isFirst ? "" : "hidden")">
-                            <p class="text-sm text-gray-500">
-                                <i class="fas fa-info-circle text-blue-400 me-1"></i>
-                                @tab.Item2 <em>(Coming soon)</em>
-                            </p>
-                        </div>
-                    }
+                    <!-- Album Appearances -->
+                    <div id="tab-album-appearances" class="tab-panel">
+                        <p class="text-sm text-gray-500">
+                            <i class="fas fa-compact-disc text-indigo-400 me-1"></i>
+                            Add this track to an album from the album's
+                            <a href="/admin/albums" class="text-blue-600 hover:underline">Tracklist editor</a>.
+                        </p>
+                    </div>
+
+                    <!-- Artist Credits -->
+                    <div id="tab-artist-credits" class="tab-panel hidden">
+                        <div data-editor-url="/admin/credits/@Model.EntityTypeId/@Model.TrackId"></div>
+                    </div>
+
+                    <!-- Genres -->
+                    <div id="tab-genres" class="tab-panel hidden">
+                        <div data-editor-url="/admin/related-items/track-genres/@Model.TrackId"></div>
+                    </div>
+
+                    <!-- Moods -->
+                    <div id="tab-moods" class="tab-panel hidden">
+                        <div data-editor-url="/admin/related-items/track-moods/@Model.TrackId"></div>
+                    </div>
+
+                    <!-- Instruments -->
+                    <div id="tab-instruments" class="tab-panel hidden">
+                        <div data-editor-url="/admin/related-items/track-instruments/@Model.TrackId"></div>
+                    </div>
+
+                    <!-- Musician Credits -->
+                    <div id="tab-musician-credits" class="tab-panel hidden">
+                        <div data-editor-url="/admin/credits/@Model.EntityTypeId/@Model.TrackId"></div>
+                    </div>
+
+                    <!-- Sung Version -->
+                    <div id="tab-sung-version" class="tab-panel hidden">
+                        <div data-editor-url="/admin/related-items/track-sung-versions/@Model.TrackId"></div>
+                    </div>
+
+                    <!-- Original Poem -->
+                    <div id="tab-original-poem" class="tab-panel hidden">
+                        <p class="text-sm text-gray-500">
+                            <i class="fas fa-feather-alt text-pink-400 me-1"></i>
+                            Associate a poem from the
+                            <a href="/admin/poems" class="text-blue-600 hover:underline">Poems</a>
+                            section.
+                        </p>
+                    </div>
+
+                    <!-- Version Type -->
+                    <div id="tab-version-type" class="tab-panel hidden">
+                        <div data-editor-url="/admin/related-items/track-version-types/@Model.TrackId"></div>
+                    </div>
+
+                    <!-- Related Tracks -->
+                    <div id="tab-related-tracks" class="tab-panel hidden">
+                        <div data-editor-url="/admin/related-items/track-related/@Model.TrackId"></div>
+                    </div>
+
+                    <!-- Recording Session -->
+                    <div id="tab-recording-session" class="tab-panel hidden">
+                        <p class="text-sm text-gray-500">
+                            <i class="fas fa-circle text-emerald-400 me-1"></i>
+                            Link sessions from the
+                            <a href="/admin/sessions" class="text-blue-600 hover:underline">Recording Sessions</a>
+                            section.
+                        </p>
+                    </div>
+
+                    <!-- Live Performance -->
+                    <div id="tab-live-performance" class="tab-panel hidden">
+                        <p class="text-sm text-gray-500">
+                            <i class="fas fa-calendar-alt text-amber-400 me-1"></i>
+                            Link events from the
+                            <a href="/admin/events" class="text-blue-600 hover:underline">Performance Events</a>
+                            section.
+                        </p>
+                    </div>
+
+                    <!-- Aliases -->
+                    <div id="tab-aliases" class="tab-panel hidden">
+                        <div data-editor-url="/admin/aliases/@Model.EntityTypeId/@Model.TrackId"></div>
+                    </div>
+
+                    <!-- Localization -->
+                    <div id="tab-localization" class="tab-panel hidden">
+                        <p class="text-sm text-gray-500">
+                            <i class="fas fa-language text-pink-400 me-1"></i>
+                            Manage localized field values from the
+                            <a href="/admin/localizations" class="text-blue-600 hover:underline">Localizations</a>
+                            section (EntityType Track, EntityId @Model.TrackId).
+                        </p>
+                    </div>
+
+                    <!-- Tags -->
+                    <div id="tab-tags" class="tab-panel hidden">
+                        <p class="text-sm text-gray-500">
+                            <i class="fas fa-hashtag text-violet-400 me-1"></i>
+                            Attach tags from the
+                            <a href="/admin/tags" class="text-blue-600 hover:underline">Tags</a>
+                            section.
+                        </p>
+                    </div>
+
+                    <!-- Links -->
+                    <div id="tab-links" class="tab-panel hidden">
+                        <p class="text-sm text-gray-500">
+                            <i class="fas fa-link text-sky-400 me-1"></i>
+                            Manage external links from the
+                            <a href="/admin/links" class="text-blue-600 hover:underline">Links</a>
+                            section (EntityType Track, EntityId @Model.TrackId).
+                        </p>
+                    </div>
+
+                    <!-- Media -->
+                    <div id="tab-media" class="tab-panel hidden">
+                        <p class="text-sm text-gray-500">
+                            <i class="fas fa-photo-video text-emerald-400 me-1"></i>
+                            Upload and assign media from the
+                            <a href="/admin/media" class="text-blue-600 hover:underline">Media</a>
+                            section.
+                        </p>
+                    </div>
+
+                    <!-- Citations -->
+                    <div id="tab-citations" class="tab-panel hidden">
+                        <p class="text-sm text-gray-500">
+                            <i class="fas fa-quote-right text-amber-400 me-1"></i>
+                            Add citations from the
+                            <a href="/admin/citations" class="text-blue-600 hover:underline">Citations</a>
+                            section (EntityType Track, EntityId @Model.TrackId).
+                        </p>
+                    </div>
+
+                    <!-- Attributes -->
+                    <div id="tab-attributes" class="tab-panel hidden">
+                        <div data-editor-url="/admin/attribute-values/@Model.EntityTypeId/@Model.TrackId"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -310,6 +418,23 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/4.1.0/jquery.validate.unobtrusive.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            var loadedTabs = {};
+
+            function loadEditor(panel) {
+                var holder = panel.querySelector('[data-editor-url]');
+                if (!holder || holder.dataset.loaded) return;
+                holder.dataset.loaded = '1';
+                var url = holder.dataset.editorUrl;
+                holder.innerHTML = '<p class="text-sm text-gray-400"><i class="fas fa-spinner fa-spin me-1"></i>Loading…</p>';
+                fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                    .then(function (r) {
+                        if (!r.ok) throw new Error('Failed to load editor');
+                        return r.text();
+                    })
+                    .then(function (html) { holder.innerHTML = html; })
+                    .catch(function () { holder.innerHTML = '<p class="text-sm text-red-600">Failed to load editor.</p>'; });
+            }
+
             var tabBtns = document.querySelectorAll('.tab-btn');
             var panels = document.querySelectorAll('.tab-panel');
             tabBtns.forEach(function (btn) {
@@ -325,9 +450,12 @@
                     var targetPanel = document.getElementById(targetId);
                     if (targetPanel) {
                         targetPanel.classList.remove('hidden');
+                        loadEditor(targetPanel);
                     }
                 });
             });
+
+            panels.forEach(function (p) { if (!p.classList.contains('hidden')) loadEditor(p); });
         });
     </script>
 }

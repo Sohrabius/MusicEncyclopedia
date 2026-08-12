@@ -98,14 +98,18 @@ public sealed class PeopleApiController : BaseApiController
                 a.Title,
                 a.OriginalTitle,
                 a.EnglishTitle,
-                a.CategoryName,
+                ac.Name AS CategoryName,
                 a.ReleaseDate,
                 a.DurationSeconds,
-                a.CoverUrl
+                m.Url AS CoverUrl
             FROM Credit c
-            INNER JOIN Album a ON a.AlbumId = c.EntityId
+            INNER JOIN Entity e ON e.EntityId = c.EntityId
+            INNER JOIN EntityType et ON et.EntityTypeId = e.EntityTypeId
+            INNER JOIN Album a ON a.EntityId = e.EntityId
+            LEFT JOIN AlbumCategory ac ON ac.AlbumCategoryId = a.AlbumCategoryId
+            LEFT JOIN Media m ON m.MediaId = a.CoverMediaId
             WHERE c.PersonId = @PersonId
-              AND c.EntityTypeCode = 'Album'
+              AND et.Code = 'Album'
               AND a.IsDeleted = 0
             ORDER BY a.ReleaseDate DESC";
 
@@ -142,9 +146,11 @@ public sealed class PeopleApiController : BaseApiController
                 t.IsInstrumental,
                 t.IsExplicit
             FROM Credit c
-            INNER JOIN Track t ON t.TrackId = c.EntityId
+            INNER JOIN Entity e ON e.EntityId = c.EntityId
+            INNER JOIN EntityType et ON et.EntityTypeId = e.EntityTypeId
+            INNER JOIN Track t ON t.EntityId = e.EntityId
             WHERE c.PersonId = @PersonId
-              AND c.EntityTypeCode = 'Track'
+              AND et.Code = 'Track'
               AND t.IsDeleted = 0
             ORDER BY t.Title";
 
@@ -173,7 +179,7 @@ public sealed class PeopleApiController : BaseApiController
         const string sql = @"
             SELECT
                 c.CreditId,
-                c.EntityTypeCode,
+                et.Code AS EntityTypeCode,
                 c.EntityId,
                 cr.Name AS RoleName,
                 cr.Code AS RoleCode,
@@ -182,6 +188,8 @@ public sealed class PeopleApiController : BaseApiController
                 c.IsPrimary,
                 c.Notes
             FROM Credit c
+            INNER JOIN Entity e ON e.EntityId = c.EntityId
+            INNER JOIN EntityType et ON et.EntityTypeId = e.EntityTypeId
             LEFT JOIN CreditRole cr ON cr.CreditRoleId = c.CreditRoleId
             LEFT JOIN Instrument i ON i.InstrumentId = c.InstrumentId
             WHERE c.PersonId = @PersonId
@@ -215,9 +223,10 @@ public sealed class PeopleApiController : BaseApiController
                 i.Slug,
                 i.Name,
                 i.Description,
-                i.FamilyName AS InstrumentFamilyName
+                inf.Name AS InstrumentFamilyName
             FROM MusicianInstrument mi
             INNER JOIN Instrument i ON i.InstrumentId = mi.InstrumentId
+            LEFT JOIN InstrumentFamily inf ON inf.InstrumentFamilyId = i.InstrumentFamilyId
             WHERE mi.PersonId = @PersonId AND i.IsDeleted = 0
             UNION
             SELECT DISTINCT
@@ -225,9 +234,10 @@ public sealed class PeopleApiController : BaseApiController
                 i.Slug,
                 i.Name,
                 i.Description,
-                i.FamilyName AS InstrumentFamilyName
+                inf.Name AS InstrumentFamilyName
             FROM Credit c
             INNER JOIN Instrument i ON i.InstrumentId = c.InstrumentId
+            LEFT JOIN InstrumentFamily inf ON inf.InstrumentFamilyId = i.InstrumentFamilyId
             WHERE c.PersonId = @PersonId AND i.IsDeleted = 0";
 
         var instruments = (await connection.QueryAsync(sql, new { PersonId = person.PersonId })).AsList();
@@ -291,17 +301,17 @@ public sealed class PeopleApiController : BaseApiController
             SELECT
                 m.MediaId,
                 m.Url,
-                m.ThumbnailUrl,
-                m.MediaType,
+                m.ThumbnailUrl300,
+                mt.Name AS MediaType,
                 mrt.Name AS MediaRole,
-                ma.Description,
                 ma.IsPrimary,
                 m.Width,
                 m.Height
             FROM MediaAssignment ma
             INNER JOIN Media m ON m.MediaId = ma.MediaId
+            INNER JOIN MediaType mt ON mt.MediaTypeId = m.MediaTypeId
             LEFT JOIN MediaRoleType mrt ON mrt.MediaRoleTypeId = ma.MediaRoleTypeId
-            WHERE ma.EntityTypeCode = 'Person'
+            WHERE ma.EntityTypeId = (SELECT EntityTypeId FROM EntityType WHERE Code = 'Person')
               AND ma.EntityId = @EntityId
               AND m.IsDeleted = 0";
 

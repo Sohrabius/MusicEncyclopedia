@@ -8,7 +8,7 @@ namespace MusicEncyclopedia.Web.Controllers;
 /// Public controller for track listing and detail pages.
 /// Routes: /{culture}/tracks and /{culture}/tracks/{slug}
 /// </summary>
-[Route("{culture:regex(^(fa)$)}/tracks")]
+[Route("{culture:regex(^(fa|en|ar|fr)$)}/tracks")]
 public sealed class TracksController : Controller
 {
     private readonly ITrackQueryService _trackQueryService;

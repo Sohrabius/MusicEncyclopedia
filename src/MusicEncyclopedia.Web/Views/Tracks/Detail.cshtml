@@ -370,7 +370,7 @@
                 <section>
                     <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["Awards"]</h2>
                     <div class="space-y-3">
-                        @foreach (var award in track.Awards.OrderByDescending(a => a.AwardDate))
+                        @foreach (var award in track.Awards.OrderByDescending(a => a.Year))
                         {
                             <div class="flex items-start gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
                                 <div class="flex-1 min-w-0">
@@ -382,11 +382,10 @@
                                     {
                                         <span class="text-gray-500"> — @award.Category</span>
                                     }
-                                    <div class="text-sm text-gray-500 mt-0.5">
-                                        @if (award.AwardDate.HasValue)
-                                        {
-                                            <span>@award.AwardDate.Value.ToString("yyyy")</span>
-                                        }
+                                    <div class="text-sm text-gray-500 mt-0.5">                                            @if (award.Year.HasValue)
+                                            {
+                                                <span>@award.Year</span>
+                                            }
                                         @if (!string.IsNullOrWhiteSpace(award.Result))
                                         {
                                             <span class="ms-2 font-medium @(award.Result == "Winner" ? "text-green-600" : "text-gray-600")">

@@ -7,5 +7,11 @@ namespace MusicEncyclopedia.Core.DTOs;
 public sealed class NamedLinkDto
 {
     public string Slug { get; init; } = "";
-    public string Name { get; init; } = "";
+
+    /// <summary>
+    /// The referenced Entity row id — used to overlay localized names (spec 7.3).
+    /// Null when the query does not select it (genres, moods, etc.).
+    /// </summary>
+    public int? EntityId { get; init; }
+    public string Name { get; set; } = "";
 }

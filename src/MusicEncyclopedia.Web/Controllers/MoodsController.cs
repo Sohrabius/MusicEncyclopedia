@@ -1,4 +1,5 @@
 using System.Data;
+using MusicEncyclopedia.Services.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Dapper;
 using MusicEncyclopedia.Core.DTOs;
@@ -11,7 +12,7 @@ namespace MusicEncyclopedia.Web.Controllers;
 /// Routes: /{culture}/moods and /{culture}/moods/{slug}
 /// Spec references: 8.1 (routes), 9.9 (detail page)
 /// </summary>
-[Route("{culture:regex(^(fa)$)}/moods")]
+[Route("{culture:regex(^(fa|en|ar|fr)$)}/moods")]
 public sealed class MoodsController : Controller
 {
     private readonly IDbConnection _db;
@@ -51,8 +52,8 @@ public sealed class MoodsController : Controller
         var totalItems = await _db.ExecuteScalarAsync<int>(countSql);
 
         var itemsSql = q is null
-            ? "SELECT MoodId, Name, Slug FROM Mood WHERE IsDeleted = 0 ORDER BY Name OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY"
-            : "SELECT MoodId, Name, Slug FROM Mood WHERE IsDeleted = 0 AND (Name LIKE @Q OR Description LIKE @Q) ORDER BY Name OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
+            ? "SELECT MoodId, Name, Slug FROM Mood WHERE IsDeleted = 0 ORDER BY Name " + SqlDialect.Pagination(SqlDialect.IsSqliteConnection(_db))
+            : "SELECT MoodId, Name, Slug FROM Mood WHERE IsDeleted = 0 AND (Name LIKE @Q OR Description LIKE @Q) ORDER BY Name " + SqlDialect.Pagination(SqlDialect.IsSqliteConnection(_db));
 
         var items = await _db.QueryAsync<NamedLinkDto>(
             itemsSql,
@@ -155,7 +156,6 @@ public sealed class MoodsController : Controller
                 @"SELECT m.MediaId,
                          COALESCE(m.Url, m.FilePath) AS Url,
                          m.ThumbnailUrl300 AS ThumbnailUrl,
-                         ma.Description,
                          mt.Name AS MediaTypeName
                   FROM MediaAssignment ma
                   INNER JOIN Media m ON ma.MediaId = m.MediaId

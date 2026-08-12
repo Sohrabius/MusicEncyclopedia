@@ -1,0 +1,54 @@
+@model RoleListViewModel
+@{
+    ViewData["Title"] = "Roles";
+    ViewData["ActiveMenu"] = "Roles";
+}
+
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
+    <div class="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
+        <p class="text-sm text-gray-500">Role definitions and the permission grants attached to each role. Users inherit a role's permissions at sign-in.</p>
+        <a href="/admin/roles/Create" class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 transition-colors"><i class="fas fa-plus"></i> <span>Create Role</span></a>
+    </div>
+</div>
+
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead class="bg-gray-50 border-b border-gray-200">
+                <tr>
+                    <th class="text-start px-4 py-3 font-medium text-gray-600">Name</th>
+                    <th class="text-center px-4 py-3 font-medium text-gray-600">Users</th>
+                    <th class="text-center px-4 py-3 font-medium text-gray-600">Permissions</th>
+                    <th class="text-end px-4 py-3 font-medium text-gray-600">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                @if (Model.Items.Count == 0)
+                {
+                    <tr><td colspan="4" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-shield-alt text-3xl text-gray-300 mb-2 block"></i>No roles yet. <a href="/admin/roles/Create" class="text-blue-600 hover:underline">Create one</a>.</td></tr>
+                }
+                else
+                {
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-4 py-3">
+                                <a href="/admin/roles/@item.Id/Edit" class="text-blue-600 hover:underline font-medium">@item.Name</a>
+                                @if (string.Equals(item.Name, "Administrator", StringComparison.OrdinalIgnoreCase)) { <span class="ms-2 inline-block px-2 py-0.5 text-xs rounded-full bg-purple-50 text-purple-700">Protected</span> }
+                            </td>
+                            <td class="px-4 py-3 text-center">@item.UserCount</td>
+                            <td class="px-4 py-3 text-center">@item.PermissionCount</td>
+                            <td class="px-4 py-3 text-end">
+                                <a href="/admin/roles/@item.Id/Edit" class="inline-flex items-center gap-1 px-2 py-1 text-xs text-blue-600 hover:bg-blue-50 rounded"><i class="fas fa-edit"></i> Edit</a>
+                                @if (!string.Equals(item.Name, "Administrator", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    <form method="post" action="/admin/roles/@item.Id/Delete" onsubmit="return confirm('Are you sure you want to delete this role?');" class="inline">@Html.AntiForgeryToken()<button type="submit" class="inline-flex items-center gap-1 px-2 py-1 text-xs text-red-600 hover:bg-red-50 rounded"><i class="fas fa-trash-alt"></i> Delete</button></form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,4 +1,5 @@
 using System.Data;
+using MusicEncyclopedia.Services.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Dapper;
 using MusicEncyclopedia.Core.DTOs;
@@ -11,7 +12,7 @@ namespace MusicEncyclopedia.Web.Controllers;
 /// Routes: /{culture}/instruments and /{culture}/instruments/{slug}
 /// Spec references: 8.1 (routes), 9.10 (detail page)
 /// </summary>
-[Route("{culture:regex(^(fa)$)}/instruments")]
+[Route("{culture:regex(^(fa|en|ar|fr)$)}/instruments")]
 public sealed class InstrumentsController : Controller
 {
     private readonly IDbConnection _db;
@@ -51,8 +52,8 @@ public sealed class InstrumentsController : Controller
         var totalItems = await _db.ExecuteScalarAsync<int>(countSql);
 
         var itemsSql = q is null
-            ? "SELECT InstrumentId, Name, Slug FROM Instrument WHERE IsDeleted = 0 ORDER BY Name OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY"
-            : "SELECT InstrumentId, Name, Slug FROM Instrument WHERE IsDeleted = 0 AND (Name LIKE @Q OR Description LIKE @Q) ORDER BY Name OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
+            ? "SELECT InstrumentId, Name, Slug FROM Instrument WHERE IsDeleted = 0 ORDER BY Name " + SqlDialect.Pagination(SqlDialect.IsSqliteConnection(_db))
+            : "SELECT InstrumentId, Name, Slug FROM Instrument WHERE IsDeleted = 0 AND (Name LIKE @Q OR Description LIKE @Q) ORDER BY Name " + SqlDialect.Pagination(SqlDialect.IsSqliteConnection(_db));
 
         // Use named mapping since column is InstrumentId not Id
         var items = (await _db.QueryAsync<(int InstrumentId, string Name, string Slug)>(
@@ -212,7 +213,6 @@ public sealed class InstrumentsController : Controller
                 @"SELECT m.MediaId,
                          COALESCE(m.Url, m.FilePath) AS Url,
                          m.ThumbnailUrl300 AS ThumbnailUrl,
-                         ma.Description,
                          mt.Name AS MediaTypeName
                   FROM MediaAssignment ma
                   INNER JOIN Media m ON ma.MediaId = m.MediaId

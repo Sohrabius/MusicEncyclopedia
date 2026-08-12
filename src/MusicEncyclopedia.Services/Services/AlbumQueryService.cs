@@ -3,8 +3,10 @@ using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using MusicEncyclopedia.Core.Constants;
 using MusicEncyclopedia.Core.DTOs;
 using MusicEncyclopedia.Core.Interfaces;
+using MusicEncyclopedia.Services.Infrastructure;
 
 namespace MusicEncyclopedia.Services.Services;
 
@@ -13,11 +15,15 @@ public sealed class AlbumQueryService : IAlbumQueryService
     private readonly string _connectionString;
     private readonly bool _isSqlite;
     private readonly ILogger<AlbumQueryService> _logger;
+    private readonly IContentLocalizationService _localizationService;
 
     public AlbumQueryService(
         IConfiguration configuration,
-        ILogger<AlbumQueryService> logger)
+        ILogger<AlbumQueryService> logger,
+        IContentLocalizationService localizationService)
     {
+        _localizationService = localizationService;
+
         var dbProvider = configuration.GetValue<string>("DatabaseProvider") ?? "SqlServer";
         _isSqlite = string.Equals(dbProvider, "Sqlite", StringComparison.OrdinalIgnoreCase);
 
@@ -102,6 +108,7 @@ public sealed class AlbumQueryService : IAlbumQueryService
         var dataSql = $@"
             SELECT
                 a.AlbumId,
+                a.EntityId,
                 a.Slug,
                 a.Title,
                 a.OriginalTitle,
@@ -115,8 +122,7 @@ public sealed class AlbumQueryService : IAlbumQueryService
             LEFT JOIN Media AS m ON m.MediaId = a.CoverMediaId
             WHERE {whereSql}
             ORDER BY {orderBy}
-            OFFSET @Offset ROWS
-            FETCH NEXT @PageSize ROWS ONLY
+            {SqlDialect.Pagination(_isSqlite)}
             ";
 
         parameters.Add("Offset", (page - 1) * pageSize);
@@ -130,6 +136,12 @@ public sealed class AlbumQueryService : IAlbumQueryService
             var totalItems = await connection.ExecuteScalarAsync<int>(countSql, parameters);
 
             var albumItems = (await connection.QueryAsync<AlbumListItemDto>(dataSql, parameters)).AsList();
+
+            // Spec 7.3: overlay localized titles on list cards (base culture skips).
+            if (LocalizationHelper.ShouldLocalize(culture))
+            {
+                await LocalizeAlbumListAsync(albumItems, culture, cancellationToken);
+            }
 
             return PagedResult<AlbumListItemDto>.Create(albumItems, page, pageSize, totalItems);
         }
@@ -184,6 +196,8 @@ public sealed class AlbumQueryService : IAlbumQueryService
 
             // For SQLite, run queries sequentially (no MARS support);
             // for SQL Server, run in parallel
+            AlbumDetailDto result;
+
             if (_isSqlite)
             {
                 var tracks = await GetAlbumTracksInternalAsync(connection, albumId, cancellationToken);
@@ -203,7 +217,7 @@ public sealed class AlbumQueryService : IAlbumQueryService
                 var certifications = await GetEntityCertificationsAsync(connection, entityId, cancellationToken);
                 var chartEntries = await GetEntityChartEntriesAsync(connection, entityId, cancellationToken);
 
-                return CreateAlbumDetail(album, tracks, credits, genres, moods, languages, countries,
+                result = CreateAlbumDetail(album, tracks, credits, genres, moods, languages, countries,
                     companies, identifiers, media, links, aliases, tags, citations, awards, certifications, chartEntries);
             }
             else
@@ -231,19 +245,77 @@ public sealed class AlbumQueryService : IAlbumQueryService
                     mediaTask, linksTask, aliasesTask, tagsTask, citationsTask,
                     awardsTask, certificationsTask, chartEntriesTask);
 
-                return CreateAlbumDetail(album, tracksTask.Result, creditsTask.Result, genresTask.Result,
+                result = CreateAlbumDetail(album, tracksTask.Result, creditsTask.Result, genresTask.Result,
                     moodsTask.Result, languagesTask.Result, countriesTask.Result,
                     companiesTask.Result, identifiersTask.Result, mediaTask.Result, linksTask.Result,
                     aliasesTask.Result, tagsTask.Result, citationsTask.Result, awardsTask.Result,
                     certificationsTask.Result, chartEntriesTask.Result);
             }
 
-            // Dead code removed - CreateAlbumDetail is used above
+            // Spec 7.3: overlay localized text (requested → base → en → empty)
+            if (LocalizationHelper.ShouldLocalize(culture))
+            {
+                await LocalizeAlbumAsync(result, entityId, culture, cancellationToken);
+            }
+
+            return result;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to load album by slug={Slug}, culture={Culture}", slug, culture);
             return null;
+        }
+    }
+
+    private static readonly string[] LocalizedAlbumFields =
+        ["Title", "OriginalTitle", "EnglishTitle", "Description"];
+
+    private async Task LocalizeAlbumAsync(
+        AlbumDetailDto album,
+        int entityId,
+        string culture,
+        CancellationToken cancellationToken)
+    {
+        var localized = await _localizationService.GetLocalizedValuesAsync(
+            entityId, LocalizedAlbumFields, culture, cancellationToken);
+
+        if (localized.Count == 0)
+            return;
+
+        album.Title = LocalizationHelper.Pick(localized, "Title", album.Title);
+        album.OriginalTitle = LocalizationHelper.Pick(localized, "OriginalTitle", album.OriginalTitle);
+        album.EnglishTitle = LocalizationHelper.Pick(localized, "EnglishTitle", album.EnglishTitle);
+        album.Description = LocalizationHelper.Pick(localized, "Description", album.Description);
+    }
+
+    private async Task LocalizeAlbumListAsync(
+        List<AlbumListItemDto> albums,
+        string culture,
+        CancellationToken cancellationToken)
+    {
+        var entityIds = albums
+            .Select(a => a.EntityId)
+            .Where(id => id.HasValue)
+            .Select(id => id!.Value)
+            .Distinct()
+            .ToArray();
+
+        if (entityIds.Length == 0)
+            return;
+
+        var localized = await _localizationService.GetLocalizedValuesAsync(
+            entityIds, ["Title"], culture, cancellationToken);
+
+        if (localized.Count == 0)
+            return;
+
+        foreach (var album in albums)
+        {
+            if (album.EntityId.HasValue &&
+                localized.TryGetValue(album.EntityId.Value, out var fields))
+            {
+                album.Title = LocalizationHelper.Pick(fields, "Title", album.Title);
+            }
         }
     }
 
@@ -333,7 +405,6 @@ public sealed class AlbumQueryService : IAlbumQueryService
             FROM AlbumTrack AS at
             INNER JOIN Track AS t ON t.TrackId = at.TrackId
             WHERE at.AlbumId = @AlbumId
-              AND at.IsDeleted = 0
               AND t.IsDeleted = 0
             ORDER BY at.DiscNumber, at.SequenceNumber
             ";
@@ -369,7 +440,6 @@ public sealed class AlbumQueryService : IAlbumQueryService
             LEFT JOIN Company AS co ON co.CompanyId = c.CompanyId
             LEFT JOIN Instrument AS i ON i.InstrumentId = c.InstrumentId
             WHERE c.EntityId = @EntityId
-              AND c.IsDeleted = 0
             ORDER BY cr.DisplayOrder, c.DisplayOrder, p.FullName, co.Name
             ";
 
@@ -459,8 +529,7 @@ public sealed class AlbumQueryService : IAlbumQueryService
             INNER JOIN Company co ON co.CompanyId = ac.CompanyId
             INNER JOIN CompanyRoleType crt ON crt.CompanyRoleTypeId = ac.CompanyRoleTypeId
             WHERE ac.AlbumId = @AlbumId
-              AND ac.IsDeleted = 0
-            ORDER BY crt.DisplayOrder, co.Name
+            ORDER BY crt.Name, co.Name
             ";
         var results = await connection.QueryAsync<AlbumCompanyDto>(sql, new { AlbumId = albumId });
         return results.AsList();
@@ -474,7 +543,7 @@ public sealed class AlbumQueryService : IAlbumQueryService
         const string sql = @"
             SELECT
                 it.Name AS IdentifierType,
-                ai.IdentifierValue
+                ai.Value
             FROM AlbumIdentifier ai
             INNER JOIN IdentifierType it ON it.IdentifierTypeId = ai.IdentifierTypeId
             WHERE ai.AlbumId = @AlbumId
@@ -493,11 +562,10 @@ public sealed class AlbumQueryService : IAlbumQueryService
             SELECT
                 m.MediaId,
                 m.Url,
-                m.ThumbnailUrl,
+                m.ThumbnailUrl300 AS ThumbnailUrl,
                 mt.Name AS MediaType,
                 mrt.Name AS MediaRole,
-                m.Description,
-                m.IsPrimary,
+                ma.IsPrimary,
                 m.Width,
                 m.Height
             FROM MediaAssignment ma
@@ -505,9 +573,8 @@ public sealed class AlbumQueryService : IAlbumQueryService
             INNER JOIN MediaType mt ON mt.MediaTypeId = m.MediaTypeId
             LEFT JOIN MediaRoleType mrt ON mrt.MediaRoleTypeId = ma.MediaRoleTypeId
             WHERE ma.EntityId = @EntityId
-              AND ma.IsDeleted = 0
               AND m.IsDeleted = 0
-            ORDER BY m.IsPrimary DESC, m.MediaId
+            ORDER BY ma.IsPrimary DESC, m.MediaId
             ";
         var results = await connection.QueryAsync<MediaDto>(sql, new { EntityId = entityId });
         return results.AsList();
@@ -528,7 +595,7 @@ public sealed class AlbumQueryService : IAlbumQueryService
             LEFT JOIN LinkType lt ON lt.LinkTypeId = el.LinkTypeId
             WHERE el.EntityId = @EntityId
               AND el.IsDeleted = 0
-            ORDER BY el.DisplayOrder
+            ORDER BY el.EntityLinkId
             ";
         var results = await connection.QueryAsync<EntityLinkDto>(sql, new { EntityId = entityId });
         return results.AsList();
@@ -551,7 +618,6 @@ public sealed class AlbumQueryService : IAlbumQueryService
             LEFT JOIN AliasType at ON at.AliasTypeId = a.AliasTypeId
             LEFT JOIN Language l ON l.LanguageId = a.LanguageId
             WHERE a.EntityId = @EntityId
-              AND a.IsDeleted = 0
             ORDER BY a.IsPrimary DESC, a.AliasId
             ";
         var results = await connection.QueryAsync<AliasDto>(sql, new { EntityId = entityId });
@@ -568,7 +634,6 @@ public sealed class AlbumQueryService : IAlbumQueryService
             FROM TagAssignment ta
             INNER JOIN Tag t ON t.TagId = ta.TagId
             WHERE ta.EntityId = @EntityId
-              AND ta.IsDeleted = 0
               AND t.IsDeleted = 0
             ORDER BY t.Name
             ";
@@ -585,7 +650,7 @@ public sealed class AlbumQueryService : IAlbumQueryService
             SELECT
                 c.CitationId,
                 c.SourceId,
-                s.Name AS SourceName,
+                s.Title AS SourceName,
                 s.Slug AS SourceSlug,
                 c.FieldName,
                 c.Quote,
@@ -595,7 +660,6 @@ public sealed class AlbumQueryService : IAlbumQueryService
             FROM Citation c
             LEFT JOIN Source s ON s.SourceId = c.SourceId
             WHERE c.EntityId = @EntityId
-              AND c.IsDeleted = 0
             ORDER BY c.CitationId
             ";
         var results = await connection.QueryAsync<CitationDto>(sql, new { EntityId = entityId });
@@ -613,15 +677,14 @@ public sealed class AlbumQueryService : IAlbumQueryService
                 aa.AwardId,
                 a.Name AS AwardName,
                 a.Slug AS AwardSlug,
-                aa.AwardDate,
+                aa.Year,
                 art.Name AS Result,
                 aa.Category
             FROM AwardAssignment aa
             INNER JOIN Award a ON a.AwardId = aa.AwardId
             LEFT JOIN AwardResultType art ON art.AwardResultTypeId = aa.AwardResultTypeId
             WHERE aa.EntityId = @EntityId
-              AND aa.IsDeleted = 0
-            ORDER BY aa.AwardDate DESC
+            ORDER BY aa.Year DESC
             ";
         var results = await connection.QueryAsync<AwardAssignmentDto>(sql, new { EntityId = entityId });
         return results.AsList();
@@ -638,14 +701,11 @@ public sealed class AlbumQueryService : IAlbumQueryService
                 ca.CertificationId,
                 c.Name AS CertificationName,
                 c.Slug AS CertificationSlug,
-                ca.CertificationDate,
-                co.Code AS Country
+                ca.Date AS CertificationDate
             FROM CertificationAssignment ca
             INNER JOIN Certification c ON c.CertificationId = ca.CertificationId
-            LEFT JOIN Country co ON co.CountryId = ca.CountryId
             WHERE ca.EntityId = @EntityId
-              AND ca.IsDeleted = 0
-            ORDER BY ca.CertificationDate DESC
+            ORDER BY ca.Date DESC
             ";
         var results = await connection.QueryAsync<CertificationAssignmentDto>(sql, new { EntityId = entityId });
         return results.AsList();
@@ -669,7 +729,6 @@ public sealed class AlbumQueryService : IAlbumQueryService
             FROM ChartEntry ce
             INNER JOIN Chart c ON c.ChartId = ce.ChartId
             WHERE ce.EntityId = @EntityId
-              AND ce.IsDeleted = 0
             ORDER BY ce.Date DESC
             ";
         var results = await connection.QueryAsync<ChartEntryDto>(sql, new { EntityId = entityId });

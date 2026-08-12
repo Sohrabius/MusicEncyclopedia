@@ -51,11 +51,11 @@ public sealed class SearchService : ISearchService
 
         // Generate the UNION ALL fragments for each entity table
         var fragments = BuildSearchFragments(
-            query.EntityType, query.Culture, query.Genre, query.Mood, query.Instrument, query.Language);
+            query.EntityType, query.Genre, query.Mood, query.Instrument);
 
         // Count query
         var countSql = $@"
-SELECT COUNT_BIG(*)
+SELECT COUNT(*)
 FROM (
 {string.Join("\n    UNION ALL\n", fragments.Select(f => f.CountSql))}
 ) AS total";
@@ -63,8 +63,6 @@ FROM (
         var countParams = new DynamicParameters();
         countParams.Add("searchTerm", $"%{searchTerm}%");
         countParams.Add("rawSearchTerm", searchTerm);
-        if (!string.IsNullOrWhiteSpace(query.Culture))
-            countParams.Add("culture", query.Culture);
         if (!string.IsNullOrWhiteSpace(query.Genre))
             countParams.Add("genre", query.Genre);
         if (!string.IsNullOrWhiteSpace(query.Mood))
@@ -82,22 +80,23 @@ FROM (
 
         // Data query
         var orderByClause = _isSqlite ? "Title ASC" : "Rank DESC";
+        var pagination = _isSqlite
+            ? "LIMIT @pageSize OFFSET @offset"
+            : "OFFSET @offset ROWS FETCH NEXT @pageSize ROWS ONLY";
+
         var dataSql = $@"
-SELECT EntityType, EntityId, Title, Subtitle, Description, ImageUrl, Url, Culture, 0 AS Rank
+SELECT EntityType, EntityId, Title, Subtitle, Description, ImageUrl, UrlSlug, Rank
 FROM (
 {string.Join("\n    UNION ALL\n", fragments.Select(f => f.SelectSql))}
 ) AS results
 ORDER BY {orderByClause}
-OFFSET @offset ROWS
-FETCH NEXT @pageSize ROWS ONLY";
+{pagination}";
 
         var dataParams = new DynamicParameters();
         dataParams.Add("searchTerm", $"%{searchTerm}%");
         dataParams.Add("rawSearchTerm", searchTerm);
         dataParams.Add("offset", offset);
         dataParams.Add("pageSize", pageSize);
-        if (!string.IsNullOrWhiteSpace(query.Culture))
-            dataParams.Add("culture", query.Culture);
         if (!string.IsNullOrWhiteSpace(query.Genre))
             dataParams.Add("genre", query.Genre);
         if (!string.IsNullOrWhiteSpace(query.Mood))
@@ -108,144 +107,88 @@ FETCH NEXT @pageSize ROWS ONLY";
         var rows = await connection.QueryAsync<SearchResultRow>(
             dataSql, dataParams, commandTimeout: 30);
 
-        var results = rows.Select(MapToDto).ToList();
+        var results = rows.Select(r => MapToDto(r, query.Culture ?? "")).ToList();
 
         return PagedResult<SearchResultDto>.Create(results, page, pageSize, totalItems);
     }
 
     /// <summary>
     /// Builds the per-table SQL fragments for the search.
-    /// For SQLite, uses LIKE-based search. For SQL Server, uses FREETEXTTABLE.
+    /// Column names and join tables match the EF Core schema exactly.
     /// </summary>
     private List<SearchFragment> BuildSearchFragments(
-        string? entityType, string? culture, string? genre, string? mood, string? instrument, string? language)
+        string? entityType, string? genre, string? mood, string? instrument)
     {
-        var cultureCondition = !string.IsNullOrWhiteSpace(culture)
-            ? "AND Culture = @culture"
-            : "";
-
-        string BuildWhereClause(string tableAlias, params string[] columns)
-        {
-            if (_isSqlite)
-            {
-                var likeConditions = columns.Select(c => $"{tableAlias}.{c} LIKE @searchTerm");
-                return string.Join(" OR ", likeConditions);
-            }
-            // SQL Server uses FREETEXTTABLE, so no WHERE clause needed on the main table
-            return "1=1";
-        }
-
-        string BuildFromClause(string tableName, string tableAlias, string ftsColumns)
-        {
-            if (_isSqlite)
-            {
-                return $"FROM {tableName} {tableAlias}";
-            }
-            return $"FROM {tableName} {tableAlias} INNER JOIN FREETEXTTABLE({tableName}, ({ftsColumns}), @rawSearchTerm) ft ON {tableAlias}.Id = ft.[Key]";
-        }
-
-        string BuildSelectColumns(string tableAlias, string titleExpr, string descriptionExpr, string urlExpr)
-        {
-            var concatOp = _isSqlite ? "||" : "+";
-            var urlFull = urlExpr.Replace("+", concatOp);
-            return $@"
-    '{tableAlias}' AS EntityType, {tableAlias}.Id AS EntityId, {titleExpr} AS Title,
-           NULL AS Subtitle, {descriptionExpr} AS Description, NULL AS ImageUrl,
-           {urlFull} AS Url, {tableAlias}.Culture,
-           0 AS Rank";
-        }
-
-        string Concat(string a, string b) => _isSqlite ? $"({a} || {b})" : $"({a} + {b})";
-
-        // Build filter joins for album and track
+        // Facet joins for Album (genres and moods only — instruments attach to tracks)
         var albumFilterJoin = "";
         if (!string.IsNullOrWhiteSpace(genre))
-            albumFilterJoin += " INNER JOIN AlbumGenre ag ON a.Id = ag.AlbumId INNER JOIN Genre g ON ag.GenreId = g.Id AND g.Slug = @genre";
+            albumFilterJoin += " INNER JOIN AlbumGenre ag ON a.AlbumId = ag.AlbumId INNER JOIN Genre g ON ag.GenreId = g.GenreId AND g.Slug = @genre";
         if (!string.IsNullOrWhiteSpace(mood))
-            albumFilterJoin += " INNER JOIN AlbumMood am ON a.Id = am.AlbumId INNER JOIN Mood m ON am.MoodId = m.Id AND m.Slug = @mood";
-        if (!string.IsNullOrWhiteSpace(instrument))
-            albumFilterJoin += " INNER JOIN AlbumInstrument ai ON a.Id = ai.AlbumId INNER JOIN Instrument i ON ai.InstrumentId = i.Id AND i.Slug = @instrument";
+            albumFilterJoin += " INNER JOIN AlbumMood am ON a.AlbumId = am.AlbumId INNER JOIN Mood m ON am.MoodId = m.MoodId AND m.Slug = @mood";
 
+        // Facet joins for Track
         var trackFilterJoin = "";
         if (!string.IsNullOrWhiteSpace(genre))
-            trackFilterJoin += " INNER JOIN TrackGenre tg ON t.Id = tg.TrackId INNER JOIN Genre g2 ON tg.GenreId = g2.Id AND g2.Slug = @genre";
+            trackFilterJoin += " INNER JOIN TrackGenre tg ON t.TrackId = tg.TrackId INNER JOIN Genre g2 ON tg.GenreId = g2.GenreId AND g2.Slug = @genre";
         if (!string.IsNullOrWhiteSpace(mood))
-            trackFilterJoin += " INNER JOIN TrackMood tm ON t.Id = tm.TrackId INNER JOIN Mood m2 ON tm.MoodId = m2.Id AND m2.Slug = @mood";
-
-        // For SQLite, add WHERE clauses for filter joins
-        var albumWhereExtra = "";
-        var trackWhereExtra = "";
-        if (_isSqlite)
-        {
-            if (!string.IsNullOrWhiteSpace(genre))
-                albumWhereExtra += " AND g.Slug = @genre";
-            if (!string.IsNullOrWhiteSpace(mood))
-                albumWhereExtra += " AND m.Slug = @mood";
-            if (!string.IsNullOrWhiteSpace(instrument))
-                albumWhereExtra += " AND i.Slug = @instrument";
-
-            if (!string.IsNullOrWhiteSpace(genre))
-                trackWhereExtra += " AND g2.Slug = @genre";
-            if (!string.IsNullOrWhiteSpace(mood))
-                trackWhereExtra += " AND m2.Slug = @mood";
-        }
+            trackFilterJoin += " INNER JOIN TrackMood tm ON t.TrackId = tm.TrackId INNER JOIN Mood m2 ON tm.MoodId = m2.MoodId AND m2.Slug = @mood";
+        if (!string.IsNullOrWhiteSpace(instrument))
+            trackFilterJoin += " INNER JOIN TrackInstrument ti ON t.TrackId = ti.TrackId INNER JOIN Instrument i ON ti.InstrumentId = i.InstrumentId AND i.Slug = @instrument";
 
         var fragments = new List<SearchFragment>();
 
         // Helper to create a fragment
-        SearchFragment MakeFragment(string entityTypeName, string tableName, string tableAlias,
-            string titleCol, string descCol, string slugCol,
-            string filterJoin, string filterWhereExtra)
+        void MakeFragment(string entityTypeName, string table, string tableAlias,
+            string pkColumn, string titleColumn, string descriptionColumn, string slugColumn,
+            string filterJoin)
         {
-            var whereClause = _isSqlite
-                ? $"WHERE ({BuildWhereClause(tableAlias, titleCol, descCol)}) {cultureCondition} {filterWhereExtra}"
-                : $"WHERE 1=1 {cultureCondition} {filterWhereExtra}";
+            string fromClause;
+            string rankExpr;
+            string whereClause;
 
-            return new SearchFragment
+            if (_isSqlite)
+            {
+                fromClause = $"FROM {table} {tableAlias}";
+                rankExpr = "0 AS Rank";
+                whereClause = $"WHERE ({tableAlias}.{titleColumn} LIKE @searchTerm OR {tableAlias}.{descriptionColumn} LIKE @searchTerm) AND {tableAlias}.IsDeleted = 0";
+            }
+            else
+            {
+                fromClause = $"FROM {table} {tableAlias} INNER JOIN FREETEXTTABLE({table}, ({titleColumn}, {descriptionColumn}), @rawSearchTerm) ft ON {tableAlias}.{pkColumn} = ft.[Key]";
+                rankExpr = "ft.Rank AS Rank";
+                whereClause = $"WHERE {tableAlias}.IsDeleted = 0";
+            }
+
+            fragments.Add(new SearchFragment
             {
                 EntityType = entityTypeName,
                 SelectSql = $@"
-    SELECT '{entityTypeName}' AS EntityType, {tableAlias}.Id AS EntityId,
-           {tableAlias}.{titleCol} AS Title,
-           NULL AS Subtitle, {tableAlias}.{descCol} AS Description, NULL AS ImageUrl,
-           {Concat($"'/{entityTypeName.ToLowerInvariant()}/'", $"{tableAlias}.{slugCol}")} AS Url,
-           {tableAlias}.Culture,
-           0 AS Rank
-    FROM {tableName} {tableAlias}
+    SELECT '{entityTypeName}' AS EntityType, {tableAlias}.{pkColumn} AS EntityId,
+           {tableAlias}.{titleColumn} AS Title,
+           NULL AS Subtitle, {tableAlias}.{descriptionColumn} AS Description, NULL AS ImageUrl,
+           {tableAlias}.{slugColumn} AS UrlSlug,
+           {rankExpr}
+    {fromClause}
     {filterJoin}
     {whereClause}",
                 CountSql = $@"
-    SELECT {tableAlias}.Id FROM {tableName} {tableAlias}
+    SELECT {tableAlias}.{pkColumn} FROM {table} {tableAlias}
     {filterJoin}
     {whereClause}"
-            };
+            });
         }
 
-        // Build fragments for all entity types
-        fragments.Add(MakeFragment("Album", "Album", "a", "Title", "Description", "Slug",
-            albumFilterJoin, albumWhereExtra));
-        fragments.Add(MakeFragment("Track", "Track", "t", "Title", "Description", "Slug",
-            trackFilterJoin, trackWhereExtra));
-        fragments.Add(MakeFragment("Person", "Person", "p", "FullName", "Biography", "Slug",
-            "", ""));
-        fragments.Add(MakeFragment("Company", "Company", "c", "Name", "History", "Slug",
-            "", ""));
-        fragments.Add(MakeFragment("Poem", "Poem", "p", "Title", "CanonicalText", "Slug",
-            "", ""));
-        fragments.Add(MakeFragment("SungVersion", "SungVersion", "sv", "Title", "Text", "Slug",
-            "", ""));
-        fragments.Add(MakeFragment("Genre", "Genre", "g", "Name", "Description", "Slug",
-            "", ""));
-        fragments.Add(MakeFragment("Mood", "Mood", "m", "Name", "Description", "Slug",
-            "", ""));
-        fragments.Add(MakeFragment("Instrument", "Instrument", "i", "Name", "Description", "Slug",
-            "", ""));
-        fragments.Add(MakeFragment("Tag", "Tag", "t", "Name", "Name", "Slug",
-            "", ""));
-        fragments.Add(MakeFragment("Alias", "Alias", "a", "AliasName", "AliasName", "AliasName",
-            "", ""));
-        fragments.Add(MakeFragment("Localization", "Localization", "l", "LocalizedText", "LocalizedText", "LocalizedText",
-            "", ""));
+        // All entity types that have public pages (Tag, Alias and Localization are
+        // cross-cutting tables without searchable detail pages and are excluded).
+        MakeFragment("Album", "Album", "a", "AlbumId", "Title", "Description", "Slug", albumFilterJoin);
+        MakeFragment("Track", "Track", "t", "TrackId", "Title", "Description", "Slug", trackFilterJoin);
+        MakeFragment("Person", "Person", "p", "PersonId", "FullName", "Biography", "Slug", "");
+        MakeFragment("Company", "Company", "c", "CompanyId", "Name", "History", "Slug", "");
+        MakeFragment("Poem", "Poem", "po", "PoemId", "Title", "CanonicalText", "Slug", "");
+        MakeFragment("SungVersion", "SungVersion", "sv", "SungVersionId", "Title", "Text", "Slug", "");
+        MakeFragment("Genre", "Genre", "g", "GenreId", "Name", "Description", "Slug", "");
+        MakeFragment("Mood", "Mood", "m", "MoodId", "Name", "Description", "Slug", "");
+        MakeFragment("Instrument", "Instrument", "i", "InstrumentId", "Name", "Description", "Slug", "");
 
         // Filter by entity type if specified
         if (!string.IsNullOrWhiteSpace(entityType))
@@ -267,8 +210,10 @@ FETCH NEXT @pageSize ROWS ONLY";
         return fragments;
     }
 
-    private static SearchResultDto MapToDto(SearchResultRow row)
+    private static SearchResultDto MapToDto(SearchResultRow row, string culture)
     {
+        var routeSegment = GetRouteSegment(row.EntityType);
+
         return new SearchResultDto
         {
             EntityType = row.EntityType,
@@ -277,10 +222,29 @@ FETCH NEXT @pageSize ROWS ONLY";
             Subtitle = row.Subtitle,
             Description = row.Description,
             ImageUrl = row.ImageUrl,
-            Url = row.Url,
-            Culture = row.Culture
+            Url = string.IsNullOrWhiteSpace(routeSegment)
+                ? ""
+                : $"/{routeSegment}/{row.UrlSlug}",
+            Culture = culture
         };
     }
+
+    /// <summary>
+    /// Maps an entity type to its public route segment (relative to the culture prefix).
+    /// </summary>
+    private static string GetRouteSegment(string entityType) => entityType switch
+    {
+        "Album" => "albums",
+        "Track" => "tracks",
+        "Person" => "people",
+        "Company" => "companies",
+        "Poem" => "poems",
+        "SungVersion" => "sung-versions",
+        "Genre" => "genres",
+        "Mood" => "moods",
+        "Instrument" => "instruments",
+        _ => ""
+    };
 
     /// <summary>
     /// Internal row type mapping the raw query result columns.
@@ -294,8 +258,7 @@ FETCH NEXT @pageSize ROWS ONLY";
         public string? Subtitle { get; init; }
         public string? Description { get; init; }
         public string? ImageUrl { get; init; }
-        public string Url { get; init; } = "";
-        public string Culture { get; init; } = "";
+        public string UrlSlug { get; init; } = "";
         public int Rank { get; init; }
     }
 

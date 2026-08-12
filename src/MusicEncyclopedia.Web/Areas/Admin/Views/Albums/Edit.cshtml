@@ -215,85 +215,60 @@
                     </nav>
                 </div>
 
-                <!-- Tab Content Panels (Placeholders) -->
+                <!-- Tab Content Panels (wired to real editors) -->
                 <div class="p-5">
                     <!-- Genres -->
                     <div id="tab-genres" class="tab-panel">
-                        <p class="text-sm text-gray-500">
-                            <i class="fas fa-tag text-blue-400 me-1"></i>
-                            Genre assignments for this album. <em>(Coming soon)</em>
-                        </p>
+                        <div data-editor-url="/admin/related-items/album-genres/@Model.AlbumId"></div>
                     </div>
 
                     <!-- Moods -->
                     <div id="tab-moods" class="tab-panel hidden">
-                        <p class="text-sm text-gray-500">
-                            <i class="fas fa-smile text-yellow-400 me-1"></i>
-                            Mood assignments for this album. <em>(Coming soon)</em>
-                        </p>
+                        <div data-editor-url="/admin/related-items/album-moods/@Model.AlbumId"></div>
                     </div>
 
                     <!-- Languages -->
                     <div id="tab-languages" class="tab-panel hidden">
-                        <p class="text-sm text-gray-500">
-                            <i class="fas fa-language text-green-400 me-1"></i>
-                            Language assignments for this album. <em>(Coming soon)</em>
-                        </p>
+                        <div data-editor-url="/admin/related-items/album-languages/@Model.AlbumId"></div>
                     </div>
 
                     <!-- Countries -->
                     <div id="tab-countries" class="tab-panel hidden">
-                        <p class="text-sm text-gray-500">
-                            <i class="fas fa-globe text-purple-400 me-1"></i>
-                            Country associations for this album. <em>(Coming soon)</em>
-                        </p>
+                        <div data-editor-url="/admin/related-items/album-countries/@Model.AlbumId"></div>
                     </div>
 
                     <!-- Companies -->
                     <div id="tab-companies" class="tab-panel hidden">
-                        <p class="text-sm text-gray-500">
-                            <i class="fas fa-building text-orange-400 me-1"></i>
-                            Companies (labels, publishers, distributors) for this album. <em>(Coming soon)</em>
-                        </p>
+                        <div data-editor-url="/admin/related-items/album-companies/@Model.AlbumId"></div>
                     </div>
 
                     <!-- Identifiers -->
                     <div id="tab-identifiers" class="tab-panel hidden">
-                        <p class="text-sm text-gray-500">
-                            <i class="fas fa-barcode text-teal-400 me-1"></i>
-                            Album identifiers (UPC, barcode, catalog numbers). <em>(Coming soon)</em>
-                        </p>
+                        <div data-editor-url="/admin/related-items/album-identifiers/@Model.AlbumId"></div>
                     </div>
 
                     <!-- Tracklist -->
                     <div id="tab-tracklist" class="tab-panel hidden">
-                        <p class="text-sm text-gray-500">
-                            <i class="fas fa-list text-indigo-400 me-1"></i>
-                            Track listing for this album with ordering, durations, and disc numbers. <em>(Coming soon)</em>
-                        </p>
+                        <div data-editor-url="/admin/album-tracklist/@Model.AlbumId"></div>
                     </div>
 
                     <!-- Credits -->
                     <div id="tab-credits" class="tab-panel hidden">
-                        <p class="text-sm text-gray-500">
-                            <i class="fas fa-users text-rose-400 me-1"></i>
-                            Credits (musicians, producers, engineers, etc.) for this album. <em>(Coming soon)</em>
-                        </p>
+                        <div data-editor-url="/admin/credits/@Model.EntityTypeId/@Model.AlbumId"></div>
                     </div>
 
                     <!-- Aliases -->
                     <div id="tab-aliases" class="tab-panel hidden">
-                        <p class="text-sm text-gray-500">
-                            <i class="fas fa-tag text-cyan-400 me-1"></i>
-                            Alternative titles and aliases for this album. <em>(Coming soon)</em>
-                        </p>
+                        <div data-editor-url="/admin/aliases/@Model.EntityTypeId/@Model.AlbumId"></div>
                     </div>
 
                     <!-- Localizations -->
                     <div id="tab-localizations" class="tab-panel hidden">
                         <p class="text-sm text-gray-500">
                             <i class="fas fa-language text-pink-400 me-1"></i>
-                            Localized field values for this album. <em>(Coming soon)</em>
+                            Manage localized field values for this album from the
+                            <a href="/admin/localizations" class="text-blue-600 hover:underline">Localizations</a>
+                            section (EntityType Album, EntityId @Model.AlbumId).
                         </p>
                     </div>
 
@@ -301,7 +276,9 @@
                     <div id="tab-tags" class="tab-panel hidden">
                         <p class="text-sm text-gray-500">
                             <i class="fas fa-hashtag text-violet-400 me-1"></i>
-                            Tags attached to this album. <em>(Coming soon)</em>
+                            Attach tags from the
+                            <a href="/admin/tags" class="text-blue-600 hover:underline">Tags</a>
+                            section.
                         </p>
                     </div>
 
@@ -309,7 +286,9 @@
                     <div id="tab-links" class="tab-panel hidden">
                         <p class="text-sm text-gray-500">
                             <i class="fas fa-link text-sky-400 me-1"></i>
-                            External links related to this album. <em>(Coming soon)</em>
+                            Manage external links from the
+                            <a href="/admin/links" class="text-blue-600 hover:underline">Links</a>
+                            section (EntityType Album, EntityId @Model.AlbumId).
                         </p>
                     </div>
 
@@ -317,7 +296,9 @@
                     <div id="tab-media" class="tab-panel hidden">
                         <p class="text-sm text-gray-500">
                             <i class="fas fa-photo-video text-emerald-400 me-1"></i>
-                            Media items (images, audio, video) attached to this album. <em>(Coming soon)</em>
+                            Upload and assign media from the
+                            <a href="/admin/media" class="text-blue-600 hover:underline">Media</a>
+                            section.
                         </p>
                     </div>
 
@@ -325,16 +306,15 @@
                     <div id="tab-citations" class="tab-panel hidden">
                         <p class="text-sm text-gray-500">
                             <i class="fas fa-quote-right text-amber-400 me-1"></i>
-                            Citations and references for this album. <em>(Coming soon)</em>
+                            Add citations from the
+                            <a href="/admin/citations" class="text-blue-600 hover:underline">Citations</a>
+                            section (EntityType Album, EntityId @Model.AlbumId).
                         </p>
                     </div>
 
                     <!-- Attributes -->
                     <div id="tab-attributes" class="tab-panel hidden">
-                        <p class="text-sm text-gray-500">
-                            <i class="fas fa-list-ul text-gray-400 me-1"></i>
-                            Custom attribute values for this album. <em>(Coming soon)</em>
-                        </p>
+                        <div data-editor-url="/admin/attribute-values/@Model.EntityTypeId/@Model.AlbumId"></div>
                     </div>
                 </div>
             </div>
@@ -399,33 +379,54 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.21.0/jquery.validate.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/4.1.0/jquery.validate.unobtrusive.min.js"></script>
     <script>
-        // Tab switching for related editors
+        // Tab switching for related editors + lazy-load of editor partials
         document.addEventListener('DOMContentLoaded', function () {
+            var loadedTabs = {};
+
+            function loadEditor(panel) {
+                var holder = panel.querySelector('[data-editor-url]');
+                if (!holder || holder.dataset.loaded) return;
+                holder.dataset.loaded = '1';
+                var url = holder.dataset.editorUrl;
+                holder.innerHTML = '<p class="text-sm text-gray-400"><i class="fas fa-spinner fa-spin me-1"></i>Loading…</p>';
+                fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                    .then(function (r) {
+                        if (!r.ok) throw new Error('Failed to load editor');
+                        return r.text();
+                    })
+                    .then(function (html) {
+                        holder.innerHTML = html;
+                    })
+                    .catch(function () {
+                        holder.innerHTML = '<p class="text-sm text-red-600">Failed to load editor.</p>';
+                    });
+            }
+
             var tabBtns = document.querySelectorAll('.tab-btn');
             var panels = document.querySelectorAll('.tab-panel');
 
             tabBtns.forEach(function (btn) {
                 btn.addEventListener('click', function () {
-                    // Deactivate all tabs
                     tabBtns.forEach(function (b) {
                         b.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600');
                         b.classList.add('text-gray-500');
                     });
-                    // Activate this tab
                     this.classList.remove('text-gray-500');
                     this.classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
 
-                    // Hide all panels
                     panels.forEach(function (p) { p.classList.add('hidden'); });
 
-                    // Show the target panel
                     var targetId = this.getAttribute('data-tab');
                     var targetPanel = document.getElementById(targetId);
                     if (targetPanel) {
                         targetPanel.classList.remove('hidden');
+                        loadEditor(targetPanel);
                     }
                 });
             });
+
+            // Load the initially-active tab
+            panels.forEach(function (p) { if (!p.classList.contains('hidden')) loadEditor(p); });
         });
     </script>
 }

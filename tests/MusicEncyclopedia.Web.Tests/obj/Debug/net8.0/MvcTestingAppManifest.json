@@ -1,8 +1,0 @@
-{
-  "MusicEncyclopedia.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "E:\\git\\MusicEncy\\src\\MusicEncyclopedia.Core",
-  "MusicEncyclopedia.Data, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "E:\\git\\MusicEncy\\src\\MusicEncyclopedia.Data",
-  "MusicEncyclopedia.Media, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "E:\\git\\MusicEncy\\src\\MusicEncyclopedia.Media",
-  "MusicEncyclopedia.Search, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "E:\\git\\MusicEncy\\src\\MusicEncyclopedia.Search",
-  "MusicEncyclopedia.Services, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "E:\\git\\MusicEncy\\src\\MusicEncyclopedia.Services",
-  "MusicEncyclopedia.Web, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "E:\\git\\MusicEncy\\src\\MusicEncyclopedia.Web"
-}

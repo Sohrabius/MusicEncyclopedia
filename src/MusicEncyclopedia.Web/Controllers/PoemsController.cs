@@ -1,4 +1,5 @@
 using System.Data;
+using MusicEncyclopedia.Services.Infrastructure;
 using Dapper;
 using Microsoft.AspNetCore.Mvc;
 using MusicEncyclopedia.Web.ViewModels.Public;
@@ -10,7 +11,7 @@ namespace MusicEncyclopedia.Web.Controllers;
 /// Routes: /{culture}/poems and /{culture}/poems/{slug}
 /// Spec references: 8.1 (routes), 9.12 (detail page)
 /// </summary>
-[Route("{culture:regex(^(fa)$)}/poems")]
+[Route("{culture:regex(^(fa|en|ar|fr)$)}/poems")]
 public sealed class PoemsController : Controller
 {
     private readonly IDbConnection _db;
@@ -53,7 +54,7 @@ public sealed class PoemsController : Controller
 
             var totalItems = await _db.ExecuteScalarAsync<int>(countSql);
 
-            var dataSql = """
+            var dataSql = $"""
                 SELECT
                     p.Slug,
                     p.Title,
@@ -66,8 +67,7 @@ public sealed class PoemsController : Controller
                 LEFT JOIN Publication pub ON pub.PublicationId = p.PublicationId AND pub.IsDeleted = 0
                 WHERE p.IsDeleted = 0
                 ORDER BY p.CreatedAt DESC
-                OFFSET @Offset ROWS
-                FETCH NEXT @PageSize ROWS ONLY
+                {SqlDialect.Pagination(SqlDialect.IsSqliteConnection(_db))}
                 """;
 
             var rows = await _db.QueryAsync<PoemListViewModel.PoemRow>(dataSql, new { Offset = offset, PageSize = pageSize });
@@ -286,19 +286,17 @@ public sealed class PoemsController : Controller
         const string sql = """
             SELECT
                 m.Url,
-                m.ThumbnailUrl,
+                m.ThumbnailUrl300 AS ThumbnailUrl,
                 mt.Name AS MediaType,
                 mrt.Name AS MediaRole,
-                m.Description,
-                m.IsPrimary
+                ma.IsPrimary
             FROM MediaAssignment ma
             INNER JOIN Media m ON m.MediaId = ma.MediaId
             INNER JOIN MediaType mt ON mt.MediaTypeId = m.MediaTypeId
             LEFT JOIN MediaRoleType mrt ON mrt.MediaRoleTypeId = ma.MediaRoleTypeId
             WHERE ma.EntityId = @EntityId
-              AND ma.IsDeleted = 0
               AND m.IsDeleted = 0
-            ORDER BY m.IsPrimary DESC, m.MediaId
+            ORDER BY ma.IsPrimary DESC, m.MediaId
             """;
         var results = await connection.QueryAsync(sql, new { EntityId = entityId });
         return results.AsList();
@@ -318,7 +316,7 @@ public sealed class PoemsController : Controller
             LEFT JOIN LinkType lt ON lt.LinkTypeId = el.LinkTypeId
             WHERE el.EntityId = @EntityId
               AND el.IsDeleted = 0
-            ORDER BY el.DisplayOrder
+            ORDER BY el.EntityLinkId
             """;
         var results = await connection.QueryAsync(sql, new { EntityId = entityId });
         return results.AsList();
@@ -333,7 +331,7 @@ public sealed class PoemsController : Controller
             SELECT
                 c.CitationId,
                 c.SourceId,
-                s.Name AS SourceName,
+                s.Title AS SourceName,
                 s.Slug AS SourceSlug,
                 c.Quote,
                 c.PageNumber,
@@ -342,7 +340,6 @@ public sealed class PoemsController : Controller
             FROM Citation c
             LEFT JOIN Source s ON s.SourceId = c.SourceId
             WHERE c.EntityId = @EntityId
-              AND c.IsDeleted = 0
             ORDER BY c.CitationId
             """;
         var results = await connection.QueryAsync(sql, new { EntityId = entityId });
@@ -359,7 +356,6 @@ public sealed class PoemsController : Controller
             FROM TagAssignment ta
             INNER JOIN Tag t ON t.TagId = ta.TagId
             WHERE ta.EntityId = @EntityId
-              AND ta.IsDeleted = 0
               AND t.IsDeleted = 0
             ORDER BY t.Name
             """;
@@ -382,7 +378,6 @@ public sealed class PoemsController : Controller
             LEFT JOIN AliasType at ON at.AliasTypeId = a.AliasTypeId
             LEFT JOIN Language l ON l.LanguageId = a.LanguageId
             WHERE a.EntityId = @EntityId
-              AND a.IsDeleted = 0
             ORDER BY a.IsPrimary DESC, a.AliasId
             """;
         var results = await connection.QueryAsync(sql, new { EntityId = entityId });

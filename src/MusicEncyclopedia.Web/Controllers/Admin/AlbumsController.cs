@@ -41,14 +41,20 @@ public sealed class AlbumsController : AdminBaseController
     public async Task<IActionResult> Index(
         int page = 1,
         string? q = null,
+        bool? deleted = null,
         CancellationToken cancellationToken = default)
     {
         const int pageSize = 20;
 
-        // Base query — include IsDeleted so admins can see soft-deleted items
+        // Base query — the global !IsDeleted filter hides deleted albums, so when
+        // the "deleted" view is requested, ignore it and filter explicitly.
         var query = _db.Albums
             .Include(a => a.AlbumCategory)
             .AsQueryable();
+        if (deleted == true)
+        {
+            query = query.IgnoreQueryFilters().Where(a => a.IsDeleted);
+        }
 
         // Apply search filter
         if (!string.IsNullOrWhiteSpace(q))
@@ -82,7 +88,8 @@ public sealed class AlbumsController : AdminBaseController
             CategoryName = a.AlbumCategory?.Name,
             ReleaseDate = a.ReleaseDate,
             DurationSeconds = a.DurationSeconds,
-            CoverUrl = null
+            CoverUrl = null,
+            IsDeleted = a.IsDeleted
         }).ToList();
 
         var viewModel = new AlbumListViewModel
@@ -90,7 +97,8 @@ public sealed class AlbumsController : AdminBaseController
             Items = PagedResult<AlbumListItemDto>.Create(items.AsReadOnly(), page, pageSize, totalItems),
             SearchQuery = q,
             Page = page,
-            PageSize = pageSize
+            PageSize = pageSize,
+            Deleted = deleted == true
         };
 
         ViewData["Title"] = "Albums";
@@ -420,6 +428,7 @@ public sealed class AlbumsController : AdminBaseController
     [HttpPost]
     [Route("{id:int}/Restore")]
     [ValidateAntiForgeryToken]
+    [Authorize(Policy = PermissionConstants.CanDeleteContent)]
     public async Task<IActionResult> Restore(
         int id,
         CancellationToken cancellationToken = default)
@@ -458,5 +467,114 @@ public sealed class AlbumsController : AdminBaseController
 
         SetSuccessMessage($"Album \"{album.Title}\" has been restored.");
         return RedirectToAction(nameof(Index));
+    }
+
+    // ──────────────────────────────────────────────
+    //  Bulk Soft Delete / Restore
+    // ──────────────────────────────────────────────
+
+    [HttpPost]
+    [Route("bulk-delete")]
+    [ValidateAntiForgeryToken]
+    [Authorize(Policy = PermissionConstants.CanDeleteContent)]
+    public async Task<IActionResult> BulkDelete(
+        [FromForm(Name = "ids")] int[]? ids,
+        CancellationToken cancellationToken = default)
+    {
+        if (ids is null || ids.Length == 0)
+        {
+            SetErrorMessage("No albums were selected.");
+            return RedirectToAction(nameof(Index));
+        }
+
+        ids = ids.Distinct().ToArray();
+        var albums = await _db.Albums
+            .Where(a => ids.Contains(a.AlbumId))
+            .ToListAsync(cancellationToken);
+
+        foreach (var album in albums)
+        {
+            album.IsDeleted = true;
+            album.ModifiedBy = User.Identity?.Name ?? "system";
+            album.ModifiedAt = DateTime.UtcNow;
+        }
+
+        // Soft-delete the backing Entity rows too so public pages keep consistent state.
+        var entityIds = albums.Select(a => a.EntityId).ToArray();
+        var entities = await _db.Set<Entity>()
+            .Where(e => entityIds.Contains(e.EntityId))
+            .ToListAsync(cancellationToken);
+        foreach (var entity in entities)
+        {
+            entity.IsDeleted = true;
+            entity.ModifiedBy = User.Identity?.Name ?? "system";
+            entity.ModifiedAt = DateTime.UtcNow;
+        }
+
+        await _db.SaveChangesAsync(cancellationToken);
+
+        foreach (var album in albums)
+        {
+            await InvalidateEntityCacheAsync("Album", album.AlbumId, "Deleted");
+        }
+
+        _logger.LogInformation("Bulk soft-delete: {Count} albums by {Admin}",
+            albums.Count, User.Identity?.Name);
+
+        SetSuccessMessage($"{albums.Count} album(s) have been deleted (soft).");
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    [Route("bulk-restore")]
+    [ValidateAntiForgeryToken]
+    [Authorize(Policy = PermissionConstants.CanDeleteContent)]
+    public async Task<IActionResult> BulkRestore(
+        [FromForm(Name = "ids")] int[]? ids,
+        CancellationToken cancellationToken = default)
+    {
+        if (ids is null || ids.Length == 0)
+        {
+            SetErrorMessage("No albums were selected.");
+            return RedirectToAction(nameof(Index), new { deleted = true });
+        }
+
+        ids = ids.Distinct().ToArray();
+        var albums = await _db.Albums
+            .IgnoreQueryFilters()
+            .Where(a => ids.Contains(a.AlbumId))
+            .ToListAsync(cancellationToken);
+
+        foreach (var album in albums)
+        {
+            album.IsDeleted = false;
+            album.ModifiedBy = User.Identity?.Name ?? "system";
+            album.ModifiedAt = DateTime.UtcNow;
+        }
+
+        var entityIds = albums.Select(a => a.EntityId).ToArray();
+        var entities = await _db.Set<Entity>()
+            .IgnoreQueryFilters()
+            .Where(e => entityIds.Contains(e.EntityId))
+            .ToListAsync(cancellationToken);
+        foreach (var entity in entities)
+        {
+            entity.IsDeleted = false;
+            entity.ModifiedBy = User.Identity?.Name ?? "system";
+            entity.ModifiedAt = DateTime.UtcNow;
+        }
+
+        await _db.SaveChangesAsync(cancellationToken);
+
+        foreach (var album in albums)
+        {
+            await InvalidateEntityCacheAsync("Album", album.AlbumId, "Restored");
+        }
+
+        _logger.LogInformation("Bulk restore: {Count} albums by {Admin}",
+            albums.Count, User.Identity?.Name);
+
+        SetSuccessMessage($"{albums.Count} album(s) have been restored.");
+        return RedirectToAction(nameof(Index), new { deleted = true });
     }
 }

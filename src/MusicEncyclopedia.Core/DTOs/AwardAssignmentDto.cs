@@ -9,7 +9,7 @@ public sealed class AwardAssignmentDto
     public int AwardId { get; init; }
     public string AwardName { get; init; } = "";
     public string AwardSlug { get; init; } = "";
-    public DateOnly? AwardDate { get; init; }
+    public int? Year { get; init; }
     public string? Result { get; init; }
     public string? Category { get; init; }
 }

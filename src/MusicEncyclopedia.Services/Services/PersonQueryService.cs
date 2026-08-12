@@ -3,8 +3,10 @@ using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using MusicEncyclopedia.Core.Constants;
 using MusicEncyclopedia.Core.DTOs;
 using MusicEncyclopedia.Core.Interfaces;
+using MusicEncyclopedia.Services.Infrastructure;
 
 namespace MusicEncyclopedia.Services.Services;
 
@@ -16,11 +18,15 @@ public sealed class PersonQueryService : IPersonQueryService
     private readonly string _connectionString;
     private readonly bool _isSqlite;
     private readonly ILogger<PersonQueryService> _logger;
+    private readonly IContentLocalizationService _localizationService;
 
     public PersonQueryService(
         IConfiguration configuration,
-        ILogger<PersonQueryService> logger)
+        ILogger<PersonQueryService> logger,
+        IContentLocalizationService localizationService)
     {
+        _localizationService = localizationService;
+
         var dbProvider = configuration.GetValue<string>("DatabaseProvider") ?? "SqlServer";
         _isSqlite = string.Equals(dbProvider, "Sqlite", StringComparison.OrdinalIgnoreCase);
 
@@ -46,6 +52,7 @@ public sealed class PersonQueryService : IPersonQueryService
         int pageSize = 24,
         string? sort = null,
         string? q = null,
+        string? personType = null,
         CancellationToken cancellationToken = default)
     {
         page = Math.Max(1, page);
@@ -58,6 +65,20 @@ public sealed class PersonQueryService : IPersonQueryService
         {
             whereClauses.Add("(p.FullName LIKE @Q OR p.OriginalName LIKE @Q OR p.EnglishName LIKE @Q)");
             parameters.Add("Q", $"%{q}%");
+        }
+
+        if (!string.IsNullOrWhiteSpace(personType))
+        {
+            whereClauses.Add("""
+                EXISTS (
+                    SELECT 1
+                    FROM PersonTypeAssignment pta
+                    INNER JOIN PersonType pt ON pt.PersonTypeId = pta.PersonTypeId
+                    WHERE pta.PersonId = p.PersonId
+                      AND pt.Code = @PersonType
+                )
+                """);
+            parameters.Add("PersonType", personType);
         }
 
         var whereSql = string.Join(" AND ", whereClauses);
@@ -77,13 +98,13 @@ public sealed class PersonQueryService : IPersonQueryService
 
         var dataSql = $"""
             SELECT
+                p.EntityId,
                 p.Slug,
                 p.FullName AS Name
             FROM Person AS p
             WHERE {whereSql}
             ORDER BY {orderBy}
-            OFFSET @Offset ROWS
-            FETCH NEXT @PageSize ROWS ONLY
+            {SqlDialect.Pagination(_isSqlite)}
             """;
 
         parameters.Add("Offset", (page - 1) * pageSize);
@@ -95,9 +116,15 @@ public sealed class PersonQueryService : IPersonQueryService
             connection.Open();
 
             var totalItems = await connection.ExecuteScalarAsync<int>(countSql, parameters);
-            var items = await connection.QueryAsync<NamedLinkDto>(dataSql, parameters);
+            var items = (await connection.QueryAsync<NamedLinkDto>(dataSql, parameters)).AsList();
 
-            return PagedResult<NamedLinkDto>.Create(items.AsList(), page, pageSize, totalItems);
+            // Spec 7.3: overlay localized names on list cards (base culture skips).
+            if (LocalizationHelper.ShouldLocalize(culture))
+            {
+                await LocalizePeopleListAsync(items, culture, cancellationToken);
+            }
+
+            return PagedResult<NamedLinkDto>.Create(items, page, pageSize, totalItems);
         }
         catch (Exception ex)
         {
@@ -126,13 +153,11 @@ public sealed class PersonQueryService : IPersonQueryService
                 p.BirthDatePrecision,
                 p.DeathDate,
                 p.DeathDatePrecision,
-                bc.Name AS BirthCountryName,
-                dc.Name AS DeathCountryName,
+                nc.Name AS Nationality,
                 m.Url AS ImageUrl
             FROM Person AS p
             LEFT JOIN PersonKind AS pk ON pk.PersonKindId = p.PersonKindId
-            LEFT JOIN Country AS bc ON bc.CountryId = p.BirthCountryId
-            LEFT JOIN Country AS dc ON dc.CountryId = p.DeathCountryId
+            LEFT JOIN Country AS nc ON nc.CountryId = p.NationalityCountryId
             LEFT JOIN Media AS m ON m.MediaId = p.ImageMediaId
             WHERE p.Slug = @Slug
               AND p.IsDeleted = 0
@@ -157,6 +182,15 @@ public sealed class PersonQueryService : IPersonQueryService
             IReadOnlyList<TagDto> tags;
             IReadOnlyList<CitationDto> citations;
 
+            // Spec 7.3: fetch localized text (requested + English) in parallel with
+            // the detail sub-queries, using its own connection.
+            Task<IReadOnlyDictionary<string, LocalizedFieldValues>>? localizationTask = null;
+            if (LocalizationHelper.ShouldLocalize(culture))
+            {
+                localizationTask = _localizationService.GetLocalizedValuesAsync(
+                    entityId, LocalizedPersonFields, culture, cancellationToken);
+            }
+
             if (_isSqlite)
             {
                 media = await GetEntityMediaAsync(connection, entityId, cancellationToken);
@@ -173,7 +207,11 @@ public sealed class PersonQueryService : IPersonQueryService
                 var tagsTask = GetEntityTagsAsync(connection, entityId, cancellationToken);
                 var citationsTask = GetEntityCitationsAsync(connection, entityId, cancellationToken);
 
-                await Task.WhenAll(mediaTask, linksTask, aliasesTask, tagsTask, citationsTask);
+                var tasks = new List<Task> { mediaTask, linksTask, aliasesTask, tagsTask, citationsTask };
+                if (localizationTask is not null)
+                    tasks.Add(localizationTask);
+
+                await Task.WhenAll(tasks);
 
                 media = mediaTask.Result;
                 links = linksTask.Result;
@@ -182,23 +220,27 @@ public sealed class PersonQueryService : IPersonQueryService
                 citations = citationsTask.Result;
             }
 
+            var localized = localizationTask is null
+                ? (IReadOnlyDictionary<string, LocalizedFieldValues>)
+                    new Dictionary<string, LocalizedFieldValues>(StringComparer.OrdinalIgnoreCase)
+                : await localizationTask;
+
             // Return as an anonymous/expando object since IPersonQueryService returns object?
             return new
             {
                 PersonId = (int)person.PersonId,
                 EntityId = entityId,
                 Slug = (string)person.Slug,
-                FullName = (string)person.FullName,
-                OriginalName = (string?)person.OriginalName,
-                EnglishName = (string?)person.EnglishName,
+                FullName = LocalizationHelper.Pick(localized, "Name", (string)person.FullName),
+                OriginalName = LocalizationHelper.Pick(localized, "OriginalName", (string?)person.OriginalName),
+                EnglishName = LocalizationHelper.Pick(localized, "EnglishName", (string?)person.EnglishName),
                 PersonKind = (string?)person.PersonKind,
-                Biography = (string?)person.Biography,
+                Biography = LocalizationHelper.Pick(localized, "Biography", (string?)person.Biography),
                 BirthDate = (DateOnly?)person.BirthDate,
                 BirthDatePrecision = (string?)person.BirthDatePrecision,
                 DeathDate = (DateOnly?)person.DeathDate,
                 DeathDatePrecision = (string?)person.DeathDatePrecision,
-                BirthCountryName = (string?)person.BirthCountryName,
-                DeathCountryName = (string?)person.DeathCountryName,
+                Nationality = (string?)person.Nationality,
                 ImageUrl = (string?)person.ImageUrl,
                 Media = media,
                 Links = links,
@@ -214,6 +256,40 @@ public sealed class PersonQueryService : IPersonQueryService
         }
     }
 
+    private static readonly string[] LocalizedPersonFields =
+        ["Name", "OriginalName", "EnglishName", "Biography"];
+
+    private async Task LocalizePeopleListAsync(
+        List<NamedLinkDto> people,
+        string culture,
+        CancellationToken cancellationToken)
+    {
+        var entityIds = people
+            .Select(p => p.EntityId)
+            .Where(id => id.HasValue)
+            .Select(id => id!.Value)
+            .Distinct()
+            .ToArray();
+
+        if (entityIds.Length == 0)
+            return;
+
+        var localized = await _localizationService.GetLocalizedValuesAsync(
+            entityIds, ["Name"], culture, cancellationToken);
+
+        if (localized.Count == 0)
+            return;
+
+        foreach (var person in people)
+        {
+            if (person.EntityId.HasValue &&
+                localized.TryGetValue(person.EntityId.Value, out var fields))
+            {
+                person.Name = LocalizationHelper.Pick(fields, "Name", person.Name);
+            }
+        }
+    }
+
     private static async Task<IReadOnlyList<MediaDto>> GetEntityMediaAsync(
         IDbConnection connection,
         int entityId,
@@ -223,11 +299,10 @@ public sealed class PersonQueryService : IPersonQueryService
             SELECT
                 m.MediaId,
                 m.Url,
-                m.ThumbnailUrl,
+                m.ThumbnailUrl300 AS ThumbnailUrl,
                 mt.Name AS MediaType,
                 mrt.Name AS MediaRole,
-                m.Description,
-                m.IsPrimary,
+                ma.IsPrimary,
                 m.Width,
                 m.Height
             FROM MediaAssignment ma
@@ -235,9 +310,8 @@ public sealed class PersonQueryService : IPersonQueryService
             INNER JOIN MediaType mt ON mt.MediaTypeId = m.MediaTypeId
             LEFT JOIN MediaRoleType mrt ON mrt.MediaRoleTypeId = ma.MediaRoleTypeId
             WHERE ma.EntityId = @EntityId
-              AND ma.IsDeleted = 0
               AND m.IsDeleted = 0
-            ORDER BY m.IsPrimary DESC, m.MediaId
+            ORDER BY ma.IsPrimary DESC, m.MediaId
             """;
         var results = await connection.QueryAsync<MediaDto>(sql, new { EntityId = entityId });
         return results.AsList();
@@ -258,7 +332,7 @@ public sealed class PersonQueryService : IPersonQueryService
             LEFT JOIN LinkType lt ON lt.LinkTypeId = el.LinkTypeId
             WHERE el.EntityId = @EntityId
               AND el.IsDeleted = 0
-            ORDER BY el.DisplayOrder
+            ORDER BY el.EntityLinkId
             """;
         var results = await connection.QueryAsync<EntityLinkDto>(sql, new { EntityId = entityId });
         return results.AsList();
@@ -281,7 +355,6 @@ public sealed class PersonQueryService : IPersonQueryService
             LEFT JOIN AliasType at ON at.AliasTypeId = a.AliasTypeId
             LEFT JOIN Language l ON l.LanguageId = a.LanguageId
             WHERE a.EntityId = @EntityId
-              AND a.IsDeleted = 0
             ORDER BY a.IsPrimary DESC, a.AliasId
             """;
         var results = await connection.QueryAsync<AliasDto>(sql, new { EntityId = entityId });
@@ -298,7 +371,6 @@ public sealed class PersonQueryService : IPersonQueryService
             FROM TagAssignment ta
             INNER JOIN Tag t ON t.TagId = ta.TagId
             WHERE ta.EntityId = @EntityId
-              AND ta.IsDeleted = 0
               AND t.IsDeleted = 0
             ORDER BY t.Name
             """;
@@ -315,7 +387,7 @@ public sealed class PersonQueryService : IPersonQueryService
             SELECT
                 c.CitationId,
                 c.SourceId,
-                s.Name AS SourceName,
+                s.Title AS SourceName,
                 s.Slug AS SourceSlug,
                 c.FieldName,
                 c.Quote,
@@ -325,7 +397,6 @@ public sealed class PersonQueryService : IPersonQueryService
             FROM Citation c
             LEFT JOIN Source s ON s.SourceId = c.SourceId
             WHERE c.EntityId = @EntityId
-              AND c.IsDeleted = 0
             ORDER BY c.CitationId
             """;
         var results = await connection.QueryAsync<CitationDto>(sql, new { EntityId = entityId });

@@ -9,7 +9,7 @@ namespace MusicEncyclopedia.Web.Controllers;
 /// Routes: /{culture}/companies and /{culture}/companies/{slug}
 /// Spec references: 8.1 (routes), 9.7 (detail page)
 /// </summary>
-[Route("{culture:regex(^(fa)$)}/companies")]
+[Route("{culture:regex(^(fa|en|ar|fr)$)}/companies")]
 public sealed class CompaniesController : Controller
 {
     private readonly ICompanyQueryService _companyQueryService;

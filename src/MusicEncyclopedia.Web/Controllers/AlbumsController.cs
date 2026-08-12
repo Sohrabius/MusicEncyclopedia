@@ -8,7 +8,7 @@ namespace MusicEncyclopedia.Web.Controllers;
 /// Public controller for album listing and detail pages.
 /// Routes: /{culture}/albums and /{culture}/albums/{slug}
 /// </summary>
-[Route("{culture:regex(^(fa)$)}/albums")]
+[Route("{culture:regex(^(fa|en|ar|fr)$)}/albums")]
 public sealed class AlbumsController : Controller
 {
     private readonly IAlbumQueryService _albumQueryService;

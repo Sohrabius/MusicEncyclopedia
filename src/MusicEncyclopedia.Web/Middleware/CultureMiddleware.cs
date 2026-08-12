@@ -1,4 +1,5 @@
 using System.Globalization;
+using MusicEncyclopedia.Core.Constants;
 
 namespace MusicEncyclopedia.Web.Middleware;
 
@@ -12,9 +13,9 @@ public class CultureMiddleware
     private readonly RequestDelegate _next;
 
     private static readonly HashSet<string> SupportedCultures = new(
-        StringComparer.OrdinalIgnoreCase) { "fa" };
+        CultureConstants.SupportedCultures, StringComparer.OrdinalIgnoreCase);
 
-    private const string DefaultCulture = "fa";
+    private const string DefaultCulture = CultureConstants.DefaultCulture;
 
     public CultureMiddleware(RequestDelegate next)
     {
@@ -105,7 +106,7 @@ public class CultureMiddleware
     /// <summary>
     /// Determines if the given culture is right-to-left.
     /// </summary>
-    private static bool IsRtl(string culture) => culture == "fa";
+    private static bool IsRtl(string culture) => CultureConstants.IsRtl(culture);
 }
 
 /// <summary>

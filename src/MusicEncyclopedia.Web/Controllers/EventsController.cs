@@ -1,4 +1,5 @@
 using System.Data;
+using MusicEncyclopedia.Services.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Dapper;
 using MusicEncyclopedia.Web.ViewModels.Public;
@@ -10,7 +11,7 @@ namespace MusicEncyclopedia.Web.Controllers;
 /// Routes: /{culture}/events
 /// Spec reference: 9.15
 /// </summary>
-[Route("{culture:regex(^(fa)$)}/events")]
+[Route("{culture:regex(^(fa|en|ar|fr)$)}/events")]
 public sealed class EventsController : Controller
 {
     private readonly IDbConnection _db;
@@ -50,7 +51,7 @@ public sealed class EventsController : Controller
             LEFT JOIN Location l ON pe.LocationId = l.LocationId
             WHERE pe.IsDeleted = 0
             ORDER BY pe.Date DESC, pe.PerformanceEventId DESC
-            OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
+            " + SqlDialect.Pagination(SqlDialect.IsSqliteConnection(_db));
 
         var items = (await _db.QueryAsync<EventListItemDto>(sql, new { Offset = offset, PageSize = pageSize })).ToList();
 

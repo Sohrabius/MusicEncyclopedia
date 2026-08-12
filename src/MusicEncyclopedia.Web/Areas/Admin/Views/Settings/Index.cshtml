@@ -1,0 +1,59 @@
+@model SettingsViewModel
+@{
+    ViewData["Title"] = "Settings";
+    ViewData["ActiveMenu"] = "Settings";
+}
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div class="px-5 py-4 border-b border-gray-200 flex items-center gap-2">
+            <i class="fas fa-server text-blue-600"></i>
+            <h2 class="font-semibold text-gray-900">Runtime</h2>
+        </div>
+        <dl class="divide-y divide-gray-100 text-sm">
+            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-gray-500 font-medium">Environment</dt><dd class="col-span-2"><span class="inline-block px-2 py-0.5 text-xs rounded-full @(Model.Environment == "Development" ? "bg-yellow-50 text-yellow-700" : "bg-green-50 text-green-700")">@Model.Environment</span></dd></div>
+            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-gray-500 font-medium">.NET Runtime</dt><dd class="col-span-2 font-mono text-xs">@Model.RuntimeVersion</dd></div>
+            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-gray-500 font-medium">Database</dt><dd class="col-span-2">@Model.DatabaseProvider</dd></div>
+            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-gray-500 font-medium">Search Provider</dt><dd class="col-span-2">@Model.SearchProvider</dd></div>
+        </dl>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div class="px-5 py-4 border-b border-gray-200 flex items-center gap-2">
+            <i class="fas fa-globe text-blue-600"></i>
+            <h2 class="font-semibold text-gray-900">Localization</h2>
+        </div>
+        <dl class="divide-y divide-gray-100 text-sm">
+            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-gray-500 font-medium">Default Culture</dt><dd class="col-span-2">@Model.DefaultCulture</dd></div>
+            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-gray-500 font-medium">Base Culture</dt><dd class="col-span-2">@Model.BaseCulture</dd></div>
+            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-gray-500 font-medium">Fallback Culture</dt><dd class="col-span-2">@Model.FallbackCulture</dd></div>
+            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-gray-500 font-medium">Supported Cultures</dt><dd class="col-span-2">@string.Join(", ", Model.SupportedCultures)</dd></div>
+        </dl>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div class="px-5 py-4 border-b border-gray-200 flex items-center gap-2">
+            <i class="fas fa-cogs text-blue-600"></i>
+            <h2 class="font-semibold text-gray-900">Application</h2>
+        </div>
+        <dl class="divide-y divide-gray-100 text-sm">
+            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-gray-500 font-medium">Site Base URL</dt><dd class="col-span-2 font-mono text-xs">@(Model.SiteBaseUrl ?? "—")</dd></div>
+            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-gray-500 font-medium">Public Page Cache</dt><dd class="col-span-2">@Model.DefaultPublicPageCacheMinutes minutes</dd></div>
+            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-gray-500 font-medium">Default Page Size</dt><dd class="col-span-2">@Model.DefaultPageSize items</dd></div>
+            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-gray-500 font-medium">Login Attempt Limit</dt><dd class="col-span-2">@Model.MaxLoginAttempts attempts</dd></div>
+        </dl>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div class="px-5 py-4 border-b border-gray-200 flex items-center gap-2">
+            <i class="fas fa-database text-blue-600"></i>
+            <h2 class="font-semibold text-gray-900">Media</h2>
+        </div>
+        <dl class="divide-y divide-gray-100 text-sm">
+            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-gray-500 font-medium">Storage Path</dt><dd class="col-span-2 font-mono text-xs">@Model.MediaStoragePath</dd></div>
+            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-gray-500 font-medium">SQLite Mode</dt><dd class="col-span-2">@(Model.IsSqlite ? "Yes" : "No")</dd></div>
+        </dl>
+    </div>
+</div>
+
+<p class="mt-6 text-sm text-gray-500"><i class="fas fa-info-circle me-1"></i> These values are read from <code class="font-mono text-xs bg-gray-100 px-1 py-0.5 rounded">appsettings.json</code> and the runtime environment. Application settings are currently managed via configuration files.</p>

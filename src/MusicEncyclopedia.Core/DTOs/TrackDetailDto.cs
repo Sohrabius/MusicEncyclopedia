@@ -8,9 +8,9 @@ public sealed class TrackDetailDto
     public int TrackId { get; init; }
     public int EntityId { get; init; }
     public string Slug { get; init; } = "";
-    public string Title { get; init; } = "";
-    public string? OriginalTitle { get; init; }
-    public string? EnglishTitle { get; init; }
+    public string Title { get; set; } = "";
+    public string? OriginalTitle { get; set; }
+    public string? EnglishTitle { get; set; }
     public int? DurationSeconds { get; init; }
     public bool IsInstrumental { get; init; }
     public bool IsExplicit { get; init; }

@@ -1,4 +1,5 @@
 using System.Data;
+using MusicEncyclopedia.Services.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Dapper;
 using MusicEncyclopedia.Web.ViewModels.Public;
@@ -10,7 +11,7 @@ namespace MusicEncyclopedia.Web.Controllers;
 /// Routes: /{culture}/awards
 /// Spec reference: 9.17
 /// </summary>
-[Route("{culture:regex(^(fa)$)}/awards")]
+[Route("{culture:regex(^(fa|en|ar|fr)$)}/awards")]
 public sealed class AwardsController : Controller
 {
     private readonly IDbConnection _db;
@@ -49,7 +50,7 @@ public sealed class AwardsController : Controller
             LEFT JOIN Country c ON a.CountryId = c.CountryId
             WHERE a.IsDeleted = 0
             ORDER BY a.Name
-            OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
+            " + SqlDialect.Pagination(SqlDialect.IsSqliteConnection(_db));
 
         var items = (await _db.QueryAsync<AwardListItemDto>(sql, new { Offset = offset, PageSize = pageSize })).ToList();
 

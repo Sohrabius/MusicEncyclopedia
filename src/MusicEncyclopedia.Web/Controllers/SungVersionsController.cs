@@ -10,7 +10,7 @@ namespace MusicEncyclopedia.Web.Controllers;
 /// Route: /{culture}/sung-versions/{slug}
 /// Spec references: 8.1 (routes), 9.13 (detail page)
 /// </summary>
-[Route("{culture:regex(^(fa)$)}/sung-versions")]
+[Route("{culture:regex(^(fa|en|ar|fr)$)}/sung-versions")]
 public sealed class SungVersionsController : Controller
 {
     private readonly IDbConnection _db;
@@ -159,19 +159,17 @@ public sealed class SungVersionsController : Controller
         const string sql = """
             SELECT
                 m.Url,
-                m.ThumbnailUrl,
+                m.ThumbnailUrl300 AS ThumbnailUrl,
                 mt.Name AS MediaType,
                 mrt.Name AS MediaRole,
-                m.Description,
-                m.IsPrimary
+                ma.IsPrimary
             FROM MediaAssignment ma
             INNER JOIN Media m ON m.MediaId = ma.MediaId
             INNER JOIN MediaType mt ON mt.MediaTypeId = m.MediaTypeId
             LEFT JOIN MediaRoleType mrt ON mrt.MediaRoleTypeId = ma.MediaRoleTypeId
             WHERE ma.EntityId = @EntityId
-              AND ma.IsDeleted = 0
               AND m.IsDeleted = 0
-            ORDER BY m.IsPrimary DESC, m.MediaId
+            ORDER BY ma.IsPrimary DESC, m.MediaId
             """;
         var results = await connection.QueryAsync(sql, new { EntityId = entityId });
         return results.AsList();
@@ -191,7 +189,7 @@ public sealed class SungVersionsController : Controller
             LEFT JOIN LinkType lt ON lt.LinkTypeId = el.LinkTypeId
             WHERE el.EntityId = @EntityId
               AND el.IsDeleted = 0
-            ORDER BY el.DisplayOrder
+            ORDER BY el.EntityLinkId
             """;
         var results = await connection.QueryAsync(sql, new { EntityId = entityId });
         return results.AsList();
@@ -206,7 +204,7 @@ public sealed class SungVersionsController : Controller
             SELECT
                 c.CitationId,
                 c.SourceId,
-                s.Name AS SourceName,
+                s.Title AS SourceName,
                 s.Slug AS SourceSlug,
                 c.Quote,
                 c.PageNumber,
@@ -215,7 +213,6 @@ public sealed class SungVersionsController : Controller
             FROM Citation c
             LEFT JOIN Source s ON s.SourceId = c.SourceId
             WHERE c.EntityId = @EntityId
-              AND c.IsDeleted = 0
             ORDER BY c.CitationId
             """;
         var results = await connection.QueryAsync(sql, new { EntityId = entityId });
@@ -232,7 +229,6 @@ public sealed class SungVersionsController : Controller
             FROM TagAssignment ta
             INNER JOIN Tag t ON t.TagId = ta.TagId
             WHERE ta.EntityId = @EntityId
-              AND ta.IsDeleted = 0
               AND t.IsDeleted = 0
             ORDER BY t.Name
             """;

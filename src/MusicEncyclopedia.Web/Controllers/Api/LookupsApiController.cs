@@ -129,9 +129,11 @@ public sealed class LookupsApiController : BaseApiController
         var offset = (page - 1) * pageSize;
         var dataSql = @"
             SELECT a.AlbumId, a.Slug, a.Title, a.OriginalTitle, a.EnglishTitle,
-                   a.CategoryName, a.ReleaseDate, a.DurationSeconds, a.CoverUrl
+                   cat.Name AS CategoryName, a.ReleaseDate, a.DurationSeconds, m.Url AS CoverUrl
             FROM AlbumGenre ag
             INNER JOIN Album a ON a.AlbumId = ag.AlbumId
+            LEFT JOIN AlbumCategory cat ON cat.AlbumCategoryId = a.AlbumCategoryId
+            LEFT JOIN Media m ON m.MediaId = a.CoverMediaId
             WHERE ag.GenreId = @GenreId AND a.IsDeleted = 0
             ORDER BY a.ReleaseDate DESC
             OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
@@ -266,9 +268,11 @@ public sealed class LookupsApiController : BaseApiController
         var offset = (page - 1) * pageSize;
         var dataSql = @"
             SELECT a.AlbumId, a.Slug, a.Title, a.OriginalTitle, a.EnglishTitle,
-                   a.CategoryName, a.ReleaseDate, a.DurationSeconds, a.CoverUrl
+                   cat.Name AS CategoryName, a.ReleaseDate, a.DurationSeconds, m.Url AS CoverUrl
             FROM AlbumMood am
             INNER JOIN Album a ON a.AlbumId = am.AlbumId
+            LEFT JOIN AlbumCategory cat ON cat.AlbumCategoryId = a.AlbumCategoryId
+            LEFT JOIN Media m ON m.MediaId = a.CoverMediaId
             WHERE am.MoodId = @MoodId AND a.IsDeleted = 0
             ORDER BY a.ReleaseDate DESC
             OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
@@ -344,8 +348,10 @@ public sealed class LookupsApiController : BaseApiController
         var offset = (page - 1) * pageSize;
         var dataSql = @"
             SELECT i.InstrumentId, i.Slug, i.Name, i.Description,
-                   i.FamilyName, i.CountryOfOrigin, i.HistoricalNotes
+                   inf.Name AS FamilyName, c.Name AS CountryOfOrigin, i.HistoricalNotes
             FROM Instrument i
+            LEFT JOIN InstrumentFamily inf ON inf.InstrumentFamilyId = i.InstrumentFamilyId
+            LEFT JOIN Country c ON c.CountryId = i.CountryId
             WHERE i.IsDeleted = 0
             ORDER BY i.Name
             OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
@@ -369,8 +375,10 @@ public sealed class LookupsApiController : BaseApiController
 
         const string sql = @"
             SELECT i.InstrumentId, i.Slug, i.Name, i.Description,
-                   i.FamilyName, i.CountryOfOrigin, i.HistoricalNotes
+                   inf.Name AS FamilyName, c.Name AS CountryOfOrigin, i.HistoricalNotes
             FROM Instrument i
+            LEFT JOIN InstrumentFamily inf ON inf.InstrumentFamilyId = i.InstrumentFamilyId
+            LEFT JOIN Country c ON c.CountryId = i.CountryId
             WHERE i.Slug = @Slug AND i.IsDeleted = 0";
 
         var instrument = await connection.QueryFirstOrDefaultAsync(sql, new { Slug = slug });

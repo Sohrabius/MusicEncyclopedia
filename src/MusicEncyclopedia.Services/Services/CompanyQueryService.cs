@@ -3,8 +3,10 @@ using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using MusicEncyclopedia.Core.Constants;
 using MusicEncyclopedia.Core.DTOs;
 using MusicEncyclopedia.Core.Interfaces;
+using MusicEncyclopedia.Services.Infrastructure;
 
 namespace MusicEncyclopedia.Services.Services;
 
@@ -16,11 +18,15 @@ public sealed class CompanyQueryService : ICompanyQueryService
     private readonly string _connectionString;
     private readonly bool _isSqlite;
     private readonly ILogger<CompanyQueryService> _logger;
+    private readonly IContentLocalizationService _localizationService;
 
     public CompanyQueryService(
         IConfiguration configuration,
-        ILogger<CompanyQueryService> logger)
+        ILogger<CompanyQueryService> logger,
+        IContentLocalizationService localizationService)
     {
+        _localizationService = localizationService;
+
         var dbProvider = configuration.GetValue<string>("DatabaseProvider") ?? "SqlServer";
         _isSqlite = string.Equals(dbProvider, "Sqlite", StringComparison.OrdinalIgnoreCase);
 
@@ -82,8 +88,7 @@ public sealed class CompanyQueryService : ICompanyQueryService
             FROM Company AS c
             WHERE {whereSql}
             ORDER BY {orderBy}
-            OFFSET @Offset ROWS
-            FETCH NEXT @PageSize ROWS ONLY
+            {SqlDialect.Pagination(_isSqlite)}
             """;
 
         parameters.Add("Offset", (page - 1) * pageSize);
@@ -123,12 +128,10 @@ public sealed class CompanyQueryService : ICompanyQueryService
                 ct.Name AS CompanyType,
                 co.Name AS CountryName,
                 c.Website,
-                c.History,
-                m.Url AS LogoUrl
+                c.History
             FROM Company AS c
             LEFT JOIN CompanyType AS ct ON ct.CompanyTypeId = c.CompanyTypeId
             LEFT JOIN Country AS co ON co.CountryId = c.CountryId
-            LEFT JOIN Media AS m ON m.MediaId = c.LogoMediaId
             WHERE c.Slug = @Slug
               AND c.IsDeleted = 0
             """;
@@ -152,6 +155,15 @@ public sealed class CompanyQueryService : ICompanyQueryService
             IReadOnlyList<TagDto> tags;
             IReadOnlyList<CitationDto> citations;
 
+            // Spec 7.3: fetch localized text (requested + English) in parallel with
+            // the detail sub-queries, using its own connection.
+            Task<IReadOnlyDictionary<string, LocalizedFieldValues>>? localizationTask = null;
+            if (LocalizationHelper.ShouldLocalize(culture))
+            {
+                localizationTask = _localizationService.GetLocalizedValuesAsync(
+                    entityId, LocalizedCompanyFields, culture, cancellationToken);
+            }
+
             if (_isSqlite)
             {
                 media = await GetEntityMediaAsync(connection, entityId, cancellationToken);
@@ -168,7 +180,11 @@ public sealed class CompanyQueryService : ICompanyQueryService
                 var tagsTask = GetEntityTagsAsync(connection, entityId, cancellationToken);
                 var citationsTask = GetEntityCitationsAsync(connection, entityId, cancellationToken);
 
-                await Task.WhenAll(mediaTask, linksTask, aliasesTask, tagsTask, citationsTask);
+                var tasks = new List<Task> { mediaTask, linksTask, aliasesTask, tagsTask, citationsTask };
+                if (localizationTask is not null)
+                    tasks.Add(localizationTask);
+
+                await Task.WhenAll(tasks);
 
                 media = mediaTask.Result;
                 links = linksTask.Result;
@@ -177,19 +193,23 @@ public sealed class CompanyQueryService : ICompanyQueryService
                 citations = citationsTask.Result;
             }
 
+            var localized = localizationTask is null
+                ? (IReadOnlyDictionary<string, LocalizedFieldValues>)
+                    new Dictionary<string, LocalizedFieldValues>(StringComparer.OrdinalIgnoreCase)
+                : await localizationTask;
+
             return new
             {
                 CompanyId = (int)company.CompanyId,
                 EntityId = entityId,
                 Slug = (string)company.Slug,
-                Name = (string)company.Name,
-                OriginalName = (string?)company.OriginalName,
-                EnglishName = (string?)company.EnglishName,
+                Name = LocalizationHelper.Pick(localized, "Name", (string)company.Name),
+                OriginalName = LocalizationHelper.Pick(localized, "OriginalName", (string?)company.OriginalName),
+                EnglishName = LocalizationHelper.Pick(localized, "EnglishName", (string?)company.EnglishName),
                 CompanyType = (string?)company.CompanyType,
                 CountryName = (string?)company.CountryName,
                 Website = (string?)company.Website,
-                History = (string?)company.History,
-                LogoUrl = (string?)company.LogoUrl,
+                History = LocalizationHelper.Pick(localized, "History", (string?)company.History),
                 Media = media,
                 Links = links,
                 Aliases = aliases,
@@ -204,6 +224,9 @@ public sealed class CompanyQueryService : ICompanyQueryService
         }
     }
 
+    private static readonly string[] LocalizedCompanyFields =
+        ["Name", "OriginalName", "EnglishName", "History"];
+
     private static async Task<IReadOnlyList<MediaDto>> GetEntityMediaAsync(
         IDbConnection connection,
         int entityId,
@@ -213,11 +236,10 @@ public sealed class CompanyQueryService : ICompanyQueryService
             SELECT
                 m.MediaId,
                 m.Url,
-                m.ThumbnailUrl,
+                m.ThumbnailUrl300 AS ThumbnailUrl,
                 mt.Name AS MediaType,
                 mrt.Name AS MediaRole,
-                m.Description,
-                m.IsPrimary,
+                ma.IsPrimary,
                 m.Width,
                 m.Height
             FROM MediaAssignment ma
@@ -225,9 +247,8 @@ public sealed class CompanyQueryService : ICompanyQueryService
             INNER JOIN MediaType mt ON mt.MediaTypeId = m.MediaTypeId
             LEFT JOIN MediaRoleType mrt ON mrt.MediaRoleTypeId = ma.MediaRoleTypeId
             WHERE ma.EntityId = @EntityId
-              AND ma.IsDeleted = 0
               AND m.IsDeleted = 0
-            ORDER BY m.IsPrimary DESC, m.MediaId
+            ORDER BY ma.IsPrimary DESC, m.MediaId
             """;
         var results = await connection.QueryAsync<MediaDto>(sql, new { EntityId = entityId });
         return results.AsList();
@@ -248,7 +269,7 @@ public sealed class CompanyQueryService : ICompanyQueryService
             LEFT JOIN LinkType lt ON lt.LinkTypeId = el.LinkTypeId
             WHERE el.EntityId = @EntityId
               AND el.IsDeleted = 0
-            ORDER BY el.DisplayOrder
+            ORDER BY el.EntityLinkId
             """;
         var results = await connection.QueryAsync<EntityLinkDto>(sql, new { EntityId = entityId });
         return results.AsList();
@@ -271,7 +292,6 @@ public sealed class CompanyQueryService : ICompanyQueryService
             LEFT JOIN AliasType at ON at.AliasTypeId = a.AliasTypeId
             LEFT JOIN Language l ON l.LanguageId = a.LanguageId
             WHERE a.EntityId = @EntityId
-              AND a.IsDeleted = 0
             ORDER BY a.IsPrimary DESC, a.AliasId
             """;
         var results = await connection.QueryAsync<AliasDto>(sql, new { EntityId = entityId });
@@ -288,7 +308,6 @@ public sealed class CompanyQueryService : ICompanyQueryService
             FROM TagAssignment ta
             INNER JOIN Tag t ON t.TagId = ta.TagId
             WHERE ta.EntityId = @EntityId
-              AND ta.IsDeleted = 0
               AND t.IsDeleted = 0
             ORDER BY t.Name
             """;
@@ -305,7 +324,7 @@ public sealed class CompanyQueryService : ICompanyQueryService
             SELECT
                 c.CitationId,
                 c.SourceId,
-                s.Name AS SourceName,
+                s.Title AS SourceName,
                 s.Slug AS SourceSlug,
                 c.FieldName,
                 c.Quote,
@@ -315,7 +334,6 @@ public sealed class CompanyQueryService : ICompanyQueryService
             FROM Citation c
             LEFT JOIN Source s ON s.SourceId = c.SourceId
             WHERE c.EntityId = @EntityId
-              AND c.IsDeleted = 0
             ORDER BY c.CitationId
             """;
         var results = await connection.QueryAsync<CitationDto>(sql, new { EntityId = entityId });

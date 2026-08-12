@@ -15,6 +15,7 @@ using MusicEncyclopedia.Data;
 using MusicEncyclopedia.Data.Seed;
 using MusicEncyclopedia.Web.Middleware;
 using MusicEncyclopedia.Web.Filters;
+using MusicEncyclopedia.Web.Security;
 
 // ────────────────────────────────────────────────────────────────
 // Serilog Bootstrapping
@@ -78,6 +79,10 @@ try
     if (isSqlite)
     {
         builder.Services.AddScoped<IDbConnection>(_ => new SqliteConnection(connectionString));
+
+        // SQLite stores dates as TEXT; register a Dapper type handler so
+        // DateOnly columns map correctly (SQL Server handles DateOnly natively).
+        Dapper.SqlMapper.AddTypeHandler(new SqliteDateOnlyHandler());
     }
     else
     {
@@ -120,7 +125,16 @@ try
     .AddDefaultTokenProviders()
     .AddRoles<IdentityRole>();
 
+    // Surface permission claims stored on roles on the signed-in user's principal
+    // (role-based permissions satisfy the application's permission policies).
+    builder.Services.AddScoped<
+        IUserClaimsPrincipalFactory<IdentityUser>,
+        AppUserClaimsPrincipalFactory>();
+
     // ---- Authentication Cookie Configuration ----
+    // CookieSecurePolicy.Always breaks local HTTP development (and the login page),
+    // so only enforce Secure cookies outside Development.
+    var isDevelopment = builder.Environment.IsDevelopment();
     builder.Services.ConfigureApplicationCookie(options =>
     {
         options.LoginPath = "/auth/login";
@@ -129,7 +143,7 @@ try
         options.SlidingExpiration = true;
         options.ExpireTimeSpan = TimeSpan.FromDays(14);
         options.Cookie.HttpOnly = true;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.Cookie.SecurePolicy = isDevelopment ? CookieSecurePolicy.SameAsRequest : CookieSecurePolicy.Always;
         options.Cookie.SameSite = SameSiteMode.Lax;
     });
 
@@ -148,6 +162,9 @@ try
             policyBuilder.RequireAssertion(context =>
                 PermissionConstants.All.Any(p => context.User.HasClaim("Permission", p))));
     });
+
+    // ---- Admin audit logging (global filter) ----
+    builder.Services.AddScoped<MusicEncyclopedia.Web.Filters.AuditLogFilter>();
 
     // ---- Culture-Aware MVC ----
     builder.Services.AddCultureAwareMvc();
@@ -220,7 +237,7 @@ try
     {
         options.HeaderName = "X-CSRF-TOKEN";
         options.Cookie.HttpOnly = true;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.Cookie.SecurePolicy = isDevelopment ? CookieSecurePolicy.SameAsRequest : CookieSecurePolicy.Always;
         options.Cookie.SameSite = SameSiteMode.Strict;
     });
 
@@ -311,12 +328,11 @@ try
     // ---- Request Localization (Culture from route) ----
     app.UseRequestLocalization(options =>
     {
-        var supportedCultures = new[]
-        {
-            new CultureInfo("fa")
-        };
+        var supportedCultures = CultureConstants.SupportedCultures
+            .Select(c => new CultureInfo(c))
+            .ToArray();
 
-        options.DefaultRequestCulture = new RequestCulture("fa");
+        options.DefaultRequestCulture = new RequestCulture(CultureConstants.DefaultCulture);
         options.SupportedCultures = supportedCultures;
         options.SupportedUICultures = supportedCultures;
         options.RequestCultureProviders.Clear();
@@ -333,7 +349,7 @@ try
     // ---- Conventional Routes (Section 28) ----
     app.MapControllerRoute(
         name: "localized-default",
-        pattern: "{culture:regex(^(fa)$)}/{controller=Home}/{action=Index}/{id?}");
+        pattern: "{culture:regex(^(fa|en|ar|fr)$)}/{controller=Home}/{action=Index}/{id?}");
 
     app.MapControllerRoute(
         name: "default",
@@ -378,6 +394,27 @@ finally
 // ────────────────────────────────────────────────────────────────
 // Health Check Response Writer
 // ────────────────────────────────────────────────────────────────
+
+/// <summary>
+/// Dapper type handler that maps SQLite TEXT dates to <see cref="DateOnly"/>.
+/// </summary>
+internal sealed class SqliteDateOnlyHandler : Dapper.SqlMapper.TypeHandler<DateOnly>
+{
+    public override DateOnly Parse(object value) => value switch
+    {
+        DateOnly date => date,
+        DateTime dateTime => DateOnly.FromDateTime(dateTime),
+        string text when DateOnly.TryParse(text, CultureInfo.InvariantCulture, out var parsed) => parsed,
+        _ => DateOnly.MinValue
+    };
+
+    public override void SetValue(IDbDataParameter parameter, DateOnly value)
+    {
+        parameter.DbType = DbType.String;
+        parameter.Value = value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+    }
+}
+
 internal static class HealthCheckResponseWriter
 {
     /// <summary>

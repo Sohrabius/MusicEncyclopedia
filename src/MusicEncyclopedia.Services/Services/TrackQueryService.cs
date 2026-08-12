@@ -3,8 +3,10 @@ using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using MusicEncyclopedia.Core.Constants;
 using MusicEncyclopedia.Core.DTOs;
 using MusicEncyclopedia.Core.Interfaces;
+using MusicEncyclopedia.Services.Infrastructure;
 
 namespace MusicEncyclopedia.Services.Services;
 
@@ -16,11 +18,15 @@ public sealed class TrackQueryService : ITrackQueryService
     private readonly string _connectionString;
     private readonly bool _isSqlite;
     private readonly ILogger<TrackQueryService> _logger;
+    private readonly IContentLocalizationService _localizationService;
 
     public TrackQueryService(
         IConfiguration configuration,
-        ILogger<TrackQueryService> logger)
+        ILogger<TrackQueryService> logger,
+        IContentLocalizationService localizationService)
     {
+        _localizationService = localizationService;
+
         var dbProvider = configuration.GetValue<string>("DatabaseProvider") ?? "SqlServer";
         _isSqlite = string.Equals(dbProvider, "Sqlite", StringComparison.OrdinalIgnoreCase);
 
@@ -71,7 +77,7 @@ public sealed class TrackQueryService : ITrackQueryService
 
         if (!string.IsNullOrWhiteSpace(artist))
         {
-            whereClauses.Add("EXISTS (SELECT 1 FROM Credit c_inner INNER JOIN Entity e_inner ON e_inner.EntityId = c_inner.EntityId INNER JOIN Person p_inner ON p_inner.PersonId = c_inner.PersonId WHERE e_inner.EntityId = t.TrackId AND p_inner.Slug = @Artist AND c_inner.IsDeleted = 0)");
+            whereClauses.Add("EXISTS (SELECT 1 FROM Credit c_inner INNER JOIN Entity e_inner ON e_inner.EntityId = c_inner.EntityId INNER JOIN Person p_inner ON p_inner.PersonId = c_inner.PersonId WHERE e_inner.EntityId = t.TrackId AND p_inner.Slug = @Artist)");
             parameters.Add("Artist", artist);
         }
 
@@ -132,8 +138,7 @@ public sealed class TrackQueryService : ITrackQueryService
             LEFT JOIN LyricsAvailabilityType AS lat ON lat.LyricsAvailabilityTypeId = t.LyricsAvailabilityTypeId
             WHERE {whereSql}
             ORDER BY {orderBy}
-            OFFSET @Offset ROWS
-            FETCH NEXT @PageSize ROWS ONLY
+            {SqlDialect.Pagination(_isSqlite)}
             """;
 
         parameters.Add("Offset", (page - 1) * pageSize);
@@ -200,6 +205,8 @@ public sealed class TrackQueryService : ITrackQueryService
             var trackId = track.TrackId;
             var entityId = track.EntityId;
 
+            TrackDetailDto result;
+
             if (_isSqlite)
             {
                 var albums = await GetTrackAlbumsAsync(connection, trackId, cancellationToken);
@@ -217,7 +224,7 @@ public sealed class TrackQueryService : ITrackQueryService
                 var certifications = await GetEntityCertificationsAsync(connection, entityId, cancellationToken);
                 var chartEntries = await GetEntityChartEntriesAsync(connection, entityId, cancellationToken);
 
-                return CreateTrackDetail(track, albums, credits, musicians, genres, moods, instruments,
+                result = CreateTrackDetail(track, albums, credits, musicians, genres, moods, instruments,
                     media, links, citations, tags, aliases, awards, certifications, chartEntries);
             }
             else
@@ -242,17 +249,45 @@ public sealed class TrackQueryService : ITrackQueryService
                     instrumentsTask, mediaTask, linksTask, citationsTask, tagsTask,
                     aliasesTask, awardsTask, certificationsTask, chartEntriesTask);
 
-                return CreateTrackDetail(track, albumsTask.Result, creditsTask.Result, musiciansTask.Result,
+                result = CreateTrackDetail(track, albumsTask.Result, creditsTask.Result, musiciansTask.Result,
                     genresTask.Result, moodsTask.Result, instrumentsTask.Result,
                     mediaTask.Result, linksTask.Result, citationsTask.Result, tagsTask.Result,
                     aliasesTask.Result, awardsTask.Result, certificationsTask.Result, chartEntriesTask.Result);
             }
+
+            // Spec 7.3: overlay localized text (requested → base → en → empty)
+            if (LocalizationHelper.ShouldLocalize(culture))
+            {
+                await LocalizeTrackAsync(result, entityId, culture, cancellationToken);
+            }
+
+            return result;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to load track by slug={Slug}, culture={Culture}", slug, culture);
             return null;
         }
+    }
+
+    private static readonly string[] LocalizedTrackFields =
+        ["Title", "OriginalTitle", "EnglishTitle"];
+
+    private async Task LocalizeTrackAsync(
+        TrackDetailDto track,
+        int entityId,
+        string culture,
+        CancellationToken cancellationToken)
+    {
+        var localized = await _localizationService.GetLocalizedValuesAsync(
+            entityId, LocalizedTrackFields, culture, cancellationToken);
+
+        if (localized.Count == 0)
+            return;
+
+        track.Title = LocalizationHelper.Pick(localized, "Title", track.Title);
+        track.OriginalTitle = LocalizationHelper.Pick(localized, "OriginalTitle", track.OriginalTitle);
+        track.EnglishTitle = LocalizationHelper.Pick(localized, "EnglishTitle", track.EnglishTitle);
     }
 
     private static TrackDetailDto CreateTrackDetail(
@@ -328,7 +363,6 @@ public sealed class TrackQueryService : ITrackQueryService
             LEFT JOIN AlbumCategory ac ON ac.AlbumCategoryId = a.AlbumCategoryId
             LEFT JOIN Media m ON m.MediaId = a.CoverMediaId
             WHERE at.TrackId = @TrackId
-              AND at.IsDeleted = 0
               AND a.IsDeleted = 0
             ORDER BY a.ReleaseDate DESC, at.DiscNumber, at.SequenceNumber
             """;
@@ -363,7 +397,6 @@ public sealed class TrackQueryService : ITrackQueryService
             LEFT JOIN Company AS co ON co.CompanyId = c.CompanyId
             LEFT JOIN Instrument AS i ON i.InstrumentId = c.InstrumentId
             WHERE c.EntityId = @EntityId
-              AND c.IsDeleted = 0
             ORDER BY cr.DisplayOrder, c.DisplayOrder, p.FullName, co.Name
             """;
         var results = await connection.QueryAsync<CreditDto>(sql, new { EntityId = entityId });
@@ -390,7 +423,6 @@ public sealed class TrackQueryService : ITrackQueryService
             LEFT JOIN Instrument AS i ON i.InstrumentId = c.InstrumentId
             WHERE c.EntityId = @EntityId
               AND cr.Code = 'MUSICIAN'
-              AND c.IsDeleted = 0
             ORDER BY c.DisplayOrder, p.FullName, i.Name
             """;
         var results = await connection.QueryAsync<MusicianCreditDto>(sql, new { EntityId = entityId });
@@ -454,11 +486,10 @@ public sealed class TrackQueryService : ITrackQueryService
             SELECT
                 m.MediaId,
                 m.Url,
-                m.ThumbnailUrl,
+                m.ThumbnailUrl300 AS ThumbnailUrl,
                 mt.Name AS MediaType,
                 mrt.Name AS MediaRole,
-                m.Description,
-                m.IsPrimary,
+                ma.IsPrimary,
                 m.Width,
                 m.Height
             FROM MediaAssignment ma
@@ -466,9 +497,8 @@ public sealed class TrackQueryService : ITrackQueryService
             INNER JOIN MediaType mt ON mt.MediaTypeId = m.MediaTypeId
             LEFT JOIN MediaRoleType mrt ON mrt.MediaRoleTypeId = ma.MediaRoleTypeId
             WHERE ma.EntityId = @EntityId
-              AND ma.IsDeleted = 0
               AND m.IsDeleted = 0
-            ORDER BY m.IsPrimary DESC, m.MediaId
+            ORDER BY ma.IsPrimary DESC, m.MediaId
             """;
         var results = await connection.QueryAsync<MediaDto>(sql, new { EntityId = entityId });
         return results.AsList();
@@ -489,7 +519,7 @@ public sealed class TrackQueryService : ITrackQueryService
             LEFT JOIN LinkType lt ON lt.LinkTypeId = el.LinkTypeId
             WHERE el.EntityId = @EntityId
               AND el.IsDeleted = 0
-            ORDER BY el.DisplayOrder
+            ORDER BY el.EntityLinkId
             """;
         var results = await connection.QueryAsync<EntityLinkDto>(sql, new { EntityId = entityId });
         return results.AsList();
@@ -504,7 +534,7 @@ public sealed class TrackQueryService : ITrackQueryService
             SELECT
                 c.CitationId,
                 c.SourceId,
-                s.Name AS SourceName,
+                s.Title AS SourceName,
                 s.Slug AS SourceSlug,
                 c.FieldName,
                 c.Quote,
@@ -514,7 +544,6 @@ public sealed class TrackQueryService : ITrackQueryService
             FROM Citation c
             LEFT JOIN Source s ON s.SourceId = c.SourceId
             WHERE c.EntityId = @EntityId
-              AND c.IsDeleted = 0
             ORDER BY c.CitationId
             """;
         var results = await connection.QueryAsync<CitationDto>(sql, new { EntityId = entityId });
@@ -531,7 +560,6 @@ public sealed class TrackQueryService : ITrackQueryService
             FROM TagAssignment ta
             INNER JOIN Tag t ON t.TagId = ta.TagId
             WHERE ta.EntityId = @EntityId
-              AND ta.IsDeleted = 0
               AND t.IsDeleted = 0
             ORDER BY t.Name
             """;
@@ -556,7 +584,6 @@ public sealed class TrackQueryService : ITrackQueryService
             LEFT JOIN AliasType at ON at.AliasTypeId = a.AliasTypeId
             LEFT JOIN Language l ON l.LanguageId = a.LanguageId
             WHERE a.EntityId = @EntityId
-              AND a.IsDeleted = 0
             ORDER BY a.IsPrimary DESC, a.AliasId
             """;
         var results = await connection.QueryAsync<AliasDto>(sql, new { EntityId = entityId });
@@ -574,15 +601,14 @@ public sealed class TrackQueryService : ITrackQueryService
                 aa.AwardId,
                 a.Name AS AwardName,
                 a.Slug AS AwardSlug,
-                aa.AwardDate,
+                aa.Year,
                 art.Name AS Result,
                 aa.Category
             FROM AwardAssignment aa
             INNER JOIN Award a ON a.AwardId = aa.AwardId
             LEFT JOIN AwardResultType art ON art.AwardResultTypeId = aa.AwardResultTypeId
             WHERE aa.EntityId = @EntityId
-              AND aa.IsDeleted = 0
-            ORDER BY aa.AwardDate DESC
+            ORDER BY aa.Year DESC
             """;
         var results = await connection.QueryAsync<AwardAssignmentDto>(sql, new { EntityId = entityId });
         return results.AsList();
@@ -599,14 +625,11 @@ public sealed class TrackQueryService : ITrackQueryService
                 ca.CertificationId,
                 c.Name AS CertificationName,
                 c.Slug AS CertificationSlug,
-                ca.CertificationDate,
-                co.Code AS Country
+                ca.Date AS CertificationDate
             FROM CertificationAssignment ca
             INNER JOIN Certification c ON c.CertificationId = ca.CertificationId
-            LEFT JOIN Country co ON co.CountryId = ca.CountryId
             WHERE ca.EntityId = @EntityId
-              AND ca.IsDeleted = 0
-            ORDER BY ca.CertificationDate DESC
+            ORDER BY ca.Date DESC
             """;
         var results = await connection.QueryAsync<CertificationAssignmentDto>(sql, new { EntityId = entityId });
         return results.AsList();
@@ -630,7 +653,6 @@ public sealed class TrackQueryService : ITrackQueryService
             FROM ChartEntry ce
             INNER JOIN Chart c ON c.ChartId = ce.ChartId
             WHERE ce.EntityId = @EntityId
-              AND ce.IsDeleted = 0
             ORDER BY ce.Date DESC
             """;
         var results = await connection.QueryAsync<ChartEntryDto>(sql, new { EntityId = entityId });

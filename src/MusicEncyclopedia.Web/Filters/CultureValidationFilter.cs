@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using MusicEncyclopedia.Core.Constants;
 
 namespace MusicEncyclopedia.Web.Filters;
 
@@ -10,7 +11,7 @@ namespace MusicEncyclopedia.Web.Filters;
 public class CultureValidationFilter : IActionFilter
 {
     private static readonly HashSet<string> SupportedCultures = new(
-        StringComparer.OrdinalIgnoreCase) { "fa" };
+        CultureConstants.SupportedCultures, StringComparer.OrdinalIgnoreCase);
 
     /// <inheritdoc />
     public void OnActionExecuting(ActionExecutingContext context)

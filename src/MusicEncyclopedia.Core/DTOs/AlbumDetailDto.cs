@@ -8,10 +8,10 @@ public sealed class AlbumDetailDto
     public int AlbumId { get; init; }
     public int EntityId { get; init; }
     public string Slug { get; init; } = "";
-    public string Title { get; init; } = "";
-    public string? OriginalTitle { get; init; }
-    public string? EnglishTitle { get; init; }
-    public string? Description { get; init; }
+    public string Title { get; set; } = "";
+    public string? OriginalTitle { get; set; }
+    public string? EnglishTitle { get; set; }
+    public string? Description { get; set; }
     public string? CategoryName { get; init; }
     public DateOnly? ReleaseDate { get; init; }
     public DateOnly? RecordingStartDate { get; init; }

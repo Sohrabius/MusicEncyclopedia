@@ -1,0 +1,226 @@
+@model AlbumTracklistViewModel
+@{
+    // Album tracklist editor (spec 10.5 "Tracklist" tab).
+    var editorId = $"tracklist-{Model.AlbumId}";
+}
+
+<div class="album-tracklist-editor" id="@editorId" data-album-id="@Model.AlbumId">
+    <div class="flex items-center justify-between mb-3">
+        <h3 class="text-sm font-semibold text-gray-700">Tracklist</h3>
+        <span class="tl-count text-xs text-gray-500">@Model.Rows.Count tracks</span>
+    </div>
+
+    @if (Model.Rows.Count == 0)
+    {
+        <p class="tl-empty text-xs text-gray-500 mb-3">
+            <i class="fas fa-info-circle text-blue-400 me-1"></i>
+            No tracks on this album yet. Add an existing track or create a new one inline.
+        </p>
+    }
+
+    <div class="overflow-x-auto mb-3">
+        <table class="w-full text-sm">
+            <thead class="bg-gray-50 border-b border-gray-200">
+                <tr>
+                    <th class="text-start px-2 py-2 font-medium text-gray-600 w-8"></th>
+                    <th class="text-start px-2 py-2 font-medium text-gray-600 w-16">Disc</th>
+                    <th class="text-start px-2 py-2 font-medium text-gray-600 w-16">#</th>
+                    <th class="text-start px-2 py-2 font-medium text-gray-600">Track</th>
+                    <th class="text-start px-2 py-2 font-medium text-gray-600 w-24">Title override</th>
+                    <th class="text-start px-2 py-2 font-medium text-gray-600 w-20">Dur. (s)</th>
+                    <th class="text-center px-2 py-2 font-medium text-gray-600 w-16">Bonus</th>
+                    <th class="text-end px-2 py-2 font-medium text-gray-600 w-32">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                @foreach (var row in Model.Rows)
+                {
+                    <tr data-album-track-id="@row.AlbumTrackId">
+                        <td class="px-2 py-2 text-gray-400">
+                            <button type="button" class="tl-move-up hover:text-blue-600 me-1" title="Move up" data-id="@row.AlbumTrackId"><i class="fas fa-chevron-up text-xs"></i></button>
+                            <button type="button" class="tl-move-down hover:text-blue-600" title="Move down" data-id="@row.AlbumTrackId"><i class="fas fa-chevron-down text-xs"></i></button>
+                        </td>
+                        <td class="px-2 py-2"><input type="number" class="tl-disc w-14 text-xs px-1.5 py-1 border border-gray-300 rounded" value="@row.DiscNumber" /></td>
+                        <td class="px-2 py-2"><input type="number" class="tl-track-no w-14 text-xs px-1.5 py-1 border border-gray-300 rounded" value="@row.TrackNumber" /></td>
+                        <td class="px-2 py-2 text-gray-800">
+                            @if (!string.IsNullOrWhiteSpace(row.TitleOverride))
+                            {
+                                <span class="line-through text-gray-400">@row.TrackTitle</span>
+                                <span class="ms-1">@row.TitleOverride</span>
+                            }
+                            else
+                            {
+                                @row.TrackTitle
+                            }
+                        </td>
+                        <td class="px-2 py-2"><input type="text" class="tl-title-override w-full text-xs px-1.5 py-1 border border-gray-300 rounded" value="@row.TitleOverride" placeholder="override" /></td>
+                        <td class="px-2 py-2"><input type="number" class="tl-duration w-16 text-xs px-1.5 py-1 border border-gray-300 rounded" value="@row.DurationOverrideSeconds" /></td>
+                        <td class="px-2 py-2 text-center">
+                            <input type="checkbox" class="tl-bonus rounded border-gray-300 text-blue-600" @(row.IsBonus ? "checked" : "") />
+                        </td>
+                        <td class="px-2 py-2 text-end">
+                            <button type="button" class="tl-save text-blue-600 hover:text-blue-800 text-xs me-2" data-id="@row.AlbumTrackId"><i class="fas fa-save"></i></button>
+                            <button type="button" class="tl-remove text-red-600 hover:text-red-800 text-xs" data-id="@row.AlbumTrackId"><i class="fas fa-trash-alt"></i></button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Add existing track -->
+    <div class="flex flex-wrap items-end gap-2 mb-2">
+        <div class="flex-1 min-w-[200px]">
+            <label class="block text-xs font-medium text-gray-600 mb-1">Add existing track</label>
+            <select class="tl-track-option w-full text-xs px-2 py-1.5 border border-gray-300 rounded">
+                <option value="">-- Select track --</option>
+                @foreach (var option in Model.AvailableTracks)
+                {
+                    <option value="@option.TrackId">@option.Title</option>
+                }
+            </select>
+        </div>
+        <div class="w-20">
+            <label class="block text-xs font-medium text-gray-600 mb-1">Disc</label>
+            <input type="number" class="tl-new-disc w-full text-xs px-2 py-1.5 border border-gray-300 rounded" value="1" />
+        </div>
+        <div class="w-20">
+            <label class="block text-xs font-medium text-gray-600 mb-1">#</label>
+            <input type="number" class="tl-new-no w-full text-xs px-2 py-1.5 border border-gray-300 rounded" value="0" placeholder="auto" />
+        </div>
+        <button type="button" class="tl-add-existing px-3 py-1.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+            <i class="fas fa-plus"></i> Add
+        </button>
+    </div>
+
+    <!-- Create inline -->
+    <details class="tl-create-inline mb-2">
+        <summary class="cursor-pointer text-xs text-blue-600 hover:text-blue-800">+ Create new track inline</summary>
+        <div class="flex flex-wrap items-end gap-2 mt-2">
+            <div class="flex-1 min-w-[200px]">
+                <label class="block text-xs font-medium text-gray-600 mb-1">Title</label>
+                <input type="text" class="tl-new-title w-full text-xs px-2 py-1.5 border border-gray-300 rounded" />
+            </div>
+            <div class="w-20">
+                <label class="block text-xs font-medium text-gray-600 mb-1">Disc</label>
+                <input type="number" class="tl-new-disc-inline w-full text-xs px-2 py-1.5 border border-gray-300 rounded" value="1" />
+            </div>
+            <div class="w-20">
+                <label class="block text-xs font-medium text-gray-600 mb-1">#</label>
+                <input type="number" class="tl-new-no-inline w-full text-xs px-2 py-1.5 border border-gray-300 rounded" value="0" placeholder="auto" />
+            </div>
+            <div class="w-24">
+                <label class="block text-xs font-medium text-gray-600 mb-1">Dur. (s)</label>
+                <input type="number" class="tl-new-duration w-full text-xs px-2 py-1.5 border border-gray-300 rounded" />
+            </div>
+            <button type="button" class="tl-create px-3 py-1.5 text-xs bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">
+                <i class="fas fa-plus"></i> Create
+            </button>
+        </div>
+    </details>
+
+    <div class="tl-error mt-2 hidden">
+        <p class="text-xs text-red-600 bg-red-50 border border-red-200 rounded px-2 py-1.5"></p>
+    </div>
+</div>
+
+<script>
+    (function () {
+        var editor = document.getElementById('@editorId');
+        if (!editor) return;
+
+        var albumId = editor.dataset.albumId;
+
+        function token() {
+            var el = document.querySelector('input[name="__RequestVerificationToken"]');
+            return el ? el.value : '';
+        }
+
+        function showError(msg) {
+            var box = editor.querySelector('.tl-error');
+            box.querySelector('p').textContent = msg;
+            box.classList.remove('hidden');
+        }
+
+        function post(url, data, done) {
+            var form = new FormData();
+            Object.keys(data).forEach(function (k) { form.append(k, data[k]); });
+            form.append('__RequestVerificationToken', token());
+            fetch(url, { method: 'POST', body: form })
+                .then(function (r) { return r.json(); })
+                .then(function (result) {
+                    if (result.success) { location.reload(); }
+                    else { showError((result.errors || []).join(', ')); }
+                })
+                .catch(function () { showError('Request failed. Please try again.'); });
+        }
+
+        editor.querySelector('.tl-add-existing').addEventListener('click', function () {
+            var option = editor.querySelector('.tl-track-option');
+            if (!option.value) { showError('Select a track first.'); return; }
+            post('/admin/album-tracklist/add-existing', {
+                albumId: albumId,
+                trackId: option.value,
+                discNumber: editor.querySelector('.tl-new-disc').value || '1',
+                trackNumber: editor.querySelector('.tl-new-no').value || '0',
+                isBonus: 'false'
+            });
+        });
+
+        editor.querySelector('.tl-create').addEventListener('click', function () {
+            var title = editor.querySelector('.tl-new-title').value.trim();
+            if (!title) { showError('Track title is required.'); return; }
+            post('/admin/album-tracklist/create-inline', {
+                albumId: albumId,
+                title: title,
+                discNumber: editor.querySelector('.tl-new-disc-inline').value || '1',
+                trackNumber: editor.querySelector('.tl-new-no-inline').value || '0',
+                durationSeconds: editor.querySelector('.tl-new-duration').value || '',
+                isBonus: 'false'
+            });
+        });
+
+        editor.querySelectorAll('.tl-save').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var row = btn.closest('tr');
+                post('/admin/album-tracklist/update', {
+                    albumTrackId: row.dataset.albumTrackId,
+                    discNumber: row.querySelector('.tl-disc').value || '1',
+                    trackNumber: row.querySelector('.tl-track-no').value || '0',
+                    titleOverride: row.querySelector('.tl-title-override').value,
+                    durationOverrideSeconds: row.querySelector('.tl-duration').value || '',
+                    isBonus: row.querySelector('.tl-bonus').checked ? 'true' : 'false',
+                    isHidden: 'false'
+                });
+            });
+        });
+
+        editor.querySelectorAll('.tl-remove').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                if (!confirm('Remove this track from the album?')) return;
+                var form = new FormData();
+                form.append('__RequestVerificationToken', token());
+                fetch('/admin/album-tracklist/remove/' + btn.dataset.id, { method: 'POST', body: form })
+                    .then(function (r) { return r.json(); })
+                    .then(function (result) {
+                        if (result.success) { location.reload(); }
+                        else { showError((result.errors || []).join(', ')); }
+                    });
+            });
+        });
+
+        editor.querySelectorAll('.tl-move-up, .tl-move-down').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var direction = btn.classList.contains('tl-move-up') ? 'up' : 'down';
+                var form = new FormData();
+                form.append('__RequestVerificationToken', token());
+                fetch('/admin/album-tracklist/move/' + btn.dataset.id + '/' + direction, { method: 'POST', body: form })
+                    .then(function (r) { return r.json(); })
+                    .then(function (result) {
+                        if (result.success) { location.reload(); }
+                        else { showError((result.errors || []).join(', ')); }
+                    });
+            });
+        });
+    })();
+</script>

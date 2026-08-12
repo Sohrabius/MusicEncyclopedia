@@ -32,4 +32,32 @@ public static class SqlDialect
     {
         return $"CAST({column} AS TEXT)";
     }
+
+    /// <summary>
+    /// Returns true when <paramref name="connection"/> is a SQLite connection.
+    /// The registered <see cref="System.Data.IDbConnection"/> type is chosen
+    /// in Program.cs based on the configured provider, so the concrete type
+    /// reliably identifies the dialect.
+    /// </summary>
+    public static bool IsSqliteConnection(System.Data.IDbConnection connection)
+    {
+        return connection is not null && connection.GetType().Name == "SqliteConnection";
+    }
+
+    /// <summary>
+    /// Returns a pagination clause for the given dialect:
+    /// SQL Server uses OFFSET/FETCH NEXT, SQLite uses LIMIT/OFFSET.
+    /// </summary>
+    /// <param name="isSqlite">True for SQLite, false for SQL Server.</param>
+    /// <param name="offsetParam">Name of the offset parameter.</param>
+    /// <param name="pageSizeParam">Name of the page-size parameter.</param>
+    public static string Pagination(
+        bool isSqlite,
+        string offsetParam = "@Offset",
+        string pageSizeParam = "@PageSize")
+    {
+        return isSqlite
+            ? $"LIMIT {pageSizeParam} OFFSET {offsetParam}"
+            : $"OFFSET {offsetParam} ROWS FETCH NEXT {pageSizeParam} ROWS ONLY";
+    }
 }

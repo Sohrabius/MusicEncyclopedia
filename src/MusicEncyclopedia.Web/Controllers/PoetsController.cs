@@ -13,7 +13,7 @@ namespace MusicEncyclopedia.Web.Controllers;
 /// A poet is a Person with PersonKind = "poet".
 /// Spec references: 8.1 (routes), 9.11 (detail page)
 /// </summary>
-[Route("{culture:regex(^(fa)$)}/poets")]
+[Route("{culture:regex(^(fa|en|ar|fr)$)}/poets")]
 public sealed class PoetsController : Controller
 {
     private readonly IPersonQueryService _personQueryService;
@@ -53,6 +53,7 @@ public sealed class PoetsController : Controller
             page,
             pageSize: 24,
             q: q,
+            personType: "POET",
             cancellationToken: cancellationToken);
 
         var viewModel = new PoetListViewModel

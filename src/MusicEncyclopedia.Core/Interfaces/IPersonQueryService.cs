@@ -16,6 +16,7 @@ public interface IPersonQueryService
         int pageSize = 24,
         string? sort = null,
         string? q = null,
+        string? personType = null,
         CancellationToken cancellationToken = default);
 
     /// <summary>

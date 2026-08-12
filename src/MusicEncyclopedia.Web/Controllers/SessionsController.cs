@@ -1,4 +1,5 @@
 using System.Data;
+using MusicEncyclopedia.Services.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Dapper;
 using MusicEncyclopedia.Web.ViewModels.Public;
@@ -10,7 +11,7 @@ namespace MusicEncyclopedia.Web.Controllers;
 /// Routes: /{culture}/sessions
 /// Spec reference: 9.14
 /// </summary>
-[Route("{culture:regex(^(fa)$)}/sessions")]
+[Route("{culture:regex(^(fa|en|ar|fr)$)}/sessions")]
 public sealed class SessionsController : Controller
 {
     private readonly IDbConnection _db;
@@ -55,7 +56,7 @@ public sealed class SessionsController : Controller
             LEFT JOIN Location l ON rs.LocationId = l.LocationId
             WHERE rs.IsDeleted = 0
             ORDER BY rs.StartDate DESC, rs.RecordingSessionId DESC
-            OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
+            " + SqlDialect.Pagination(SqlDialect.IsSqliteConnection(_db));
 
         var items = (await _db.QueryAsync<SessionListItemDto>(sql, new { Offset = offset, PageSize = pageSize })).ToList();
 

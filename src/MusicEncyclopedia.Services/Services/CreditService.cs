@@ -56,7 +56,6 @@ public sealed class CreditService : ICreditService
             LEFT JOIN Instrument AS i ON i.InstrumentId = c.InstrumentId
             WHERE c.EntityId = @EntityId
               AND et.Code = @EntityTypeCode
-              AND c.IsDeleted = 0
             ORDER BY cr.DisplayOrder, c.DisplayOrder, p.FullName, co.Name
             """;
 
@@ -128,7 +127,6 @@ public sealed class CreditService : ICreditService
             WHERE c.EntityId = @EntityId
               AND et.Code = @EntityTypeCode
               AND cr.Code = 'MUSICIAN'
-              AND c.IsDeleted = 0
             ORDER BY c.DisplayOrder, p.FullName, i.Name
             """;
 

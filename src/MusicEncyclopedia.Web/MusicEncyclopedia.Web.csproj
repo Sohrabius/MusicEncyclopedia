@@ -4,6 +4,8 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <!-- SharedResources.cs is the strongly-typed accessor; keep the SDK from generating one too -->
+    <GenerateResxSource>false</GenerateResxSource>
   </PropertyGroup>
 
   <ItemGroup>
@@ -38,6 +40,27 @@
     <ProjectReference Include="..\MusicEncyclopedia.Services\MusicEncyclopedia.Services.csproj" />
     <ProjectReference Include="..\MusicEncyclopedia.Search\MusicEncyclopedia.Search.csproj" />
     <ProjectReference Include="..\MusicEncyclopedia.Media\MusicEncyclopedia.Media.csproj" />
+  </ItemGroup>
+
+  <!--
+    Explicit manifest names for the shared UI resources. With ResourcesPath = "Resources",
+    IStringLocalizer&lt;SharedResources&gt; (class in the root MusicEncyclopedia.Web namespace)
+    computes the base name MusicEncyclopedia.Web.Resources.SharedResources. The LogicalName
+    below guarantees the embedded manifests (incl. satellites) match exactly.
+  -->
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\SharedResources.resx">
+      <LogicalName>MusicEncyclopedia.Web.Resources.SharedResources.resources</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\SharedResources.fa.resx">
+      <LogicalName>MusicEncyclopedia.Web.Resources.SharedResources.fa.resources</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\SharedResources.ar.resx">
+      <LogicalName>MusicEncyclopedia.Web.Resources.SharedResources.ar.resources</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\SharedResources.fr.resx">
+      <LogicalName>MusicEncyclopedia.Web.Resources.SharedResources.fr.resources</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

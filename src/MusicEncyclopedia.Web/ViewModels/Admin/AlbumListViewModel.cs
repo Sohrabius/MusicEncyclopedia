@@ -19,4 +19,9 @@ public sealed class AlbumListViewModel
 
     /// <summary>Number of items per page.</summary>
     public int PageSize { get; init; } = 20;
+
+    /// <summary>
+    /// True when the list is showing soft-deleted albums (restore mode).
+    /// </summary>
+    public bool Deleted { get; init; }
 }

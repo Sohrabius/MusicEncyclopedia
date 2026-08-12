@@ -316,7 +316,7 @@ public sealed class AdvancedApiController : BaseApiController
                 a.Slug,
                 a.Name,
                 a.Description,
-                a.OrganizationName,
+                a.Organization AS OrganizationName,
                 c.Name AS CountryName
             FROM Award a
             LEFT JOIN Country c ON c.CountryId = a.CountryId
@@ -348,7 +348,7 @@ public sealed class AdvancedApiController : BaseApiController
                 a.Slug,
                 a.Name,
                 a.Description,
-                a.OrganizationName,
+                a.Organization AS OrganizationName,
                 c.Name AS CountryName
             FROM Award a
             LEFT JOIN Country c ON c.CountryId = a.CountryId
@@ -392,8 +392,7 @@ public sealed class AdvancedApiController : BaseApiController
                 c.Slug,
                 c.Name,
                 c.Description,
-                c.LevelName,
-                c.MinimumUnits,
+                c.Organization AS OrganizationName,
                 co.Name AS CountryName
             FROM Certification c
             LEFT JOIN Country co ON co.CountryId = c.CountryId
@@ -438,8 +437,8 @@ public sealed class AdvancedApiController : BaseApiController
                 c.Slug,
                 c.Name,
                 c.Description,
-                c.PublisherName,
-                c.FrequencyName,
+                c.Publisher AS PublisherName,
+                c.Frequency AS FrequencyName,
                 co.Name AS CountryName
             FROM Chart c
             LEFT JOIN Country co ON co.CountryId = c.CountryId
@@ -471,8 +470,8 @@ public sealed class AdvancedApiController : BaseApiController
                 c.Slug,
                 c.Name,
                 c.Description,
-                c.PublisherName,
-                c.FrequencyName,
+                c.Publisher AS PublisherName,
+                c.Frequency AS FrequencyName,
                 co.Name AS CountryName
             FROM Chart c
             LEFT JOIN Country co ON co.CountryId = c.CountryId
@@ -515,9 +514,10 @@ public sealed class AdvancedApiController : BaseApiController
                 ce.Position,
                 ce.PreviousPosition,
                 ce.WeeksOnChart,
-                ce.EntityTypeCode,
+                et.Code AS EntityTypeCode,
                 ce.EntityId
             FROM ChartEntry ce
+            INNER JOIN EntityType et ON et.EntityTypeId = ce.EntityTypeId
             WHERE ce.ChartId = @ChartId
             ORDER BY ce.Date DESC, ce.Position
             OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";

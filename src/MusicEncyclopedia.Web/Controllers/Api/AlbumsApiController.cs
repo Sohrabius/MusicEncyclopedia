@@ -211,11 +211,12 @@ public sealed class AlbumsApiController : BaseApiController
                 a.Slug,
                 a.Title,
                 a.ReleaseDate,
-                a.CoverUrl,
+                m.Url AS CoverUrl,
                 art.Name AS RelationType
             FROM AlbumRelation ar
             INNER JOIN Album a ON a.AlbumId = ar.RelatedAlbumId
             LEFT JOIN AlbumRelationType art ON art.AlbumRelationTypeId = ar.AlbumRelationTypeId
+            LEFT JOIN Media m ON m.MediaId = a.CoverMediaId
             WHERE ar.AlbumId = @AlbumId AND a.IsDeleted = 0
             UNION
             SELECT
@@ -223,11 +224,12 @@ public sealed class AlbumsApiController : BaseApiController
                 a.Slug,
                 a.Title,
                 a.ReleaseDate,
-                a.CoverUrl,
+                m.Url AS CoverUrl,
                 art.Name AS RelationType
             FROM AlbumRelation ar
             INNER JOIN Album a ON a.AlbumId = ar.AlbumId
             LEFT JOIN AlbumRelationType art ON art.AlbumRelationTypeId = ar.AlbumRelationTypeId
+            LEFT JOIN Media m ON m.MediaId = a.CoverMediaId
             WHERE ar.RelatedAlbumId = @AlbumId AND a.IsDeleted = 0";
 
         await using var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));

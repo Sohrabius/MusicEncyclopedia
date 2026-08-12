@@ -1,6 +1,7 @@
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
+using MusicEncyclopedia.Core.Constants;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -21,7 +22,7 @@ public static class MvcBuilderExtensions
         this IServiceCollection services,
         string[]? supportedCultures = null)
     {
-        supportedCultures ??= ["fa"];
+        supportedCultures ??= CultureConstants.SupportedCultures.ToArray();
 
         // Configure localization services
         services.AddLocalization(options =>
@@ -46,10 +47,13 @@ public static class MvcBuilderExtensions
 
         // Add controllers with views and localization
         var mvcBuilder = services
-            .AddControllersWithViews(options =>
+            .AddControllersWithViews(            options =>
             {
                 // Apply culture validation filter globally
                 options.Filters.Add<MusicEncyclopedia.Web.Filters.CultureValidationFilter>();
+
+                // Record admin write operations to the audit log
+                options.Filters.Add<MusicEncyclopedia.Web.Filters.AuditLogFilter>();
             })
             .AddViewLocalization()
             .AddDataAnnotationsLocalization();
@@ -68,7 +72,7 @@ public static class MvcBuilderExtensions
         // Default localized route
         app.MapControllerRoute(
             name: "localized-default",
-            pattern: "{culture:regex(^(fa)$)}/{controller=Home}/{action=Index}/{id?}");
+            pattern: "{culture:regex(^(fa|en|ar|fr)$)}/{controller=Home}/{action=Index}/{id?}");
 
         // Fallback route (no culture prefix — redirects or uses default)
         app.MapControllerRoute(

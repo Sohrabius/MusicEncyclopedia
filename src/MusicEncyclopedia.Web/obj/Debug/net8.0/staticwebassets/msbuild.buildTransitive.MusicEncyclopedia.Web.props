@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\buildMultiTargeting\MusicEncyclopedia.Web.props" />
-</Project>

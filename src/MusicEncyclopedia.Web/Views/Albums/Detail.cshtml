@@ -321,7 +321,7 @@
         {
             <section class="detail-section">
                 <h2 class="detail-section__title">@Localizer["Awards & Nominations"]</h2>
-                @foreach (var award in album.Awards.OrderByDescending(a => a.AwardDate))
+                @foreach (var award in album.Awards.OrderByDescending(a => a.Year))
                 {
                     <div class="track-row">
                         <div class="track-row__num" style="background: var(--color-accent); color: var(--color-accent-ink);">
@@ -338,7 +338,7 @@
                                 }
                             </div>
                             <div class="track-row__artist">
-                                @if (award.AwardDate.HasValue) { <span>@award.AwardDate.Value.ToString("yyyy")</span> }
+                                @if (award.Year.HasValue) { <span>@award.Year</span> }
                                 @if (!string.IsNullOrWhiteSpace(award.Result))
                                 {
                                     <span style="color: @(award.Result == "Winner" ? "var(--color-success)" : "var(--color-ink-3)");"> · @award.Result</span>

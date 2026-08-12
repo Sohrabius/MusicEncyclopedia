@@ -12,7 +12,7 @@ namespace MusicEncyclopedia.Web.Controllers;
 /// Route: /{culture}/search
 /// Spec reference: 8.1 (routes), 9.21 (search page)
 /// </summary>
-[Route("{culture:regex(^(fa)$)}/search")]
+[Route("{culture:regex(^(fa|en|ar|fr)$)}/search")]
 public sealed class SearchController : Controller
 {
     private readonly ISearchService _searchService;
