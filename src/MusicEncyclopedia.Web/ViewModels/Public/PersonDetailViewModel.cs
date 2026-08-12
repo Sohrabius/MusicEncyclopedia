@@ -1,23 +1,27 @@
+using MusicEncyclopedia.Core.DTOs;
+
 namespace MusicEncyclopedia.Web.ViewModels.Public;
 
 /// <summary>
 /// View model for the person detail page (9.6).
-/// The Person property is dynamic because the service returns object?
-/// (the concrete PersonDetailDto lives in the services layer).
+/// Carries the typed detail DTO plus the active discography / contribution filters.
 /// </summary>
 public sealed class PersonDetailViewModel
 {
-    /// <summary>
-    /// The full person detail data from the service.
-    /// Properties expected: FullName, OriginalName, EnglishName, PersonKind,
-    /// Nationality, BirthDate, DeathDate, BirthPlace, DeathPlace,
-    /// Biography, ImageUrl, Instruments, Roles, Timeline, Media,
-    /// Links, Aliases, Tags, Citations
-    /// </summary>
-    public required dynamic Person { get; init; }
+    public required PersonDetailDto Person { get; init; }
 
-    /// <summary>
-    /// The current culture for URL generation.
-    /// </summary>
+    /// <summary>The current culture for URL generation.</summary>
     public string Culture { get; init; } = "fa";
+
+    // ── Active discography filters (4.2) ──
+    public string? AlbumCategory { get; init; }
+    public int? AlbumYear { get; init; }
+    public string? AlbumRole { get; init; }
+    public string? AlbumInstrument { get; init; }
+
+    // ── Active track contribution filters (4.2) ──
+    public string? ContributionRole { get; init; }
+    public string? ContributionInstrument { get; init; }
+    public string? ContributionAlbum { get; init; }
+    public string? ContributionGenre { get; init; }
 }

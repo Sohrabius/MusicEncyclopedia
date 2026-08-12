@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MusicEncyclopedia.Core.Constants;
 using MusicEncyclopedia.Core.DTOs;
+using MusicEncyclopedia.Core.Infrastructure;
 using MusicEncyclopedia.Core.Interfaces;
 using MusicEncyclopedia.Services.Infrastructure;
 
@@ -16,13 +17,16 @@ public sealed class AlbumQueryService : IAlbumQueryService
     private readonly bool _isSqlite;
     private readonly ILogger<AlbumQueryService> _logger;
     private readonly IContentLocalizationService _localizationService;
+    private readonly ICacheService _cache;
 
     public AlbumQueryService(
         IConfiguration configuration,
         ILogger<AlbumQueryService> logger,
-        IContentLocalizationService localizationService)
+        IContentLocalizationService localizationService,
+        ICacheService cache)
     {
         _localizationService = localizationService;
+        _cache = cache;
 
         var dbProvider = configuration.GetValue<string>("DatabaseProvider") ?? "SqlServer";
         _isSqlite = string.Equals(dbProvider, "Sqlite", StringComparison.OrdinalIgnoreCase);
@@ -56,6 +60,38 @@ public sealed class AlbumQueryService : IAlbumQueryService
         page = Math.Max(1, page);
         pageSize = Math.Clamp(pageSize, 1, 100);
 
+        try
+        {
+            var cacheKey = CacheKeys.List("album", culture, page, pageSize, sort, category, genre, mood, q);
+
+            var cached = await _cache.GetAsync<PagedResult<AlbumListItemDto>>(cacheKey, cancellationToken);
+            if (cached is not null)
+                return cached;
+
+            var result = await LoadAlbumsCoreAsync(
+                culture, page, pageSize, sort, category, genre, mood, q, cancellationToken);
+
+            await _cache.SetAsync(cacheKey, result, CacheKeys.ListDuration, cancellationToken);
+            return result;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to load album list for culture={Culture}, page={Page}", culture, page);
+            return PagedResult<AlbumListItemDto>.Create([], page, pageSize, 0);
+        }
+    }
+
+    private async Task<PagedResult<AlbumListItemDto>> LoadAlbumsCoreAsync(
+        string culture,
+        int page,
+        int pageSize,
+        string? sort,
+        string? category,
+        string? genre,
+        string? mood,
+        string? q,
+        CancellationToken cancellationToken)
+    {
         var whereClauses = new List<string> { "a.IsDeleted = 0" };
         var parameters = new DynamicParameters();
 
@@ -128,34 +164,54 @@ public sealed class AlbumQueryService : IAlbumQueryService
         parameters.Add("Offset", (page - 1) * pageSize);
         parameters.Add("PageSize", pageSize);
 
-        try
+        using var connection = CreateConnection();
+        connection.Open();
+
+        var totalItems = await connection.ExecuteScalarAsync<int>(countSql, parameters);
+
+        var albumItems = (await connection.QueryAsync<AlbumListItemDto>(dataSql, parameters)).AsList();
+
+        // Spec 7.3: overlay localized titles on list cards (base culture skips).
+        if (LocalizationHelper.ShouldLocalize(culture))
         {
-            using var connection = CreateConnection();
-            connection.Open();
-
-            var totalItems = await connection.ExecuteScalarAsync<int>(countSql, parameters);
-
-            var albumItems = (await connection.QueryAsync<AlbumListItemDto>(dataSql, parameters)).AsList();
-
-            // Spec 7.3: overlay localized titles on list cards (base culture skips).
-            if (LocalizationHelper.ShouldLocalize(culture))
-            {
-                await LocalizeAlbumListAsync(albumItems, culture, cancellationToken);
-            }
-
-            return PagedResult<AlbumListItemDto>.Create(albumItems, page, pageSize, totalItems);
+            await LocalizeAlbumListAsync(albumItems, culture, cancellationToken);
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to load album list for culture={Culture}, page={Page}", culture, page);
-            return PagedResult<AlbumListItemDto>.Create([], page, pageSize, 0);
-        }
+
+        return PagedResult<AlbumListItemDto>.Create(albumItems, page, pageSize, totalItems);
     }
 
     public async Task<AlbumDetailDto?> GetAlbumBySlugAsync(
         string slug,
         string culture,
         CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var cacheKey = CacheKeys.Detail("album", culture, slug);
+
+            var cached = await _cache.GetAsync<AlbumDetailDto>(cacheKey, cancellationToken);
+            if (cached is not null)
+                return cached;
+
+            var result = await LoadAlbumDetailCoreAsync(slug, culture, cancellationToken);
+            if (result is not null)
+            {
+                await _cache.SetAsync(cacheKey, result, CacheKeys.DetailDuration, cancellationToken);
+            }
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to load album by slug={Slug}, culture={Culture}", slug, culture);
+            return null;
+        }
+    }
+
+    private async Task<AlbumDetailDto?> LoadAlbumDetailCoreAsync(
+        string slug,
+        string culture,
+        CancellationToken cancellationToken)
     {
         const string albumSql = @"
             SELECT
@@ -216,9 +272,13 @@ public sealed class AlbumQueryService : IAlbumQueryService
                 var awards = await GetEntityAwardsAsync(connection, entityId, cancellationToken);
                 var certifications = await GetEntityCertificationsAsync(connection, entityId, cancellationToken);
                 var chartEntries = await GetEntityChartEntriesAsync(connection, entityId, cancellationToken);
+                var relatedAlbums = await GetAlbumRelationsAsync(connection, albumId, cancellationToken);
+                var sessions = await GetAlbumRecordingSessionsAsync(connection, albumId, cancellationToken);
+                var events = await GetAlbumPerformanceEventsAsync(connection, albumId, cancellationToken);
 
                 result = CreateAlbumDetail(album, tracks, credits, genres, moods, languages, countries,
-                    companies, identifiers, media, links, aliases, tags, citations, awards, certifications, chartEntries);
+                    companies, identifiers, media, links, aliases, tags, citations, awards, certifications,
+                    chartEntries, relatedAlbums, sessions, events);
             }
             else
             {
@@ -238,18 +298,23 @@ public sealed class AlbumQueryService : IAlbumQueryService
                 var awardsTask = GetEntityAwardsAsync(connection, entityId, cancellationToken);
                 var certificationsTask = GetEntityCertificationsAsync(connection, entityId, cancellationToken);
                 var chartEntriesTask = GetEntityChartEntriesAsync(connection, entityId, cancellationToken);
+                var relatedAlbumsTask = GetAlbumRelationsAsync(connection, albumId, cancellationToken);
+                var sessionsTask = GetAlbumRecordingSessionsAsync(connection, albumId, cancellationToken);
+                var eventsTask = GetAlbumPerformanceEventsAsync(connection, albumId, cancellationToken);
 
                 await Task.WhenAll(
                     tracksTask, creditsTask, genresTask, moodsTask,
                     languagesTask, countriesTask, companiesTask, identifiersTask,
                     mediaTask, linksTask, aliasesTask, tagsTask, citationsTask,
-                    awardsTask, certificationsTask, chartEntriesTask);
+                    awardsTask, certificationsTask, chartEntriesTask,
+                    relatedAlbumsTask, sessionsTask, eventsTask);
 
                 result = CreateAlbumDetail(album, tracksTask.Result, creditsTask.Result, genresTask.Result,
                     moodsTask.Result, languagesTask.Result, countriesTask.Result,
                     companiesTask.Result, identifiersTask.Result, mediaTask.Result, linksTask.Result,
                     aliasesTask.Result, tagsTask.Result, citationsTask.Result, awardsTask.Result,
-                    certificationsTask.Result, chartEntriesTask.Result);
+                    certificationsTask.Result, chartEntriesTask.Result, relatedAlbumsTask.Result,
+                    sessionsTask.Result, eventsTask.Result);
             }
 
             // Spec 7.3: overlay localized text (requested → base → en → empty)
@@ -336,7 +401,10 @@ public sealed class AlbumQueryService : IAlbumQueryService
         IReadOnlyList<CitationDto> citations,
         IReadOnlyList<AwardAssignmentDto> awards,
         IReadOnlyList<CertificationAssignmentDto> certifications,
-        IReadOnlyList<ChartEntryDto> chartEntries)
+        IReadOnlyList<ChartEntryDto> chartEntries,
+        IReadOnlyList<AlbumRelationDto> relatedAlbums,
+        IReadOnlyList<RecordingSessionDto> sessions,
+        IReadOnlyList<PerformanceEventDto> events)
     {
         return new AlbumDetailDto
         {
@@ -369,7 +437,10 @@ public sealed class AlbumQueryService : IAlbumQueryService
             Citations = citations,
             Awards = awards,
             Certifications = certifications,
-            ChartEntries = chartEntries
+            ChartEntries = chartEntries,
+            RelatedAlbums = relatedAlbums,
+            RecordingSessions = sessions,
+            PerformanceEvents = events
         };
     }
 
@@ -550,6 +621,96 @@ public sealed class AlbumQueryService : IAlbumQueryService
             ORDER BY it.Name
             ";
         var results = await connection.QueryAsync<IdentifierDto>(sql, new { AlbumId = albumId });
+        return results.AsList();
+    }
+
+    private static async Task<IReadOnlyList<AlbumRelationDto>> GetAlbumRelationsAsync(
+        IDbConnection connection,
+        int albumId,
+        CancellationToken cancellationToken)
+    {
+        const string sql = @"
+            SELECT
+                ar.AlbumRelationId,
+                a.AlbumId AS RelatedAlbumId,
+                a.Slug,
+                a.Title,
+                a.ReleaseDate,
+                m.Url AS CoverUrl,
+                art.Name AS RelationName,
+                art.Code AS RelationCode
+            FROM AlbumRelation ar
+            INNER JOIN Album a ON a.AlbumId = ar.RelatedAlbumId
+            LEFT JOIN AlbumRelationType art ON art.AlbumRelationTypeId = ar.AlbumRelationTypeId
+            LEFT JOIN Media m ON m.MediaId = a.CoverMediaId
+            WHERE ar.AlbumId = @AlbumId AND a.IsDeleted = 0
+            UNION
+            SELECT
+                ar.AlbumRelationId,
+                a.AlbumId AS RelatedAlbumId,
+                a.Slug,
+                a.Title,
+                a.ReleaseDate,
+                m.Url AS CoverUrl,
+                art.Name AS RelationName,
+                art.Code AS RelationCode
+            FROM AlbumRelation ar
+            INNER JOIN Album a ON a.AlbumId = ar.AlbumId
+            LEFT JOIN AlbumRelationType art ON art.AlbumRelationTypeId = ar.AlbumRelationTypeId
+            LEFT JOIN Media m ON m.MediaId = a.CoverMediaId
+            WHERE ar.RelatedAlbumId = @AlbumId AND a.IsDeleted = 0
+            ORDER BY a.ReleaseDate DESC
+            ";
+        var results = await connection.QueryAsync<AlbumRelationDto>(sql, new { AlbumId = albumId });
+        return results.AsList();
+    }
+
+    private static async Task<IReadOnlyList<RecordingSessionDto>> GetAlbumRecordingSessionsAsync(
+        IDbConnection connection,
+        int albumId,
+        CancellationToken cancellationToken)
+    {
+        const string sql = @"
+            SELECT
+                rs.RecordingSessionId,
+                rs.Slug,
+                rs.StartDate,
+                rs.EndDate,
+                st.Name AS SessionTypeName,
+                l.Name AS LocationName,
+                rs.Notes
+            FROM RecordingSession rs
+            INNER JOIN RecordingSessionAlbum rsa ON rsa.RecordingSessionId = rs.RecordingSessionId
+            LEFT JOIN SessionType st ON st.SessionTypeId = rs.SessionTypeId
+            LEFT JOIN Location l ON l.LocationId = rs.LocationId
+            WHERE rsa.AlbumId = @AlbumId AND rs.IsDeleted = 0
+            ORDER BY rs.StartDate DESC
+            ";
+        var results = await connection.QueryAsync<RecordingSessionDto>(sql, new { AlbumId = albumId });
+        return results.AsList();
+    }
+
+    private static async Task<IReadOnlyList<PerformanceEventDto>> GetAlbumPerformanceEventsAsync(
+        IDbConnection connection,
+        int albumId,
+        CancellationToken cancellationToken)
+    {
+        const string sql = @"
+            SELECT
+                pe.PerformanceEventId,
+                pe.Slug,
+                pe.Date,
+                et.Name AS EventTypeName,
+                l.Name AS LocationName,
+                pe.PerformanceNotes
+            FROM PerformanceEvent pe
+            INNER JOIN PerformanceEventAlbum pea ON pea.PerformanceEventId = pe.PerformanceEventId
+            LEFT JOIN EventType et ON et.EventTypeId = pe.EventTypeId
+            LEFT JOIN Location l ON l.LocationId = pe.LocationId
+            WHERE pea.AlbumId = @AlbumId AND pe.IsDeleted = 0
+            ORDER BY pe.Date DESC
+            ";
+        var results = await connection.QueryAsync<PerformanceEventDto>(sql, new { AlbumId = albumId });
         return results.AsList();
     }
 

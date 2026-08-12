@@ -1,6 +1,8 @@
 using System.Data;
 using Dapper;
 using Microsoft.AspNetCore.Mvc;
+using MusicEncyclopedia.Core.Infrastructure;
+using MusicEncyclopedia.Core.Interfaces;
 using MusicEncyclopedia.Services.Infrastructure;
 using MusicEncyclopedia.Web.ViewModels;
 
@@ -15,11 +17,13 @@ public sealed class HomeController : Controller
 {
     private readonly IDbConnection _db;
     private readonly ILogger<HomeController> _logger;
+    private readonly ICacheService _cache;
 
-    public HomeController(IDbConnection db, ILogger<HomeController> logger)
+    public HomeController(IDbConnection db, ILogger<HomeController> logger, ICacheService cache)
     {
         _db = db;
         _logger = logger;
+        _cache = cache;
     }
 
     /// <summary>
@@ -31,8 +35,23 @@ public sealed class HomeController : Controller
     [Route("")]
     [Route("Home")]
     [Route("Home/Index")]
-    [ResponseCache(Duration = 300, Location = ResponseCacheLocation.Any, VaryByQueryKeys = ["*"])]
     public async Task<IActionResult> Index(string culture, CancellationToken cancellationToken = default)
+    {
+        // Spec §15.1 home cache key: home:{culture}. Only successful loads are cached.
+        var cacheKey = CacheKeys.Home(culture);
+        var cached = await _cache.GetAsync<HomeViewModel>(cacheKey, cancellationToken);
+        if (cached is not null)
+            return View(cached);
+
+        var viewModel = await LoadHomeViewModelAsync(culture, cancellationToken);
+
+        await _cache.SetAsync(cacheKey, viewModel, CacheKeys.HomeDuration, cancellationToken);
+        return View(viewModel);
+    }
+
+    private async Task<HomeViewModel> LoadHomeViewModelAsync(
+        string culture,
+        CancellationToken cancellationToken)
     {
         _logger.LogDebug("Home page requested for culture: {Culture}", culture);
 
@@ -199,7 +218,7 @@ public sealed class HomeController : Controller
             _logger.LogError(ex, "Failed to load home page content for culture={Culture}", culture);
         }
 
-        return View(viewModel);
+        return viewModel;
     }
 
     /// <summary>

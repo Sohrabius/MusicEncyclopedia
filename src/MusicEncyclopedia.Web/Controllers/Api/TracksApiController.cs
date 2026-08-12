@@ -13,18 +13,15 @@ namespace MusicEncyclopedia.Web.Controllers.Api;
 public sealed class TracksApiController : BaseApiController
 {
     private readonly ITrackQueryService _trackQueryService;
-    private readonly ICacheService _cache;
     private readonly IConfiguration _configuration;
     private readonly ILogger<TracksApiController> _logger;
 
     public TracksApiController(
         ITrackQueryService trackQueryService,
-        ICacheService cache,
         IConfiguration configuration,
         ILogger<TracksApiController> logger)
     {
         _trackQueryService = trackQueryService;
-        _cache = cache;
         _configuration = configuration;
         _logger = logger;
     }

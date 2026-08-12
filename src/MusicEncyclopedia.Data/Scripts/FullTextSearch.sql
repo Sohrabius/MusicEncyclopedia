@@ -174,3 +174,64 @@ BEGIN
     WITH (CHANGE_TRACKING AUTO);
 END
 GO
+
+-- Publication
+IF NOT EXISTS (SELECT * FROM sys.fulltext_indexes WHERE object_id = OBJECT_ID('dbo.Publication'))
+BEGIN
+    CREATE FULLTEXT INDEX ON dbo.Publication (
+        Title LANGUAGE 1033
+    )
+    KEY INDEX PK_Publication
+    ON MusicEncyclopediaCatalog
+    WITH (CHANGE_TRACKING AUTO);
+END
+GO
+
+-- Location
+IF NOT EXISTS (SELECT * FROM sys.fulltext_indexes WHERE object_id = OBJECT_ID('dbo.Location'))
+BEGIN
+    CREATE FULLTEXT INDEX ON dbo.Location (
+        Name LANGUAGE 1033
+    )
+    KEY INDEX PK_Location
+    ON MusicEncyclopediaCatalog
+    WITH (CHANGE_TRACKING AUTO);
+END
+GO
+
+-- RecordingSession (searchable via session notes)
+IF NOT EXISTS (SELECT * FROM sys.fulltext_indexes WHERE object_id = OBJECT_ID('dbo.RecordingSession'))
+BEGIN
+    CREATE FULLTEXT INDEX ON dbo.RecordingSession (
+        Notes LANGUAGE 1033
+    )
+    KEY INDEX PK_RecordingSession
+    ON MusicEncyclopediaCatalog
+    WITH (CHANGE_TRACKING AUTO);
+END
+GO
+
+-- PerformanceEvent (searchable via performance notes)
+IF NOT EXISTS (SELECT * FROM sys.fulltext_indexes WHERE object_id = OBJECT_ID('dbo.PerformanceEvent'))
+BEGIN
+    CREATE FULLTEXT INDEX ON dbo.PerformanceEvent (
+        PerformanceNotes LANGUAGE 1033
+    )
+    KEY INDEX PK_PerformanceEvent
+    ON MusicEncyclopediaCatalog
+    WITH (CHANGE_TRACKING AUTO);
+END
+GO
+
+-- Source
+IF NOT EXISTS (SELECT * FROM sys.fulltext_indexes WHERE object_id = OBJECT_ID('dbo.Source'))
+BEGIN
+    CREATE FULLTEXT INDEX ON dbo.Source (
+        Title LANGUAGE 1033,
+        Author LANGUAGE 1033
+    )
+    KEY INDEX PK_Source
+    ON MusicEncyclopediaCatalog
+    WITH (CHANGE_TRACKING AUTO);
+END
+GO

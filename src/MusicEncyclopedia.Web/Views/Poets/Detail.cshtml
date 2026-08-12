@@ -207,37 +207,114 @@
             }
 
             <!-- ============================================================
-                 3. Timeline
+                 3. Timeline (4.1) — shared person career timeline
                  ============================================================ -->
             @if (timeline.Count > 0)
             {
                 <section>
                     <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["Timeline"]</h2>
-                    <div class="space-y-4">
-                        @foreach (var entry in timeline)
-                        {
-                            string? entryTitle = null;
-                            string? entryDate = null;
-                            string? entryType = null;
-                            try { entryTitle = (string?)entry.Title ?? (string?)entry.Name; } catch { }
-                            try { entryDate = (string?)entry.Date?.ToString() ?? (string?)entry.Year?.ToString(); } catch { }
-                            try { entryType = (string?)entry.Type ?? (string?)entry.EventType; } catch { }
+                    <div class="relative">
+                        <div class="absolute top-0 bottom-0 start-4 w-px bg-gray-200" aria-hidden="true"></div>
+                        <ul class="space-y-4">
+                            @foreach (var entry in timeline)
+                            {
+                                string? entryTitle = null;
+                                string? entryType = null;
+                                string? entryRoute = null;
+                                string? entrySlug = null;
+                                string? entryDetail = null;
+                                DateTime? entryDate = null;
+                                int? entryYear = null;
+                                try { entryTitle = (string?)entry.Title ?? (string?)entry.Name; } catch { }
+                                try { entryType = (string?)entry.Type ?? (string?)entry.EventType; } catch { }
+                                try { entryRoute = (string?)entry.RouteName; } catch { }
+                                try { entrySlug = (string?)entry.Slug; } catch { }
+                                try { entryDetail = (string?)entry.Detail; } catch { }
+                                try { entryDate = (DateTime?)entry.Date; } catch { }
+                                try { entryYear = (int?)entry.Year; } catch { }
 
-                            <div class="border-s-2 border-amber-300 ps-4 py-1">
-                                @if (!string.IsNullOrWhiteSpace(entryDate))
+                                var badgeClass = entryType switch
                                 {
-                                    <span class="text-xs text-amber-600 font-medium">@entryDate</span>
-                                }
-                                @if (!string.IsNullOrWhiteSpace(entryTitle))
+                                    "AlbumRelease" => "bg-emerald-50 text-emerald-700",
+                                    "TrackRelease" => "bg-teal-50 text-teal-700",
+                                    "RecordingSession" => "bg-indigo-50 text-indigo-700",
+                                    "PerformanceEvent" => "bg-rose-50 text-rose-700",
+                                    "Award" => "bg-amber-50 text-amber-700",
+                                    "ChartEntry" => "bg-sky-50 text-sky-700",
+                                    "Publication" => "bg-violet-50 text-violet-700",
+                                    _ => "bg-gray-100 text-gray-600"
+                                };
+                                var typeLabel = entryType switch
                                 {
-                                    <p class="text-sm text-gray-700 mt-0.5">@entryTitle</p>
-                                }
-                                @if (!string.IsNullOrWhiteSpace(entryType))
-                                {
-                                    <span class="text-xs text-gray-400">@entryType</span>
-                                }
-                            </div>
-                        }
+                                    "AlbumRelease" => Localizer["Album Release"].Value,
+                                    "TrackRelease" => Localizer["Track Release"].Value,
+                                    "RecordingSession" => Localizer["Recording Session"].Value,
+                                    "PerformanceEvent" => Localizer["Live Performance"].Value,
+                                    "Award" => Localizer["Award"].Value,
+                                    "ChartEntry" => Localizer["Chart Entry"].Value,
+                                    "Publication" => Localizer["Publication"].Value,
+                                    _ => entryType
+                                };
+                                var entryDateText = entryDate.HasValue
+                                    ? entryDate.Value.ToString("yyyy-MM-dd")
+                                    : entryYear.HasValue ? entryYear.Value.ToString() : null;
+                                var hasLink = !string.IsNullOrWhiteSpace(entryRoute) && !string.IsNullOrWhiteSpace(entrySlug);
+
+                                <li class="relative ps-10">
+                                    <span class="absolute start-0 top-1.5 flex h-8 w-8 items-center justify-center rounded-full bg-white border border-gray-200 shadow-sm" aria-hidden="true">
+                                        @switch (entryType)
+                                        {
+                                            case "AlbumRelease":
+                                                <text>&#128218;</text>
+                                                break;
+                                            case "TrackRelease":
+                                                <text>&#127925;</text>
+                                                break;
+                                            case "RecordingSession":
+                                                <text>&#127908;</text>
+                                                break;
+                                            case "PerformanceEvent":
+                                                <text>&#127897;</text>
+                                                break;
+                                            case "Award":
+                                                <text>&#127942;</text>
+                                                break;
+                                            case "ChartEntry":
+                                                <text>&#128200;</text>
+                                                break;
+                                            case "Publication":
+                                                <text>&#128214;</text>
+                                                break;
+                                            default:
+                                                <text>&#9679;</text>
+                                                break;
+                                        }
+                                    </span>
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        @if (!string.IsNullOrWhiteSpace(entryDateText))
+                                        {
+                                            <span class="text-xs font-semibold text-gray-500 tabular-nums">@entryDateText</span>
+                                        }
+                                        <span class="inline-block text-xs font-medium px-2 py-0.5 rounded-full @badgeClass">@typeLabel</span>
+                                    </div>
+                                    @if (hasLink)
+                                    {
+                                        <a href="/@culture/@entryRoute/@entrySlug"
+                                           class="mt-1 block text-sm font-medium text-gray-900 hover:text-blue-600 transition-colors">
+                                            @entryTitle
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <p class="mt-1 text-sm font-medium text-gray-900">@entryTitle</p>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(entryDetail))
+                                    {
+                                        <p class="text-xs text-gray-500 mt-0.5">@entryDetail</p>
+                                    }
+                                </li>
+                            }
+                        </ul>
                     </div>
                 </section>
             }

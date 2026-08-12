@@ -1,8 +1,11 @@
 using System.Data;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.EntityFrameworkCore;
 using HealthChecks.SqlServer;
 using Hangfire;
+using Hangfire.Dashboard;
 using Hangfire.SqlServer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
@@ -15,7 +18,9 @@ using MusicEncyclopedia.Data;
 using MusicEncyclopedia.Data.Seed;
 using MusicEncyclopedia.Web.Middleware;
 using MusicEncyclopedia.Web.Filters;
+using MusicEncyclopedia.Web.Jobs;
 using MusicEncyclopedia.Web.Security;
+using MusicEncyclopedia.Web.Seed;
 
 // ────────────────────────────────────────────────────────────────
 // Serilog Bootstrapping
@@ -230,6 +235,9 @@ try
             options.WorkerCount = Environment.ProcessorCount * 2;
             options.Queues = ["default", "media", "search"];
         });
+
+        // Recurring jobs (spec §20) are resolved from DI by Hangfire.
+        builder.Services.AddScoped<CacheWarmJob>();
     }
 
     // ---- Anti-Forgery Tokens (Section 17.3) ----
@@ -249,12 +257,61 @@ try
     // ────────────────────────────────────────────────────────────
     var app = builder.Build();
 
-    // Database initialization for SQLite (create schema + seed lookup data)
-    if (isSqlite)
+    // ---- Forwarded Headers (reverse proxy deployments) ----
+    // When running behind nginx / Caddy / a cloud load balancer, honor
+    // X-Forwarded-For and X-Forwarded-Proto so rate limiting keys off the real
+    // client IP and generated links / HTTPS redirect use the external scheme.
+    // Gated by Site:BehindProxy (default false) — never trust client-supplied
+    // forwarded headers when the app is directly exposed.
+    if (builder.Configuration.GetValue("Site:BehindProxy", false))
+    {
+        app.UseForwardedHeaders(new ForwardedHeadersOptions
+        {
+            ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            // KnownProxies/KnownNetworks keep their loopback defaults — see
+            // DEPLOYMENT.md for restricting to specific proxy addresses.
+        });
+    }
+
+    // ---- Database initialization ----
+    // SQLite: EnsureCreated creates the schema. SQL Server: EF migrations are
+    // applied (idempotent) before seeding.
+    // Controlled by Seed:OnStartup (default true) and Seed:SampleContent
+    // (default: true for the SQLite/dev path, false for SQL Server so production
+    // deploys seed lookup data only — set explicitly in appsettings.Production.json).
+    var seedOnStartup = builder.Configuration.GetValue("Seed:OnStartup", true);
+    var seedSampleContent = builder.Configuration.GetValue("Seed:SampleContent", isSqlite);
+
+    if (seedOnStartup)
     {
         using var scope = app.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        await DatabaseInitializer.InitializeAsync(context, isSqlite);
+        if (isSqlite)
+        {
+            await DatabaseInitializer.InitializeAsync(context, isSqlite, seedSampleContent);
+        }
+        else
+        {
+            await context.Database.MigrateAsync();
+            await DatabaseInitializer.InitializeAsync(context, isSqlite, seedSampleContent);
+        }
+    }
+
+    // ---- First-run admin bootstrap ----
+    // Seeds roles + Administrator permissions and creates the configured admin
+    // user (Admin:Email/UserName/Password). Fully idempotent; safe every boot.
+    try
+    {
+        var bootstrapLogger = app.Services
+            .GetRequiredService<ILoggerFactory>()
+            .CreateLogger("AdminBootstrap");
+        await AdminBootstrap.SeedRolesAndAdminAsync(
+            app.Services, builder.Configuration, bootstrapLogger);
+    }
+    catch (Exception ex)
+    {
+        // Never take the site down because identity seeding hiccupped — log it.
+        Log.Warning(ex, "Admin bootstrap did not complete");
     }
 
     // ---- Exception Handling ----
@@ -268,8 +325,12 @@ try
         app.UseHsts();
     }
 
-    // ---- HTTPS Redirection (enforce in production) ----
-    if (!app.Environment.IsDevelopment())
+    // ---- HTTPS Redirection ----
+    // Enabled by default outside Development; explicit opt-out for proxy
+    // deployments that terminate TLS upstream (Site:EnableHttpsRedirection=false).
+    var enableHttpsRedirection = builder.Configuration.GetValue(
+        "Site:EnableHttpsRedirection", !app.Environment.IsDevelopment());
+    if (enableHttpsRedirection)
     {
         app.UseHttpsRedirection();
     }
@@ -345,6 +406,30 @@ try
     // ---- Authentication & Authorization ----
     app.UseAuthentication();
     app.UseAuthorization();
+
+    // ---- Hangfire Dashboard & Recurring Jobs (SQL Server only) ----
+    if (!isSqlite)
+    {
+        app.UseHangfireDashboard("/hangfire", new DashboardOptions
+        {
+            Authorization = [new HangfireDashboardAuthorizationFilter()]
+        });
+
+        // Nightly cache warm-up (spec §20 / §15) so the public site starts the
+        // day with warm list caches. Registration is best-effort: on first deploy
+        // the database may not exist yet and the job is registered on next start.
+        try
+        {
+            RecurringJob.AddOrUpdate<CacheWarmJob>(
+                "cache-warm",
+                job => job.WarmAsync(),
+                Cron.Daily(3, 0));
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Failed to register Hangfire recurring jobs");
+        }
+    }
 
     // ---- Conventional Routes (Section 28) ----
     app.MapControllerRoute(

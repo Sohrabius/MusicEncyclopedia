@@ -1,0 +1,31 @@
+# Build artifacts
+**/bin/
+**/obj/
+**/out/
+**/publish/
+artifacts/
+
+# Local databases & secrets
+*.db
+*.db-shm
+*.db-wal
+appsettings.*.local.json
+.env
+
+# Logs & media
+**/logs/
+**/media/
+media/
+
+# Version control & IDE
+.git/
+.gitignore
+.github/
+.vs/
+.vscode/
+.idea/
+*.user
+
+# Test results
+**/TestResults/
+**/coverage/

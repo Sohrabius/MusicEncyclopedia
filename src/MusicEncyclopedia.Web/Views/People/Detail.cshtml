@@ -205,38 +205,391 @@
             }
 
             <!-- ============================================================
-                 3. Timeline
+                 3. Timeline (4.1) — album/track releases, sessions, events,
+                    awards, chart entries, publications — date-sorted with links
                  ============================================================ -->
             @if (timeline.Count > 0)
             {
                 <section>
                     <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["Timeline"]</h2>
-                    <div class="space-y-4">
-                        @foreach (var entry in timeline)
-                        {
-                            string? entryTitle = null;
-                            string? entryDate = null;
-                            string? entryType = null;
-                            try { entryTitle = (string?)entry.Title ?? (string?)entry.Name; } catch { }
-                            try { entryDate = (string?)entry.Date?.ToString() ?? (string?)entry.Year?.ToString(); } catch { }
-                            try { entryType = (string?)entry.Type ?? (string?)entry.EventType; } catch { }
+                    <div class="relative">
+                        <div class="absolute top-0 bottom-0 start-4 w-px bg-gray-200" aria-hidden="true"></div>
+                        <ul class="space-y-4">
+                            @foreach (var entry in timeline)
+                            {
+                                string? entryTitle = null;
+                                string? entryType = null;
+                                string? entryRoute = null;
+                                string? entrySlug = null;
+                                string? entryDetail = null;
+                                DateTime? entryDate = null;
+                                int? entryYear = null;
+                                try { entryTitle = (string?)entry.Title ?? (string?)entry.Name; } catch { }
+                                try { entryType = (string?)entry.Type ?? (string?)entry.EventType; } catch { }
+                                try { entryRoute = (string?)entry.RouteName; } catch { }
+                                try { entrySlug = (string?)entry.Slug; } catch { }
+                                try { entryDetail = (string?)entry.Detail; } catch { }
+                                try { entryDate = (DateTime?)entry.Date; } catch { }
+                                try { entryYear = (int?)entry.Year; } catch { }
 
-                            <div class="border-s-2 border-blue-300 ps-4 py-1">
-                                @if (!string.IsNullOrWhiteSpace(entryDate))
+                                var badgeClass = entryType switch
                                 {
-                                    <span class="text-xs text-blue-600 font-medium">@entryDate</span>
-                                }
-                                @if (!string.IsNullOrWhiteSpace(entryTitle))
+                                    "AlbumRelease" => "bg-emerald-50 text-emerald-700",
+                                    "TrackRelease" => "bg-teal-50 text-teal-700",
+                                    "RecordingSession" => "bg-indigo-50 text-indigo-700",
+                                    "PerformanceEvent" => "bg-rose-50 text-rose-700",
+                                    "Award" => "bg-amber-50 text-amber-700",
+                                    "ChartEntry" => "bg-sky-50 text-sky-700",
+                                    "Publication" => "bg-violet-50 text-violet-700",
+                                    _ => "bg-gray-100 text-gray-600"
+                                };
+                                var typeLabel = entryType switch
                                 {
-                                    <p class="text-sm text-gray-700 mt-0.5">@entryTitle</p>
-                                }
-                                @if (!string.IsNullOrWhiteSpace(entryType))
-                                {
-                                    <span class="text-xs text-gray-400">@entryType</span>
-                                }
-                            </div>
-                        }
+                                    "AlbumRelease" => Localizer["Album Release"].Value,
+                                    "TrackRelease" => Localizer["Track Release"].Value,
+                                    "RecordingSession" => Localizer["Recording Session"].Value,
+                                    "PerformanceEvent" => Localizer["Live Performance"].Value,
+                                    "Award" => Localizer["Award"].Value,
+                                    "ChartEntry" => Localizer["Chart Entry"].Value,
+                                    "Publication" => Localizer["Publication"].Value,
+                                    _ => entryType
+                                };
+                                var entryDateText = entryDate.HasValue
+                                    ? entryDate.Value.ToString("yyyy-MM-dd")
+                                    : entryYear.HasValue ? entryYear.Value.ToString() : null;
+                                var hasLink = !string.IsNullOrWhiteSpace(entryRoute) && !string.IsNullOrWhiteSpace(entrySlug);
+
+                                <li class="relative ps-10">
+                                    <span class="absolute start-0 top-1.5 flex h-8 w-8 items-center justify-center rounded-full bg-white border border-gray-200 shadow-sm" aria-hidden="true">
+                                        @switch (entryType)
+                                        {
+                                            case "AlbumRelease":
+                                                <text>&#128218;</text>
+                                                break;
+                                            case "TrackRelease":
+                                                <text>&#127925;</text>
+                                                break;
+                                            case "RecordingSession":
+                                                <text>&#127908;</text>
+                                                break;
+                                            case "PerformanceEvent":
+                                                <text>&#127897;</text>
+                                                break;
+                                            case "Award":
+                                                <text>&#127942;</text>
+                                                break;
+                                            case "ChartEntry":
+                                                <text>&#128200;</text>
+                                                break;
+                                            case "Publication":
+                                                <text>&#128214;</text>
+                                                break;
+                                            default:
+                                                <text>&#9679;</text>
+                                                break;
+                                        }
+                                    </span>
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        @if (!string.IsNullOrWhiteSpace(entryDateText))
+                                        {
+                                            <span class="text-xs font-semibold text-gray-500 tabular-nums">@entryDateText</span>
+                                        }
+                                        <span class="inline-block text-xs font-medium px-2 py-0.5 rounded-full @badgeClass">@typeLabel</span>
+                                    </div>
+                                    @if (hasLink)
+                                    {
+                                        <a href="/@culture/@entryRoute/@entrySlug"
+                                           class="mt-1 block text-sm font-medium text-gray-900 hover:text-blue-600 transition-colors">
+                                            @entryTitle
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <p class="mt-1 text-sm font-medium text-gray-900">@entryTitle</p>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(entryDetail))
+                                    {
+                                        <p class="text-xs text-gray-500 mt-0.5">@entryDetail</p>
+                                    }
+                                </li>
+                            }
+                        </ul>
                     </div>
+                </section>
+            }
+
+            <!-- ============================================================
+                 4. Discography (4.2) — filterable by category / year / role / instrument
+                 ============================================================ -->
+            @if (Model.Person.Albums.Count > 0)
+            {
+                var hasAlbumFilters = Model.Person.AlbumCategories.Count > 0 || Model.Person.AlbumYears.Count > 0
+                    || Model.Person.AlbumRoles.Count > 0 || Model.Person.AlbumInstruments.Count > 0;
+
+                <section>
+                    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                        <h2 class="text-2xl font-bold text-gray-900">@Localizer["Discography"]</h2>
+                        <span class="text-sm text-gray-500">@Model.Person.Albums.Count @Localizer["albums"]</span>
+                    </div>
+
+                    @if (hasAlbumFilters)
+                    {
+                        <form method="get" class="flex flex-wrap items-end gap-3 mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            @if (Model.Person.AlbumCategories.Count > 0)
+                            {
+                                <div>
+                                    <label for="albumCategory" class="block text-xs font-medium text-gray-500 mb-1">@Localizer["Category"]</label>
+                                    <select id="albumCategory" name="albumCategory" class="text-sm border border-gray-300 rounded-md px-2.5 py-1.5 bg-white">
+                                        <option value="">@Localizer["All"]</option>
+                                        @foreach (var category in Model.Person.AlbumCategories)
+                                        {
+                                            var selectedAttr = Model.AlbumCategory == category ? "selected" : null;
+                                            <option value="@category" selected="@selectedAttr">@category</option>
+                                        }
+                                    </select>
+                                </div>
+                            }
+                            @if (Model.Person.AlbumYears.Count > 0)
+                            {
+                                <div>
+                                    <label for="albumYear" class="block text-xs font-medium text-gray-500 mb-1">@Localizer["Year"]</label>
+                                    <select id="albumYear" name="albumYear" class="text-sm border border-gray-300 rounded-md px-2.5 py-1.5 bg-white">
+                                        <option value="">@Localizer["All"]</option>
+                                        @foreach (var year in Model.Person.AlbumYears)
+                                        {
+                                            var selectedAttr = Model.AlbumYear == year ? "selected" : null;
+                                            <option value="@year" selected="@selectedAttr">@year</option>
+                                        }
+                                    </select>
+                                </div>
+                            }
+                            @if (Model.Person.AlbumRoles.Count > 0)
+                            {
+                                <div>
+                                    <label for="albumRole" class="block text-xs font-medium text-gray-500 mb-1">@Localizer["Role"]</label>
+                                    <select id="albumRole" name="albumRole" class="text-sm border border-gray-300 rounded-md px-2.5 py-1.5 bg-white">
+                                        <option value="">@Localizer["All"]</option>
+                                        @foreach (var role in Model.Person.AlbumRoles)
+                                        {
+                                            var selectedAttr = Model.AlbumRole == role ? "selected" : null;
+                                            <option value="@role" selected="@selectedAttr">@role</option>
+                                        }
+                                    </select>
+                                </div>
+                            }
+                            @if (Model.Person.AlbumInstruments.Count > 0)
+                            {
+                                <div>
+                                    <label for="albumInstrument" class="block text-xs font-medium text-gray-500 mb-1">@Localizer["Instrument"]</label>
+                                    <select id="albumInstrument" name="albumInstrument" class="text-sm border border-gray-300 rounded-md px-2.5 py-1.5 bg-white">
+                                        <option value="">@Localizer["All"]</option>
+                                        @foreach (var instrument in Model.Person.AlbumInstruments)
+                                        {
+                                            var selectedAttr = Model.AlbumInstrument == instrument ? "selected" : null;
+                                            <option value="@instrument" selected="@selectedAttr">@instrument</option>
+                                        }
+                                    </select>
+                                </div>
+                            }
+                            <button type="submit" class="text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md px-4 py-1.5 transition-colors">
+                                @Localizer["Filter"]
+                            </button>
+                            @if (Model.AlbumCategory is not null || Model.AlbumYear is not null || Model.AlbumRole is not null || Model.AlbumInstrument is not null)
+                            {
+                                <a href="/@culture/people/@Model.Person.Slug" class="text-sm text-gray-500 hover:text-gray-700 px-2 py-1.5">@Localizer["Clear"]</a>
+                            }
+                        </form>
+                    }
+
+                    @{
+                        var filteredAlbums = Model.Person.Albums
+                            .Where(a => string.IsNullOrEmpty(Model.AlbumCategory) || a.CategoryName == Model.AlbumCategory)
+                            .Where(a => !Model.AlbumYear.HasValue || a.ReleaseDate?.Year == Model.AlbumYear)
+                            .Where(a => string.IsNullOrEmpty(Model.AlbumRole) || a.Roles.Contains(Model.AlbumRole))
+                            .Where(a => string.IsNullOrEmpty(Model.AlbumInstrument) || a.Instruments.Contains(Model.AlbumInstrument))
+                            .ToList();
+                    }
+
+                    @if (filteredAlbums.Count == 0)
+                    {
+                        <p class="text-sm text-gray-500">@Localizer["No albums match the selected filters."]</p>
+                    }
+                    else
+                    {
+                        <ul class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            @foreach (var album in filteredAlbums)
+                            {
+                                <li>
+                                    <a href="/@culture/albums/@album.Slug"
+                                       class="group flex gap-4 p-3 rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all bg-white">
+                                        <div class="w-16 h-16 flex-shrink-0 rounded-md bg-gray-100 overflow-hidden">
+                                            @if (!string.IsNullOrWhiteSpace(album.CoverUrl))
+                                            {
+                                                <img src="@album.CoverUrl" alt="@album.Title" class="w-full h-full object-cover" loading="lazy" />
+                                            }
+                                            else
+                                            {
+                                                <svg class="w-full h-full p-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 21a9 9 0 110-18 9 9 0 010 18zm0-11l5 3-5 3V10z" />
+                                                </svg>
+                                            }
+                                        </div>
+                                        <div class="min-w-0">
+                                            <p class="text-sm font-semibold text-gray-900 group-hover:text-blue-600 transition-colors truncate">@album.Title</p>
+                                            <p class="text-xs text-gray-500 mt-0.5">
+                                                @album.CategoryName
+                                                @if (album.ReleaseDate.HasValue)
+                                                {
+                                                    <text> · @album.ReleaseDate.Value.Year</text>
+                                                }
+                                            </p>
+                                            @if (album.Roles.Count > 0)
+                                            {
+                                                <p class="text-xs text-gray-400 mt-1 truncate">@string.Join(" · ", album.Roles)</p>
+                                            }
+                                        </div>
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    }
+                </section>
+            }
+
+            <!-- ============================================================
+                 5. Track Contributions (4.2) — filterable by role / instrument / album / genre
+                 ============================================================ -->
+            @if (Model.Person.TrackContributions.Count > 0)
+            {
+                var hasContributionFilters = Model.Person.ContributionRoles.Count > 0 || Model.Person.ContributionInstruments.Count > 0
+                    || Model.Person.ContributionAlbums.Count > 0 || Model.Person.ContributionGenres.Count > 0;
+
+                <section>
+                    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                        <h2 class="text-2xl font-bold text-gray-900">@Localizer["Track Contributions"]</h2>
+                        <span class="text-sm text-gray-500">@Model.Person.TrackContributions.Count @Localizer["tracks"]</span>
+                    </div>
+
+                    @if (hasContributionFilters)
+                    {
+                        <form method="get" class="flex flex-wrap items-end gap-3 mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            @if (Model.Person.ContributionRoles.Count > 0)
+                            {
+                                <div>
+                                    <label for="contributionRole" class="block text-xs font-medium text-gray-500 mb-1">@Localizer["Role"]</label>
+                                    <select id="contributionRole" name="contributionRole" class="text-sm border border-gray-300 rounded-md px-2.5 py-1.5 bg-white">
+                                        <option value="">@Localizer["All"]</option>
+                                        @foreach (var role in Model.Person.ContributionRoles)
+                                        {
+                                            var selectedAttr = Model.ContributionRole == role ? "selected" : null;
+                                            <option value="@role" selected="@selectedAttr">@role</option>
+                                        }
+                                    </select>
+                                </div>
+                            }
+                            @if (Model.Person.ContributionInstruments.Count > 0)
+                            {
+                                <div>
+                                    <label for="contributionInstrument" class="block text-xs font-medium text-gray-500 mb-1">@Localizer["Instrument"]</label>
+                                    <select id="contributionInstrument" name="contributionInstrument" class="text-sm border border-gray-300 rounded-md px-2.5 py-1.5 bg-white">
+                                        <option value="">@Localizer["All"]</option>
+                                        @foreach (var instrument in Model.Person.ContributionInstruments)
+                                        {
+                                            var selectedAttr = Model.ContributionInstrument == instrument ? "selected" : null;
+                                            <option value="@instrument" selected="@selectedAttr">@instrument</option>
+                                        }
+                                    </select>
+                                </div>
+                            }
+                            @if (Model.Person.ContributionAlbums.Count > 0)
+                            {
+                                <div>
+                                    <label for="contributionAlbum" class="block text-xs font-medium text-gray-500 mb-1">@Localizer["Album"]</label>
+                                    <select id="contributionAlbum" name="contributionAlbum" class="text-sm border border-gray-300 rounded-md px-2.5 py-1.5 bg-white">
+                                        <option value="">@Localizer["All"]</option>
+                                        @foreach (var album in Model.Person.ContributionAlbums)
+                                        {
+                                            var selectedAttr = Model.ContributionAlbum == album ? "selected" : null;
+                                            <option value="@album" selected="@selectedAttr">@album</option>
+                                        }
+                                    </select>
+                                </div>
+                            }
+                            @if (Model.Person.ContributionGenres.Count > 0)
+                            {
+                                <div>
+                                    <label for="contributionGenre" class="block text-xs font-medium text-gray-500 mb-1">@Localizer["Genre"]</label>
+                                    <select id="contributionGenre" name="contributionGenre" class="text-sm border border-gray-300 rounded-md px-2.5 py-1.5 bg-white">
+                                        <option value="">@Localizer["All"]</option>
+                                        @foreach (var genre in Model.Person.ContributionGenres)
+                                        {
+                                            var selectedAttr = Model.ContributionGenre == genre ? "selected" : null;
+                                            <option value="@genre" selected="@selectedAttr">@genre</option>
+                                        }
+                                    </select>
+                                </div>
+                            }
+                            <button type="submit" class="text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md px-4 py-1.5 transition-colors">
+                                @Localizer["Filter"]
+                            </button>
+                            @if (Model.ContributionRole is not null || Model.ContributionInstrument is not null || Model.ContributionAlbum is not null || Model.ContributionGenre is not null)
+                            {
+                                <a href="/@culture/people/@Model.Person.Slug" class="text-sm text-gray-500 hover:text-gray-700 px-2 py-1.5">@Localizer["Clear"]</a>
+                            }
+                        </form>
+                    }
+
+                    @{
+                        var filteredContributions = Model.Person.TrackContributions
+                            .Where(c => string.IsNullOrEmpty(Model.ContributionRole) || c.Roles.Contains(Model.ContributionRole))
+                            .Where(c => string.IsNullOrEmpty(Model.ContributionInstrument) || c.Instruments.Contains(Model.ContributionInstrument))
+                            .Where(c => string.IsNullOrEmpty(Model.ContributionAlbum) || c.AlbumTitle == Model.ContributionAlbum)
+                            .Where(c => string.IsNullOrEmpty(Model.ContributionGenre) || c.Genres.Contains(Model.ContributionGenre))
+                            .ToList();
+                    }
+
+                    @if (filteredContributions.Count == 0)
+                    {
+                        <p class="text-sm text-gray-500">@Localizer["No tracks match the selected filters."]</p>
+                    }
+                    else
+                    {
+                        <ul class="divide-y divide-gray-100 border border-gray-200 rounded-lg overflow-hidden bg-white">
+                            @foreach (var contribution in filteredContributions)
+                            {
+                                <li class="p-3 hover:bg-gray-50 transition-colors">
+                                    <div class="flex items-center justify-between gap-3">
+                                        <a href="/@culture/tracks/@contribution.Slug"
+                                           class="text-sm font-medium text-gray-900 hover:text-blue-600 transition-colors">
+                                            @contribution.Title
+                                        </a>
+                                        @if (contribution.ReleaseDate.HasValue)
+                                        {
+                                            <span class="text-xs text-gray-400 tabular-nums">@contribution.ReleaseDate.Value.Year</span>
+                                        }
+                                    </div>
+                                    <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-xs text-gray-500">
+                                        @if (!string.IsNullOrWhiteSpace(contribution.AlbumTitle))
+                                        {
+                                            <a href="/@culture/albums/@contribution.AlbumSlug" class="hover:text-blue-600 transition-colors">@contribution.AlbumTitle</a>
+                                        }
+                                        @foreach (var role in contribution.Roles)
+                                        {
+                                            <span class="inline-block bg-purple-50 text-purple-700 px-1.5 py-0.5 rounded">@role</span>
+                                        }
+                                        @foreach (var instrument in contribution.Instruments)
+                                        {
+                                            <span class="inline-block bg-amber-50 text-amber-700 px-1.5 py-0.5 rounded">@instrument</span>
+                                        }
+                                        @foreach (var genre in contribution.Genres)
+                                        {
+                                            <span class="inline-block bg-teal-50 text-teal-700 px-1.5 py-0.5 rounded">@genre</span>
+                                        }
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+                    }
                 </section>
             }
 

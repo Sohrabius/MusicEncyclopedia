@@ -124,5 +124,8 @@
     <script src="~/js/site.js"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
+
+    <!-- Structured data · JSON-LD from detail views -->
+    @await RenderSectionAsync("StructuredData", required: false)
 </body>
 </html>

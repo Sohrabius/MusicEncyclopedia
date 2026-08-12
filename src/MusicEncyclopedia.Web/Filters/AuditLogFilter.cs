@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Routing;
 using MusicEncyclopedia.Data;
 using MusicEncyclopedia.Data.Entities;
+using MusicEncyclopedia.Services.Services;
 
 namespace MusicEncyclopedia.Web.Filters;
 
@@ -15,11 +16,16 @@ public sealed class AuditLogFilter : IAsyncActionFilter
 {
     private readonly AppDbContext _db;
     private readonly ILogger<AuditLogFilter> _logger;
+    private readonly CacheInvalidationService _cacheInvalidation;
 
-    public AuditLogFilter(AppDbContext db, ILogger<AuditLogFilter> logger)
+    public AuditLogFilter(
+        AppDbContext db,
+        ILogger<AuditLogFilter> logger,
+        CacheInvalidationService cacheInvalidation)
     {
         _db = db;
         _logger = logger;
+        _cacheInvalidation = cacheInvalidation;
     }
 
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -96,6 +102,53 @@ public sealed class AuditLogFilter : IAsyncActionFilter
             // Auditing must never break the request.
             _logger.LogWarning(ex, "Failed to write audit log entry for {Action}", $"{controller}.{action}");
         }
+
+        // Phase 5 (§15.1): invalidate cached public pages after any successful admin
+        // write so the site reflects the change immediately. Runs after the DB write
+        // and is best-effort — invalidation failures must never break the request.
+        if (isSuccess)
+        {
+            await InvalidateCacheAsync(controller, entityType, entityId, action);
+        }
+    }
+
+    private async Task InvalidateCacheAsync(
+        string controller,
+        string entityType,
+        int? entityId,
+        string action)
+    {
+        try
+        {
+            // Cross-cutting operations affect too many pages to invalidate individually.
+            if (entityType is "LookupTable" or "Dashboard" or "User" or "Role" or "Settings")
+            {
+                await _cacheInvalidation.InvalidateBroadAsync();
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(entityType) || entityType is "Unknown" or "AuditLog")
+                return;
+
+            await _cacheInvalidation.InvalidateEntityAsync(
+                entityType, entityId ?? 0, DeriveChangeType(action));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Cache invalidation failed for {Action}", $"{controller}.{action}");
+        }
+    }
+
+    private static string DeriveChangeType(string action)
+    {
+        if (action.Contains("Delete", StringComparison.OrdinalIgnoreCase))
+            return "Deleted";
+        if (action.Contains("Restore", StringComparison.OrdinalIgnoreCase))
+            return "Restored";
+        if (action.Contains("Create", StringComparison.OrdinalIgnoreCase)
+            || action.Contains("Add", StringComparison.OrdinalIgnoreCase))
+            return "Created";
+        return "Updated";
     }
 
     /// <summary>Maps admin controller names to entity type codes for the audit trail.</summary>

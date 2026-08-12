@@ -2,6 +2,7 @@ using System.Data;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using MusicEncyclopedia.Core.DTOs;
+using MusicEncyclopedia.Core.Infrastructure;
 using MusicEncyclopedia.Core.Interfaces;
 
 namespace MusicEncyclopedia.Search.Services;
@@ -15,11 +16,13 @@ public sealed class SearchService : ISearchService
 {
     private readonly string _connectionString;
     private readonly bool _isSqlite;
+    private readonly ICacheService? _cache;
 
-    public SearchService(string connectionString, bool isSqlite = false)
+    public SearchService(string connectionString, bool isSqlite = false, ICacheService? cache = null)
     {
         _connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
         _isSqlite = isSqlite;
+        _cache = cache;
     }
 
     private IDbConnection CreateConnection()
@@ -41,7 +44,32 @@ public sealed class SearchService : ISearchService
             return PagedResult<SearchResultDto>.Create([], query.Page, query.PageSize, 0);
         }
 
-        var searchTerm = query.Q.Trim();
+        // Spec §15.1 search cache key: search:{culture}:{hash}. Only successful
+        // results are cached; failures propagate to the caller.
+        if (_cache is not null)
+        {
+            var cacheKey = CacheKeys.Search(
+                query.Culture ?? "", query.Q, query.EntityType, query.Genre, query.Mood,
+                query.Instrument, query.Page, query.PageSize);
+
+            var cached = await _cache.GetAsync<PagedResult<SearchResultDto>>(cacheKey, cancellationToken);
+            if (cached is not null)
+                return cached;
+
+            var result = await SearchCoreAsync(query, cancellationToken);
+            await _cache.SetAsync(cacheKey, result, CacheKeys.SearchDuration, cancellationToken);
+            return result;
+        }
+
+        return await SearchCoreAsync(query, cancellationToken);
+    }
+
+    private async Task<PagedResult<SearchResultDto>> SearchCoreAsync(
+        SearchQuery query,
+        CancellationToken cancellationToken)
+    {
+        // SearchAsync guards against a null/empty Q before calling this method.
+        var searchTerm = query.Q!.Trim();
         var page = Math.Max(1, query.Page);
         var pageSize = Math.Max(1, Math.Min(100, query.PageSize));
         var offset = (page - 1) * pageSize;
@@ -137,10 +165,12 @@ ORDER BY {orderByClause}
 
         var fragments = new List<SearchFragment>();
 
-        // Helper to create a fragment
+        // Helper to create a fragment. titleExpr/descExpr are the SELECT and LIKE
+        // search expressions; ftsColumns is the comma-separated list of REAL indexed
+        // columns for the SQL Server FREETEXTTABLE join (must match FullTextSearch.sql).
         void MakeFragment(string entityTypeName, string table, string tableAlias,
-            string pkColumn, string titleColumn, string descriptionColumn, string slugColumn,
-            string filterJoin)
+            string pkColumn, string titleExpr, string descExpr, string ftsColumns,
+            string slugColumn, string filterJoin)
         {
             string fromClause;
             string rankExpr;
@@ -150,11 +180,11 @@ ORDER BY {orderByClause}
             {
                 fromClause = $"FROM {table} {tableAlias}";
                 rankExpr = "0 AS Rank";
-                whereClause = $"WHERE ({tableAlias}.{titleColumn} LIKE @searchTerm OR {tableAlias}.{descriptionColumn} LIKE @searchTerm) AND {tableAlias}.IsDeleted = 0";
+                whereClause = $"WHERE ({titleExpr} LIKE @searchTerm OR {descExpr} LIKE @searchTerm) AND {tableAlias}.IsDeleted = 0";
             }
             else
             {
-                fromClause = $"FROM {table} {tableAlias} INNER JOIN FREETEXTTABLE({table}, ({titleColumn}, {descriptionColumn}), @rawSearchTerm) ft ON {tableAlias}.{pkColumn} = ft.[Key]";
+                fromClause = $"FROM {table} {tableAlias} INNER JOIN FREETEXTTABLE({table}, ({ftsColumns}), @rawSearchTerm) ft ON {tableAlias}.{pkColumn} = ft.[Key]";
                 rankExpr = "ft.Rank AS Rank";
                 whereClause = $"WHERE {tableAlias}.IsDeleted = 0";
             }
@@ -164,15 +194,16 @@ ORDER BY {orderByClause}
                 EntityType = entityTypeName,
                 SelectSql = $@"
     SELECT '{entityTypeName}' AS EntityType, {tableAlias}.{pkColumn} AS EntityId,
-           {tableAlias}.{titleColumn} AS Title,
-           NULL AS Subtitle, {tableAlias}.{descriptionColumn} AS Description, NULL AS ImageUrl,
+           {titleExpr} AS Title,
+           NULL AS Subtitle, {descExpr} AS Description, NULL AS ImageUrl,
            {tableAlias}.{slugColumn} AS UrlSlug,
            {rankExpr}
     {fromClause}
     {filterJoin}
     {whereClause}",
                 CountSql = $@"
-    SELECT {tableAlias}.{pkColumn} FROM {table} {tableAlias}
+    SELECT {tableAlias}.{pkColumn}
+    {fromClause}
     {filterJoin}
     {whereClause}"
             });
@@ -180,15 +211,44 @@ ORDER BY {orderByClause}
 
         // All entity types that have public pages (Tag, Alias and Localization are
         // cross-cutting tables without searchable detail pages and are excluded).
-        MakeFragment("Album", "Album", "a", "AlbumId", "Title", "Description", "Slug", albumFilterJoin);
-        MakeFragment("Track", "Track", "t", "TrackId", "Title", "Description", "Slug", trackFilterJoin);
-        MakeFragment("Person", "Person", "p", "PersonId", "FullName", "Biography", "Slug", "");
-        MakeFragment("Company", "Company", "c", "CompanyId", "Name", "History", "Slug", "");
-        MakeFragment("Poem", "Poem", "po", "PoemId", "Title", "CanonicalText", "Slug", "");
-        MakeFragment("SungVersion", "SungVersion", "sv", "SungVersionId", "Title", "Text", "Slug", "");
-        MakeFragment("Genre", "Genre", "g", "GenreId", "Name", "Description", "Slug", "");
-        MakeFragment("Mood", "Mood", "m", "MoodId", "Name", "Description", "Slug", "");
-        MakeFragment("Instrument", "Instrument", "i", "InstrumentId", "Name", "Description", "Slug", "");
+        // The ftsColumns list must match the full-text indexes in FullTextSearch.sql.
+        MakeFragment("Album", "Album", "a", "AlbumId",
+            "a.Title", "a.Description", "Title, Description, OriginalTitle, EnglishTitle", "Slug", albumFilterJoin);
+        MakeFragment("Track", "Track", "t", "TrackId",
+            "t.Title", "t.Description", "Title, Description, OriginalTitle, EnglishTitle", "Slug", trackFilterJoin);
+        MakeFragment("Person", "Person", "p", "PersonId",
+            "p.FullName", "p.Biography", "FullName, Biography, OriginalName, EnglishName", "Slug", "");
+        MakeFragment("Company", "Company", "c", "CompanyId",
+            "c.Name", "c.History", "Name, History, OriginalName, EnglishName", "Slug", "");
+        MakeFragment("Poem", "Poem", "po", "PoemId",
+            "po.Title", "po.CanonicalText", "Title, CanonicalText, OriginalTitle, EnglishTitle", "Slug", "");
+        MakeFragment("SungVersion", "SungVersion", "sv", "SungVersionId",
+            "sv.Title", "sv.Text", "Title, Text", "Slug", "");
+        MakeFragment("Genre", "Genre", "g", "GenreId",
+            "g.Name", "g.Description", "Name, Description", "Slug", "");
+        MakeFragment("Mood", "Mood", "m", "MoodId",
+            "m.Name", "m.Description", "Name, Description", "Slug", "");
+        MakeFragment("Instrument", "Instrument", "i", "InstrumentId",
+            "i.Name", "i.Description", "Name, Description", "Slug", "");
+
+        // Source and Location have no Description column; their Author/Name still match.
+        MakeFragment("Source", "Source", "s", "SourceId",
+            "s.Title", "s.Author", "Title, Author", "Slug", "");
+        MakeFragment("Location", "Location", "l", "LocationId",
+            "l.Name", "NULL", "Name", "Slug", "");
+        MakeFragment("Publication", "Publication", "pu", "PublicationId",
+            "pu.Title", "NULL", "Title", "Slug", "");
+
+        // Recording sessions and performance events have no Title column; the site
+        // titles them by their type name, so search results do the same.
+        MakeFragment("RecordingSession", "RecordingSession", "rs", "RecordingSessionId",
+            "(CASE WHEN st.Name IS NULL THEN 'Recording Session' ELSE st.Name END)",
+            "rs.Notes", "Notes", "Slug",
+            "LEFT JOIN SessionType st ON st.SessionTypeId = rs.SessionTypeId");
+        MakeFragment("PerformanceEvent", "PerformanceEvent", "pe", "PerformanceEventId",
+            "(CASE WHEN et.Name IS NULL THEN 'Performance Event' ELSE et.Name END)",
+            "pe.PerformanceNotes", "PerformanceNotes", "Slug",
+            "LEFT JOIN EventType et ON et.EventTypeId = pe.EventTypeId");
 
         // Filter by entity type if specified
         if (!string.IsNullOrWhiteSpace(entityType))
@@ -243,6 +303,11 @@ ORDER BY {orderByClause}
         "Genre" => "genres",
         "Mood" => "moods",
         "Instrument" => "instruments",
+        "Publication" => "publications",
+        "RecordingSession" => "sessions",
+        "PerformanceEvent" => "events",
+        "Location" => "locations",
+        "Source" => "sources",
         _ => ""
     };
 

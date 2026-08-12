@@ -31,7 +31,6 @@ public sealed class ArtistsController : Controller
     [HttpGet]
     [Route("")]
     [Route("Index")]
-    [ResponseCache(Duration = 300, VaryByQueryKeys = new[] { "*" }, VaryByHeader = "Accept-Language")]
     public async Task<IActionResult> Index(
         string culture,
         int page = 1,

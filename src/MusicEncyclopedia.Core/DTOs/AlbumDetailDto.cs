@@ -36,4 +36,9 @@ public sealed class AlbumDetailDto
     public IReadOnlyList<AwardAssignmentDto> Awards { get; init; } = [];
     public IReadOnlyList<CertificationAssignmentDto> Certifications { get; init; } = [];
     public IReadOnlyList<ChartEntryDto> ChartEntries { get; init; } = [];
+
+    // ── Phase 4 additions ──
+    public IReadOnlyList<AlbumRelationDto> RelatedAlbums { get; init; } = [];
+    public IReadOnlyList<RecordingSessionDto> RecordingSessions { get; init; } = [];
+    public IReadOnlyList<PerformanceEventDto> PerformanceEvents { get; init; } = [];
 }

@@ -408,6 +408,104 @@
             </section>
         }
 
+        <!-- Related Albums (4.3) -->
+        @if (album.RelatedAlbums.Count > 0)
+        {
+            <section class="detail-section">
+                <h2 class="detail-section__title">@Localizer["Related Albums"]</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: var(--space-md);">
+                    @foreach (var related in album.RelatedAlbums)
+                    {
+                        <a href="/@culture/albums/@related.Slug" class="card">
+                            <div class="card__image">
+                                @if (!string.IsNullOrWhiteSpace(related.CoverUrl))
+                                {
+                                    <img src="@related.CoverUrl" alt="@related.Title" loading="lazy" />
+                                }
+                                else
+                                {
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 40px; height: 40px; color: var(--color-ink-3);">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z" />
+                                    </svg>
+                                }
+                            </div>
+                            <div class="card__body">
+                                <div class="card__title" title="@related.Title">@related.Title</div>
+                                <div class="card__meta">
+                                    @if (!string.IsNullOrWhiteSpace(related.RelationName))
+                                    {
+                                        <span class="tag tag--accent">@related.RelationName</span>
+                                    }
+                                    @if (related.ReleaseDate.HasValue)
+                                    {
+                                        <span>@related.ReleaseDate.Value.Year</span>
+                                    }
+                                </div>
+                            </div>
+                        </a>
+                    }
+                </div>
+            </section>
+        }
+
+        <!-- Recording Sessions (4.3) -->
+        @if (album.RecordingSessions.Count > 0)
+        {
+            <section class="detail-section">
+                <h2 class="detail-section__title">@Localizer["Recording Sessions"]</h2>
+                <div class="space-y-3" style="display: flex; flex-direction: column; gap: var(--space-sm);">
+                    @foreach (var session in album.RecordingSessions.OrderByDescending(s => s.StartDate))
+                    {
+                        <div class="track-row">
+                            <div class="track-row__num" style="background: var(--color-paper-2); color: var(--color-ink-2);">
+                                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                            <div class="track-row__info">
+                                <a href="/@culture/sessions/@session.Slug" class="track-row__title" style="text-decoration: none; color: var(--color-accent);">
+                                    @(session.SessionTypeName ?? Localizer["Recording Session"].ToString())
+                                </a>
+                                <div class="track-row__artist">
+                                    @if (session.StartDate.HasValue) { <span>@session.StartDate.Value.ToString("yyyy-MM-dd")</span> }
+                                    @if (!string.IsNullOrWhiteSpace(session.LocationName)) { <span> · @session.LocationName</span> }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </section>
+        }
+
+        <!-- Performance Events (4.3) -->
+        @if (album.PerformanceEvents.Count > 0)
+        {
+            <section class="detail-section">
+                <h2 class="detail-section__title">@Localizer["Live Performances"]</h2>
+                <div class="space-y-3" style="display: flex; flex-direction: column; gap: var(--space-sm);">
+                    @foreach (var evt in album.PerformanceEvents.OrderByDescending(e => e.Date))
+                    {
+                        <div class="track-row">
+                            <div class="track-row__num" style="background: var(--color-accent); color: var(--color-accent-ink);">
+                                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V7a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                            <div class="track-row__info">
+                                <a href="/@culture/events/@evt.Slug" class="track-row__title" style="text-decoration: none; color: var(--color-accent);">
+                                    @(evt.EventTypeName ?? Localizer["Live Performance"].ToString())
+                                </a>
+                                <div class="track-row__artist">
+                                    @if (evt.Date.HasValue) { <span>@evt.Date.Value.ToString("yyyy-MM-dd")</span> }
+                                    @if (!string.IsNullOrWhiteSpace(evt.LocationName)) { <span> · @evt.LocationName</span> }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </section>
+        }
+
         <!-- Media -->
         @{
             var images = album.Media.Where(m => m.MediaType == "IMAGE").ToList();

@@ -32,7 +32,7 @@ public sealed class PoemsController : Controller
     [HttpGet]
     [Route("")]
     [Route("Index")]
-    [ResponseCache(Duration = 300, VaryByQueryKeys = new[] { "*" }, VaryByHeader = "Accept-Language")]
+    [ResponseCache(Duration = 60, VaryByQueryKeys = new[] { "*" }, VaryByHeader = "Accept-Language")]
     public async Task<IActionResult> Index(
         string culture,
         int page = 1,
@@ -124,7 +124,7 @@ public sealed class PoemsController : Controller
     /// </summary>
     [HttpGet]
     [Route("{slug}")]
-    [ResponseCache(Duration = 600)]
+    [ResponseCache(Duration = 60)]
     public async Task<IActionResult> Detail(
         string culture,
         string slug,

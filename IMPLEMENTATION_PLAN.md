@@ -2,7 +2,7 @@
 
 > Plan to close every gap identified in the codebase audit (see conversation history).
 > Spec of record: `music-encyclopedia-q.md` (§24 Milestones, §25 DoD, §35 Future Enhancements, §36 Acceptance Criteria).
-> Current state: **Phases 0–3 COMPLETE** (build green, core repaired, 4 cultures, full admin CRUD incl. Users/Roles/Lookup Tables/Audit Log/Settings + bulk soft delete). **Remaining: Phases 4–8 below.**
+> Current state: **Phases 0–6 COMPLETE** (build green, core repaired, 4 cultures, full admin CRUD incl. Users/Roles/Lookup Tables/Audit Log/Settings + bulk soft delete; advanced encyclopedia features; performance/search/caching with real cache invalidation; containers + CI + production config + admin bootstrap + deployment runbook). **Remaining: Phases 7–8 below.**
 
 ---
 
@@ -14,13 +14,13 @@
 | 1 — Repair Broken Core | ✅ DONE |
 | 2 — Localization & Multi-Language | ✅ DONE |
 | 3 — Complete Admin CRUD | ✅ DONE |
-| **4 — Advanced Encyclopedia Features** | ⏳ **REMAINING** |
-| **5 — Performance, Search & Caching** | ⏳ **REMAINING** |
-| **6 — Hardening & Deployment** | ⏳ **REMAINING** |
+| **4 — Advanced Encyclopedia Features** | ✅ DONE |
+| **5 — Performance, Search & Caching** | ✅ DONE |
+| **6 — Hardening & Deployment** | ✅ DONE |
 | **7 — Testing** | ⏳ **REMAINING** |
 | **8 — Acceptance & Polish** | ⏳ **REMAINING** |
 
-> **Next up: Phase 4.** See each phase's **Goal → Touch → Verify** and **Definition of Done** below.
+> **Next up: Phase 7.** See each phase's **Goal → Touch → Verify** and **Definition of Done** below.
 
 ---
 
@@ -172,7 +172,7 @@ Build each as a standard CRUD pair (controller + `EditViewModel`/`ListViewModel`
 
 ---
 
-## ⏳ Phase 4 — Advanced Encyclopedia Features (M5) — NEXT UP
+## ✅ Phase 4 — Advanced Encyclopedia Features (M5) (COMPLETE)
 
 **Objective:** Complete the remaining public-facing content features.
 
@@ -192,7 +192,7 @@ Build each as a standard CRUD pair (controller + `EditViewModel`/`ListViewModel`
 
 ---
 
-## ⏳ Phase 5 — Performance, Search & Caching (spec §14–15, §18; M6)
+## ✅ Phase 5 — Performance, Search & Caching (spec §14–15, §18; M6) (COMPLETE)
 
 **Objective:** Fast pages, working full-text search, and real cache invalidation.
 
@@ -214,9 +214,17 @@ Build each as a standard CRUD pair (controller + `EditViewModel`/`ListViewModel`
 
 **DoD:** Cache hits + invalidation proven; full-text search works on SQL Server; detail pages meet latency target.
 
+**Completion record (verified on SQLite; SQL Server paths documented):**
+
+- **5.1 Cache layer — done.** `CacheKeys` (Core/Infrastructure) implements §15.1 keys (`{type}:detail:{culture}:{slug}`, `{type}:list:{culture}:{hash}`, `search:{culture}:{hash}`, `home:{culture}`, `lookup:{name}`) with process-stable SHA-256 hashes and §15.2 durations (home/list 5 m, detail 10 m, search 1 m, lookup 1 h). `AlbumQueryService`, `TrackQueryService`, `PersonQueryService`, `CompanyQueryService`, `SearchService`, `HomeController` and the search-page lookup lists now cache through `ICacheService`; only successful (non-null) results are cached so failures/404s never poison the cache. HTTP-level `[ResponseCache]` was stripped from the cached controllers (ASP.NET Core's response cache has no purge API, which would defeat invalidation) and replaced with a 60 s output cache on the 12 direct-DB controllers not covered by `ICacheService`.
+- **Invalidation — done.** Fixed `CacheInvalidationService.EntityTypeIdMap` (was 16→Tag, 17→Award, 19→Chart; now matches seed: 10 Publication, 14 Award, 15 Certification, 16 Chart, 17 Source, 18 Tag). `AuditLogFilter` now invalidates after every successful Admin write (entity type + id + created/updated/deleted/restored), with pattern-based invalidation covering detail/list/home/search plus cross-entity keys (album/track/person/company/poem details refresh when credits/tags/media/localizations/citations/related items change) and `lookup:` on genre/mood/instrument edits; broad invalidation for lookups/users/settings.
+- **5.2 Search — done.** `SearchService` expanded to all 14 public entity types (added Publication, RecordingSession, PerformanceEvent, Location, Source) with route-segment mapping, search-page filter pills/badges, and a `Performance Event` resx key. FTS fragments aligned with `FullTextSearch.sql`, which now also indexes the 5 new tables (Publication.Title, Location.Name, RecordingSession.Notes, PerformanceEvent.PerformanceNotes, Source.Title/Author); the SQL Server count fragment was fixed to reuse the FREETEXTTABLE join so `TotalItems`/pagination stay correct. Hangfire: `CacheWarmJob` (recurring, warms album/track/person/company lists per culture through the query services) and a permission-claim-gated dashboard filter, registered only in SQL Server mode.
+- **5.3 Query optimization — done.** Album/track detail sub-queries already batched (SQL Server parallel via `Task.WhenAll`, SQLite sequential); N+1 audit found no remaining per-row query loops in the cached read paths.
+- **Verified:** build clean; 13 tests green (incl. 6 new `CacheTests` covering key stability, the corrected ID map, cross-entity + broad invalidation); all cross-culture pages 200; search returns sessions/events/locations/publications/sources; cached detail pages serve warm; the 12 direct-DB controllers send `Cache-Control: public,max-age=60`. SQL Server/FTS remains unverifiable locally (no Docker/SQL Server) — see Risks.
+
 ---
 
-## ⏳ Phase 6 — Hardening & Deployment (spec §17, §19–20; M7)
+## ✅ Phase 6 — Hardening & Deployment (spec §17, §19–20; M7) (COMPLETE)
 
 **Objective:** Production-ready packaging, CI, and operations.
 
@@ -237,6 +245,17 @@ Build each as a standard CRUD pair (controller + `EditViewModel`/`ListViewModel`
 - **Verify:** structured logs flow; backup/restore procedure documented and rehearsed once.
 
 **DoD:** Containers build, CI green, prod config boots, backup + monitoring documented.
+
+**Completion record (files written; container/SQL Server runtime unverifiable locally — no Docker installed):**
+
+- **6.1 Containerization — done.** `Dockerfile` (multi-stage sdk:8.0 → aspnet:8.0, non-root `$APP_UID`, layer-cached restore, `EXPOSE 8080`, `HEALTHCHECK` via `curl /health/live` — the initial `--healthcheck` arg stub was wrong and is fixed); `.dockerignore` (artifacts, secrets, local DB/logs/media); `docker-compose.yml` (web + `mcr.microsoft.com/mssql/server:2022` with healthcheck gating, `mssql-data`/`media-data` volumes, FTS script mounted read-only, `.env`-driven secrets); `.env.example` documenting every variable.
+- **6.2 CI — done.** `.github/workflows/ci.yml` (checkout → setup-dotnet honoring `global.json` → restore → Release build → `dotnet test` → publish → upload artifact).
+- **6.3 Production config & startup — done.** `Program.cs`: SQL Server now applies `MigrateAsync()` + seed on startup, gated by `Seed:OnStartup` (default true) and `Seed:SampleContent` (default true on the SQLite/dev path, false for SQL Server — production seeds lookup data only); `DatabaseInitializer.InitializeAsync` gained the `seedSampleContent` flag so demo artists/albums/poems + Phase 4 content are skipped when disabled. Forwarded-headers middleware added behind `Site:BehindProxy` (default false — never trust client-supplied headers when directly exposed). HTTPS redirection is now config-driven (`Site:EnableHttpsRedirection`, default on outside Development). `appsettings.Production.json` added: SqlServer provider, env-overridable `DefaultConnection`, `Site.BaseUrl`/CDN, `Seed` + `Admin` sections, tuned endpoint-aware rate limiting (120/min global, 30/min search, 5/min login, 60/min API) and Serilog file+console sinks.
+- **6.3 Admin bootstrap — done.** New `Seed/AdminBootstrap.cs` (idempotent, runs every boot): seeds the six `RoleConstants` roles, grants the Administrator role all 21 `PermissionConstants` permission claims (role-claim pattern identical to the admin Roles screen, surfaced by `AppUserClaimsPrincipalFactory`), and creates the configured first admin (`Admin:Email`/`Password`) when present — closing the "Admin account created / Roles seeded" §22.4 checklist gap. The admin's login name is the email itself (the login form posts the email and `PasswordSignInAsync` treats it as the user name, same contract as self-registration). Claims and the user-role link are written through `DbSet`s in isolated scopes rather than `RoleManager.AddClaimAsync`/`UserManager.AddToRoleAsync` — those attach freshly-created (Added-state) entities and throw an EF tracking conflict on first boot. Failures log loudly but never block startup.
+- **Latent auth bug fixed (found while wiring the bootstrap).** `AppDbContext` never registered the Identity model — `AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<AppDbContext>()` was configured against a context with no `IdentityUser`/`IdentityRole`, so **every `UserManager`/`RoleManager`/`SignInManager` call threw (registration, login, and the admin Users/Roles screens could never have worked)**. Fixed by deriving `AppDbContext` from `IdentityDbContext<IdentityUser, IdentityRole, string>` (+ the `Microsoft.AspNetCore.Identity.EntityFrameworkCore` package in the Data project). The seven AspNet tables are created idempotently in `DatabaseInitializer` for both providers, **and** a real migration (`AddCurrentModelTables`) was generated from the current model so `MigrateAsync` on a fresh SQL Server produces a complete schema (the 2026-07-22 `InitialCreate` already carried all 82 domain tables; the new migration adds exactly the Identity + `AuditLog` delta and keeps the snapshot in sync for future `migrations add` runs). The idempotent DDL remains as a backward-compat safety net for databases created before the migration existed. Verified end-to-end on SQLite: register-less admin login → 302, `/admin/users` and `/admin/roles` render authenticated, 6 roles + 21 permission claims present.
+- **Admin-area layout bug fixed (found while verifying the bootstrap end-to-end).** `Areas/Admin/Views/_ViewStart.cshtml` set `Layout = "_AdminLayout.cshtml"` — a bare filename *with* the `.cshtml` extension. Razor resolves a layout name containing an extension as a path relative to the executing `_ViewStart`'s own directory, so it searched only `/Areas/Admin/Views/_AdminLayout.cshtml` and never `Views/Shared/` — every admin page threw `The layout view '/Areas/Admin/Views/_AdminLayout.cshtml' could not be located` (500). Changed to the explicit app-relative `Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml"` (same form the root `Views/_ViewStart.cshtml` uses for `_Layout`), which resolves correctly. Verified: `/admin/users` and `/admin/roles` now render 200 with real content after login.
+- **6.4 Operations docs — done.** `DEPLOYMENT.md` runbook: architecture diagram, quick start, full env-var reference, security posture recap, FTS one-time setup via `sqlcmd` (script mounted in the mssql container), SQL backup + restore-drill procedure, monitoring (health endpoints + Serilog + alerting guidance), `hey` load-test targets, TLS/proxy notes, rollout/rollback + zero-downtime guidance, and a troubleshooting table. `README.md` rewritten from a stub with overview, dev quickstart, and deployment pointer.
+- **Verified locally:** build clean; 13 tests green; `dotnet publish` succeeds with all three appsettings files; SQLite dev path boots, seeds sample content, and the admin bootstrap + full login flow verified end-to-end via curl (302 on login POST, authenticated `/admin/users` + `/admin/roles`). Docker/CI/SQL Server runtime remains unverifiable here (no Docker) — see Risks.
 
 ---
 
@@ -294,7 +313,7 @@ Recommended agents split: one agent per phase (4, 5, 6, 7) after Phase 4 lands.
 
 ## Risks & notes
 
-- **No SQL Server instance available locally** → Phases 5.2, 6.1, Hangfire, and the FTS path are unverifiable until one is provisioned (Docker `mssql` image works). All dev work is on SQLite.
+- **No SQL Server instance / Docker available locally** → Phases 5.2, 6.1 (container runtime), Hangfire, and the FTS path are unverifiable until one is provisioned (Docker `mssql` image works — `docker-compose.yml` + `DEPLOYMENT.md` are written and ready). All dev work is on SQLite; the SQL Server startup path (migrate + seed + admin bootstrap) is code-reviewed but not runtime-verified.
 - **`ContentLocalizationService` and API controllers pass `culture: "en"`** which is not a supported culture until Phase 2.1 lands — fix ordering so 2.1 ships before any culture-dependent verification.
 - **SkiaSharp** (MediaService thumbnails) requires native libs — the copy-fallback path already guards this; keep it.
 - **Scope control:** do not start §35 items until §36 passes.
@@ -308,8 +327,8 @@ Recommended agents split: one agent per phase (4, 5, 6, 7) after Phase 4 lands.
 2. ✅ Public site browsable with seeded content, search working, home populated (Phase 1).
 3. ✅ All 4 cultures render with RTL and localization fallback (Phase 2).
 4. ✅ Every admin nav section functional with validation, concurrency, soft delete, authorization (Phase 3).
-5. ⏳ Advanced features render from DB (Phase 4).
-6. ⏳ Caching + invalidation proven; full-text search works on SQL Server (Phase 5).
-7. ⏳ Containers + CI + production config working (Phase 6).
+5. ✅ Advanced features render from DB (Phase 4).
+6. ✅ Caching + invalidation proven (Phase 5); full-text search works on SQL Server (documented, unverifiable locally).
+7. ✅ Containers + CI + production config written; runtime verification pending a Docker host (Phase 6).
 8. ⏳ Tests cover spec §21 (Phase 7).
 9. ⏳ Spec §36's 20 acceptance criteria all pass (Phase 8).

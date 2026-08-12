@@ -34,4 +34,9 @@ public sealed class TrackDetailDto
     public IReadOnlyList<AwardAssignmentDto> Awards { get; init; } = [];
     public IReadOnlyList<CertificationAssignmentDto> Certifications { get; init; } = [];
     public IReadOnlyList<ChartEntryDto> ChartEntries { get; init; } = [];
+
+    // ── Phase 4 additions ──
+    public IReadOnlyList<TrackRelationDto> RelatedTracks { get; init; } = [];
+    public IReadOnlyList<RecordingSessionDto> RecordingSessions { get; init; } = [];
+    public IReadOnlyList<PerformanceEventDto> PerformanceEvents { get; init; } = [];
 }

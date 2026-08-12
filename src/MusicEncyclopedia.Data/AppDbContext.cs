@@ -1,10 +1,19 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using MusicEncyclopedia.Data.Entities;
 
 namespace MusicEncyclopedia.Data;
 
-public class AppDbContext : DbContext
+/// <summary>
+/// Application data context. Derives from <see cref="IdentityDbContext{TUser,TRole,TKey}"/>
+/// so the ASP.NET Core Identity model (AspNetUsers/AspNetRoles/AspNetUserRoles/…
+/// tables) is part of the EF model. The tables themselves are created via
+/// idempotent DDL in <see cref="Seed.DatabaseInitializer"/> for existing databases
+/// (the same pattern already used for <see cref="AuditLog"/>).
+/// </summary>
+public class AppDbContext : IdentityDbContext<IdentityUser, IdentityRole, string>
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {

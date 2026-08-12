@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MusicEncyclopedia.Core.Constants;
 using MusicEncyclopedia.Core.DTOs;
+using MusicEncyclopedia.Core.Infrastructure;
 using MusicEncyclopedia.Core.Interfaces;
 using MusicEncyclopedia.Services.Infrastructure;
 
@@ -19,13 +20,16 @@ public sealed class CompanyQueryService : ICompanyQueryService
     private readonly bool _isSqlite;
     private readonly ILogger<CompanyQueryService> _logger;
     private readonly IContentLocalizationService _localizationService;
+    private readonly ICacheService _cache;
 
     public CompanyQueryService(
         IConfiguration configuration,
         ILogger<CompanyQueryService> logger,
-        IContentLocalizationService localizationService)
+        IContentLocalizationService localizationService,
+        ICacheService cache)
     {
         _localizationService = localizationService;
+        _cache = cache;
 
         var dbProvider = configuration.GetValue<string>("DatabaseProvider") ?? "SqlServer";
         _isSqlite = string.Equals(dbProvider, "Sqlite", StringComparison.OrdinalIgnoreCase);
@@ -57,6 +61,34 @@ public sealed class CompanyQueryService : ICompanyQueryService
         page = Math.Max(1, page);
         pageSize = Math.Clamp(pageSize, 1, 100);
 
+        try
+        {
+            var cacheKey = CacheKeys.List("company", culture, page, pageSize, sort, q);
+
+            var cached = await _cache.GetAsync<PagedResult<NamedLinkDto>>(cacheKey, cancellationToken);
+            if (cached is not null)
+                return cached;
+
+            var result = await LoadCompaniesCoreAsync(culture, page, pageSize, sort, q, cancellationToken);
+
+            await _cache.SetAsync(cacheKey, result, CacheKeys.ListDuration, cancellationToken);
+            return result;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to load company list for culture={Culture}, page={Page}", culture, page);
+            return PagedResult<NamedLinkDto>.Create([], page, pageSize, 0);
+        }
+    }
+
+    private async Task<PagedResult<NamedLinkDto>> LoadCompaniesCoreAsync(
+        string culture,
+        int page,
+        int pageSize,
+        string? sort,
+        string? q,
+        CancellationToken cancellationToken)
+    {
         var whereClauses = new List<string> { "c.IsDeleted = 0" };
         var parameters = new DynamicParameters();
 
@@ -94,21 +126,13 @@ public sealed class CompanyQueryService : ICompanyQueryService
         parameters.Add("Offset", (page - 1) * pageSize);
         parameters.Add("PageSize", pageSize);
 
-        try
-        {
-            using var connection = CreateConnection();
-            connection.Open();
+        using var connection = CreateConnection();
+        connection.Open();
 
-            var totalItems = await connection.ExecuteScalarAsync<int>(countSql, parameters);
-            var items = await connection.QueryAsync<NamedLinkDto>(dataSql, parameters);
+        var totalItems = await connection.ExecuteScalarAsync<int>(countSql, parameters);
+        var items = await connection.QueryAsync<NamedLinkDto>(dataSql, parameters);
 
-            return PagedResult<NamedLinkDto>.Create(items.AsList(), page, pageSize, totalItems);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to load company list for culture={Culture}, page={Page}", culture, page);
-            return PagedResult<NamedLinkDto>.Create([], page, pageSize, 0);
-        }
+        return PagedResult<NamedLinkDto>.Create(items.AsList(), page, pageSize, totalItems);
     }
 
     /// <inheritdoc />
@@ -116,6 +140,34 @@ public sealed class CompanyQueryService : ICompanyQueryService
         string slug,
         string culture,
         CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var cacheKey = CacheKeys.Detail("company", culture, slug);
+
+            var cached = await _cache.GetAsync<object>(cacheKey, cancellationToken);
+            if (cached is not null)
+                return cached;
+
+            var result = await LoadCompanyDetailCoreAsync(slug, culture, cancellationToken);
+            if (result is not null)
+            {
+                await _cache.SetAsync(cacheKey, result, CacheKeys.DetailDuration, cancellationToken);
+            }
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to load company by slug={Slug}, culture={Culture}", slug, culture);
+            return null;
+        }
+    }
+
+    private async Task<object?> LoadCompanyDetailCoreAsync(
+        string slug,
+        string culture,
+        CancellationToken cancellationToken)
     {
         const string companySql = """
             SELECT

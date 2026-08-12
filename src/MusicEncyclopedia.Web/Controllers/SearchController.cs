@@ -2,6 +2,7 @@ using System.Data;
 using Dapper;
 using Microsoft.AspNetCore.Mvc;
 using MusicEncyclopedia.Core.DTOs;
+using MusicEncyclopedia.Core.Infrastructure;
 using MusicEncyclopedia.Core.Interfaces;
 using MusicEncyclopedia.Web.ViewModels.Public;
 
@@ -18,22 +19,33 @@ public sealed class SearchController : Controller
     private readonly ISearchService _searchService;
     private readonly IDbConnection _db;
     private readonly ILogger<SearchController> _logger;
+    private readonly ICacheService _cache;
 
     public SearchController(
         ISearchService searchService,
         IDbConnection db,
-        ILogger<SearchController> logger)
+        ILogger<SearchController> logger,
+        ICacheService cache)
     {
         _searchService = searchService;
         _db = db;
         _logger = logger;
+        _cache = cache;
     }
 
     private async Task<List<LookupItem>> LoadLookupsAsync(string table, CancellationToken ct)
     {
+        var cacheKey = CacheKeys.Lookup(table.ToLowerInvariant());
+        var cached = await _cache.GetAsync<List<LookupItem>>(cacheKey, ct);
+        if (cached is not null)
+            return cached;
+
         var rows = await _db.QueryAsync<(string Slug, string Name)>(
             $"SELECT Slug, Name FROM {table} WHERE IsDeleted = 0 ORDER BY Name");
-        return rows.Select(r => new LookupItem { Slug = r.Slug, Name = r.Name }).ToList();
+        var items = rows.Select(r => new LookupItem { Slug = r.Slug, Name = r.Name }).ToList();
+
+        await _cache.SetAsync(cacheKey, items, CacheKeys.LookupDuration, ct);
+        return items;
     }
 
     /// <summary>
@@ -43,7 +55,6 @@ public sealed class SearchController : Controller
     [HttpGet]
     [Route("")]
     [Route("Index")]
-    [ResponseCache(Duration = 120, VaryByQueryKeys = new[] { "*" }, VaryByHeader = "Accept-Language")]
     public async Task<IActionResult> Index(
         string culture,
         string? q,

@@ -9,7 +9,18 @@ namespace MusicEncyclopedia.Data.Seed;
 /// </summary>
 public static class DatabaseInitializer
 {
-    public static async Task InitializeAsync(AppDbContext context, bool isSqlite)
+    /// <summary>
+    /// Initializes schema and seed data.
+    /// </summary>
+    /// <param name="context">The application database context.</param>
+    /// <param name="isSqlite">True when running on SQLite (EnsureCreated); false applies on SQL Server (migrations are applied by the caller).</param>
+    /// <param name="seedSampleContent">
+    /// When false, only lookup data is seeded — the demo artists/albums/tracks/
+    /// poems and Phase 4 content are skipped. Production deployments should set
+    /// this to false (config <c>Seed:SampleContent</c>).
+    /// </param>
+    public static async Task InitializeAsync(
+        AppDbContext context, bool isSqlite, bool seedSampleContent = true)
     {
         if (isSqlite)
         {
@@ -31,6 +42,81 @@ public static class DatabaseInitializer
                     "Details" TEXT NULL,
                     "IpAddress" TEXT NULL
                 )
+                """);
+
+            // ASP.NET Core Identity tables. Fresh databases get these from the
+            // model (EnsureCreated) / migration (MigrateAsync); the CREATE TABLE
+            // IF NOT EXISTS guards below are a backward-compat safety net for
+            // existing databases created before Identity was added to the model.
+            await context.Database.ExecuteSqlRawAsync(
+                """
+                CREATE TABLE IF NOT EXISTS "AspNetRoles" (
+                    "Id" TEXT NOT NULL CONSTRAINT "PK_AspNetRoles" PRIMARY KEY,
+                    "Name" TEXT NULL,
+                    "NormalizedName" TEXT NULL,
+                    "ConcurrencyStamp" TEXT NULL
+                );
+                CREATE UNIQUE INDEX IF NOT EXISTS "RoleNameIndex" ON "AspNetRoles" ("NormalizedName");
+
+                CREATE TABLE IF NOT EXISTS "AspNetUsers" (
+                    "Id" TEXT NOT NULL CONSTRAINT "PK_AspNetUsers" PRIMARY KEY,
+                    "UserName" TEXT NULL,
+                    "NormalizedUserName" TEXT NULL,
+                    "Email" TEXT NULL,
+                    "NormalizedEmail" TEXT NULL,
+                    "EmailConfirmed" INTEGER NOT NULL,
+                    "PasswordHash" TEXT NULL,
+                    "SecurityStamp" TEXT NULL,
+                    "ConcurrencyStamp" TEXT NULL,
+                    "PhoneNumber" TEXT NULL,
+                    "PhoneNumberConfirmed" INTEGER NOT NULL,
+                    "TwoFactorEnabled" INTEGER NOT NULL,
+                    "LockoutEnd" TEXT NULL,
+                    "LockoutEnabled" INTEGER NOT NULL,
+                    "AccessFailedCount" INTEGER NOT NULL
+                );
+                CREATE UNIQUE INDEX IF NOT EXISTS "UserNameIndex" ON "AspNetUsers" ("NormalizedUserName");
+                CREATE UNIQUE INDEX IF NOT EXISTS "EmailIndex" ON "AspNetUsers" ("NormalizedEmail");
+
+                CREATE TABLE IF NOT EXISTS "AspNetRoleClaims" (
+                    "Id" INTEGER NOT NULL CONSTRAINT "PK_AspNetRoleClaims" PRIMARY KEY AUTOINCREMENT,
+                    "RoleId" TEXT NOT NULL,
+                    "ClaimType" TEXT NULL,
+                    "ClaimValue" TEXT NULL
+                );
+                CREATE INDEX IF NOT EXISTS "IX_AspNetRoleClaims_RoleId" ON "AspNetRoleClaims" ("RoleId");
+
+                CREATE TABLE IF NOT EXISTS "AspNetUserClaims" (
+                    "Id" INTEGER NOT NULL CONSTRAINT "PK_AspNetUserClaims" PRIMARY KEY AUTOINCREMENT,
+                    "UserId" TEXT NOT NULL,
+                    "ClaimType" TEXT NULL,
+                    "ClaimValue" TEXT NULL
+                );
+                CREATE INDEX IF NOT EXISTS "IX_AspNetUserClaims_UserId" ON "AspNetUserClaims" ("UserId");
+
+                CREATE TABLE IF NOT EXISTS "AspNetUserLogins" (
+                    "LoginProvider" TEXT NOT NULL,
+                    "ProviderKey" TEXT NOT NULL,
+                    "ProviderDisplayName" TEXT NULL,
+                    "UserId" TEXT NOT NULL,
+                    CONSTRAINT "PK_AspNetUserLogins" PRIMARY KEY ("LoginProvider", "ProviderKey")
+                );
+                CREATE INDEX IF NOT EXISTS "IX_AspNetUserLogins_UserId" ON "AspNetUserLogins" ("UserId");
+
+                CREATE TABLE IF NOT EXISTS "AspNetUserRoles" (
+                    "UserId" TEXT NOT NULL,
+                    "RoleId" TEXT NOT NULL,
+                    CONSTRAINT "PK_AspNetUserRoles" PRIMARY KEY ("UserId", "RoleId")
+                );
+                CREATE INDEX IF NOT EXISTS "IX_AspNetUserRoles_RoleId" ON "AspNetUserRoles" ("RoleId");
+
+                CREATE TABLE IF NOT EXISTS "AspNetUserTokens" (
+                    "UserId" TEXT NOT NULL,
+                    "LoginProvider" TEXT NOT NULL,
+                    "Name" TEXT NOT NULL,
+                    "Value" TEXT NULL,
+                    CONSTRAINT "PK_AspNetUserTokens" PRIMARY KEY ("UserId", "LoginProvider", "Name")
+                );
                 """);
         }
         else
@@ -55,21 +141,133 @@ public static class DatabaseInitializer
                     )
                 END
                 """);
+
+            // ASP.NET Core Identity tables. On a fresh SQL Server the
+            // AddCurrentModelTables migration creates them (idempotent DDL below
+            // no-ops via the IF OBJECT_ID guards); these remain as a
+            // backward-compat safety net for databases created before the
+            // migration existed. Types match the IdentityDbContext mapping.
+            await context.Database.ExecuteSqlRawAsync(
+                """
+                IF OBJECT_ID(N'[AspNetRoles]', N'U') IS NULL
+                BEGIN
+                    CREATE TABLE [AspNetRoles] (
+                        [Id] nvarchar(450) NOT NULL CONSTRAINT [PK_AspNetRoles] PRIMARY KEY,
+                        [Name] nvarchar(256) NULL,
+                        [NormalizedName] nvarchar(256) NULL,
+                        [ConcurrencyStamp] nvarchar(max) NULL
+                    );
+                    CREATE UNIQUE INDEX [RoleNameIndex] ON [AspNetRoles] ([NormalizedName]) WHERE [NormalizedName] IS NOT NULL;
+                END
+
+                IF OBJECT_ID(N'[AspNetUsers]', N'U') IS NULL
+                BEGIN
+                    CREATE TABLE [AspNetUsers] (
+                        [Id] nvarchar(450) NOT NULL CONSTRAINT [PK_AspNetUsers] PRIMARY KEY,
+                        [UserName] nvarchar(256) NULL,
+                        [NormalizedUserName] nvarchar(256) NULL,
+                        [Email] nvarchar(256) NULL,
+                        [NormalizedEmail] nvarchar(256) NULL,
+                        [EmailConfirmed] bit NOT NULL,
+                        [PasswordHash] nvarchar(max) NULL,
+                        [SecurityStamp] nvarchar(max) NULL,
+                        [ConcurrencyStamp] nvarchar(max) NULL,
+                        [PhoneNumber] nvarchar(max) NULL,
+                        [PhoneNumberConfirmed] bit NOT NULL,
+                        [TwoFactorEnabled] bit NOT NULL,
+                        [LockoutEnd] datetimeoffset NULL,
+                        [LockoutEnabled] bit NOT NULL,
+                        [AccessFailedCount] int NOT NULL
+                    );
+                    CREATE UNIQUE INDEX [UserNameIndex] ON [AspNetUsers] ([NormalizedUserName]) WHERE [NormalizedUserName] IS NOT NULL;
+                    CREATE UNIQUE INDEX [EmailIndex] ON [AspNetUsers] ([NormalizedEmail]) WHERE [NormalizedEmail] IS NOT NULL;
+                END
+
+                IF OBJECT_ID(N'[AspNetRoleClaims]', N'U') IS NULL
+                BEGIN
+                    CREATE TABLE [AspNetRoleClaims] (
+                        [Id] int NOT NULL IDENTITY(1,1) CONSTRAINT [PK_AspNetRoleClaims] PRIMARY KEY,
+                        [RoleId] nvarchar(450) NOT NULL,
+                        [ClaimType] nvarchar(max) NULL,
+                        [ClaimValue] nvarchar(max) NULL
+                    );
+                    CREATE INDEX [IX_AspNetRoleClaims_RoleId] ON [AspNetRoleClaims] ([RoleId]);
+                END
+
+                IF OBJECT_ID(N'[AspNetUserClaims]', N'U') IS NULL
+                BEGIN
+                    CREATE TABLE [AspNetUserClaims] (
+                        [Id] int NOT NULL IDENTITY(1,1) CONSTRAINT [PK_AspNetUserClaims] PRIMARY KEY,
+                        [UserId] nvarchar(450) NOT NULL,
+                        [ClaimType] nvarchar(max) NULL,
+                        [ClaimValue] nvarchar(max) NULL
+                    );
+                    CREATE INDEX [IX_AspNetUserClaims_UserId] ON [AspNetUserClaims] ([UserId]);
+                END
+
+                IF OBJECT_ID(N'[AspNetUserLogins]', N'U') IS NULL
+                BEGIN
+                    CREATE TABLE [AspNetUserLogins] (
+                        [LoginProvider] nvarchar(128) NOT NULL,
+                        [ProviderKey] nvarchar(128) NOT NULL,
+                        [ProviderDisplayName] nvarchar(max) NULL,
+                        [UserId] nvarchar(450) NOT NULL,
+                        CONSTRAINT [PK_AspNetUserLogins] PRIMARY KEY ([LoginProvider], [ProviderKey])
+                    );
+                    CREATE INDEX [IX_AspNetUserLogins_UserId] ON [AspNetUserLogins] ([UserId]);
+                END
+
+                IF OBJECT_ID(N'[AspNetUserRoles]', N'U') IS NULL
+                BEGIN
+                    CREATE TABLE [AspNetUserRoles] (
+                        [UserId] nvarchar(450) NOT NULL,
+                        [RoleId] nvarchar(450) NOT NULL,
+                        CONSTRAINT [PK_AspNetUserRoles] PRIMARY KEY ([UserId], [RoleId])
+                    );
+                    CREATE INDEX [IX_AspNetUserRoles_RoleId] ON [AspNetUserRoles] ([RoleId]);
+                END
+
+                IF OBJECT_ID(N'[AspNetUserTokens]', N'U') IS NULL
+                BEGIN
+                    CREATE TABLE [AspNetUserTokens] (
+                        [UserId] nvarchar(450) NOT NULL,
+                        [LoginProvider] nvarchar(128) NOT NULL,
+                        [Name] nvarchar(128) NOT NULL,
+                        [Value] nvarchar(max) NULL,
+                        CONSTRAINT [PK_AspNetUserTokens] PRIMARY KEY ([UserId], [LoginProvider], [Name])
+                    );
+                END
+                """);
         }
 
         // Check if data already exists (using MediaTypes as a sentinel table)
         if (await context.MediaTypes.AnyAsync())
         {
-            await SeedSampleContentAsync(context);
+            await SeedOptionalContentAsync(context, seedSampleContent);
             await SeedLocalizationsAsync(context);
             return; // Lookup data already seeded
         }
 
         await SeedLookupDataAsync(context);
 
-        await SeedSampleContentAsync(context);
+        await SeedOptionalContentAsync(context, seedSampleContent);
 
         await SeedLocalizationsAsync(context);
+    }
+
+    /// <summary>
+    /// Seeds demo/sample content only when explicitly enabled (config
+    /// <c>Seed:SampleContent</c>). Production deployments keep lookup-only data.
+    /// </summary>
+    private static async Task SeedOptionalContentAsync(AppDbContext context, bool seedSampleContent)
+    {
+        if (!seedSampleContent)
+        {
+            return;
+        }
+
+        await SeedSampleContentAsync(context);
+        await SeedPhase4ContentAsync(context);
     }
 
     /// <summary>
@@ -461,6 +659,306 @@ public static class DatabaseInitializer
         });
 
         await context.SaveChangesAsync();
+    }
+
+    /// <summary>
+    /// Seeds Phase 4 (Advanced Encyclopedia Features) data: a recording session,
+    /// a performance event, an award + assignment, a chart + entries, a
+    /// publication, musician/track credits, musician instruments, and album/
+    /// track relations — so the timeline, discography filters, contribution
+    /// filters and related-items sections are demonstrable out of the box.
+    /// Every section is guarded so re-runs never duplicate data.
+    /// </summary>
+    private static async Task SeedPhase4ContentAsync(AppDbContext context)
+    {
+        if (await context.RecordingSessions.AnyAsync())
+            return; // Phase 4 content already seeded
+
+        var now = DateTime.UtcNow;
+
+        // ── Resolve seeded entities by slug (works on fresh and existing DBs) ──
+        var artist = await context.People.FirstOrDefaultAsync(p => p.Slug == "darya-ensemble");
+        var poet = await context.People.FirstOrDefaultAsync(p => p.Slug == "niloofar-rahimi");
+        var album = await context.Albums.FirstOrDefaultAsync(a => a.Slug == "midnight-garden");
+        var otherAlbum = await context.Albums.FirstOrDefaultAsync(a => a.Slug == "the-silent-river");
+        var track = await context.Tracks.FirstOrDefaultAsync(t => t.Slug == "garden-of-stars");
+        var otherTrack = await context.Tracks.FirstOrDefaultAsync(t => t.Slug == "silent-petals");
+
+        if (artist is null || album is null || track is null)
+            return; // Sample content not present — nothing to attach Phase 4 data to
+
+        // ── Resolve lookup ids by code (never hard-code against row order) ──
+        var sessionTypeAlbum = await context.SessionTypes.FirstOrDefaultAsync(s => s.Code == "ALBUM");
+        var eventTypeConcert = await context.EventTypes.FirstOrDefaultAsync(e => e.Code == "CONCERT");
+        var awardResultWon = await context.AwardResultTypes.FirstOrDefaultAsync(r => r.Code == "WON");
+        var publicationTypeBook = await context.PublicationTypes.FirstOrDefaultAsync(p => p.Code == "BOOK");
+        var albumRelationFollowUp = await context.AlbumRelationTypes.FirstOrDefaultAsync(r => r.Code == "FOLLOW_UP");
+        var trackRelationAcoustic = await context.TrackRelationTypes.FirstOrDefaultAsync(r => r.Code == "ACOUSTIC");
+        var santur = await context.Instruments.FirstOrDefaultAsync(i => i.Slug == "santur");
+        var tombak = await context.Instruments.FirstOrDefaultAsync(i => i.Slug == "tombak");
+
+        // ── Location: the ensemble's own Tehran studio ──
+        var location = await context.Locations.FirstOrDefaultAsync(l => l.Slug == "darya-studio-tehran");
+        if (location is null)
+        {
+            var locationEntity = await CreateEntityAsync(context, 13, "darya-studio-tehran");
+            location = new Location
+            {
+                EntityId = locationEntity.EntityId,
+                Name = "Darya Studio",
+                LocationTypeId = 4, // Recording Studio
+                CountryId = 1,
+                Slug = "darya-studio-tehran",
+                IsDeleted = false,
+                RowVersion = new byte[8],
+                CreatedBy = "seed",
+                CreatedAt = now
+            };
+            context.Locations.Add(location);
+            await context.SaveChangesAsync();
+        }
+
+        // ── Recording session ──
+        var session = await context.RecordingSessions.FirstOrDefaultAsync(s => s.Slug == "midnight-garden-session");
+        if (session is null)
+        {
+            var sessionEntity = await CreateEntityAsync(context, 11, "midnight-garden-session");
+            session = new RecordingSession
+            {
+                EntityId = sessionEntity.EntityId,
+                SessionTypeId = sessionTypeAlbum?.SessionTypeId,
+                LocationId = location.LocationId,
+                StartDate = new DateOnly(2022, 2, 10),
+                EndDate = new DateOnly(2022, 4, 28),
+                Notes = "Principal tracking for Midnight Garden.",
+                Slug = "midnight-garden-session",
+                IsDeleted = false,
+                RowVersion = new byte[8],
+                CreatedBy = "seed",
+                CreatedAt = now
+            };
+            context.RecordingSessions.Add(session);
+            await context.SaveChangesAsync();
+
+            context.RecordingSessionAlbums.Add(new RecordingSessionAlbum { RecordingSessionId = session.RecordingSessionId, AlbumId = album.AlbumId });
+            context.RecordingSessionTracks.Add(new RecordingSessionTrack { RecordingSessionId = session.RecordingSessionId, TrackId = track.TrackId });
+            await context.SaveChangesAsync();
+        }
+
+        // ── Performance event ──
+        var perfEvent = await context.PerformanceEvents.FirstOrDefaultAsync(e => e.Slug == "darya-tehran-concert-2023");
+        if (perfEvent is null)
+        {
+            var eventEntity = await CreateEntityAsync(context, 12, "darya-tehran-concert-2023");
+            perfEvent = new PerformanceEvent
+            {
+                EntityId = eventEntity.EntityId,
+                EventTypeId = eventTypeConcert?.EventTypeId,
+                LocationId = location.LocationId,
+                Date = new DateTime(2023, 9, 15, 20, 0, 0),
+                PerformanceNotes = "Album-release concert for Midnight Garden.",
+                Slug = "darya-tehran-concert-2023",
+                IsDeleted = false,
+                RowVersion = new byte[8],
+                CreatedBy = "seed",
+                CreatedAt = now
+            };
+            context.PerformanceEvents.Add(perfEvent);
+            await context.SaveChangesAsync();
+
+            context.PerformanceEventAlbums.Add(new PerformanceEventAlbum { PerformanceEventId = perfEvent.PerformanceEventId, AlbumId = album.AlbumId });
+            context.PerformanceEventTracks.Add(new PerformanceEventTrack { PerformanceEventId = perfEvent.PerformanceEventId, TrackId = track.TrackId });
+            await context.SaveChangesAsync();
+        }
+
+        // ── Award + assignment ──
+        var award = await context.Awards.FirstOrDefaultAsync(a => a.Slug == "persian-music-award");
+        if (award is null)
+        {
+            var awardEntity = await CreateEntityAsync(context, 14, "persian-music-award");
+            award = new Award
+            {
+                EntityId = awardEntity.EntityId,
+                Name = "Persian Music Award",
+                Organization = "Persian Music Academy",
+                CountryId = 1,
+                Description = "Annual award honoring excellence in Persian music.",
+                Slug = "persian-music-award",
+                IsDeleted = false,
+                RowVersion = new byte[8],
+                CreatedBy = "seed",
+                CreatedAt = now
+            };
+            context.Awards.Add(award);
+            await context.SaveChangesAsync();
+        }
+
+        if (!await context.AwardAssignments.AnyAsync(aa => aa.AwardId == award.AwardId && aa.EntityId == album.EntityId))
+        {
+            context.AwardAssignments.Add(new AwardAssignment
+            {
+                AwardId = award.AwardId,
+                EntityTypeId = 1, // Album
+                EntityId = album.EntityId,
+                AwardResultTypeId = awardResultWon?.AwardResultTypeId,
+                Year = 2023,
+                Category = "Best Instrumental Album",
+                Notes = "Awarded for Midnight Garden."
+            });
+            await context.SaveChangesAsync();
+        }
+
+        // ── Chart + entries ──
+        var chart = await context.Charts.FirstOrDefaultAsync(c => c.Slug == "iranian-album-chart");
+        if (chart is null)
+        {
+            var chartEntity = await CreateEntityAsync(context, 16, "iranian-album-chart");
+            chart = new Chart
+            {
+                EntityId = chartEntity.EntityId,
+                Name = "Iranian Album Chart",
+                Publisher = "Music Weekly",
+                CountryId = 1,
+                Frequency = "Weekly",
+                Slug = "iranian-album-chart",
+                IsDeleted = false,
+                RowVersion = new byte[8],
+                CreatedBy = "seed",
+                CreatedAt = now
+            };
+            context.Charts.Add(chart);
+            await context.SaveChangesAsync();
+        }
+
+        if (!await context.ChartEntries.AnyAsync(ce => ce.ChartId == chart.ChartId && ce.EntityId == album.EntityId))
+        {
+            context.ChartEntries.AddRange(
+                new ChartEntry
+                {
+                    ChartId = chart.ChartId,
+                    EntityTypeId = 1, // Album
+                    EntityId = album.EntityId,
+                    Date = new DateOnly(2022, 6, 25),
+                    Position = 3,
+                    PreviousPosition = null,
+                    WeeksOnChart = 1
+                },
+                new ChartEntry
+                {
+                    ChartId = chart.ChartId,
+                    EntityTypeId = 1,
+                    EntityId = album.EntityId,
+                    Date = new DateOnly(2022, 7, 2),
+                    Position = 1,
+                    PreviousPosition = 3,
+                    WeeksOnChart = 2
+                });
+            await context.SaveChangesAsync();
+        }
+
+        // ── Publication for the poet ──
+        if (poet is not null && !await context.Publications.AnyAsync(p => p.Slug == "garden-of-quiet-poems"))
+        {
+            var pubEntity = await CreateEntityAsync(context, 10, "garden-of-quiet-poems");
+            context.Publications.Add(new Publication
+            {
+                EntityId = pubEntity.EntityId,
+                PersonId = poet.PersonId,
+                Title = "The Garden of Quiet: Collected Poems",
+                PublicationTypeId = publicationTypeBook?.PublicationTypeId,
+                PublicationDate = new DateOnly(2024, 1, 12),
+                ISBN = "978-600-000-000-0",
+                Slug = "garden-of-quiet-poems",
+                IsDeleted = false,
+                RowVersion = new byte[8],
+                CreatedBy = "seed",
+                CreatedAt = now
+            });
+            await context.SaveChangesAsync();
+        }
+
+        // ── Musician instruments (artist plays santur & tombak) ──
+        if (santur is not null &&
+            !await context.MusicianInstruments.AnyAsync(mi => mi.PersonId == artist.PersonId && mi.InstrumentId == santur.InstrumentId))
+        {
+            context.MusicianInstruments.Add(new MusicianInstrument { PersonId = artist.PersonId, InstrumentId = santur.InstrumentId, Notes = "Principal instrument" });
+        }
+        if (tombak is not null &&
+            !await context.MusicianInstruments.AnyAsync(mi => mi.PersonId == artist.PersonId && mi.InstrumentId == tombak.InstrumentId))
+        {
+            context.MusicianInstruments.Add(new MusicianInstrument { PersonId = artist.PersonId, InstrumentId = tombak.InstrumentId });
+        }
+        await context.SaveChangesAsync();
+
+        // ── Track musician credits (drives Track Contributions + timeline TrackRelease) ──
+        if (!await context.Credits.AnyAsync(c => c.EntityTypeId == 2 && c.PersonId == artist.PersonId))
+        {
+            var trackEntity = await context.Entities.FirstOrDefaultAsync(e => e.EntityId == track.EntityId);
+            if (trackEntity is not null)
+            {
+                context.Credits.Add(new Credit
+                {
+                    EntityTypeId = 2, // Track
+                    EntityId = track.EntityId,
+                    CreditRoleId = 4, // Musician
+                    RoleScopeTypeId = 1,
+                    PersonId = artist.PersonId,
+                    InstrumentId = santur?.InstrumentId,
+                    DisplayOrder = 1,
+                    IsPrimary = true,
+                    CreatedBy = "seed",
+                    CreatedAt = now
+                });
+            }
+
+            if (otherTrack is not null)
+            {
+                var otherTrackEntity = await context.Entities.FirstOrDefaultAsync(e => e.EntityId == otherTrack.EntityId);
+                if (otherTrackEntity is not null)
+                {
+                    context.Credits.Add(new Credit
+                    {
+                        EntityTypeId = 2,
+                        EntityId = otherTrack.EntityId,
+                        CreditRoleId = 4,
+                        RoleScopeTypeId = 1,
+                        PersonId = artist.PersonId,
+                        InstrumentId = tombak?.InstrumentId,
+                        DisplayOrder = 1,
+                        IsPrimary = false,
+                        CreatedBy = "seed",
+                        CreatedAt = now
+                    });
+                }
+            }
+            await context.SaveChangesAsync();
+        }
+
+        // ── Album relation: The Silent River is the follow-up to Midnight Garden ──
+        if (otherAlbum is not null && albumRelationFollowUp is not null &&
+            !await context.AlbumRelations.AnyAsync(r => r.AlbumId == album.AlbumId && r.RelatedAlbumId == otherAlbum.AlbumId))
+        {
+            context.AlbumRelations.Add(new AlbumRelation
+            {
+                AlbumId = album.AlbumId,
+                RelatedAlbumId = otherAlbum.AlbumId,
+                AlbumRelationTypeId = albumRelationFollowUp.AlbumRelationTypeId
+            });
+            await context.SaveChangesAsync();
+        }
+
+        // ── Track relation: Silent Petals is the acoustic sibling of Garden of Stars ──
+        if (otherTrack is not null && trackRelationAcoustic is not null &&
+            !await context.TrackRelations.AnyAsync(r => r.TrackId == track.TrackId && r.RelatedTrackId == otherTrack.TrackId))
+        {
+            context.TrackRelations.Add(new TrackRelation
+            {
+                TrackId = track.TrackId,
+                RelatedTrackId = otherTrack.TrackId,
+                TrackRelationTypeId = trackRelationAcoustic.TrackRelationTypeId
+            });
+            await context.SaveChangesAsync();
+        }
     }
 
     private static async Task<Entity> CreateEntityAsync(AppDbContext context, int entityTypeId, string slug)

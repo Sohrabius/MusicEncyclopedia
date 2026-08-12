@@ -30,7 +30,6 @@ public sealed class PeopleController : Controller
     [HttpGet]
     [Route("")]
     [Route("Index")]
-    [ResponseCache(Duration = 300, VaryByQueryKeys = new[] { "*" }, VaryByHeader = "Accept-Language")]
     public async Task<IActionResult> Index(
         string culture,
         int page = 1,
@@ -65,14 +64,22 @@ public sealed class PeopleController : Controller
 
     /// <summary>
     /// Person detail page (9.6).
-    /// Displays full person information including biography, instruments, roles, media, etc.
+    /// Displays full person information including biography, instruments, roles,
+    /// career timeline, discography and track contributions (4.1, 4.2).
     /// </summary>
     [HttpGet]
     [Route("{slug}")]
-    [ResponseCache(Duration = 600)]
     public async Task<IActionResult> Detail(
         string culture,
         string slug,
+        string? albumCategory = null,
+        int? albumYear = null,
+        string? albumRole = null,
+        string? albumInstrument = null,
+        string? contributionRole = null,
+        string? contributionInstrument = null,
+        string? contributionAlbum = null,
+        string? contributionGenre = null,
         CancellationToken cancellationToken = default)
     {
         _logger.LogDebug("Person detail requested: culture={Culture}, slug={Slug}", culture, slug);
@@ -91,16 +98,20 @@ public sealed class PeopleController : Controller
         var viewModel = new PersonDetailViewModel
         {
             Person = person,
-            Culture = culture
+            Culture = culture,
+            AlbumCategory = albumCategory,
+            AlbumYear = albumYear,
+            AlbumRole = albumRole,
+            AlbumInstrument = albumInstrument,
+            ContributionRole = contributionRole,
+            ContributionInstrument = contributionInstrument,
+            ContributionAlbum = contributionAlbum,
+            ContributionGenre = contributionGenre
         };
 
-        // Attempt to extract a title from the dynamic person object for SEO
-        string? personTitle = null;
-        try { personTitle = (string?)((dynamic)person).FullName ?? (string?)((dynamic)person).Name; } catch { /* ignore */ }
-
-        ViewData["Title"] = personTitle ?? "Person";
-        ViewData["MetaDescription"] = personTitle is not null
-            ? $"Profile: {personTitle}"
+        ViewData["Title"] = person.FullName;
+        ViewData["MetaDescription"] = !string.IsNullOrWhiteSpace(person.FullName)
+            ? $"Profile: {person.FullName}"
             : "Person detail page";
         ViewData["Robots"] = "index, follow";
         ViewData["OgType"] = "profile";

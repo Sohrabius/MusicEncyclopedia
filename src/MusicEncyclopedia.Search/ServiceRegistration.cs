@@ -32,7 +32,7 @@ public static class ServiceRegistration
                 : configuration.GetConnectionString("DefaultConnection")
                     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found in configuration.");
 
-            return new SearchService(connectionString, useSqlite);
+            return new SearchService(connectionString, useSqlite, sp.GetService<ICacheService>());
         });
 
         return services;

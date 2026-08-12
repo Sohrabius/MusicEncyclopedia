@@ -15,7 +15,10 @@ public sealed class CacheInvalidationService
     private readonly ILogger<CacheInvalidationService> _logger;
 
     // Maps known EntityTypeId values to type codes used in cache key patterns.
-    // These correspond to seed data in the EntityType table.
+    // These MUST match the EntityType rows seeded in SeedLookupData.sql:
+    // 1 Album, 2 Track, 3 Person, 4 Company, 5 Genre, 6 Mood, 7 Instrument, 8 Poem,
+    // 9 SungVersion, 10 Publication, 11 RecordingSession, 12 PerformanceEvent,
+    // 13 Location, 14 Award, 15 Certification, 16 Chart, 17 Source, 18 Tag.
     private static readonly Dictionary<int, string> EntityTypeIdMap = new()
     {
         { 1, "Album" },
@@ -27,12 +30,15 @@ public sealed class CacheInvalidationService
         { 7, "Instrument" },
         { 8, "Poem" },
         { 9, "SungVersion" },
+        { 10, "Publication" },
         { 11, "RecordingSession" },
         { 12, "PerformanceEvent" },
         { 13, "Location" },
-        { 16, "Tag" },
-        { 17, "Award" },
-        { 19, "Chart" },
+        { 14, "Award" },
+        { 15, "Certification" },
+        { 16, "Chart" },
+        { 17, "Source" },
+        { 18, "Tag" },
     };
 
     public CacheInvalidationService(
@@ -105,7 +111,7 @@ public sealed class CacheInvalidationService
     /// </summary>
     public async Task InvalidateBroadAsync(CancellationToken ct = default)
     {
-        var patterns = new[] { "home:", "search:" };
+        var patterns = new[] { "home:", "search:", "lookup:" };
 
         var keysToRemove = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var pattern in patterns)
@@ -144,13 +150,28 @@ public sealed class CacheInvalidationService
             "search:",
         };
 
-        // When core entities change, also invalidate cross-referencing entity caches
-        if (type is "album" or "track" or "person" or "company" or "poem" or "sungversion")
+        // When core entities change, also invalidate cross-referencing entity caches.
+        // Content-bearing entities (album/track/person/company/poem) render credits,
+        // tags, media, citations, localizations and related items, so changes to any
+        // of those (or to the core entities themselves) must refresh their detail keys.
+        if (type is "album" or "track" or "person" or "company" or "poem" or "sungversion"
+            or "publication" or "recordingsession" or "performanceevent" or "location"
+            or "award" or "certification" or "chart" or "source" or "genre" or "mood"
+            or "instrument" or "tag" or "citation" or "media" or "localization" or "alias"
+            or "attributevalue" or "albumtrack" or "credit" or "relateditem")
         {
             patterns.Add("album:detail:");
             patterns.Add("track:detail:");
             patterns.Add("person:detail:");
             patterns.Add("company:detail:");
+            patterns.Add("poem:detail:");
+        }
+
+        // Lookup lists (search page genre/mood/instrument facets) refresh when the
+        // underlying lookup tables change.
+        if (type is "genre" or "mood" or "instrument")
+        {
+            patterns.Add("lookup:");
         }
 
         return patterns;

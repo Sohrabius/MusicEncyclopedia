@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-test-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+          # global.json pins 8.0.401; setup-dotnet honors it when global-json-file is set
+          global-json-file: global.json
+
+      - name: Restore
+        run: dotnet restore MusicEncyclopedia.sln
+
+      - name: Build (Release)
+        run: dotnet build MusicEncyclopedia.sln --no-restore -c Release
+
+      - name: Test
+        run: dotnet test MusicEncyclopedia.sln --no-build -c Release
+
+      - name: Publish web artifact
+        run: dotnet publish src/MusicEncyclopedia.Web/MusicEncyclopedia.Web.csproj -c Release --no-restore -o ./artifacts/publish
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: music-encyclopedia-web
+          path: ./artifacts/publish
+          retention-days: 7

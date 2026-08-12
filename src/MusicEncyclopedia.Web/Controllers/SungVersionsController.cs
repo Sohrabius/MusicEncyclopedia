@@ -30,7 +30,7 @@ public sealed class SungVersionsController : Controller
     /// </summary>
     [HttpGet]
     [Route("{slug}")]
-    [ResponseCache(Duration = 600)]
+    [ResponseCache(Duration = 60)]
     public async Task<IActionResult> Detail(
         string culture,
         string slug,

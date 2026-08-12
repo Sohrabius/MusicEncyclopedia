@@ -13,18 +13,15 @@ namespace MusicEncyclopedia.Web.Controllers.Api;
 public sealed class CompaniesApiController : BaseApiController
 {
     private readonly ICompanyQueryService _companyQueryService;
-    private readonly ICacheService _cache;
     private readonly IConfiguration _configuration;
     private readonly ILogger<CompaniesApiController> _logger;
 
     public CompaniesApiController(
         ICompanyQueryService companyQueryService,
-        ICacheService cache,
         IConfiguration configuration,
         ILogger<CompaniesApiController> logger)
     {
         _companyQueryService = companyQueryService;
-        _cache = cache;
         _configuration = configuration;
         _logger = logger;
     }

@@ -13,18 +13,15 @@ namespace MusicEncyclopedia.Web.Controllers.Api;
 public sealed class AlbumsApiController : BaseApiController
 {
     private readonly IAlbumQueryService _albumQueryService;
-    private readonly ICacheService _cache;
     private readonly IConfiguration _configuration;
     private readonly ILogger<AlbumsApiController> _logger;
 
     public AlbumsApiController(
         IAlbumQueryService albumQueryService,
-        ICacheService cache,
         IConfiguration configuration,
         ILogger<AlbumsApiController> logger)
     {
         _albumQueryService = albumQueryService;
-        _cache = cache;
         _configuration = configuration;
         _logger = logger;
     }

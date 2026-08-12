@@ -480,6 +480,102 @@
             }
 
             <!-- ============================================================
+                 15b. Related Tracks (4.3)
+                 ============================================================ -->
+            @if (track.RelatedTracks.Count > 0)
+            {
+                <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["Related Tracks"]</h2>
+                    <ul class="divide-y divide-gray-100 border border-gray-200 rounded-lg overflow-hidden bg-white">
+                        @foreach (var related in track.RelatedTracks)
+                        {
+                            <li class="flex items-center gap-3 p-3 hover:bg-gray-50 transition-colors">
+                                <span class="inline-flex items-center gap-1 text-xs font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
+                                    @related.RelationName
+                                </span>
+                                <a href="/@culture/tracks/@related.Slug"
+                                   class="flex-1 min-w-0 text-sm font-medium text-gray-900 hover:text-blue-600 transition-colors truncate">
+                                    @related.Title
+                                </a>
+                                @if (related.DurationSeconds.HasValue)
+                                {
+                                    <span class="text-xs text-gray-400 tabular-nums">
+                                        @TimeSpan.FromSeconds(related.DurationSeconds.Value).ToString(@"m\:ss")
+                                    </span>
+                                }
+                            </li>
+                        }
+                    </ul>
+                </section>
+            }
+
+            <!-- ============================================================
+                 15c. Recording Sessions (4.3)
+                 ============================================================ -->
+            @if (track.RecordingSessions.Count > 0)
+            {
+                <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["Recording Sessions"]</h2>
+                    <div class="space-y-3">
+                        @foreach (var session in track.RecordingSessions.OrderByDescending(s => s.StartDate))
+                        {
+                            <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                <div class="flex-1 min-w-0">
+                                    <a href="/@culture/sessions/@session.Slug"
+                                       class="text-blue-600 hover:text-blue-800 font-medium">
+                                        @(session.SessionTypeName ?? Localizer["Recording Session"].ToString())
+                                    </a>
+                                    <div class="text-sm text-gray-500 mt-0.5">
+                                        @if (session.StartDate.HasValue)
+                                        {
+                                            <span>@session.StartDate.Value.ToString("yyyy-MM-dd")</span>
+                                        }
+                                        @if (!string.IsNullOrWhiteSpace(session.LocationName))
+                                        {
+                                            <span class="ms-1">· @session.LocationName</span>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            }
+
+            <!-- ============================================================
+                 15d. Performance Events (4.3)
+                 ============================================================ -->
+            @if (track.PerformanceEvents.Count > 0)
+            {
+                <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["Live Performances"]</h2>
+                    <div class="space-y-3">
+                        @foreach (var evt in track.PerformanceEvents.OrderByDescending(e => e.Date))
+                        {
+                            <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                <div class="flex-1 min-w-0">
+                                    <a href="/@culture/events/@evt.Slug"
+                                       class="text-blue-600 hover:text-blue-800 font-medium">
+                                        @(evt.EventTypeName ?? Localizer["Live Performance"].ToString())
+                                    </a>
+                                    <div class="text-sm text-gray-500 mt-0.5">
+                                        @if (evt.Date.HasValue)
+                                        {
+                                            <span>@evt.Date.Value.ToString("yyyy-MM-dd")</span>
+                                        }
+                                        @if (!string.IsNullOrWhiteSpace(evt.LocationName))
+                                        {
+                                            <span class="ms-1">· @evt.LocationName</span>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            }
+
+            <!-- ============================================================
                  16. Media (Audio preview, video, PDF, score)
                  ============================================================ -->
             @{

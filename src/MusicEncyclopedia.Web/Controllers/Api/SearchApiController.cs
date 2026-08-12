@@ -13,16 +13,13 @@ namespace MusicEncyclopedia.Web.Controllers.Api;
 public sealed class SearchApiController : BaseApiController
 {
     private readonly ISearchService _searchService;
-    private readonly ICacheService _cache;
     private readonly ILogger<SearchApiController> _logger;
 
     public SearchApiController(
         ISearchService searchService,
-        ICacheService cache,
         ILogger<SearchApiController> logger)
     {
         _searchService = searchService;
-        _cache = cache;
         _logger = logger;
     }
 

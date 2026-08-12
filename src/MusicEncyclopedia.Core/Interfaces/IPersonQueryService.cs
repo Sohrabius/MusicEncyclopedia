@@ -20,9 +20,10 @@ public interface IPersonQueryService
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Gets the detail of a person by their slug.
+    /// Gets the detail of a person by their slug, including the career timeline,
+    /// discography and track contributions (spec 9.6).
     /// </summary>
-    Task<object?> GetPersonBySlugAsync(
+    Task<PersonDetailDto?> GetPersonBySlugAsync(
         string slug,
         string culture,
         CancellationToken cancellationToken = default);

@@ -13,18 +13,15 @@ namespace MusicEncyclopedia.Web.Controllers.Api;
 public sealed class PeopleApiController : BaseApiController
 {
     private readonly IPersonQueryService _personQueryService;
-    private readonly ICacheService _cache;
     private readonly IConfiguration _configuration;
     private readonly ILogger<PeopleApiController> _logger;
 
     public PeopleApiController(
         IPersonQueryService personQueryService,
-        ICacheService cache,
         IConfiguration configuration,
         ILogger<PeopleApiController> logger)
     {
         _personQueryService = personQueryService;
-        _cache = cache;
         _configuration = configuration;
         _logger = logger;
     }

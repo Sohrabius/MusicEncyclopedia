@@ -37,7 +37,6 @@ public sealed class PoetsController : Controller
     [HttpGet]
     [Route("")]
     [Route("Index")]
-    [ResponseCache(Duration = 300, VaryByQueryKeys = new[] { "*" }, VaryByHeader = "Accept-Language")]
     public async Task<IActionResult> Index(
         string culture,
         int page = 1,
@@ -78,7 +77,6 @@ public sealed class PoetsController : Controller
     /// </summary>
     [HttpGet]
     [Route("{slug}")]
-    [ResponseCache(Duration = 600)]
     public async Task<IActionResult> Detail(
         string culture,
         string slug,
@@ -101,27 +99,16 @@ public sealed class PoetsController : Controller
         // Augment with poet-specific related data (poems, publications, sung versions)
         try
         {
-            // Try to get the PersonId from the dynamic object
-            int? personId = null;
-            try { personId = (int)((dynamic)poet).PersonId; } catch { }
-            try { personId ??= (int)((dynamic)poet).Id; } catch { }
-
-            // Try to get EntityId as well
-            int? entityId = null;
-            try { entityId = (int)((dynamic)poet).EntityId; } catch { }
-
             IReadOnlyList<dynamic> poems = [];
             IReadOnlyList<dynamic> publications = [];
             IReadOnlyList<dynamic> sungVersions = [];
 
-            if (personId.HasValue)
-            {
-                poems = await GetPoemsByPersonAsync(_db, personId.Value, cancellationToken);
-                publications = await GetPublicationsByPersonAsync(_db, personId.Value, cancellationToken);
-                sungVersions = await GetSungVersionsByPersonAsync(_db, personId.Value, cancellationToken);
-            }
+            poems = await GetPoemsByPersonAsync(_db, poet.PersonId, cancellationToken);
+            publications = await GetPublicationsByPersonAsync(_db, poet.PersonId, cancellationToken);
+            sungVersions = await GetSungVersionsByPersonAsync(_db, poet.PersonId, cancellationToken);
 
-            // Build augmented poet object
+            // Build augmented poet object (Person is the typed detail DTO; the
+            // poet-specific collections stay dynamic as they come from Dapper).
             var augmented = new
             {
                 Person = poet,
@@ -136,9 +123,8 @@ public sealed class PoetsController : Controller
                 Culture = culture
             };
 
-            // Attempt to extract poet name for SEO
-            string? poetName = null;
-            try { poetName = (string?)((dynamic)poet).FullName ?? (string?)((dynamic)poet).Name; } catch { }
+            // Poet name for SEO — direct typed access.
+            string? poetName = poet.FullName;
 
             ViewData["Title"] = poetName is not null ? $"{poetName} — Poet" : "Poet";
             ViewData["MetaDescription"] = poetName is not null

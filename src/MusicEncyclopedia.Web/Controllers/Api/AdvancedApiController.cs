@@ -13,16 +13,13 @@ namespace MusicEncyclopedia.Web.Controllers.Api;
 /// </summary>
 public sealed class AdvancedApiController : BaseApiController
 {
-    private readonly ICacheService _cache;
     private readonly IConfiguration _configuration;
     private readonly ILogger<AdvancedApiController> _logger;
 
     public AdvancedApiController(
-        ICacheService cache,
         IConfiguration configuration,
         ILogger<AdvancedApiController> logger)
     {
-        _cache = cache;
         _configuration = configuration;
         _logger = logger;
     }

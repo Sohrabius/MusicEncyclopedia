@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MusicEncyclopedia.Core.Constants;
 using MusicEncyclopedia.Core.DTOs;
+using MusicEncyclopedia.Core.Infrastructure;
 using MusicEncyclopedia.Core.Interfaces;
 using MusicEncyclopedia.Services.Infrastructure;
 
@@ -19,13 +20,16 @@ public sealed class TrackQueryService : ITrackQueryService
     private readonly bool _isSqlite;
     private readonly ILogger<TrackQueryService> _logger;
     private readonly IContentLocalizationService _localizationService;
+    private readonly ICacheService _cache;
 
     public TrackQueryService(
         IConfiguration configuration,
         ILogger<TrackQueryService> logger,
-        IContentLocalizationService localizationService)
+        IContentLocalizationService localizationService,
+        ICacheService cache)
     {
         _localizationService = localizationService;
+        _cache = cache;
 
         var dbProvider = configuration.GetValue<string>("DatabaseProvider") ?? "SqlServer";
         _isSqlite = string.Equals(dbProvider, "Sqlite", StringComparison.OrdinalIgnoreCase);
@@ -60,6 +64,38 @@ public sealed class TrackQueryService : ITrackQueryService
         page = Math.Max(1, page);
         pageSize = Math.Clamp(pageSize, 1, 100);
 
+        try
+        {
+            var cacheKey = CacheKeys.List("track", culture, page, pageSize, sort, genre, mood, artist, q);
+
+            var cached = await _cache.GetAsync<PagedResult<TrackDetailDto>>(cacheKey, cancellationToken);
+            if (cached is not null)
+                return cached;
+
+            var result = await LoadTracksCoreAsync(
+                culture, page, pageSize, sort, genre, mood, artist, q, cancellationToken);
+
+            await _cache.SetAsync(cacheKey, result, CacheKeys.ListDuration, cancellationToken);
+            return result;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to load track list for culture={Culture}, page={Page}", culture, page);
+            return PagedResult<TrackDetailDto>.Create([], page, pageSize, 0);
+        }
+    }
+
+    private async Task<PagedResult<TrackDetailDto>> LoadTracksCoreAsync(
+        string culture,
+        int page,
+        int pageSize,
+        string? sort,
+        string? genre,
+        string? mood,
+        string? artist,
+        string? q,
+        CancellationToken cancellationToken)
+    {
         var whereClauses = new List<string> { "t.IsDeleted = 0" };
         var parameters = new DynamicParameters();
 
@@ -144,21 +180,13 @@ public sealed class TrackQueryService : ITrackQueryService
         parameters.Add("Offset", (page - 1) * pageSize);
         parameters.Add("PageSize", pageSize);
 
-        try
-        {
-            using var connection = CreateConnection();
-            connection.Open();
+        using var connection = CreateConnection();
+        connection.Open();
 
-            var totalItems = await connection.ExecuteScalarAsync<int>(countSql, parameters);
-            var items = await connection.QueryAsync<TrackDetailDto>(dataSql, parameters);
+        var totalItems = await connection.ExecuteScalarAsync<int>(countSql, parameters);
+        var items = await connection.QueryAsync<TrackDetailDto>(dataSql, parameters);
 
-            return PagedResult<TrackDetailDto>.Create(items.AsList(), page, pageSize, totalItems);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to load track list for culture={Culture}, page={Page}", culture, page);
-            return PagedResult<TrackDetailDto>.Create([], page, pageSize, 0);
-        }
+        return PagedResult<TrackDetailDto>.Create(items.AsList(), page, pageSize, totalItems);
     }
 
     /// <inheritdoc />
@@ -166,6 +194,34 @@ public sealed class TrackQueryService : ITrackQueryService
         string slug,
         string culture,
         CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var cacheKey = CacheKeys.Detail("track", culture, slug);
+
+            var cached = await _cache.GetAsync<TrackDetailDto>(cacheKey, cancellationToken);
+            if (cached is not null)
+                return cached;
+
+            var result = await LoadTrackDetailCoreAsync(slug, culture, cancellationToken);
+            if (result is not null)
+            {
+                await _cache.SetAsync(cacheKey, result, CacheKeys.DetailDuration, cancellationToken);
+            }
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to load track by slug={Slug}, culture={Culture}", slug, culture);
+            return null;
+        }
+    }
+
+    private async Task<TrackDetailDto?> LoadTrackDetailCoreAsync(
+        string slug,
+        string culture,
+        CancellationToken cancellationToken)
     {
         const string trackSql = """
             SELECT
@@ -223,9 +279,13 @@ public sealed class TrackQueryService : ITrackQueryService
                 var awards = await GetEntityAwardsAsync(connection, entityId, cancellationToken);
                 var certifications = await GetEntityCertificationsAsync(connection, entityId, cancellationToken);
                 var chartEntries = await GetEntityChartEntriesAsync(connection, entityId, cancellationToken);
+                var relatedTracks = await GetTrackRelationsAsync(connection, trackId, cancellationToken);
+                var sessions = await GetTrackRecordingSessionsAsync(connection, trackId, cancellationToken);
+                var events = await GetTrackPerformanceEventsAsync(connection, trackId, cancellationToken);
 
                 result = CreateTrackDetail(track, albums, credits, musicians, genres, moods, instruments,
-                    media, links, citations, tags, aliases, awards, certifications, chartEntries);
+                    media, links, citations, tags, aliases, awards, certifications, chartEntries,
+                    relatedTracks, sessions, events);
             }
             else
             {
@@ -243,16 +303,21 @@ public sealed class TrackQueryService : ITrackQueryService
                 var awardsTask = GetEntityAwardsAsync(connection, entityId, cancellationToken);
                 var certificationsTask = GetEntityCertificationsAsync(connection, entityId, cancellationToken);
                 var chartEntriesTask = GetEntityChartEntriesAsync(connection, entityId, cancellationToken);
+                var relatedTracksTask = GetTrackRelationsAsync(connection, trackId, cancellationToken);
+                var sessionsTask = GetTrackRecordingSessionsAsync(connection, trackId, cancellationToken);
+                var eventsTask = GetTrackPerformanceEventsAsync(connection, trackId, cancellationToken);
 
                 await Task.WhenAll(
                     albumsTask, creditsTask, musiciansTask, genresTask, moodsTask,
                     instrumentsTask, mediaTask, linksTask, citationsTask, tagsTask,
-                    aliasesTask, awardsTask, certificationsTask, chartEntriesTask);
+                    aliasesTask, awardsTask, certificationsTask, chartEntriesTask,
+                    relatedTracksTask, sessionsTask, eventsTask);
 
                 result = CreateTrackDetail(track, albumsTask.Result, creditsTask.Result, musiciansTask.Result,
                     genresTask.Result, moodsTask.Result, instrumentsTask.Result,
                     mediaTask.Result, linksTask.Result, citationsTask.Result, tagsTask.Result,
-                    aliasesTask.Result, awardsTask.Result, certificationsTask.Result, chartEntriesTask.Result);
+                    aliasesTask.Result, awardsTask.Result, certificationsTask.Result, chartEntriesTask.Result,
+                    relatedTracksTask.Result, sessionsTask.Result, eventsTask.Result);
             }
 
             // Spec 7.3: overlay localized text (requested → base → en → empty)
@@ -305,7 +370,10 @@ public sealed class TrackQueryService : ITrackQueryService
         IReadOnlyList<AliasDto> aliases,
         IReadOnlyList<AwardAssignmentDto> awards,
         IReadOnlyList<CertificationAssignmentDto> certifications,
-        IReadOnlyList<ChartEntryDto> chartEntries)
+        IReadOnlyList<ChartEntryDto> chartEntries,
+        IReadOnlyList<TrackRelationDto> relatedTracks,
+        IReadOnlyList<RecordingSessionDto> sessions,
+        IReadOnlyList<PerformanceEventDto> events)
     {
         return new TrackDetailDto
         {
@@ -336,7 +404,10 @@ public sealed class TrackQueryService : ITrackQueryService
             Aliases = aliases,
             Awards = awards,
             Certifications = certifications,
-            ChartEntries = chartEntries
+            ChartEntries = chartEntries,
+            RelatedTracks = relatedTracks,
+            RecordingSessions = sessions,
+            PerformanceEvents = events
         };
     }
 
@@ -474,6 +545,92 @@ public sealed class TrackQueryService : ITrackQueryService
             ORDER BY i.Name
             """;
         var results = await connection.QueryAsync<NamedLinkDto>(sql, new { TrackId = trackId });
+        return results.AsList();
+    }
+
+    private static async Task<IReadOnlyList<TrackRelationDto>> GetTrackRelationsAsync(
+        IDbConnection connection,
+        int trackId,
+        CancellationToken cancellationToken)
+    {
+        const string sql = """
+            SELECT
+                tr.TrackRelationId,
+                t.TrackId AS RelatedTrackId,
+                t.Slug,
+                t.Title,
+                t.DurationSeconds,
+                trt.Name AS RelationName,
+                trt.Code AS RelationCode
+            FROM TrackRelation tr
+            INNER JOIN Track t ON t.TrackId = tr.RelatedTrackId
+            LEFT JOIN TrackRelationType trt ON trt.TrackRelationTypeId = tr.TrackRelationTypeId
+            WHERE tr.TrackId = @TrackId AND t.IsDeleted = 0
+            UNION
+            SELECT
+                tr.TrackRelationId,
+                t.TrackId AS RelatedTrackId,
+                t.Slug,
+                t.Title,
+                t.DurationSeconds,
+                trt.Name AS RelationName,
+                trt.Code AS RelationCode
+            FROM TrackRelation tr
+            INNER JOIN Track t ON t.TrackId = tr.TrackId
+            LEFT JOIN TrackRelationType trt ON trt.TrackRelationTypeId = tr.TrackRelationTypeId
+            WHERE tr.RelatedTrackId = @TrackId AND t.IsDeleted = 0
+            ORDER BY t.Title
+            """;
+        var results = await connection.QueryAsync<TrackRelationDto>(sql, new { TrackId = trackId });
+        return results.AsList();
+    }
+
+    private static async Task<IReadOnlyList<RecordingSessionDto>> GetTrackRecordingSessionsAsync(
+        IDbConnection connection,
+        int trackId,
+        CancellationToken cancellationToken)
+    {
+        const string sql = """
+            SELECT
+                rs.RecordingSessionId,
+                rs.Slug,
+                rs.StartDate,
+                rs.EndDate,
+                st.Name AS SessionTypeName,
+                l.Name AS LocationName,
+                rs.Notes
+            FROM RecordingSession rs
+            INNER JOIN RecordingSessionTrack rst ON rst.RecordingSessionId = rs.RecordingSessionId
+            LEFT JOIN SessionType st ON st.SessionTypeId = rs.SessionTypeId
+            LEFT JOIN Location l ON l.LocationId = rs.LocationId
+            WHERE rst.TrackId = @TrackId AND rs.IsDeleted = 0
+            ORDER BY rs.StartDate DESC
+            """;
+        var results = await connection.QueryAsync<RecordingSessionDto>(sql, new { TrackId = trackId });
+        return results.AsList();
+    }
+
+    private static async Task<IReadOnlyList<PerformanceEventDto>> GetTrackPerformanceEventsAsync(
+        IDbConnection connection,
+        int trackId,
+        CancellationToken cancellationToken)
+    {
+        const string sql = """
+            SELECT
+                pe.PerformanceEventId,
+                pe.Slug,
+                pe.Date,
+                et.Name AS EventTypeName,
+                l.Name AS LocationName,
+                pe.PerformanceNotes
+            FROM PerformanceEvent pe
+            INNER JOIN PerformanceEventTrack pet ON pet.PerformanceEventId = pe.PerformanceEventId
+            LEFT JOIN EventType et ON et.EventTypeId = pe.EventTypeId
+            LEFT JOIN Location l ON l.LocationId = pe.LocationId
+            WHERE pet.TrackId = @TrackId AND pe.IsDeleted = 0
+            ORDER BY pe.Date DESC
+            """;
+        var results = await connection.QueryAsync<PerformanceEventDto>(sql, new { TrackId = trackId });
         return results.AsList();
     }
 

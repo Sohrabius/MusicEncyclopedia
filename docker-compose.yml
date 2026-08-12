@@ -1,0 +1,80 @@
+# ────────────────────────────────────────────────────────────────
+# MusicEncyclopedia — web + SQL Server 2022 stack
+#
+# Prerequisites:
+#   - A `.env` file in this directory with at least MSSQL_SA_PASSWORD
+#     (see `.env.example`). Optionally ADMIN_EMAIL / ADMIN_USER_NAME /
+#     ADMIN_PASSWORD to bootstrap the first administrator on startup.
+#
+# Usage:
+#   docker compose up -d --build
+#   curl http://localhost:8080/health/ready
+#
+# Production notes (see DEPLOYMENT.md):
+#   - Never commit .env. Set SITE_BASE_URL, CDN url, and admin credentials.
+#   - TLS is intentionally terminated at an upstream proxy (nginx / Caddy /
+#     cloud LB); the app runs plain HTTP on 8080. Set Site__BehindProxy=true
+#     (default below) so forwarded proto/for headers are honored.
+# ────────────────────────────────────────────────────────────────
+
+name: music-encyclopedia
+
+services:
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: ${MSSQL_PID:-Express}
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:?Set MSSQL_SA_PASSWORD in .env}
+    ports:
+      # Optional host exposure for backup/restore drills (sqlcmd from the host).
+      - "${MSSQL_PORT:-1433}:1433"
+    volumes:
+      - mssql-data:/var/opt/mssql
+      # FTS script mounted read-only for the one-time catalog setup (DEPLOYMENT.md §FTS).
+      - ./src/MusicEncyclopedia.Data/Scripts/FullTextSearch.sql:/scripts/FullTextSearch.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      DatabaseProvider: SqlServer
+      ConnectionStrings__DefaultConnection: >-
+        Server=mssql;Database=MusicEncyclopedia;User Id=sa;
+        Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True;Encrypt=True
+      Site__BaseUrl: ${SITE_BASE_URL:-https://example.com}
+      # Set BEHIND_PROXY=true when an upstream proxy terminates TLS / forwards headers
+      Site__BehindProxy: ${BEHIND_PROXY:-false}
+      # Default false: the container serves plain HTTP on 8080 and TLS terminates
+      # at the upstream proxy. Set true only if the app itself terminates TLS.
+      Site__EnableHttpsRedirection: ${ENABLE_HTTPS_REDIRECTION:-false}
+      Seed__OnStartup: "true"                  # apply migrations + lookup seed on boot
+      Seed__SampleContent: ${SEED_SAMPLE_CONTENT:-false}
+      Admin__Email: ${ADMIN_EMAIL:-}
+      Admin__UserName: ${ADMIN_USER_NAME:-admin}
+      Admin__Password: ${ADMIN_PASSWORD:-}
+      Media__StoragePath: /app/media
+      Media__CdnBaseUrl: ${CDN_BASE_URL:-}
+    depends_on:
+      mssql:
+        condition: service_healthy
+    ports:
+      - "${WEB_PORT:-8080}:8080"
+    volumes:
+      - media-data:/app/media
+    restart: unless-stopped
+    # Container HEALTHCHECK comes from the Dockerfile (curl /health/live)
+
+volumes:
+  mssql-data:
+  media-data:

@@ -71,6 +71,7 @@ public sealed class SitemapController : Controller
         await AddEntityUrlsAsync("Award", "awards", 0.6m, "monthly", urls);
         await AddEntityUrlsAsync("Chart", "charts", 0.5m, "monthly", urls);
         await AddEntityUrlsAsync("Source", "sources", 0.5m, "monthly", urls);
+        await AddEntityUrlsAsync("Publication", "publications", 0.6m, "monthly", urls);
         await AddEntityUrlsAsync("Tag", "tags", 0.4m, "monthly", urls);
 
         // ────────────────────────────────────────────────────────────
@@ -93,6 +94,7 @@ public sealed class SitemapController : Controller
             ("awards", 0.6m),
             ("charts", 0.6m),
             ("sources", 0.6m),
+            ("publications", 0.6m),
             ("tags", 0.6m),
         };
 

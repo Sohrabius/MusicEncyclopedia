@@ -7,7 +7,7 @@
     var isRtl = dir == "rtl";
     var results = Model.Results;
     var hasQuery = !string.IsNullOrWhiteSpace(Model.Query);
-    var knownEntityTypes = new[] { "Album", "Track", "Person", "Poem", "SungVersion", "Company", "Genre", "Mood", "Instrument" };
+    var knownEntityTypes = new[] { "Album", "Track", "Person", "Poem", "SungVersion", "Company", "Genre", "Mood", "Instrument", "Publication", "RecordingSession", "PerformanceEvent", "Location", "Source" };
 }
 
 <!-- ===== Canonical URL ===== -->
@@ -61,7 +61,7 @@
                     var isActive = string.Equals(Model.EntityType, et, StringComparison.OrdinalIgnoreCase);
                     <a href="/@culture/search?q=@(Uri.EscapeDataString(Model.Query ?? ""))&type=@et"
                        class="inline-block px-3 py-1.5 text-sm rounded-full border transition-colors @(isActive ? "bg-blue-600 text-white border-blue-600" : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50")">
-                        @Localizer[et]
+                        @GetEntityTypeLabel(et)
                     </a>
                 }
             </div>
@@ -109,7 +109,7 @@
                 </svg>
                 <h3 class="mt-4 text-lg font-medium text-gray-900">@Localizer["No results found"]</h3>
                 <p class="mt-2 text-gray-500">
-                    @Localizer["No results for \"{0}\". Try adjusting your search terms.", Model.Query]
+                    @Localizer["No results for \"{0}\". Try adjusting your search terms.", Model.Query ?? ""]
                 </p>
             </div>
         }
@@ -121,7 +121,7 @@
                     ((results.Page - 1) * results.PageSize) + 1,
                     Math.Min(results.Page * results.PageSize, results.TotalItems),
                     results.TotalItems,
-                    Model.Query]
+                    Model.Query ?? ""]
             </p>
 
             <!-- Result Cards -->
@@ -304,7 +304,28 @@
             "genre" => "bg-pink-100 text-pink-800",
             "mood" => "bg-teal-100 text-teal-800",
             "instrument" => "bg-orange-100 text-orange-800",
+            "publication" => "bg-violet-100 text-violet-800",
+            "recordingsession" => "bg-cyan-100 text-cyan-800",
+            "performanceevent" => "bg-rose-100 text-rose-800",
+            "location" => "bg-emerald-100 text-emerald-800",
+            "source" => "bg-slate-100 text-slate-800",
             _ => "bg-gray-100 text-gray-800"
+        };
+    }
+
+    /// <summary>
+    /// Returns a localized display label for an entity type pill.
+    /// </summary>
+    string GetEntityTypeLabel(string entityType)
+    {
+        return entityType switch
+        {
+            "RecordingSession" => Localizer["Recording Session"].Value,
+            "PerformanceEvent" => Localizer["Performance Event"].Value,
+            "Album" or "Track" or "Person" or "Poem" or "SungVersion" or "Company"
+                or "Genre" or "Mood" or "Instrument" or "Publication" or "Location" or "Source"
+                => Localizer[entityType].Value,
+            _ => entityType
         };
     }
 

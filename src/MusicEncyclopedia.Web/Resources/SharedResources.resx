@@ -45,4 +45,85 @@
   <data name="Footer.Copyright" xml:space="preserve">
     <value>© {0}</value>
   </data>
+  <data name="Timeline" xml:space="preserve">
+    <value>Timeline</value>
+  </data>
+  <data name="Discography" xml:space="preserve">
+    <value>Discography</value>
+  </data>
+  <data name="Track Contributions" xml:space="preserve">
+    <value>Track Contributions</value>
+  </data>
+  <data name="Album Release" xml:space="preserve">
+    <value>Album Release</value>
+  </data>
+  <data name="Track Release" xml:space="preserve">
+    <value>Track Release</value>
+  </data>
+  <data name="Recording Session" xml:space="preserve">
+    <value>Recording Session</value>
+  </data>
+  <data name="Performance Event" xml:space="preserve">
+    <value>Performance Event</value>
+  </data>
+  <data name="Recording Sessions" xml:space="preserve">
+    <value>Recording Sessions</value>
+  </data>
+  <data name="Live Performance" xml:space="preserve">
+    <value>Live Performance</value>
+  </data>
+  <data name="Live Performances" xml:space="preserve">
+    <value>Live Performances</value>
+  </data>
+  <data name="Chart Entry" xml:space="preserve">
+    <value>Chart Entry</value>
+  </data>
+  <data name="Publication" xml:space="preserve">
+    <value>Publication</value>
+  </data>
+  <data name="Related Albums" xml:space="preserve">
+    <value>Related Albums</value>
+  </data>
+  <data name="Related Tracks" xml:space="preserve">
+    <value>Related Tracks</value>
+  </data>
+  <data name="Category" xml:space="preserve">
+    <value>Category</value>
+  </data>
+  <data name="Year" xml:space="preserve">
+    <value>Year</value>
+  </data>
+  <data name="Role" xml:space="preserve">
+    <value>Role</value>
+  </data>
+  <data name="Instrument" xml:space="preserve">
+    <value>Instrument</value>
+  </data>
+  <data name="Album" xml:space="preserve">
+    <value>Album</value>
+  </data>
+  <data name="Genre" xml:space="preserve">
+    <value>Genre</value>
+  </data>
+  <data name="All" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="Filter" xml:space="preserve">
+    <value>Filter</value>
+  </data>
+  <data name="Clear" xml:space="preserve">
+    <value>Clear</value>
+  </data>
+  <data name="No albums match the selected filters." xml:space="preserve">
+    <value>No albums match the selected filters.</value>
+  </data>
+  <data name="No tracks match the selected filters." xml:space="preserve">
+    <value>No tracks match the selected filters.</value>
+  </data>
+  <data name="albums" xml:space="preserve">
+    <value>albums</value>
+  </data>
+  <data name="tracks" xml:space="preserve">
+    <value>tracks</value>
+  </data>
 </root>
