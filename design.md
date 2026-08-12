@@ -1,6 +1,7 @@
 # Music Encyclopedia · Design System
 
-> Hallmark v1.1.0 · modern-minimal · Ecosystem Index · Coral theme
+> Hallmark v2 · minimal-flat · Encyclopedia · link-blue theme
+> Full redesign plan: `UI_REDESIGN_PLAN.md`
 
 ---
 
@@ -8,56 +9,73 @@
 
 | Token | Value | Use |
 |-------|-------|-----|
-| `--color-paper` | `oklch(97% 0.008 70)` | Page background |
-| `--color-paper-2` | `oklch(94% 0.010 70)` | Subtle background |
-| `--color-surface` | `oklch(100% 0 0)` | Card/panel background |
-| `--color-surface-raised` | `oklch(99% 0.004 70)` | Elevated surface |
-| `--color-ink` | `oklch(18% 0.010 60)` | Primary text |
-| `--color-ink-2` | `oklch(40% 0.008 60)` | Secondary text |
-| `--color-ink-3` | `oklch(56% 0.006 60)` | Tertiary/muted text |
-| `--color-rule` | `oklch(88% 0.008 70)` | Borders |
-| `--color-rule-light` | `oklch(92% 0.006 70)` | Subtle borders |
-| `--color-accent` | `oklch(62% 0.17 25)` | Coral accent |
-| `--color-accent-ink` | `oklch(100% 0 0)` | Text on accent |
-| `--color-focus` | `oklch(62% 0.17 25)` | Focus rings |
+| `--color-paper` | `#F8FAFC` | Page background |
+| `--color-paper-2` | `#F1F5F9` | Subtle background |
+| `--color-surface` | `#FFFFFF` | Card/panel background |
+| `--color-ink` | `#1E293B` | Primary text |
+| `--color-ink-2` | `#475569` | Secondary text |
+| `--color-ink-3` | `#64748B` | Tertiary/muted text (citations) |
+| `--color-rule` | `#E2E8F0` | Borders |
+| `--color-rule-light` | `#EDF1F5` | Subtle borders |
+| `--color-accent` | `#2563EB` | Link blue accent |
+| `--color-accent-hover` | `#1D4ED8` | Accent hover |
+| `--color-accent-ink` | `#FFFFFF` | Text on accent |
+| `--color-accent-soft` | `#EFF6FF` | Accent tint (badges, icons) |
+| `--color-success` | `#16A34A` | Success |
+| `--color-warning` | `#D97706` | Warning |
+| `--color-error` | `#DC2626` | Error |
+| `--color-info` | `#2563EB` | Info |
+
+All contrast pairs ≥ 4.5:1 (WCAG AA).
 
 ## Typography
 
-| Token | Value |
-|-------|-------|
-| Display | Geist, Inter, system-ui |
-| Body | Geist, Inter, system-ui |
-| Mono | Geist Mono, JetBrains Mono |
+| Token | LTR (`en`, `fr`) | RTL (`fa`, `ar`) |
+|-------|------------------|------------------|
+| Display | Inter | **Vazirmatn (Vazir)** |
+| Body | Inter | **Vazirmatn (Vazir)** |
+| Mono | JetBrains Mono | JetBrains Mono |
+
+- Fonts are **self-hosted** in `wwwroot/fonts/` and declared in `wwwroot/css/fonts.css`.
+- Direction-aware font selection is automatic via `html[dir="rtl"]` rules — **no per-view font markup**.
+- Vazirmatn is the maintained successor of the Vazir font (same designer). The legacy `Vazir` family name remains in the fallback chain.
 
 Scale (major third 1.25):
-- `--text-xs`: 0.64rem
-- `--text-sm`: 0.8rem
-- `--text-base`: 1rem
-- `--text-md`: 1.25rem
-- `--text-lg`: 1.5625rem
-- `--text-xl`: 1.9531rem
-- `--text-2xl`: 2.4414rem
-- `--text-display`: clamp(2rem, 4vw + 0.5rem, 3.5rem)
+- `--text-xs`: 0.64rem · `--text-sm`: 0.8rem · `--text-base`: 1rem
+- `--text-md`: 1.25rem · `--text-lg`: 1.5625rem · `--text-xl`: 1.9531rem
+- `--text-2xl`: 2.4414rem · `--text-display`: clamp(2rem, 4vw + 0.5rem, 3.25rem)
+
+In RTL: `letter-spacing: 0` on headings.
 
 ## Spacing
 
-4pt scale: `--space-3xs` (0.125rem) through `--space-3xl` (6rem).
+4pt scale: `--space-3xs` (0.125rem) through `--space-3xl` (6rem), plus `--space-section` (4.5rem).
 
 ## Components
 
-- **Nav**: N5 floating pill — sticky, centered, frosted glass
-- **Footer**: Ft2 inline single line — minimal, border-top only
-- **Cards**: hover lift with subtle shadow
-- **Tags**: pill-shaped, muted background
-- **Buttons**: pill-shaped, ink primary, paper secondary
+- **Nav**: sticky top bar — white/92 blur, hairline bottom border, brand + links + search + language switcher
+- **Hero**: search-first — statement + subtitle + prominent search + hint chips
+- **Footer**: single line — brand + copyright + links
+- **Cards**: flat — 1px rule border, hover lift with subtle shadow, image scale 1.03
+- **Tags**: pill-shaped, paper-2 background; accent variant uses accent-soft
+- **Buttons**: pill, ink primary (hover → accent), surface secondary; min-height 40px; visible focus ring
+- **Alerts**: shared `_Alerts` partial — success/error/warning/info with dismiss
+- **Pagination**: shared `_Pagination` partial — used by public and admin
+- **Tables**: muted uppercase header, row hover tint, `overflow-x-auto`
 
 ## Motion
 
-- Micro: 120ms (hover, focus)
-- Short: 220ms (transforms)
-- Long: 420ms (image zoom)
-- Easing: `cubic-bezier(0.16, 1, 0.3, 1)` out
+- Micro: 150ms (hover, focus) · Short: 220ms (transforms) · Long: 300ms (image zoom)
+- Easing: `cubic-bezier(0.2, 0, 0, 1)` out
 - Respects `prefers-reduced-motion`
+
+## RTL Strategy (`fa`, `ar`)
+
+1. **Vazirmatn (Vazir) font** applied automatically via `html[dir="rtl"]` rules in `fonts.css`.
+2. Logical properties only: `margin-inline-start`, `inset-inline-end`, `text-align: start`.
+3. Directional icons flip with `[dir="rtl"] .icon-directional { transform: scaleX(-1) }`.
+4. `dir="auto"` on mixed-language user content.
+5. Tabular numbers via `font-variant-numeric: tabular-nums`.
 
 ## Voice & Copy
 
@@ -75,4 +93,4 @@ Scale (major third 1.25):
 5. Mobile-first responsive
 6. Semantic HTML with ARIA where needed
 7. Keyboard navigable
-8. RTL-aware spacing
+8. RTL-aware spacing and fonts

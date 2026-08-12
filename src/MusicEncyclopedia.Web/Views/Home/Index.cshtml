@@ -8,7 +8,7 @@
     var dir = Context.Items["dir"] as string ?? "ltr";
 }
 
-<!-- Hero -->
+<!-- Hero · search-first -->
 <section class="hero">
     <div class="hero__inner">
         <h1 class="hero__title">
@@ -31,6 +31,24 @@
                        aria-label="@Localizer["Search"]" />
             </div>
         </form>
+
+        @if (Model.Genres.Count > 0 || Model.Moods.Count > 0 || Model.Instruments.Count > 0)
+        {
+            <div class="hero__hints">
+                @foreach (var genre in Model.Genres.Take(4))
+                {
+                    <a href="/@culture/genres/@genre.Slug" class="tag">@genre.Name</a>
+                }
+                @foreach (var mood in Model.Moods.Take(3))
+                {
+                    <a href="/@culture/moods/@mood.Slug" class="tag">@mood.Name</a>
+                }
+                @foreach (var instrument in Model.Instruments.Take(3))
+                {
+                    <a href="/@culture/instruments/@instrument.Slug" class="tag">@instrument.Name</a>
+                }
+            </div>
+        }
     </div>
 </section>
 
@@ -197,24 +215,6 @@
                 </div>
             </a>
         </div>
-
-        @if (Model.Genres.Count > 0 || Model.Moods.Count > 0 || Model.Instruments.Count > 0)
-        {
-            <div class="mt-8 flex flex-wrap gap-2">
-                @foreach (var genre in Model.Genres)
-                {
-                    <a href="/@culture/genres/@genre.Slug" class="tag">@genre.Name</a>
-                }
-                @foreach (var mood in Model.Moods)
-                {
-                    <a href="/@culture/moods/@mood.Slug" class="tag">@mood.Name</a>
-                }
-                @foreach (var instrument in Model.Instruments)
-                {
-                    <a href="/@culture/instruments/@instrument.Slug" class="tag">@instrument.Name</a>
-                }
-            </div>
-        }
     </div>
 </section>
 

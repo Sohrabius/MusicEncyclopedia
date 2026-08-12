@@ -21,6 +21,10 @@ packages/
 project.assets.json
 project.nuget.cache
 
+# ── Python skill caches ───────────────────────────────────────────────
+__pycache__/
+*.pyc
+
 # ── SQLite databases (dev data, do not commit) ────────────────────────
 *.db
 *.db-shm

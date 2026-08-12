@@ -33,12 +33,10 @@
     }
     <link rel="alternate" hreflang="x-default" href="@CultureUrl(CultureConstants.DefaultCulture)" />
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <!-- Fonts (self-hosted: Vazirmatn for fa/ar RTL, Inter for en/fr LTR) -->
+    <link rel="stylesheet" href="~/css/fonts.css" />
 
-    <!-- Tailwind -->
+    <!-- Tailwind (utility layer, kept for legacy view classes) -->
     <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- Styles -->
@@ -49,7 +47,7 @@
 
 <body class="min-h-screen bg-[var(--color-paper)] text-[var(--color-ink)] font-[var(--font-body)] antialiased">
 
-    <!-- Nav · N5 Floating Pill -->
+    <!-- Nav · sticky top bar -->
     <nav class="nav" aria-label="@L["Nav.MainNavigation"]">
         <div class="nav__inner">
             <a href="/@culture" class="nav__brand">
@@ -68,6 +66,13 @@
             </ul>
 
             <div class="nav__actions">
+                <a href="/@culture/search" class="nav__search" aria-label="@L["Nav.Search"]">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
+                    </svg>
+                    <span>@L["Nav.Search"]</span>
+                </a>
+
                 <!-- Language switcher · Spec 7.5 -->
                 <div class="nav__lang">
                     <label class="nav__lang-label" for="lang-select">@L["Nav.Language"]</label>
@@ -81,7 +86,7 @@
                     </select>
                 </div>
 
-                <button class="nav__toggle" aria-label="@L["Nav.OpenMenu"]" onclick="document.querySelector('.nav__mobile').classList.add('is-open')">
+                <button class="nav__toggle" aria-label="@L["Nav.OpenMenu"]" aria-expanded="false" aria-controls="mobile-nav">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
                 </button>
             </div>
@@ -89,8 +94,8 @@
     </nav>
 
     <!-- Mobile Nav -->
-    <div class="nav__mobile">
-        <button class="nav__mobile-close" aria-label="@L["Nav.CloseMenu"]" onclick="this.parentElement.classList.remove('is-open')">
+    <div class="nav__mobile" id="mobile-nav">
+        <button class="nav__mobile-close" aria-label="@L["Nav.CloseMenu"]">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
         <a href="/@culture">@L["Nav.Home"]</a>
@@ -98,13 +103,15 @@
         <a href="/@culture/artists">@L["Nav.Artists"]</a>
         <a href="/@culture/poets">@L["Nav.Poets"]</a>
         <a href="/@culture/people">@L["Nav.People"]</a>
+        <a href="/@culture/search">@L["Nav.Search"]</a>
     </div>
 
     <main class="min-h-[60vh]">
+        @await Html.PartialAsync("_Alerts")
         @RenderBody()
     </main>
 
-    <!-- Footer · Ft2 Inline Single Line -->
+    <!-- Footer -->
     <footer class="footer">
         <div class="footer__inner">
             <div class="footer__left">

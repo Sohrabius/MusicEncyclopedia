@@ -30,6 +30,9 @@
   <data name="Nav.People" xml:space="preserve">
     <value>افراد</value>
   </data>
+  <data name="Nav.Search" xml:space="preserve">
+    <value>جستجو</value>
+  </data>
   <data name="Nav.MainNavigation" xml:space="preserve">
     <value>ناوبری اصلی</value>
   </data>

@@ -10,13 +10,20 @@
     // -----------------------------------------------------------------------
 
     function getCurrentCulture() {
-        var m = window.location.pathname.match(/^\/(fa)\b/);
+        // Prefer the <html lang> attribute set by CultureMiddleware,
+        // fall back to the first URL segment for safety.
+        var lang = document.documentElement ? document.documentElement.lang : '';
+        if (lang && /^[a-z]{2}(-[A-Z]{2})?$/.test(lang)) {
+            return lang.substring(0, 2).toLowerCase();
+        }
+        var m = window.location.pathname.match(/^\/([a-z]{2})\b/);
         return m ? m[1] : 'fa';
     }
 
     function localizeUrl(culture) {
         var path = window.location.pathname;
-        var newPath = path.replace(/^\/(fa)\b/, '/' + culture);
+        var current = getCurrentCulture();
+        var newPath = path.replace(new RegExp('^\\/' + current + '\\b'), '/' + culture);
         return newPath + window.location.search + window.location.hash;
     }
 
@@ -89,27 +96,51 @@
     // Mobile nav
     // -----------------------------------------------------------------------
 
+    function setMobileNav(open) {
+        var mobile = document.querySelector('.nav__mobile');
+        var toggle = document.querySelector('.nav__toggle');
+        if (mobile) {
+            mobile.classList.toggle('is-open', open);
+        }
+        if (toggle) {
+            toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        }
+    }
+
     function initMobileNav() {
         var toggle = document.querySelector('.nav__toggle');
         var mobile = document.querySelector('.nav__mobile');
-        var close = document.querySelector('.nav__mobile-close');
         if (!toggle || !mobile) return;
 
         toggle.addEventListener('click', function () {
-            mobile.classList.add('is-open');
+            setMobileNav(!mobile.classList.contains('is-open'));
         });
 
+        var close = document.querySelector('.nav__mobile-close');
         if (close) {
             close.addEventListener('click', function () {
-                mobile.classList.remove('is-open');
+                setMobileNav(false);
             });
         }
 
         // Close on link click
         mobile.querySelectorAll('a').forEach(function (link) {
             link.addEventListener('click', function () {
-                mobile.classList.remove('is-open');
+                setMobileNav(false);
             });
+        });
+
+        // Close on Esc / on backdrop click
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && mobile.classList.contains('is-open')) {
+                setMobileNav(false);
+            }
+        });
+
+        mobile.addEventListener('click', function (e) {
+            if (e.target === mobile) {
+                setMobileNav(false);
+            }
         });
     }
 
