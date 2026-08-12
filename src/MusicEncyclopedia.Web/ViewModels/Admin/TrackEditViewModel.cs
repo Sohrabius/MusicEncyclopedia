@@ -15,51 +15,51 @@ public sealed class TrackEditViewModel
 
     [Required(ErrorMessage = "Title is required.")]
     [StringLength(500, ErrorMessage = "Title must not exceed 500 characters.")]
-    [Display(Name = "Title")]
+    [Display(Name = "عنوان")]
     public string Title { get; set; } = "";
 
     [StringLength(500)]
-    [Display(Name = "Sort Title")]
+    [Display(Name = "عنوان مرتب‌سازی")]
     public string? TitleSort { get; set; }
 
     [StringLength(500)]
-    [Display(Name = "Original Title")]
+    [Display(Name = "عنوان اصلی")]
     public string? OriginalTitle { get; set; }
 
     [StringLength(500)]
-    [Display(Name = "English Title")]
+    [Display(Name = "عنوان انگلیسی")]
     public string? EnglishTitle { get; set; }
 
-    [Display(Name = "Duration (seconds)")]
+    [Display(Name = "مدت (ثانیه)")]
     public int? DurationSeconds { get; set; }
 
-    [Display(Name = "Release Date")]
+    [Display(Name = "تاریخ انتشار")]
     public DateOnly? ReleaseDate { get; set; }
 
     [StringLength(50)]
-    [Display(Name = "Release Date Precision")]
+    [Display(Name = "دقت تاریخ انتشار")]
     public string? ReleaseDatePrecision { get; set; }
 
-    [Display(Name = "Recording Start Date")]
+    [Display(Name = "تاریخ شروع ضبط")]
     public DateOnly? RecordingStartDate { get; set; }
 
-    [Display(Name = "Recording End Date")]
+    [Display(Name = "تاریخ پایان ضبط")]
     public DateOnly? RecordingEndDate { get; set; }
 
     [StringLength(50)]
-    [Display(Name = "Recording Date Precision")]
+    [Display(Name = "دقت تاریخ ضبط")]
     public string? RecordingDatePrecision { get; set; }
 
-    [Display(Name = "Description")]
+    [Display(Name = "توضیحات")]
     public string? Description { get; set; }
 
-    [Display(Name = "Lyrics Availability Type")]
+    [Display(Name = "نوع در دسترس بودن متن ترانه")]
     public int? LyricsAvailabilityTypeId { get; set; }
 
-    [Display(Name = "Vocal Style")]
+    [Display(Name = "سبک آواز")]
     public int? VocalStyleId { get; set; }
 
-    [Display(Name = "Musical Key")]
+    [Display(Name = "گام موسیقی")]
     public int? MusicalKeyId { get; set; }
 
     [Display(Name = "BPM")]
@@ -69,14 +69,14 @@ public sealed class TrackEditViewModel
     [Display(Name = "ISRC")]
     public string? ISRC { get; set; }
 
-    [Display(Name = "Is Instrumental")]
+    [Display(Name = "بی‌کلام است")]
     public bool IsInstrumental { get; set; }
 
-    [Display(Name = "Is Explicit")]
+    [Display(Name = "صریح است")]
     public bool IsExplicit { get; set; }
 
     [StringLength(1000)]
-    [Display(Name = "Copyright Notice")]
+    [Display(Name = "اعلامیه حق نشر")]
     public string? CopyrightNotice { get; set; }
 
     [Required(ErrorMessage = "Slug is required.")]

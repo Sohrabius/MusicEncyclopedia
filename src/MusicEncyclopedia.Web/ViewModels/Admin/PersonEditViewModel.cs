@@ -15,51 +15,51 @@ public sealed class PersonEditViewModel
 
     [Required(ErrorMessage = "Full name is required.")]
     [StringLength(500, ErrorMessage = "Full name must not exceed 500 characters.")]
-    [Display(Name = "Full Name")]
+    [Display(Name = "نام کامل")]
     public string FullName { get; set; } = "";
 
     [StringLength(500)]
-    [Display(Name = "Sort Name")]
+    [Display(Name = "نام مرتب‌سازی")]
     public string? FullNameSort { get; set; }
 
     [StringLength(500)]
-    [Display(Name = "Original Name")]
+    [Display(Name = "نام اصلی")]
     public string? OriginalName { get; set; }
 
     [StringLength(500)]
-    [Display(Name = "English Name")]
+    [Display(Name = "نام انگلیسی")]
     public string? EnglishName { get; set; }
 
-    [Display(Name = "Person Kind")]
+    [Display(Name = "نوع شخص")]
     public int? PersonKindId { get; set; }
 
-    [Display(Name = "Biography")]
+    [Display(Name = "زندگی‌نامه")]
     public string? Biography { get; set; }
 
-    [Display(Name = "Birth Date")]
+    [Display(Name = "تاریخ تولد")]
     public DateOnly? BirthDate { get; set; }
 
     [StringLength(50)]
-    [Display(Name = "Birth Date Precision")]
+    [Display(Name = "دقت تاریخ تولد")]
     public string? BirthDatePrecision { get; set; }
 
-    [Display(Name = "Birth Location")]
+    [Display(Name = "محل تولد")]
     public int? BirthLocationId { get; set; }
 
-    [Display(Name = "Death Date")]
+    [Display(Name = "تاریخ فوت")]
     public DateOnly? DeathDate { get; set; }
 
     [StringLength(50)]
-    [Display(Name = "Death Date Precision")]
+    [Display(Name = "دقت تاریخ فوت")]
     public string? DeathDatePrecision { get; set; }
 
-    [Display(Name = "Death Location")]
+    [Display(Name = "محل فوت")]
     public int? DeathLocationId { get; set; }
 
-    [Display(Name = "Nationality Country")]
+    [Display(Name = "کشور تابعیت")]
     public int? NationalityCountryId { get; set; }
 
-    [Display(Name = "Image Media")]
+    [Display(Name = "رسانه تصویر")]
     public int? ImageMediaId { get; set; }
 
     [Required(ErrorMessage = "Slug is required.")]

@@ -10,10 +10,10 @@ public sealed class MoodEditViewModel
 {
     [Required(ErrorMessage = "Name is required.")]
     [StringLength(255, ErrorMessage = "Name must not exceed 255 characters.")]
-    [Display(Name = "Name")]
+    [Display(Name = "نام")]
     public string Name { get; set; } = "";
 
-    [Display(Name = "Description")]
+    [Display(Name = "توضیحات")]
     public string? Description { get; set; }
 
     [Required(ErrorMessage = "Slug is required.")]

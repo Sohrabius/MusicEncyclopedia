@@ -11,16 +11,16 @@
             <span class="inline-block px-2 py-0.5 text-xs rounded-full @(Model.IsSuccess ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700")">@(Model.IsSuccess ? "Success" : "Failed")</span>
         </div>
         <dl class="divide-y divide-gray-100 text-sm">
-            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-gray-500 font-medium">Timestamp</dt><dd class="col-span-2">@Model.Timestamp.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss 'UTC'zzz")</dd></div>
-            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-gray-500 font-medium">User</dt><dd class="col-span-2">@Model.UserName</dd></div>
-            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-gray-500 font-medium">Action</dt><dd class="col-span-2 font-mono text-xs">@Model.Action</dd></div>
-            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-gray-500 font-medium">Entity</dt><dd class="col-span-2">@(Model.EntityType is null ? "—" : $"{Model.EntityType}{(Model.EntityId.HasValue ? $" #{Model.EntityId}" : "")}")</dd></div>
-            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-gray-500 font-medium">IP Address</dt><dd class="col-span-2 font-mono text-xs">@(Model.IpAddress ?? "—")</dd></div>
-            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-gray-500 font-medium">Details</dt><dd class="col-span-2">@(string.IsNullOrWhiteSpace(Model.Details) ? "—" : Model.Details)</dd></div>
+            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-gray-500 font-medium">زمان‌بندی</dt><dd class="col-span-2">@Model.Timestamp.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss 'UTC'zzz")</dd></div>
+            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-gray-500 font-medium">کاربر</dt><dd class="col-span-2">@Model.UserName</dd></div>
+            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-gray-500 font-medium">عملیات</dt><dd class="col-span-2 font-mono text-xs">@Model.Action</dd></div>
+            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-gray-500 font-medium">موجودیت</dt><dd class="col-span-2">@(Model.EntityType is null ? "—" : $"{Model.EntityType}{(Model.EntityId.HasValue ? $" #{Model.EntityId}" : "")}")</dd></div>
+            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-gray-500 font-medium">آدرس IP</dt><dd class="col-span-2 font-mono text-xs">@(Model.IpAddress ?? "—")</dd></div>
+            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-gray-500 font-medium">جزئیات</dt><dd class="col-span-2">@(string.IsNullOrWhiteSpace(Model.Details) ? "—" : Model.Details)</dd></div>
         </dl>
     </div>
 
     <div class="mt-4">
-        <a href="/admin/audit-log" class="inline-flex items-center gap-2 px-4 py-2.5 text-sm text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"><i class="fas fa-arrow-left"></i> Back to Audit Log</a>
+        <a href="/admin/audit-log" class="inline-flex items-center gap-2 px-4 py-2.5 text-sm text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"><i class="fas fa-arrow-left"></i> بازگشت به گزارش عملیات</a>
     </div>
 </div>

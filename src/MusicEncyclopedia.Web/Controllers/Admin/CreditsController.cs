@@ -114,7 +114,7 @@ public sealed class CreditsController : AdminBaseController
 
             if (credit is null)
             {
-                return Json(new { success = false, errors = new[] { "Credit not found." } });
+                return Json(new { success = false, errors = new[] { "اعتبار یافت نشد." } });
             }
 
             credit.CreditRoleId = model.CreditRoleId;
@@ -145,7 +145,7 @@ public sealed class CreditsController : AdminBaseController
 
             if (entityTypeId == 0 || entityId == 0)
             {
-                return Json(new { success = false, errors = new[] { "Entity type and entity ID are required." } });
+                return Json(new { success = false, errors = new[] { "موجودیت type and entity ID are required." } });
             }
 
             var credit = new Credit
@@ -191,7 +191,7 @@ public sealed class CreditsController : AdminBaseController
 
         if (credit is null)
         {
-            return Json(new { success = false, errors = new[] { "Credit not found." } });
+            return Json(new { success = false, errors = new[] { "اعتبار یافت نشد." } });
         }
 
         _db.Credits.Remove(credit);

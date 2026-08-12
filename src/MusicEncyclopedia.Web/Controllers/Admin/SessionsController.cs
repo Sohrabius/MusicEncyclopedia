@@ -158,7 +158,7 @@ public sealed class SessionsController : AdminBaseController
 
         await InvalidateEntityCacheAsync("RecordingSession", session.RecordingSessionId, "Created");
 
-        SetSuccessMessage($"Recording session \"{session.Slug}\" created successfully.");
+        SetSuccessMessage($"جلسه ضبط «{session.Slug}» با موفقیت ایجاد شد.");
         return RedirectToAction(nameof(Edit), new { id = session.RecordingSessionId });
     }
 
@@ -173,7 +173,7 @@ public sealed class SessionsController : AdminBaseController
 
         if (session is null)
         {
-            SetErrorMessage("Recording session not found.");
+            SetErrorMessage("جلسه ضبط یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -208,7 +208,7 @@ public sealed class SessionsController : AdminBaseController
     {
         if (id != viewModel.RecordingSessionId)
         {
-            SetErrorMessage("Session ID mismatch.");
+            SetErrorMessage("شناسه جلسه ناسازگار است.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -225,7 +225,7 @@ public sealed class SessionsController : AdminBaseController
 
         if (session is null)
         {
-            SetErrorMessage("Recording session not found.");
+            SetErrorMessage("جلسه ضبط یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -272,12 +272,12 @@ public sealed class SessionsController : AdminBaseController
 
             await InvalidateEntityCacheAsync("RecordingSession", session.RecordingSessionId, "Updated");
 
-            SetSuccessMessage($"Recording session \"{session.Slug}\" updated successfully.");
+            SetSuccessMessage($"جلسه ضبط «{session.Slug}» با موفقیت به‌روزرسانی شد.");
         }
         catch (DbUpdateConcurrencyException ex)
         {
             _logger.LogWarning(ex, "Concurrency conflict updating recording session {Id}", id);
-            SetErrorMessage("This session was modified by another user. Please reload and try again.");
+            SetErrorMessage("این جلسه توسط کاربر دیگری تغییر کرده است. لطفاً دوباره بارگذاری و تلاش کنید.");
             viewModel.RowVersion = session.RowVersion;
             viewModel.SessionTypes = await _db.SessionTypes.OrderBy(st => st.Name).ToListAsync(cancellationToken);
             viewModel.Locations = await _db.Locations.Where(l => !l.IsDeleted).OrderBy(l => l.Name).ToListAsync(cancellationToken);
@@ -300,7 +300,7 @@ public sealed class SessionsController : AdminBaseController
 
         if (session is null)
         {
-            SetErrorMessage("Recording session not found.");
+            SetErrorMessage("جلسه ضبط یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -323,7 +323,7 @@ public sealed class SessionsController : AdminBaseController
 
         await InvalidateEntityCacheAsync("RecordingSession", session.RecordingSessionId, "Deleted");
 
-        SetSuccessMessage($"Recording session \"{session.Slug}\" has been deleted.");
+        SetSuccessMessage($"جلسه ضبط «{session.Slug}» حذف شد.");
         return RedirectToAction(nameof(Index));
     }
 
@@ -340,7 +340,7 @@ public sealed class SessionsController : AdminBaseController
 
         if (session is null)
         {
-            SetErrorMessage("Recording session not found.");
+            SetErrorMessage("جلسه ضبط یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -362,7 +362,7 @@ public sealed class SessionsController : AdminBaseController
 
         await InvalidateEntityCacheAsync("RecordingSession", session.RecordingSessionId, "Restored");
 
-        SetSuccessMessage($"Recording session \"{session.Slug}\" has been restored.");
+        SetSuccessMessage($"جلسه ضبط «{session.Slug}» بازیابی شد.");
         return RedirectToAction(nameof(Index));
     }
 }

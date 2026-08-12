@@ -1,6 +1,6 @@
 @model PersonListViewModel
 @{
-    ViewData["Title"] = "People";
+    ViewData["Title"] = "اشخاص";
     ViewData["ActiveMenu"] = "People";
 }
 
@@ -9,7 +9,7 @@
         <form method="get" action="/admin/people" class="flex items-center gap-2 flex-1 max-w-md">
             <div class="relative flex-1">
                 <i class="fas fa-search absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
-                <input type="text" name="q" value="@Model.SearchQuery" placeholder="Search people..."
+                <input type="text" name="q" value="@Model.SearchQuery" placeholder="جستجوی اشخاص..."
                        class="w-full ps-9 pe-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
             </div>
             <button type="submit" class="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors">
@@ -18,13 +18,13 @@
             @if (!string.IsNullOrWhiteSpace(Model.SearchQuery))
             {
                 <a href="/admin/people" class="px-3 py-2 text-sm text-gray-600 hover:text-gray-900">
-                    <i class="fas fa-times"></i> Clear
+                    <i class="fas fa-times"></i> پاک کردن
                 </a>
             }
         </form>
         <a href="/admin/people/Create"
            class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 transition-colors">
-            <i class="fas fa-plus"></i> <span>Create Person</span>
+            <i class="fas fa-plus"></i> <span>ایجاد شخص</span>
         </a>
     </div>
 </div>
@@ -34,13 +34,13 @@
         <table class="w-full text-sm">
             <thead class="bg-gray-50 border-b border-gray-200">
                 <tr>
-                    <th class="text-start px-4 py-3 font-medium text-gray-600">Full Name</th>
+                    <th class="text-start px-4 py-3 font-medium text-gray-600">نام کامل</th>
                     <th class="text-start px-4 py-3 font-medium text-gray-600">Slug</th>
-                    <th class="text-start px-4 py-3 font-medium text-gray-600">Kind</th>
-                    <th class="text-start px-4 py-3 font-medium text-gray-600">Birth</th>
-                    <th class="text-start px-4 py-3 font-medium text-gray-600">Death</th>
-                    <th class="text-center px-4 py-3 font-medium text-gray-600">Status</th>
-                    <th class="text-end px-4 py-3 font-medium text-gray-600">Actions</th>
+                    <th class="text-start px-4 py-3 font-medium text-gray-600">نوع</th>
+                    <th class="text-start px-4 py-3 font-medium text-gray-600">تولد</th>
+                    <th class="text-start px-4 py-3 font-medium text-gray-600">فوت</th>
+                    <th class="text-center px-4 py-3 font-medium text-gray-600">وضعیت</th>
+                    <th class="text-end px-4 py-3 font-medium text-gray-600">عملیات</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
@@ -51,11 +51,11 @@
                             <i class="fas fa-users text-3xl text-gray-300 mb-2 block"></i>
                             @if (!string.IsNullOrWhiteSpace(Model.SearchQuery))
                             {
-                                <span>No people found matching "<strong>@Model.SearchQuery</strong>".</span>
+                                <span>هیچ شخصی مطابق با "<strong>@Model.SearchQuery</strong>".</span>
                             }
                             else
                             {
-                                <span>No people yet. <a href="/admin/people/Create" class="text-blue-600 hover:underline">Create one</a>.</span>
+                                <span>هنوز شخصی وجود ندارد. <a href="/admin/people/Create" class="text-blue-600 hover:underline">ایجاد کنید</a>.</span>
                             }
                         </td>
                     </tr>
@@ -76,14 +76,14 @@
                             <td class="px-4 py-3"><span class="inline-block px-2 py-0.5 bg-blue-50 text-blue-700 text-xs rounded-full">@person.KindName</span></td>
                             <td class="px-4 py-3 text-gray-500">@person.BirthDate?.ToString("yyyy-MM-dd")</td>
                             <td class="px-4 py-3 text-gray-500">@person.DeathDate?.ToString("yyyy-MM-dd")</td>
-                            <td class="px-4 py-3 text-center"><span class="inline-block px-2 py-0.5 text-xs rounded-full bg-green-50 text-green-700">Active</span></td>
+                            <td class="px-4 py-3 text-center"><span class="inline-block px-2 py-0.5 text-xs rounded-full bg-green-50 text-green-700">فعال</span></td>
                             <td class="px-4 py-3 text-end">
                                 <div class="flex items-center justify-end gap-2">
-                                    <a href="/admin/people/@person.PersonId/Edit" class="inline-flex items-center gap-1 px-2 py-1 text-xs text-blue-600 hover:bg-blue-50 rounded" title="Edit"><i class="fas fa-edit"></i> Edit</a>
+                                    <a href="/admin/people/@person.PersonId/Edit" class="inline-flex items-center gap-1 px-2 py-1 text-xs text-blue-600 hover:bg-blue-50 rounded" title="ویرایش"><i class="fas fa-edit"></i> ویرایش</a>
                                     <form method="post" action="/admin/people/@person.PersonId/Delete"
                                           onsubmit="return confirm('Are you sure you want to delete this person? It can be restored later.');" class="inline">
                                         @Html.AntiForgeryToken()
-                                        <button type="submit" class="inline-flex items-center gap-1 px-2 py-1 text-xs text-red-600 hover:bg-red-50 rounded" title="Soft delete"><i class="fas fa-trash-alt"></i> Delete</button>
+                                        <button type="submit" class="inline-flex items-center gap-1 px-2 py-1 text-xs text-red-600 hover:bg-red-50 rounded" title="Soft delete"><i class="fas fa-trash-alt"></i> حذف</button>
                                     </form>
                                 </div>
                             </td>
@@ -97,15 +97,15 @@
     @if (Model.Items.TotalPages > 1)
     {
         <div class="flex items-center justify-between px-4 py-3 bg-gray-50 border-t border-gray-200">
-            <p class="text-sm text-gray-500">Showing page <strong>@Model.Items.Page</strong> of <strong>@Model.Items.TotalPages</strong> (@Model.Items.TotalItems total people)</p>
-            <nav class="flex items-center gap-1" aria-label="Pagination">
+            <p class="text-sm text-gray-500">نمایش صفحه <strong>@Model.Items.Page</strong> از <strong>@Model.Items.TotalPages</strong> (@Model.Items.TotalItems total people)</p>
+            <nav class="flex items-center gap-1" aria-label="صفحه‌بندی">
                 @if (Model.Items.Page > 1)
                 {
-                    <a href="/admin/people?page=@(Model.Items.Page - 1)&q=@Model.SearchQuery" class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-200 rounded"><i class="fas fa-chevron-right"></i> Previous</a>
+                    <a href="/admin/people?page=@(Model.Items.Page - 1)&q=@Model.SearchQuery" class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-200 rounded"><i class="fas fa-chevron-right"></i> قبلی</a>
                 }
                 @if (Model.Items.Page < Model.Items.TotalPages)
                 {
-                    <a href="/admin/people?page=@(Model.Items.Page + 1)&q=@Model.SearchQuery" class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-200 rounded">Next <i class="fas fa-chevron-left"></i></a>
+                    <a href="/admin/people?page=@(Model.Items.Page + 1)&q=@Model.SearchQuery" class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-200 rounded">بعدی <i class="fas fa-chevron-left"></i></a>
                 }
             </nav>
         </div>

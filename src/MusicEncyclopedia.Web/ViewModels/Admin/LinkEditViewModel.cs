@@ -12,14 +12,14 @@ public sealed class LinkEditViewModel
     public int EntityLinkId { get; set; }
 
     [Required(ErrorMessage = "Entity type is required.")]
-    [Display(Name = "Entity Type")]
+    [Display(Name = "نوع موجودیت")]
     public int EntityTypeId { get; set; }
 
     [Required(ErrorMessage = "Entity ID is required.")]
-    [Display(Name = "Entity ID")]
+    [Display(Name = "شناسه موجودیت")]
     public int EntityId { get; set; }
 
-    [Display(Name = "Link Type")]
+    [Display(Name = "نوع پیوند")]
     public int? LinkTypeId { get; set; }
 
     [Required(ErrorMessage = "URL is required.")]
@@ -29,7 +29,7 @@ public sealed class LinkEditViewModel
     public string Url { get; set; } = "";
 
     [StringLength(500, ErrorMessage = "Title must not exceed 500 characters.")]
-    [Display(Name = "Title")]
+    [Display(Name = "عنوان")]
     public string? Title { get; set; }
 
     // Dropdown data

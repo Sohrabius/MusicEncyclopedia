@@ -48,4 +48,94 @@
   <data name="Footer.Copyright" xml:space="preserve">
     <value>© {0}</value>
   </data>
+  <data name="Login" xml:space="preserve">
+    <value>ورود</value>
+  </data>
+  <data name="Sign in to your account" xml:space="preserve">
+    <value>ورود به حساب کاربری</value>
+  </data>
+  <data name="Or" xml:space="preserve">
+    <value>یا</value>
+  </data>
+  <data name="create a new account" xml:space="preserve">
+    <value>ایجاد حساب جدید</value>
+  </data>
+  <data name="Email" xml:space="preserve">
+    <value>ایمیل</value>
+  </data>
+  <data name="you@example.com" xml:space="preserve">
+    <value>you@example.com</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>رمز عبور</value>
+  </data>
+  <data name="Remember me" xml:space="preserve">
+    <value>مرا به خاطر بسپار</value>
+  </data>
+  <data name="Forgot password?" xml:space="preserve">
+    <value>رمز عبور را فراموش کرده‌اید؟</value>
+  </data>
+  <data name="Sign in" xml:space="preserve">
+    <value>ورود</value>
+  </data>
+  <data name="Register" xml:space="preserve">
+    <value>ثبت‌نام</value>
+  </data>
+  <data name="Create a new account" xml:space="preserve">
+    <value>ایجاد حساب جدید</value>
+  </data>
+  <data name="sign in to your existing account" xml:space="preserve">
+    <value>ورود به حساب کاربری موجود</value>
+  </data>
+  <data name="Confirm password" xml:space="preserve">
+    <value>تأیید رمز عبور</value>
+  </data>
+  <data name="At least 10 characters with uppercase, lowercase, digit, and special character." xml:space="preserve">
+    <value>حداقل ۱۰ کاراکتر شامل حروف بزرگ، حروف کوچک، عدد و کاراکتر خاص.</value>
+  </data>
+  <data name="Forgot Password" xml:space="preserve">
+    <value>فراموشی رمز عبور</value>
+  </data>
+  <data name="Forgot your password?" xml:space="preserve">
+    <value>رمز عبور خود را فراموش کرده‌اید؟</value>
+  </data>
+  <data name="Enter your email address and we will send you a link to reset your password." xml:space="preserve">
+    <value>آدرس ایمیل خود را وارد کنید تا لینک بازنشانی رمز عبور برای شما ارسال شود.</value>
+  </data>
+  <data name="Send reset link" xml:space="preserve">
+    <value>ارسال لینک بازنشانی</value>
+  </data>
+  <data name="Back to login" xml:space="preserve">
+    <value>بازگشت به ورود</value>
+  </data>
+  <data name="Forgot Password Confirmation" xml:space="preserve">
+    <value>تأیید فراموشی رمز عبور</value>
+  </data>
+  <data name="Check your email" xml:space="preserve">
+    <value>ایمیل خود را بررسی کنید</value>
+  </data>
+  <data name="If an account with that email address exists, we have sent a password reset link. Please check your inbox and follow the instructions." xml:space="preserve">
+    <value>اگر حسابی با این آدرس ایمیل وجود داشته باشد، لینک بازنشانی رمز عبور ارسال شده است. لطفاً صندوق ورودی خود را بررسی کنید و دستورالعمل‌ها را دنبال کنید.</value>
+  </data>
+  <data name="Access Denied" xml:space="preserve">
+    <value>دسترسی غیرمجاز</value>
+  </data>
+  <data name="You do not have permission to access this page. If you believe this is an error, please contact the administrator." xml:space="preserve">
+    <value>شما مجوز دسترسی به این صفحه را ندارید. اگر فکر می‌کنید این خطاست، لطفاً با مدیر سیستم تماس بگیرید.</value>
+  </data>
+  <data name="Back to Home" xml:space="preserve">
+    <value>بازگشت به صفحه اصلی</value>
+  </data>
+  <data name="Invalid login attempt. Please check your email and password." xml:space="preserve">
+    <value>تلاش برای ورود ناموفق بود. لطفاً ایمیل و رمز عبور خود را بررسی کنید.</value>
+  </data>
+  <data name="This account has been locked out due to too many failed attempts. Please try again in 15 minutes." xml:space="preserve">
+    <value>به دلیل تلاش‌های ناموفق زیاد، این حساب قفل شده است. لطفاً ۱۵ دقیقه دیگر دوباره تلاش کنید.</value>
+  </data>
+  <data name="Sign in is not allowed. Please confirm your email or contact support." xml:space="preserve">
+    <value>ورود مجاز نیست. لطفاً ایمیل خود را تأیید کنید یا با پشتیبانی تماس بگیرید.</value>
+  </data>
+  <data name="Two-factor authentication is required but not yet configured." xml:space="preserve">
+    <value>احراز هویت دو مرحله‌ای الزامی است اما هنوز پیکربندی نشده است.</value>
+  </data>
 </root>

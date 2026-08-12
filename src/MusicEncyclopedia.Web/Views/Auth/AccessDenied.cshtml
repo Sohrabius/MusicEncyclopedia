@@ -1,5 +1,4 @@
-@using Microsoft.AspNetCore.Mvc.Localization
-@inject IViewLocalizer Localizer
+@inject IStringLocalizer<SharedResources> Localizer
 
 @{
     ViewData["Title"] = Localizer["Access Denied"];

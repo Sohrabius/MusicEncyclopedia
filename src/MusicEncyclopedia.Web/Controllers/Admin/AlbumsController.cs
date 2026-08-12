@@ -206,7 +206,7 @@ public sealed class AlbumsController : AdminBaseController
 
         await InvalidateEntityCacheAsync("Album", album.AlbumId, "Created");
 
-        SetSuccessMessage($"Album \"{album.Title}\" created successfully.");
+        SetSuccessMessage($"آلبوم «{album.Title}» با موفقیت ایجاد شد.");
         return RedirectToAction(nameof(Edit), new { id = album.AlbumId });
     }
 
@@ -227,7 +227,7 @@ public sealed class AlbumsController : AdminBaseController
         if (album is null)
         {
             _logger.LogWarning("Album not found for edit: AlbumId={AlbumId}", id);
-            SetErrorMessage("Album not found.");
+            SetErrorMessage("آلبوم یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -272,7 +272,7 @@ public sealed class AlbumsController : AdminBaseController
     {
         if (id != viewModel.AlbumId)
         {
-            SetErrorMessage("Album ID mismatch.");
+            SetErrorMessage("شناسه آلبوم ناسازگار است.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -310,7 +310,7 @@ public sealed class AlbumsController : AdminBaseController
         if (album is null)
         {
             _logger.LogWarning("Album not found for update: AlbumId={AlbumId}", id);
-            SetErrorMessage("Album not found. It may have been deleted.");
+            SetErrorMessage("آلبوم یافت نشد. احتمالاً حذف شده است.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -357,12 +357,12 @@ public sealed class AlbumsController : AdminBaseController
 
             await InvalidateEntityCacheAsync("Album", album.AlbumId, "Updated");
 
-            SetSuccessMessage($"Album \"{album.Title}\" updated successfully.");
+            SetSuccessMessage($"آلبوم «{album.Title}» با موفقیت به‌روزرسانی شد.");
         }
         catch (DbUpdateConcurrencyException ex)
         {
             _logger.LogWarning(ex, "Concurrency conflict updating album {AlbumId}", id);
-            SetErrorMessage("This album was modified by another user. Please reload and try again.");
+            SetErrorMessage("این آلبوم توسط کاربر دیگری تغییر کرده است. لطفاً دوباره بارگذاری و تلاش کنید.");
 
             // Reload the view model with fresh data
             viewModel.Categories = await _db.AlbumCategories
@@ -393,7 +393,7 @@ public sealed class AlbumsController : AdminBaseController
 
         if (album is null)
         {
-            SetErrorMessage("Album not found.");
+            SetErrorMessage("آلبوم یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -417,7 +417,7 @@ public sealed class AlbumsController : AdminBaseController
 
         await InvalidateEntityCacheAsync("Album", id, "Deleted");
 
-        SetSuccessMessage($"Album \"{album.Title}\" has been deleted (soft).");
+        SetSuccessMessage($"آلبوم «{album.Title}» به‌صورت نرم حذف شد.");
         return RedirectToAction(nameof(Index));
     }
 
@@ -440,7 +440,7 @@ public sealed class AlbumsController : AdminBaseController
 
         if (album is null)
         {
-            SetErrorMessage("Album not found.");
+            SetErrorMessage("آلبوم یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -465,7 +465,7 @@ public sealed class AlbumsController : AdminBaseController
 
         await InvalidateEntityCacheAsync("Album", id, "Restored");
 
-        SetSuccessMessage($"Album \"{album.Title}\" has been restored.");
+        SetSuccessMessage($"آلبوم «{album.Title}» بازیابی شد.");
         return RedirectToAction(nameof(Index));
     }
 
@@ -483,7 +483,7 @@ public sealed class AlbumsController : AdminBaseController
     {
         if (ids is null || ids.Length == 0)
         {
-            SetErrorMessage("No albums were selected.");
+            SetErrorMessage("هیچ آلبومی انتخاب نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -521,7 +521,7 @@ public sealed class AlbumsController : AdminBaseController
         _logger.LogInformation("Bulk soft-delete: {Count} albums by {Admin}",
             albums.Count, User.Identity?.Name);
 
-        SetSuccessMessage($"{albums.Count} album(s) have been deleted (soft).");
+        SetSuccessMessage($"{albums.Count} آلبوم به‌صورت نرم حذف شد.");
         return RedirectToAction(nameof(Index));
     }
 
@@ -535,7 +535,7 @@ public sealed class AlbumsController : AdminBaseController
     {
         if (ids is null || ids.Length == 0)
         {
-            SetErrorMessage("No albums were selected.");
+            SetErrorMessage("هیچ آلبومی انتخاب نشد.");
             return RedirectToAction(nameof(Index), new { deleted = true });
         }
 
@@ -574,7 +574,7 @@ public sealed class AlbumsController : AdminBaseController
         _logger.LogInformation("Bulk restore: {Count} albums by {Admin}",
             albums.Count, User.Identity?.Name);
 
-        SetSuccessMessage($"{albums.Count} album(s) have been restored.");
+        SetSuccessMessage($"{albums.Count} آلبوم بازیابی شد.");
         return RedirectToAction(nameof(Index), new { deleted = true });
     }
 }

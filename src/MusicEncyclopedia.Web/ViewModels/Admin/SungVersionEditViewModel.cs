@@ -11,23 +11,23 @@ public sealed class SungVersionEditViewModel
 {
     [Required(ErrorMessage = "Title is required.")]
     [StringLength(500, ErrorMessage = "Title must not exceed 500 characters.")]
-    [Display(Name = "Title")]
+    [Display(Name = "عنوان")]
     public string Title { get; set; } = "";
 
     [Required(ErrorMessage = "Poem is required.")]
-    [Display(Name = "Poem")]
+    [Display(Name = "شعر")]
     public int PoemId { get; set; }
 
-    [Display(Name = "Vocal Style")]
+    [Display(Name = "سبک آواز")]
     public int? VocalStyleId { get; set; }
 
-    [Display(Name = "Text")]
+    [Display(Name = "متن")]
     public string? Text { get; set; }
 
-    [Display(Name = "Notes")]
+    [Display(Name = "یادداشت‌ها")]
     public string? Notes { get; set; }
 
-    [Display(Name = "Is Canonical")]
+    [Display(Name = "نسخه اصلی است")]
     public bool IsCanonical { get; set; }
 
     [Required(ErrorMessage = "Slug is required.")]

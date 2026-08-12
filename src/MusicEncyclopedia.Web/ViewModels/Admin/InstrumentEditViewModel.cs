@@ -11,19 +11,19 @@ public sealed class InstrumentEditViewModel
 {
     [Required(ErrorMessage = "Name is required.")]
     [StringLength(255, ErrorMessage = "Name must not exceed 255 characters.")]
-    [Display(Name = "Name")]
+    [Display(Name = "نام")]
     public string Name { get; set; } = "";
 
-    [Display(Name = "Description")]
+    [Display(Name = "توضیحات")]
     public string? Description { get; set; }
 
-    [Display(Name = "Instrument Family")]
+    [Display(Name = "خانواده ساز")]
     public int? InstrumentFamilyId { get; set; }
 
-    [Display(Name = "Country")]
+    [Display(Name = "کشور")]
     public int? CountryId { get; set; }
 
-    [Display(Name = "Historical Notes")]
+    [Display(Name = "یادداشت‌های تاریخی")]
     public string? HistoricalNotes { get; set; }
 
     [Required(ErrorMessage = "Slug is required.")]

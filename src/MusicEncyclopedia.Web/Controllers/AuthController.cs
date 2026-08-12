@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using MusicEncyclopedia.Web.ViewModels.Account;
 
 namespace MusicEncyclopedia.Web.Controllers;
@@ -15,15 +16,18 @@ public sealed class AuthController : Controller
     private readonly SignInManager<IdentityUser> _signInManager;
     private readonly UserManager<IdentityUser> _userManager;
     private readonly ILogger<AuthController> _logger;
+    private readonly IStringLocalizer<SharedResources> _localizer;
 
     public AuthController(
         SignInManager<IdentityUser> signInManager,
         UserManager<IdentityUser> userManager,
-        ILogger<AuthController> logger)
+        ILogger<AuthController> logger,
+        IStringLocalizer<SharedResources> localizer)
     {
         _signInManager = signInManager;
         _userManager = userManager;
         _logger = logger;
+        _localizer = localizer;
     }
 
     // ──────────────────────────────────────────────
@@ -33,7 +37,7 @@ public sealed class AuthController : Controller
     [AllowAnonymous]
     public IActionResult Login(string? returnUrl = null)
     {
-        ViewData["Title"] = "Login";
+        ViewData["Title"] = _localizer["Login"];
 
         // If the user is already authenticated, redirect away
         if (User.Identity?.IsAuthenticated == true)
@@ -55,7 +59,7 @@ public sealed class AuthController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(LoginViewModel model)
     {
-        ViewData["Title"] = "Login";
+        ViewData["Title"] = _localizer["Login"];
 
         if (!ModelState.IsValid)
         {
@@ -78,27 +82,27 @@ public sealed class AuthController : Controller
         if (result.RequiresTwoFactor)
         {
             // Two-factor is not yet implemented; redirect to login with an error
-            ModelState.AddModelError(string.Empty, "Two-factor authentication is required but not yet configured.");
+            ModelState.AddModelError(string.Empty, _localizer["Two-factor authentication is required but not yet configured."]);
             return View(model);
         }
 
         if (result.IsLockedOut)
         {
             _logger.LogWarning("User {Email} is locked out.", model.Email);
-            ModelState.AddModelError(string.Empty, "This account has been locked out due to too many failed attempts. Please try again in 15 minutes.");
+            ModelState.AddModelError(string.Empty, _localizer["This account has been locked out due to too many failed attempts. Please try again in 15 minutes."]);
             return View(model);
         }
 
         if (result.IsNotAllowed)
         {
             _logger.LogWarning("User {Email} is not allowed to sign in (email not confirmed or account disabled).", model.Email);
-            ModelState.AddModelError(string.Empty, "Sign in is not allowed. Please confirm your email or contact support.");
+            ModelState.AddModelError(string.Empty, _localizer["Sign in is not allowed. Please confirm your email or contact support."]);
             return View(model);
         }
 
         // Default failure
         _logger.LogWarning("Failed login attempt for {Email}.", model.Email);
-        ModelState.AddModelError(string.Empty, "Invalid login attempt. Please check your email and password.");
+        ModelState.AddModelError(string.Empty, _localizer["Invalid login attempt. Please check your email and password."]);
         return View(model);
     }
 
@@ -123,7 +127,7 @@ public sealed class AuthController : Controller
     [AllowAnonymous]
     public IActionResult Register(string? returnUrl = null)
     {
-        ViewData["Title"] = "Register";
+        ViewData["Title"] = _localizer["Register"];
 
         if (User.Identity?.IsAuthenticated == true)
         {
@@ -144,7 +148,7 @@ public sealed class AuthController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Register(RegisterViewModel model)
     {
-        ViewData["Title"] = "Register";
+        ViewData["Title"] = _localizer["Register"];
 
         if (!ModelState.IsValid)
         {
@@ -186,7 +190,7 @@ public sealed class AuthController : Controller
     [AllowAnonymous]
     public IActionResult AccessDenied()
     {
-        ViewData["Title"] = "Access Denied";
+        ViewData["Title"] = _localizer["Access Denied"];
         return View();
     }
 
@@ -197,7 +201,7 @@ public sealed class AuthController : Controller
     [AllowAnonymous]
     public IActionResult ForgotPassword()
     {
-        ViewData["Title"] = "Forgot Password";
+        ViewData["Title"] = _localizer["Forgot Password"];
         return View();
     }
 
@@ -209,7 +213,7 @@ public sealed class AuthController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
     {
-        ViewData["Title"] = "Forgot Password";
+        ViewData["Title"] = _localizer["Forgot Password"];
 
         if (!ModelState.IsValid)
         {
@@ -245,7 +249,7 @@ public sealed class AuthController : Controller
     [AllowAnonymous]
     public IActionResult ForgotPasswordConfirmation()
     {
-        ViewData["Title"] = "Forgot Password Confirmation";
+        ViewData["Title"] = _localizer["Forgot Password Confirmation"];
         return View();
     }
 

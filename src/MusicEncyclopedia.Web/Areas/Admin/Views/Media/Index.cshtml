@@ -1,6 +1,6 @@
 @model MediaListViewModel
 @{
-    ViewData["Title"] = "Media Manager";
+    ViewData["Title"] = "مدیریت رسانه";
     ViewData["ActiveMenu"] = "Media";
 }
 
@@ -9,23 +9,23 @@
         <form method="get" action="/admin/media" class="flex items-center gap-2 flex-1 max-w-lg">
             <div class="relative flex-1">
                 <i class="fas fa-search absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
-                <input type="text" name="q" value="@Model.SearchQuery" placeholder="Search media files..." class="w-full ps-9 pe-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                <input type="text" name="q" value="@Model.SearchQuery" placeholder="جستجو رسانه‌ای files..." class="w-full ps-9 pe-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
             </div>
             <button type="submit" class="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors"><i class="fas fa-search"></i></button>
-            @if (!string.IsNullOrWhiteSpace(Model.SearchQuery)) { <a href="/admin/media" class="px-3 py-2 text-sm text-gray-600 hover:text-gray-900"><i class="fas fa-times"></i> Clear</a> }
+            @if (!string.IsNullOrWhiteSpace(Model.SearchQuery)) { <a href="/admin/media" class="px-3 py-2 text-sm text-gray-600 hover:text-gray-900"><i class="fas fa-times"></i> پاک کردن</a> }
         </form>
-        <a href="/admin/media/Upload" class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 transition-colors"><i class="fas fa-upload"></i> <span>Upload Media</span></a>
+        <a href="/admin/media/Upload" class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 transition-colors"><i class="fas fa-upload"></i> <span>بارگذاری رسانه</span></a>
     </div>
 
     <!-- Filter Bar -->
     <div class="flex flex-wrap items-center gap-3 mt-3 pt-3 border-t border-gray-100">
-        <span class="text-xs text-gray-500 font-medium">Filter:</span>
+        <span class="text-xs text-gray-500 font-medium">فیلتر:</span>
 
         <!-- Media Type Filter -->
         <div class="flex items-center gap-1">
             <a href="/admin/media?mediaType=&q=@Model.SearchQuery"
                class="px-2 py-1 text-xs rounded @(string.IsNullOrEmpty(Model.MediaTypeFilter) ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-600 hover:bg-gray-200")">
-                All
+                همه
             </a>
             @foreach (var mt in Model.MediaTypes)
             {
@@ -41,13 +41,13 @@
         <!-- Assigned Entity Filter (simple) -->
         <div class="flex items-center gap-1">
             <select name="entityTypeId" id="filter-entity-type" class="px-2 py-1 text-xs border border-gray-300 rounded bg-white">
-                <option value="">Entity Type</option>
+                <option value="">نوع موجودیت</option>
                 @foreach (var et in Model.EntityTypes)
                 {
                     <option value="@et.EntityTypeId" selected="@(Model.AssignedEntityTypeId == et.EntityTypeId)">@et.Name</option>
                 }
             </select>
-            <input type="number" id="filter-entity-id" value="@Model.AssignedEntityId" placeholder="Entity ID" class="px-2 py-1 text-xs border border-gray-300 rounded w-20" />
+            <input type="number" id="filter-entity-id" value="@Model.AssignedEntityId" placeholder="شناسه موجودیت" class="px-2 py-1 text-xs border border-gray-300 rounded w-20" />
             <button type="button" id="btn-apply-entity-filter" class="px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700">Go</button>
         </div>
     </div>
@@ -58,13 +58,13 @@
         <table class="w-full text-sm">
             <thead class="bg-gray-50 border-b border-gray-200">
                 <tr>
-                    <th class="text-start px-4 py-3 font-medium text-gray-600">Preview</th>
-                    <th class="text-start px-4 py-3 font-medium text-gray-600">File Name</th>
-                    <th class="text-start px-4 py-3 font-medium text-gray-600">Type</th>
-                    <th class="text-end px-4 py-3 font-medium text-gray-600">Size</th>
-                    <th class="text-center px-4 py-3 font-medium text-gray-600">Dimensions</th>
-                    <th class="text-center px-4 py-3 font-medium text-gray-600">Assignments</th>
-                    <th class="text-end px-4 py-3 font-medium text-gray-600">Actions</th>
+                    <th class="text-start px-4 py-3 font-medium text-gray-600">پیش‌نمایش</th>
+                    <th class="text-start px-4 py-3 font-medium text-gray-600">نام فایل</th>
+                    <th class="text-start px-4 py-3 font-medium text-gray-600">نوع</th>
+                    <th class="text-end px-4 py-3 font-medium text-gray-600">اندازه</th>
+                    <th class="text-center px-4 py-3 font-medium text-gray-600">ابعاد</th>
+                    <th class="text-center px-4 py-3 font-medium text-gray-600">تخصیص‌ها</th>
+                    <th class="text-end px-4 py-3 font-medium text-gray-600">عملیات</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
@@ -75,11 +75,11 @@
                             <i class="fas fa-photo-video text-3xl text-gray-300 mb-2 block"></i>
                             @if (!string.IsNullOrWhiteSpace(Model.SearchQuery))
                             {
-                                <span>No media files matching "<strong>@Model.SearchQuery</strong>".</span>
+                                <span>هیچ فایل رسانه‌ای مطابق با "<strong>@Model.SearchQuery</strong>".</span>
                             }
                             else
                             {
-                                <span>No media files yet. <a href="/admin/media/Upload" class="text-blue-600 hover:underline">Upload one</a>.</span>
+                                <span>هنوز فایل رسانه‌ای وجود ندارد. <a href="/admin/media/Upload" class="text-blue-600 hover:underline">بارگذاری کنید</a>.</span>
                             }
                         </td>
                     </tr>
@@ -131,10 +131,10 @@
                                 <span class="inline-block px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full">@item.AssignmentCount</span>
                             </td>
                             <td class="px-4 py-3 text-end">
-                                <a href="/admin/media/@item.MediaId/Edit" class="inline-flex items-center gap-1 px-2 py-1 text-xs text-blue-600 hover:bg-blue-50 rounded"><i class="fas fa-edit"></i> Edit</a>
+                                <a href="/admin/media/@item.MediaId/Edit" class="inline-flex items-center gap-1 px-2 py-1 text-xs text-blue-600 hover:bg-blue-50 rounded"><i class="fas fa-edit"></i> ویرایش</a>
                                 <form method="post" action="/admin/media/@item.MediaId/Delete" onsubmit="return confirm('Are you sure you want to delete this media file?');" class="inline">
                                     @Html.AntiForgeryToken()
-                                    <button type="submit" class="inline-flex items-center gap-1 px-2 py-1 text-xs text-red-600 hover:bg-red-50 rounded"><i class="fas fa-trash-alt"></i> Delete</button>
+                                    <button type="submit" class="inline-flex items-center gap-1 px-2 py-1 text-xs text-red-600 hover:bg-red-50 rounded"><i class="fas fa-trash-alt"></i> حذف</button>
                                 </form>
                             </td>
                         </tr>
@@ -147,10 +147,10 @@
     @if (Model.Items.TotalPages > 1)
     {
         <div class="flex items-center justify-between px-4 py-3 bg-gray-50 border-t border-gray-200">
-            <p class="text-sm text-gray-500">Page <strong>@Model.Items.Page</strong> of <strong>@Model.Items.TotalPages</strong> (@Model.Items.TotalItems total)</p>
+            <p class="text-sm text-gray-500">صفحه <strong>@Model.Items.Page</strong> از <strong>@Model.Items.TotalPages</strong> (@Model.Items.TotalItems total)</p>
             <nav class="flex items-center gap-1">
-                @if (Model.Items.Page > 1) { <a href="/admin/media?page=@(Model.Items.Page - 1)&q=@Model.SearchQuery&mediaType=@Model.MediaTypeFilter" class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-200 rounded"><i class="fas fa-chevron-right"></i> Previous</a> }
-                @if (Model.Items.Page < Model.Items.TotalPages) { <a href="/admin/media?page=@(Model.Items.Page + 1)&q=@Model.SearchQuery&mediaType=@Model.MediaTypeFilter" class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-200 rounded">Next <i class="fas fa-chevron-left"></i></a> }
+                @if (Model.Items.Page > 1) { <a href="/admin/media?page=@(Model.Items.Page - 1)&q=@Model.SearchQuery&mediaType=@Model.MediaTypeFilter" class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-200 rounded"><i class="fas fa-chevron-right"></i> قبلی</a> }
+                @if (Model.Items.Page < Model.Items.TotalPages) { <a href="/admin/media?page=@(Model.Items.Page + 1)&q=@Model.SearchQuery&mediaType=@Model.MediaTypeFilter" class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-200 rounded">بعدی <i class="fas fa-chevron-left"></i></a> }
             </nav>
         </div>
     }

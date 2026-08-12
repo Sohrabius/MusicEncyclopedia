@@ -78,7 +78,7 @@ public sealed class AliasesController : AdminBaseController
     {
         if (string.IsNullOrWhiteSpace(model.AliasName))
         {
-            return Json(new { success = false, errors = new[] { "Alias name is required." } });
+            return Json(new { success = false, errors = new[] { "نام مستعار الزامی است." } });
         }
 
         if (model.AliasId > 0)
@@ -88,7 +88,7 @@ public sealed class AliasesController : AdminBaseController
 
             if (alias is null)
             {
-                return Json(new { success = false, errors = new[] { "Alias not found." } });
+                return Json(new { success = false, errors = new[] { "نام مستعار یافت نشد." } });
             }
 
             alias.AliasTypeId = model.AliasTypeId;
@@ -111,7 +111,7 @@ public sealed class AliasesController : AdminBaseController
 
             if (entityTypeId == 0 || entityId == 0)
             {
-                return Json(new { success = false, errors = new[] { "Entity type and entity ID are required." } });
+                return Json(new { success = false, errors = new[] { "موجودیت type and entity ID are required." } });
             }
 
             var alias = new Alias
@@ -151,7 +151,7 @@ public sealed class AliasesController : AdminBaseController
 
         if (alias is null)
         {
-            return Json(new { success = false, errors = new[] { "Alias not found." } });
+            return Json(new { success = false, errors = new[] { "نام مستعار یافت نشد." } });
         }
 
         _db.Aliases.Remove(alias);

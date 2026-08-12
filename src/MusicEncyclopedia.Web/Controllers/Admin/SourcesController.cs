@@ -145,7 +145,7 @@ public sealed class SourcesController : AdminBaseController
 
         await InvalidateEntityCacheAsync("Source", source.SourceId, "Created");
 
-        SetSuccessMessage($"Source \"{source.Title}\" created successfully.");
+        SetSuccessMessage($"منبع «{source.Title}» با موفقیت ایجاد شد.");
         return RedirectToAction(nameof(Edit), new { id = source.SourceId });
     }
 
@@ -158,7 +158,7 @@ public sealed class SourcesController : AdminBaseController
 
         if (source is null)
         {
-            SetErrorMessage("Source not found.");
+            SetErrorMessage("منبع یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -193,7 +193,7 @@ public sealed class SourcesController : AdminBaseController
     {
         if (id != viewModel.SourceId)
         {
-            SetErrorMessage("Source ID mismatch.");
+            SetErrorMessage("شناسه منبع ناسازگار است.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -210,7 +210,7 @@ public sealed class SourcesController : AdminBaseController
 
         if (source is null)
         {
-            SetErrorMessage("Source not found.");
+            SetErrorMessage("منبع یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -242,12 +242,12 @@ public sealed class SourcesController : AdminBaseController
 
             await InvalidateEntityCacheAsync("Source", source.SourceId, "Updated");
 
-            SetSuccessMessage($"Source \"{source.Title}\" updated successfully.");
+            SetSuccessMessage($"منبع «{source.Title}» با موفقیت به‌روزرسانی شد.");
         }
         catch (DbUpdateConcurrencyException ex)
         {
             _logger.LogWarning(ex, "Concurrency conflict updating source {SourceId}", id);
-            SetErrorMessage("This source was modified by another user. Please reload and try again.");
+            SetErrorMessage("این منبع توسط کاربر دیگری تغییر کرده است. لطفاً دوباره بارگذاری و تلاش کنید.");
             viewModel.SourceTypes = await _db.SourceTypes.OrderBy(t => t.Name).ToListAsync(cancellationToken);
             viewModel.Companies = await _db.Companies.OrderBy(c => c.Name).ToListAsync(cancellationToken);
             viewModel.RowVersion = source.RowVersion;
@@ -266,7 +266,7 @@ public sealed class SourcesController : AdminBaseController
         var source = await _db.Sources.FirstOrDefaultAsync(s => s.SourceId == id, cancellationToken);
         if (source is null)
         {
-            SetErrorMessage("Source not found.");
+            SetErrorMessage("منبع یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -286,7 +286,7 @@ public sealed class SourcesController : AdminBaseController
 
         await InvalidateEntityCacheAsync("Source", source.SourceId, "Deleted");
 
-        SetSuccessMessage($"Source \"{source.Title}\" has been deleted (soft).");
+        SetSuccessMessage($"منبع «{source.Title}» به‌صورت نرم حذف شد.");
         return RedirectToAction(nameof(Index));
     }
 
@@ -299,7 +299,7 @@ public sealed class SourcesController : AdminBaseController
             .FirstOrDefaultAsync(s => s.SourceId == id, cancellationToken);
         if (source is null)
         {
-            SetErrorMessage("Source not found.");
+            SetErrorMessage("منبع یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -320,7 +320,7 @@ public sealed class SourcesController : AdminBaseController
 
         await InvalidateEntityCacheAsync("Source", source.SourceId, "Restored");
 
-        SetSuccessMessage($"Source \"{source.Title}\" has been restored.");
+        SetSuccessMessage($"منبع «{source.Title}» بازیابی شد.");
         return RedirectToAction(nameof(Index));
     }
 }

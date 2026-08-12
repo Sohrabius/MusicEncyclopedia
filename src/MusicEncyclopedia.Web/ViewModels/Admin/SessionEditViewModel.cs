@@ -7,23 +7,23 @@ public sealed class SessionEditViewModel
 {
     public int RecordingSessionId { get; set; }
 
-    [Display(Name = "Session Type")]
+    [Display(Name = "نوع جلسه")]
     public int? SessionTypeId { get; set; }
 
-    [Display(Name = "Location")]
+    [Display(Name = "مکان")]
     public int? LocationId { get; set; }
 
-    [Display(Name = "Start Date")]
+    [Display(Name = "تاریخ شروع")]
     public DateOnly? StartDate { get; set; }
 
-    [Display(Name = "End Date")]
+    [Display(Name = "تاریخ پایان")]
     public DateOnly? EndDate { get; set; }
 
     [StringLength(50)]
-    [Display(Name = "Date Precision")]
+    [Display(Name = "دقت تاریخ")]
     public string? DatePrecision { get; set; }
 
-    [Display(Name = "Notes")]
+    [Display(Name = "یادداشت‌ها")]
     public string? Notes { get; set; }
 
     [Required(ErrorMessage = "Slug is required.")]

@@ -49,6 +49,31 @@ public class CultureMiddleware
     /// </summary>
     private static string ResolveCulture(HttpContext context)
     {
+        // The Admin area is Persian (fa) only — force the culture so the
+        // admin login entry and every admin page render RTL in Persian
+        // regardless of the user's language cookie or Accept-Language header.
+        var path = context.Request.Path.Value;
+        if (path is not null &&
+            (path.Equals("/admin", StringComparison.OrdinalIgnoreCase) ||
+             path.StartsWith("/admin/", StringComparison.OrdinalIgnoreCase)))
+        {
+            return "fa";
+        }
+
+        // The admin login entry: /auth/login (etc.) redirected from an admin
+        // URL carries ?ReturnUrl=/admin… — keep that entry Persian as well.
+        if (path is not null && path.StartsWith("/auth/", StringComparison.OrdinalIgnoreCase))
+        {
+            var returnUrl = context.Request.Query["ReturnUrl"].FirstOrDefault()
+                            ?? context.Request.Query["returnUrl"].FirstOrDefault();
+            if (!string.IsNullOrWhiteSpace(returnUrl) &&
+                (returnUrl.Equals("/admin", StringComparison.OrdinalIgnoreCase) ||
+                 returnUrl.StartsWith("/admin/", StringComparison.OrdinalIgnoreCase)))
+            {
+                return "fa";
+            }
+        }
+
         // First, try from route data (set by the routing middleware)
         var routeCulture = context.Request.RouteValues["culture"] as string;
 

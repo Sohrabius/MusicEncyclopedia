@@ -32,17 +32,17 @@ public sealed class CertificationEditViewModel
 {
     [Required(ErrorMessage = "Name is required.")]
     [StringLength(255, ErrorMessage = "Name must not exceed 255 characters.")]
-    [Display(Name = "Name")]
+    [Display(Name = "نام")]
     public string Name { get; set; } = "";
 
     [StringLength(500)]
-    [Display(Name = "Organization")]
+    [Display(Name = "سازمان")]
     public string? Organization { get; set; }
 
-    [Display(Name = "Country")]
+    [Display(Name = "کشور")]
     public int? CountryId { get; set; }
 
-    [Display(Name = "Description")]
+    [Display(Name = "توضیحات")]
     public string? Description { get; set; }
 
     [Required(ErrorMessage = "Slug is required.")]

@@ -12,10 +12,10 @@
         <div class="lg:col-span-2 space-y-6">
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
                 <h2 class="text-lg font-semibold text-gray-900 mb-1">@Model.Email</h2>
-                <p class="text-sm text-gray-500 mb-4">Assign roles and direct permissions. Role permissions are applied automatically on the next sign-in.</p>
+                <p class="text-sm text-gray-500 mb-4">نقش‌ها و دسترسی‌های مستقیم را تخصیص دهید. دسترسی‌های نقش در ورود بعدی به‌صورت خودکار اعمال می‌شوند.</p>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <span class="block text-sm font-medium text-gray-700 mb-2">Roles</span>
+                        <span class="block text-sm font-medium text-gray-700 mb-2">نقش‌ها</span>
                         <div class="space-y-2 border border-gray-200 rounded-md p-3 max-h-56 overflow-y-auto">
                             @foreach (var role in Model.AllRoles)
                             {
@@ -26,25 +26,25 @@
                             }
                             @if (Model.AllRoles.Count == 0)
                             {
-                                <p class="text-xs text-gray-400">No roles defined. <a href="/admin/roles" class="text-blue-600 hover:underline">Create roles</a> first.</p>
+                                <p class="text-xs text-gray-400">نقشی تعریف نشده است. <a href="/admin/roles" class="text-blue-600 hover:underline">ایجاد نقش</a> ابتدا.</p>
                             }
                         </div>
                     </div>
                     <div>
-                        <span class="block text-sm font-medium text-gray-700 mb-2">Account State</span>
+                        <span class="block text-sm font-medium text-gray-700 mb-2">وضعیت حساب</span>
                         <div class="space-y-3 border border-gray-200 rounded-md p-3">
                             <label class="flex items-center gap-2 text-sm cursor-pointer">
                                 <input type="checkbox" asp-for="IsLockedOut" class="rounded border-gray-300 text-red-600 focus:ring-red-500" />
-                                <span>Lock this account</span>
+                                <span>قفل کردن این حساب</span>
                             </label>
-                            <p class="text-xs text-gray-400">Locked users cannot sign in until the lock is removed.</p>
+                            <p class="text-xs text-gray-400">کاربران قفل‌شده نمی‌توانند تا زمانی که قفل برداشته نشده وارد شوند.</p>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                <h2 class="text-lg font-semibold text-gray-900 mb-1">Permissions</h2>
-                <p class="text-sm text-gray-500 mb-4">Direct permission claims. These combine with any permissions granted through roles.</p>
+                <h2 class="text-lg font-semibold text-gray-900 mb-1">دسترسی‌ها</h2>
+                <p class="text-sm text-gray-500 mb-4">ادعاهای دسترسی مستقیم. این‌ها با هر دسترسی اعطاشده از طریق نقش‌ها ترکیب می‌شوند.</p>
                 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2 border border-gray-200 rounded-md p-3 max-h-96 overflow-y-auto">
                     @foreach (var permission in Model.AllPermissions)
                     {
@@ -58,11 +58,11 @@
         </div>
         <div class="space-y-6">
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">Actions</h2>
-                <button type="submit" class="w-full px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"><i class="fas fa-save"></i> Save Changes</button>
-                <a href="/admin/users" class="w-full block text-center mt-3 px-4 py-2.5 text-sm text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"><i class="fas fa-arrow-left me-1"></i> Back to Users</a>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">عملیات</h2>
+                <button type="submit" class="w-full px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"><i class="fas fa-save"></i> ذخیره تغییرات</button>
+                <a href="/admin/users" class="w-full block text-center mt-3 px-4 py-2.5 text-sm text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"><i class="fas fa-arrow-left me-1"></i> بازگشت به کاربران</a>
                 <hr class="border-gray-200 my-3" />
-                <form method="post" action="/admin/users/@Model.Id/Delete" onsubmit="return confirm('Are you sure you want to delete this user?');">@Html.AntiForgeryToken()<button type="submit" class="w-full px-4 py-2 text-sm text-red-600 border border-red-200 rounded-md hover:bg-red-50 transition-colors flex items-center justify-center gap-2"><i class="fas fa-trash-alt"></i> Delete User</button></form>
+                <form method="post" action="/admin/users/@Model.Id/Delete" onsubmit="return confirm('Are you sure you want to delete this user?');">@Html.AntiForgeryToken()<button type="submit" class="w-full px-4 py-2 text-sm text-red-600 border border-red-200 rounded-md hover:bg-red-50 transition-colors flex items-center justify-center gap-2"><i class="fas fa-trash-alt"></i> حذف کاربر</button></form>
             </div>
         </div>
     </div>

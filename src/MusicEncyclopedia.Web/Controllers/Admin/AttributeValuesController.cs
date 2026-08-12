@@ -83,7 +83,7 @@ public sealed class AttributeValuesController : AdminBaseController
     {
         if (model.AttributeDefinitionId == 0)
         {
-            return Json(new { success = false, errors = new[] { "Attribute definition is required." } });
+            return Json(new { success = false, errors = new[] { "تعریف ویژگی الزامی است." } });
         }
 
         if (model.AttributeValueId > 0)
@@ -93,7 +93,7 @@ public sealed class AttributeValuesController : AdminBaseController
 
             if (attributeValue is null)
             {
-                return Json(new { success = false, errors = new[] { "Attribute value not found." } });
+                return Json(new { success = false, errors = new[] { "مقدار ویژگی یافت نشد." } });
             }
 
             attributeValue.AttributeDefinitionId = model.AttributeDefinitionId;
@@ -125,7 +125,7 @@ public sealed class AttributeValuesController : AdminBaseController
 
             if (entityTypeId == 0 || entityId == 0)
             {
-                return Json(new { success = false, errors = new[] { "Entity type and entity ID are required." } });
+                return Json(new { success = false, errors = new[] { "موجودیت type and entity ID are required." } });
             }
 
             var attributeValue = new AttributeValue
@@ -170,7 +170,7 @@ public sealed class AttributeValuesController : AdminBaseController
 
         if (attributeValue is null)
         {
-            return Json(new { success = false, errors = new[] { "Attribute value not found." } });
+            return Json(new { success = false, errors = new[] { "مقدار ویژگی یافت نشد." } });
         }
 
         _db.AttributeValues.Remove(attributeValue);

@@ -154,7 +154,7 @@ public sealed class LinksController : AdminBaseController
         await InvalidateEntityCacheAsync(entityLink.EntityTypeId, entityLink.EntityId, "Updated");
         await InvalidateBroadCacheAsync();
 
-        SetSuccessMessage("Link created successfully.");
+        SetSuccessMessage("پیوند با موفقیت ایجاد شد.");
         return RedirectToAction(nameof(Edit), new { id = entityLink.EntityLinkId });
     }
 
@@ -173,7 +173,7 @@ public sealed class LinksController : AdminBaseController
 
         if (entityLink is null)
         {
-            SetErrorMessage("Link not found.");
+            SetErrorMessage("پیوند یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -205,7 +205,7 @@ public sealed class LinksController : AdminBaseController
     {
         if (id != viewModel.EntityLinkId)
         {
-            SetErrorMessage("Link ID mismatch.");
+            SetErrorMessage("شناسه پیوند ناسازگار است.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -222,7 +222,7 @@ public sealed class LinksController : AdminBaseController
 
         if (entityLink is null)
         {
-            SetErrorMessage("Link not found.");
+            SetErrorMessage("پیوند یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -242,7 +242,7 @@ public sealed class LinksController : AdminBaseController
         }
         await InvalidateBroadCacheAsync();
 
-        SetSuccessMessage("Link updated successfully.");
+        SetSuccessMessage("پیوند با موفقیت به‌روزرسانی شد.");
 
         return RedirectToAction(nameof(Edit), new { id });
     }
@@ -264,7 +264,7 @@ public sealed class LinksController : AdminBaseController
 
         if (entityLink is null)
         {
-            SetErrorMessage("Link not found.");
+            SetErrorMessage("پیوند یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -279,7 +279,7 @@ public sealed class LinksController : AdminBaseController
         }
         await InvalidateBroadCacheAsync();
 
-        SetSuccessMessage("Link deleted successfully.");
+        SetSuccessMessage("پیوند با موفقیت حذف شد.");
 
         return RedirectToAction(nameof(Index));
     }
@@ -301,7 +301,7 @@ public sealed class LinksController : AdminBaseController
 
         if (entityLink is null)
         {
-            SetErrorMessage("Link not found.");
+            SetErrorMessage("پیوند یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -314,7 +314,7 @@ public sealed class LinksController : AdminBaseController
         }
         await InvalidateBroadCacheAsync();
 
-        SetSuccessMessage("Link restored successfully.");
+        SetSuccessMessage("پیوند با موفقیت بازیابی شد.");
         return RedirectToAction(nameof(Index));
     }
 }

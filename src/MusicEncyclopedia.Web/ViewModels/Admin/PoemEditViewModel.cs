@@ -11,48 +11,48 @@ public sealed class PoemEditViewModel
 {
     [Required(ErrorMessage = "Title is required.")]
     [StringLength(500, ErrorMessage = "Title must not exceed 500 characters.")]
-    [Display(Name = "Title")]
+    [Display(Name = "عنوان")]
     public string Title { get; set; } = "";
 
     [StringLength(500)]
-    [Display(Name = "Original Title")]
+    [Display(Name = "عنوان اصلی")]
     public string? OriginalTitle { get; set; }
 
     [StringLength(500)]
-    [Display(Name = "English Title")]
+    [Display(Name = "عنوان انگلیسی")]
     public string? EnglishTitle { get; set; }
 
-    [Display(Name = "Poet")]
+    [Display(Name = "شاعر")]
     public int? PoetId { get; set; }
 
-    [Display(Name = "Publication")]
+    [Display(Name = "انتشارات")]
     public int? PublicationId { get; set; }
 
-    [Display(Name = "Source")]
+    [Display(Name = "منبع")]
     public string? Source { get; set; }
 
     [StringLength(500)]
-    [Display(Name = "Book")]
+    [Display(Name = "کتاب")]
     public string? Book { get; set; }
 
-    [Display(Name = "Original Publication Date")]
+    [Display(Name = "تاریخ انتشار اصلی")]
     public DateOnly? OriginalPublicationDate { get; set; }
 
     [StringLength(50)]
-    [Display(Name = "Original Publication Date Precision")]
+    [Display(Name = "دقت تاریخ انتشار اصلی")]
     public string? OriginalPublicationDatePrecision { get; set; }
 
     [StringLength(500)]
-    [Display(Name = "External Reference URL")]
+    [Display(Name = "آدرس مرجع خارجی")]
     public string? ExternalReferenceUrl { get; set; }
 
-    [Display(Name = "Copyright")]
+    [Display(Name = "حق نشر")]
     public string? Copyright { get; set; }
 
-    [Display(Name = "Notes")]
+    [Display(Name = "یادداشت‌ها")]
     public string? Notes { get; set; }
 
-    [Display(Name = "Canonical Text")]
+    [Display(Name = "متن اصلی")]
     public string? CanonicalText { get; set; }
 
     [Required(ErrorMessage = "Slug is required.")]

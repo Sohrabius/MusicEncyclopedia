@@ -102,7 +102,7 @@ public sealed class AuditLogsController : AdminBaseController
 
         if (entry is null)
         {
-            SetErrorMessage("Audit log entry not found.");
+            SetErrorMessage("مورد گزارش عملیات یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 

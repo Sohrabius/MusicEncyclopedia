@@ -128,7 +128,7 @@ public sealed class MoodsController : AdminBaseController
 
         await InvalidateEntityCacheAsync("Mood", mood.MoodId, "Created");
 
-        SetSuccessMessage($"Mood \"{mood.Name}\" created successfully.");
+        SetSuccessMessage($"حالت «{mood.Name}» با موفقیت ایجاد شد.");
         return RedirectToAction(nameof(Edit), new { id = mood.MoodId });
     }
 
@@ -141,7 +141,7 @@ public sealed class MoodsController : AdminBaseController
 
         if (mood is null)
         {
-            SetErrorMessage("Mood not found.");
+            SetErrorMessage("حالت یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -170,7 +170,7 @@ public sealed class MoodsController : AdminBaseController
     {
         if (id != viewModel.MoodId)
         {
-            SetErrorMessage("Mood ID mismatch.");
+            SetErrorMessage("شناسه حالت ناسازگار است.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -185,7 +185,7 @@ public sealed class MoodsController : AdminBaseController
 
         if (mood is null)
         {
-            SetErrorMessage("Mood not found.");
+            SetErrorMessage("حالت یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -213,12 +213,12 @@ public sealed class MoodsController : AdminBaseController
 
             await InvalidateEntityCacheAsync("Mood", mood.MoodId, "Updated");
 
-            SetSuccessMessage($"Mood \"{mood.Name}\" updated successfully.");
+            SetSuccessMessage($"حالت «{mood.Name}» با موفقیت به‌روزرسانی شد.");
         }
         catch (DbUpdateConcurrencyException ex)
         {
             _logger.LogWarning(ex, "Concurrency conflict updating mood {MoodId}", id);
-            SetErrorMessage("This mood was modified by another user. Please reload and try again.");
+            SetErrorMessage("این حالت توسط کاربر دیگری تغییر کرده است. لطفاً دوباره بارگذاری و تلاش کنید.");
             viewModel.RowVersion = mood.RowVersion;
             return View(viewModel);
         }
@@ -235,7 +235,7 @@ public sealed class MoodsController : AdminBaseController
         var mood = await _db.Moods.FirstOrDefaultAsync(m => m.MoodId == id, cancellationToken);
         if (mood is null)
         {
-            SetErrorMessage("Mood not found.");
+            SetErrorMessage("حالت یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -255,7 +255,7 @@ public sealed class MoodsController : AdminBaseController
 
         await InvalidateEntityCacheAsync("Mood", mood.MoodId, "Deleted");
 
-        SetSuccessMessage($"Mood \"{mood.Name}\" has been deleted (soft).");
+        SetSuccessMessage($"حالت «{mood.Name}» به‌صورت نرم حذف شد.");
         return RedirectToAction(nameof(Index));
     }
 
@@ -268,7 +268,7 @@ public sealed class MoodsController : AdminBaseController
             .FirstOrDefaultAsync(m => m.MoodId == id, cancellationToken);
         if (mood is null)
         {
-            SetErrorMessage("Mood not found.");
+            SetErrorMessage("حالت یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -289,7 +289,7 @@ public sealed class MoodsController : AdminBaseController
 
         await InvalidateEntityCacheAsync("Mood", mood.MoodId, "Restored");
 
-        SetSuccessMessage($"Mood \"{mood.Name}\" has been restored.");
+        SetSuccessMessage($"حالت «{mood.Name}» بازیابی شد.");
         return RedirectToAction(nameof(Index));
     }
 }

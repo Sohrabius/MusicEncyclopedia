@@ -11,32 +11,32 @@ public sealed class CompanyEditViewModel
 {
     [Required(ErrorMessage = "Name is required.")]
     [StringLength(500, ErrorMessage = "Name must not exceed 500 characters.")]
-    [Display(Name = "Name")]
+    [Display(Name = "نام")]
     public string Name { get; set; } = "";
 
     [StringLength(500)]
-    [Display(Name = "Sort Name")]
+    [Display(Name = "نام مرتب‌سازی")]
     public string? NameSort { get; set; }
 
     [StringLength(500)]
-    [Display(Name = "Original Name")]
+    [Display(Name = "نام اصلی")]
     public string? OriginalName { get; set; }
 
     [StringLength(500)]
-    [Display(Name = "English Name")]
+    [Display(Name = "نام انگلیسی")]
     public string? EnglishName { get; set; }
 
-    [Display(Name = "Company Type")]
+    [Display(Name = "نوع شرکت")]
     public int? CompanyTypeId { get; set; }
 
-    [Display(Name = "Country")]
+    [Display(Name = "کشور")]
     public int? CountryId { get; set; }
 
     [StringLength(500)]
-    [Display(Name = "Website")]
+    [Display(Name = "وب‌سایت")]
     public string? Website { get; set; }
 
-    [Display(Name = "History")]
+    [Display(Name = "تاریخچه")]
     public string? History { get; set; }
 
     [Required(ErrorMessage = "Slug is required.")]

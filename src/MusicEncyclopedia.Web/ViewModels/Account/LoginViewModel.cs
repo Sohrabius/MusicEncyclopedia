@@ -11,15 +11,15 @@ public sealed class LoginViewModel
     /// <summary>
     /// The user's email address.
     /// </summary>
-    [Required(ErrorMessage = "Email is required.")]
-    [EmailAddress(ErrorMessage = "Invalid email address.")]
+    [Required(ErrorMessage = "ایمیل الزامی است.")]
+    [EmailAddress(ErrorMessage = "آدرس ایمیل نامعتبر است.")]
     [Display(Name = "Email")]
     public string Email { get; set; } = string.Empty;
 
     /// <summary>
     /// The user's password.
     /// </summary>
-    [Required(ErrorMessage = "Password is required.")]
+    [Required(ErrorMessage = "رمز عبور الزامی است.")]
     [DataType(DataType.Password)]
     [Display(Name = "Password")]
     public string Password { get; set; } = string.Empty;

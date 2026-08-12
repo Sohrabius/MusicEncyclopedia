@@ -142,7 +142,7 @@ public sealed class InstrumentsController : AdminBaseController
 
         await InvalidateEntityCacheAsync("Instrument", instrument.InstrumentId, "Created");
 
-        SetSuccessMessage($"Instrument \"{instrument.Name}\" created successfully.");
+        SetSuccessMessage($"ساز «{instrument.Name}» با موفقیت ایجاد شد.");
         return RedirectToAction(nameof(Edit), new { id = instrument.InstrumentId });
     }
 
@@ -155,7 +155,7 @@ public sealed class InstrumentsController : AdminBaseController
 
         if (instrument is null)
         {
-            SetErrorMessage("Instrument not found.");
+            SetErrorMessage("ساز یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -189,7 +189,7 @@ public sealed class InstrumentsController : AdminBaseController
     {
         if (id != viewModel.InstrumentId)
         {
-            SetErrorMessage("Instrument ID mismatch.");
+            SetErrorMessage("شناسه ساز ناسازگار است.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -206,7 +206,7 @@ public sealed class InstrumentsController : AdminBaseController
 
         if (instrument is null)
         {
-            SetErrorMessage("Instrument not found.");
+            SetErrorMessage("ساز یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -237,12 +237,12 @@ public sealed class InstrumentsController : AdminBaseController
 
             await InvalidateEntityCacheAsync("Instrument", instrument.InstrumentId, "Updated");
 
-            SetSuccessMessage($"Instrument \"{instrument.Name}\" updated successfully.");
+            SetSuccessMessage($"ساز «{instrument.Name}» با موفقیت به‌روزرسانی شد.");
         }
         catch (DbUpdateConcurrencyException ex)
         {
             _logger.LogWarning(ex, "Concurrency conflict updating instrument {InstrumentId}", id);
-            SetErrorMessage("This instrument was modified by another user. Please reload and try again.");
+            SetErrorMessage("این ساز توسط کاربر دیگری تغییر کرده است. لطفاً دوباره بارگذاری و تلاش کنید.");
             viewModel.InstrumentFamilies = await _db.InstrumentFamilies.OrderBy(f => f.Name).ToListAsync(cancellationToken);
             viewModel.Countries = await _db.Countries.OrderBy(c => c.Name).ToListAsync(cancellationToken);
             viewModel.RowVersion = instrument.RowVersion;
@@ -261,7 +261,7 @@ public sealed class InstrumentsController : AdminBaseController
         var instrument = await _db.Instruments.FirstOrDefaultAsync(i => i.InstrumentId == id, cancellationToken);
         if (instrument is null)
         {
-            SetErrorMessage("Instrument not found.");
+            SetErrorMessage("ساز یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -281,7 +281,7 @@ public sealed class InstrumentsController : AdminBaseController
 
         await InvalidateEntityCacheAsync("Instrument", instrument.InstrumentId, "Deleted");
 
-        SetSuccessMessage($"Instrument \"{instrument.Name}\" has been deleted (soft).");
+        SetSuccessMessage($"ساز «{instrument.Name}» به‌صورت نرم حذف شد.");
         return RedirectToAction(nameof(Index));
     }
 
@@ -294,7 +294,7 @@ public sealed class InstrumentsController : AdminBaseController
             .FirstOrDefaultAsync(i => i.InstrumentId == id, cancellationToken);
         if (instrument is null)
         {
-            SetErrorMessage("Instrument not found.");
+            SetErrorMessage("ساز یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -315,7 +315,7 @@ public sealed class InstrumentsController : AdminBaseController
 
         await InvalidateEntityCacheAsync("Instrument", instrument.InstrumentId, "Restored");
 
-        SetSuccessMessage($"Instrument \"{instrument.Name}\" has been restored.");
+        SetSuccessMessage($"ساز «{instrument.Name}» بازیابی شد.");
         return RedirectToAction(nameof(Index));
     }
 }

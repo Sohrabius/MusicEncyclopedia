@@ -1,17 +1,17 @@
 @model UserListViewModel
 @{
-    ViewData["Title"] = "Users";
+    ViewData["Title"] = "کاربران";
     ViewData["ActiveMenu"] = "Users";
 }
 
 <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
     <div class="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
         <form method="get" action="/admin/users" class="flex items-center gap-2 flex-1 max-w-md">
-            <div class="relative flex-1"><i class="fas fa-search absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i><input type="text" name="q" value="@Model.SearchQuery" placeholder="Search by email..." class="w-full ps-9 pe-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" /></div>
+            <div class="relative flex-1"><i class="fas fa-search absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i><input type="text" name="q" value="@Model.SearchQuery" placeholder="جستجو by email..." class="w-full ps-9 pe-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" /></div>
             <button type="submit" class="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors"><i class="fas fa-search"></i></button>
-            @if (!string.IsNullOrWhiteSpace(Model.SearchQuery)) { <a href="/admin/users" class="px-3 py-2 text-sm text-gray-600 hover:text-gray-900"><i class="fas fa-times"></i> Clear</a> }
+            @if (!string.IsNullOrWhiteSpace(Model.SearchQuery)) { <a href="/admin/users" class="px-3 py-2 text-sm text-gray-600 hover:text-gray-900"><i class="fas fa-times"></i> پاک کردن</a> }
         </form>
-        <a href="/admin/roles" class="inline-flex items-center gap-2 px-4 py-2 bg-gray-600 text-white text-sm rounded-md hover:bg-gray-700 transition-colors"><i class="fas fa-shield-alt"></i> <span>Manage Roles</span></a>
+        <a href="/admin/roles" class="inline-flex items-center gap-2 px-4 py-2 bg-gray-600 text-white text-sm rounded-md hover:bg-gray-700 transition-colors"><i class="fas fa-shield-alt"></i> <span>مدیریت نقش‌ها</span></a>
     </div>
 </div>
 
@@ -20,17 +20,17 @@
         <table class="w-full text-sm">
             <thead class="bg-gray-50 border-b border-gray-200">
                 <tr>
-                    <th class="text-start px-4 py-3 font-medium text-gray-600">Email</th>
-                    <th class="text-start px-4 py-3 font-medium text-gray-600">Roles</th>
-                    <th class="text-center px-4 py-3 font-medium text-gray-600">Permissions</th>
-                    <th class="text-center px-4 py-3 font-medium text-gray-600">Status</th>
-                    <th class="text-end px-4 py-3 font-medium text-gray-600">Actions</th>
+                    <th class="text-start px-4 py-3 font-medium text-gray-600">ایمیل</th>
+                    <th class="text-start px-4 py-3 font-medium text-gray-600">نقش‌ها</th>
+                    <th class="text-center px-4 py-3 font-medium text-gray-600">دسترسی‌ها</th>
+                    <th class="text-center px-4 py-3 font-medium text-gray-600">وضعیت</th>
+                    <th class="text-end px-4 py-3 font-medium text-gray-600">عملیات</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
                 @if (Model.Items.Items.Count == 0)
                 {
-                    <tr><td colspan="5" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-users text-3xl text-gray-300 mb-2 block"></i>No users found.</td></tr>
+                    <tr><td colspan="5" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-users text-3xl text-gray-300 mb-2 block"></i>هیچ کاربری یافت نشد.</td></tr>
                 }
                 else
                 {
@@ -39,12 +39,12 @@
                         <tr class="hover:bg-gray-50 transition-colors">
                             <td class="px-4 py-3">
                                 <a href="/admin/users/@item.Id/Edit" class="text-blue-600 hover:underline font-medium">@item.Email</a>
-                                @if (!item.EmailConfirmed) { <span class="ms-2 inline-block px-2 py-0.5 text-xs rounded-full bg-yellow-50 text-yellow-700" title="Email not confirmed">Unconfirmed</span> }
+                                @if (!item.EmailConfirmed) { <span class="ms-2 inline-block px-2 py-0.5 text-xs rounded-full bg-yellow-50 text-yellow-700" title="ایمیل تأیید نشده">تأییدنشده</span> }
                             </td>
                             <td class="px-4 py-3">
                                 @if (item.Roles.Count == 0)
                                 {
-                                    <span class="text-gray-400 text-xs">No roles</span>
+                                    <span class="text-gray-400 text-xs">بدون نقش</span>
                                 }
                                 else
                                 {
@@ -67,16 +67,16 @@
                             <td class="px-4 py-3 text-center">
                                 @if (item.IsLockedOut)
                                 {
-                                    <span class="inline-block px-2 py-0.5 text-xs rounded-full bg-red-50 text-red-700">Locked</span>
+                                    <span class="inline-block px-2 py-0.5 text-xs rounded-full bg-red-50 text-red-700">قفل‌شده</span>
                                 }
                                 else
                                 {
-                                    <span class="inline-block px-2 py-0.5 text-xs rounded-full bg-green-50 text-green-700">Active</span>
+                                    <span class="inline-block px-2 py-0.5 text-xs rounded-full bg-green-50 text-green-700">فعال</span>
                                 }
                             </td>
                             <td class="px-4 py-3 text-end">
-                                <a href="/admin/users/@item.Id/Edit" class="inline-flex items-center gap-1 px-2 py-1 text-xs text-blue-600 hover:bg-blue-50 rounded"><i class="fas fa-edit"></i> Edit</a>
-                                <form method="post" action="/admin/users/@item.Id/Delete" onsubmit="return confirm('Are you sure you want to delete this user?');" class="inline">@Html.AntiForgeryToken()<button type="submit" class="inline-flex items-center gap-1 px-2 py-1 text-xs text-red-600 hover:bg-red-50 rounded"><i class="fas fa-trash-alt"></i> Delete</button></form>
+                                <a href="/admin/users/@item.Id/Edit" class="inline-flex items-center gap-1 px-2 py-1 text-xs text-blue-600 hover:bg-blue-50 rounded"><i class="fas fa-edit"></i> ویرایش</a>
+                                <form method="post" action="/admin/users/@item.Id/Delete" onsubmit="return confirm('Are you sure you want to delete this user?');" class="inline">@Html.AntiForgeryToken()<button type="submit" class="inline-flex items-center gap-1 px-2 py-1 text-xs text-red-600 hover:bg-red-50 rounded"><i class="fas fa-trash-alt"></i> حذف</button></form>
                             </td>
                         </tr>
                     }
@@ -87,10 +87,10 @@
     @if (Model.Items.TotalPages > 1)
     {
         <div class="flex items-center justify-between px-4 py-3 bg-gray-50 border-t border-gray-200">
-            <p class="text-sm text-gray-500">Page <strong>@Model.Items.Page</strong> of <strong>@Model.Items.TotalPages</strong> (@Model.Items.TotalItems total)</p>
+            <p class="text-sm text-gray-500">صفحه <strong>@Model.Items.Page</strong> از <strong>@Model.Items.TotalPages</strong> (@Model.Items.TotalItems total)</p>
             <nav class="flex items-center gap-1">
-                @if (Model.Items.Page > 1) { <a href="/admin/users?page=@(Model.Items.Page - 1)&q=@Model.SearchQuery" class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-200 rounded"><i class="fas fa-chevron-right"></i> Previous</a> }
-                @if (Model.Items.Page < Model.Items.TotalPages) { <a href="/admin/users?page=@(Model.Items.Page + 1)&q=@Model.SearchQuery" class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-200 rounded">Next <i class="fas fa-chevron-left"></i></a> }
+                @if (Model.Items.Page > 1) { <a href="/admin/users?page=@(Model.Items.Page - 1)&q=@Model.SearchQuery" class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-200 rounded"><i class="fas fa-chevron-right"></i> قبلی</a> }
+                @if (Model.Items.Page < Model.Items.TotalPages) { <a href="/admin/users?page=@(Model.Items.Page + 1)&q=@Model.SearchQuery" class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-200 rounded">بعدی <i class="fas fa-chevron-left"></i></a> }
             </nav>
         </div>
     }

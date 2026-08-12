@@ -78,7 +78,7 @@ public sealed class RelatedItemsController : AdminBaseController
 
         if (entityId == 0)
         {
-            return Json(new { success = false, errors = new[] { "Entity id is required." } });
+            return Json(new { success = false, errors = new[] { "موجودیت id is required." } });
         }
 
         try

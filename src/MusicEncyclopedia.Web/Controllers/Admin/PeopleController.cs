@@ -155,7 +155,7 @@ public sealed class PeopleController : AdminBaseController
 
         await InvalidateEntityCacheAsync("Person", person.PersonId, "Created");
 
-        SetSuccessMessage($"Person \"{person.FullName}\" created successfully.");
+        SetSuccessMessage($"شخص «{person.FullName}» با موفقیت ایجاد شد.");
         return RedirectToAction(nameof(Edit), new { id = person.PersonId });
     }
 
@@ -168,7 +168,7 @@ public sealed class PeopleController : AdminBaseController
 
         if (person is null)
         {
-            SetErrorMessage("Person not found.");
+            SetErrorMessage("شخص یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -211,7 +211,7 @@ public sealed class PeopleController : AdminBaseController
     {
         if (id != viewModel.PersonId)
         {
-            SetErrorMessage("Person ID mismatch.");
+            SetErrorMessage("شناسه شخص ناسازگار است.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -228,7 +228,7 @@ public sealed class PeopleController : AdminBaseController
 
         if (person is null)
         {
-            SetErrorMessage("Person not found.");
+            SetErrorMessage("شخص یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -268,12 +268,12 @@ public sealed class PeopleController : AdminBaseController
 
             await InvalidateEntityCacheAsync("Person", person.PersonId, "Updated");
 
-            SetSuccessMessage($"Person \"{person.FullName}\" updated successfully.");
+            SetSuccessMessage($"شخص «{person.FullName}» با موفقیت به‌روزرسانی شد.");
         }
         catch (DbUpdateConcurrencyException ex)
         {
             _logger.LogWarning(ex, "Concurrency conflict updating person {PersonId}", id);
-            SetErrorMessage("This person was modified by another user. Please reload and try again.");
+            SetErrorMessage("این شخص توسط کاربر دیگری تغییر کرده است. لطفاً دوباره بارگذاری و تلاش کنید.");
             viewModel.PersonKinds = await _db.PersonKinds.OrderBy(k => k.Name).ToListAsync(cancellationToken);
             viewModel.Countries = await _db.Countries.OrderBy(c => c.Name).ToListAsync(cancellationToken);
             viewModel.RowVersion = person.RowVersion;
@@ -292,7 +292,7 @@ public sealed class PeopleController : AdminBaseController
         var person = await _db.People.FirstOrDefaultAsync(p => p.PersonId == id, cancellationToken);
         if (person is null)
         {
-            SetErrorMessage("Person not found.");
+            SetErrorMessage("شخص یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -312,7 +312,7 @@ public sealed class PeopleController : AdminBaseController
 
         await InvalidateEntityCacheAsync("Person", person.PersonId, "Deleted");
 
-        SetSuccessMessage($"Person \"{person.FullName}\" has been deleted (soft).");
+        SetSuccessMessage($"شخص «{person.FullName}» به‌صورت نرم حذف شد.");
         return RedirectToAction(nameof(Index));
     }
 
@@ -325,7 +325,7 @@ public sealed class PeopleController : AdminBaseController
             .FirstOrDefaultAsync(p => p.PersonId == id, cancellationToken);
         if (person is null)
         {
-            SetErrorMessage("Person not found.");
+            SetErrorMessage("شخص یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -346,7 +346,7 @@ public sealed class PeopleController : AdminBaseController
 
         await InvalidateEntityCacheAsync("Person", person.PersonId, "Restored");
 
-        SetSuccessMessage($"Person \"{person.FullName}\" has been restored.");
+        SetSuccessMessage($"شخص «{person.FullName}» بازیابی شد.");
         return RedirectToAction(nameof(Index));
     }
 }

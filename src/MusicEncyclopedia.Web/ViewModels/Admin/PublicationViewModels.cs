@@ -33,24 +33,24 @@ public sealed class PublicationEditViewModel
 {
     [Required(ErrorMessage = "Title is required.")]
     [StringLength(500, ErrorMessage = "Title must not exceed 500 characters.")]
-    [Display(Name = "Title")]
+    [Display(Name = "عنوان")]
     public string Title { get; set; } = "";
 
-    [Display(Name = "Publication Type")]
+    [Display(Name = "نوع انتشارات")]
     public int? PublicationTypeId { get; set; }
 
     [Required(ErrorMessage = "Person is required.")]
-    [Display(Name = "Person")]
+    [Display(Name = "شخص")]
     public int PersonId { get; set; }
 
-    [Display(Name = "Publisher")]
+    [Display(Name = "ناشر")]
     public int? PublisherId { get; set; }
 
-    [Display(Name = "Publication Date")]
+    [Display(Name = "تاریخ انتشار")]
     public DateOnly? PublicationDate { get; set; }
 
     [StringLength(50)]
-    [Display(Name = "Date Precision")]
+    [Display(Name = "دقت تاریخ")]
     public string? PublicationDatePrecision { get; set; }
 
     [StringLength(50)]

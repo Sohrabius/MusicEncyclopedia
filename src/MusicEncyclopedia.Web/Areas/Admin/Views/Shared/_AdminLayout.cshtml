@@ -2,21 +2,21 @@
 @inject Microsoft.AspNetCore.Identity.UserManager<Microsoft.AspNetCore.Identity.IdentityUser> UserManager
 
 @{
-    var userName = User.Identity?.Name ?? "Admin";
+    var userName = User.Identity?.Name ?? "مدیر";
     var displayName = userName;
 
-    // Determine RTL direction from the current culture (default to ltr)
-    var dir = System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.IsRightToLeft ? "rtl" : "ltr";
-    var isRtl = dir == "rtl";
+    // Admin is Persian-only: force fa culture + RTL regardless of the request culture.
+    var dir = "rtl";
+    var isRtl = true;
 }
 
 <!DOCTYPE html>
-<html dir="@dir" lang="@(System.Threading.Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName)" class="scroll-smooth">
+<html dir="rtl" lang="fa" class="scroll-smooth">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>@ViewData["Title"] - Admin - Music Encyclopedia</title>
+    <title>@ViewData["Title"] - مدیریت - دایرة‌المعارف موسیقی</title>
 
     <!-- Fonts (self-hosted: Vazirmatn for fa/ar RTL, Inter for en/fr LTR) -->
     <link rel="stylesheet" href="~/css/fonts.css" />
@@ -72,13 +72,13 @@
             <div class="flex items-center gap-3">
                 <button id="sidebar-toggle"
                         class="lg:hidden p-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        aria-label="Toggle sidebar">
+                        aria-label="باز/بستن منوی کناری">
                     <i class="fas fa-bars text-xl"></i>
                 </button>
                 <a href="/admin" class="flex items-center gap-2 text-lg font-bold text-gray-800 hover:text-blue-600 transition-colors">
                     <i class="fas fa-music text-blue-600"></i>
-                    <span class="hidden sm:inline">Music Encyclopedia Admin</span>
-                    <span class="sm:hidden">Admin</span>
+                    <span class="hidden sm:inline">مدیریت دایرة‌المعارف موسیقی</span>
+                    <span class="sm:hidden">مدیریت</span>
                 </a>
             </div>
 
@@ -90,9 +90,9 @@
                 </span>
                 <a href="/auth/logout"
                    class="inline-flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
-                   title="Logout">
+                   title="خروج">
                     <i class="fas fa-sign-out-alt"></i>
-                    <span class="hidden sm:inline">Logout</span>
+                    <span class="hidden sm:inline">خروج</span>
                 </a>
             </div>
         </div>
@@ -107,61 +107,61 @@
         <aside id="sidebar"
                class="fixed lg:static inset-y-0 start-0 z-20 w-64 bg-gray-900 text-gray-300 transform -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out overflow-y-auto sidebar-scroll pt-16 lg:pt-0">
 
-            <nav class="py-4 px-3 space-y-1 text-sm" aria-label="Admin navigation">
+            <nav class="py-4 px-3 space-y-1 text-sm" aria-label="ناوبری مدیریت">
 
                 <!-- Dashboard -->
                 <a href="/admin"
                    class="nav-link-admin flex items-center gap-3 px-3 py-2.5 rounded-md @(ViewData["ActiveMenu"]?.ToString() == "Dashboard" ? "nav-active" : "")">
                     <i class="fas fa-tachometer-alt w-5 text-center"></i>
-                    <span>Dashboard</span>
+                    <span>داشبورد</span>
                 </a>
 
                 <!-- Content Management -->
-                <div class="pt-4 pb-1 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Content</div>
+                <div class="pt-4 pb-1 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">محتوا</div>
 
-                @RenderNavItem("Albums", "/admin/albums", "fa fa-compact-disc")
-                @RenderNavItem("Tracks", "/admin/tracks", "fa fa-music")
-                @RenderNavItem("People", "/admin/people", "fa fa-users")
-                @RenderNavItem("Companies", "/admin/companies", "fa fa-building")
-                @RenderNavItem("Poems", "/admin/poems", "fa fa-feather-alt")
-                @RenderNavItem("Sung Versions", "/admin/sung-versions", "fa fa-microphone-alt")
-                @RenderNavItem("Publications", "/admin/publications", "fa fa-book")
-                @RenderNavItem("Genres", "/admin/genres", "fa fa-tag")
-                @RenderNavItem("Moods", "/admin/moods", "fa fa-smile")
-                @RenderNavItem("Instruments", "/admin/instruments", "fa fa-guitar")
+                @RenderNavItem("Albums", "آلبوم‌ها", "/admin/albums", "fa fa-compact-disc")
+                @RenderNavItem("Tracks", "ترک‌ها", "/admin/tracks", "fa fa-music")
+                @RenderNavItem("People", "اشخاص", "/admin/people", "fa fa-users")
+                @RenderNavItem("Companies", "شرکت‌ها", "/admin/companies", "fa fa-building")
+                @RenderNavItem("Poems", "شعرها", "/admin/poems", "fa fa-feather-alt")
+                @RenderNavItem("Sung Versions", "نسخه‌های خوانده‌شده", "/admin/sung-versions", "fa fa-microphone-alt")
+                @RenderNavItem("Publications", "انتشارات", "/admin/publications", "fa fa-book")
+                @RenderNavItem("Genres", "سبک‌ها", "/admin/genres", "fa fa-tag")
+                @RenderNavItem("Moods", "حالت‌ها", "/admin/moods", "fa fa-smile")
+                @RenderNavItem("Instruments", "سازها", "/admin/instruments", "fa fa-guitar")
 
                 <!-- Sessions & Events -->
-                <div class="pt-4 pb-1 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Sessions & Events</div>
+                <div class="pt-4 pb-1 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">جلسات و رویدادها</div>
 
-                @RenderNavItem("Recording Sessions", "/admin/sessions", "fa fa-circle")
-                @RenderNavItem("Performance Events", "/admin/events", "fa fa-calendar-alt")
-                @RenderNavItem("Locations", "/admin/locations", "fa fa-map-marker-alt")
+                @RenderNavItem("Recording Sessions", "جلسات ضبط", "/admin/sessions", "fa fa-circle")
+                @RenderNavItem("Performance Events", "رویدادهای اجرا", "/admin/events", "fa fa-calendar-alt")
+                @RenderNavItem("Locations", "مکان‌ها", "/admin/locations", "fa fa-map-marker-alt")
 
                 <!-- Awards & Charts -->
-                <div class="pt-4 pb-1 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Awards & Charts</div>
+                <div class="pt-4 pb-1 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">جوایز و جدول‌ها</div>
 
-                @RenderNavItem("Awards", "/admin/awards", "fa fa-trophy")
-                @RenderNavItem("Certifications", "/admin/certifications", "fa fa-certificate")
-                @RenderNavItem("Charts", "/admin/charts", "fa fa-chart-line")
+                @RenderNavItem("Awards", "جوایز", "/admin/awards", "fa fa-trophy")
+                @RenderNavItem("Certifications", "گواهینامه‌ها", "/admin/certifications", "fa fa-certificate")
+                @RenderNavItem("Charts", "جدول‌ها", "/admin/charts", "fa fa-chart-line")
 
                 <!-- Media & References -->
-                <div class="pt-4 pb-1 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Media & References</div>
+                <div class="pt-4 pb-1 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">رسانه و مراجع</div>
 
-                @RenderNavItem("Media", "/admin/media", "fa fa-photo-video")
-                @RenderNavItem("Sources", "/admin/sources", "fa fa-database")
-                @RenderNavItem("Citations", "/admin/citations", "fa fa-quote-right")
-                @RenderNavItem("Tags", "/admin/tags", "fa fa-hashtag")
-                @RenderNavItem("Attributes", "/admin/attributes", "fa fa-list-ul")
-                @RenderNavItem("Localizations", "/admin/localizations", "fa fa-language")
+                @RenderNavItem("Media", "رسانه", "/admin/media", "fa fa-photo-video")
+                @RenderNavItem("Sources", "منابع", "/admin/sources", "fa fa-database")
+                @RenderNavItem("Citations", "ارجاع‌ها", "/admin/citations", "fa fa-quote-right")
+                @RenderNavItem("Tags", "برچسب‌ها", "/admin/tags", "fa fa-hashtag")
+                @RenderNavItem("Attributes", "ویژگی‌ها", "/admin/attributes", "fa fa-list-ul")
+                @RenderNavItem("Localizations", "بومی‌سازی‌ها", "/admin/localizations", "fa fa-language")
 
                 <!-- Settings -->
-                <div class="pt-4 pb-1 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Settings</div>
+                <div class="pt-4 pb-1 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">تنظیمات</div>
 
-                @RenderNavItem("Lookup Tables", "/admin/lookup-tables", "fa fa-cog")
-                @RenderNavItem("Users", "/admin/users", "fa fa-user-shield")
-                @RenderNavItem("Roles", "/admin/roles", "fa fa-shield-alt")
-                @RenderNavItem("Settings", "/admin/settings", "fa fa-wrench")
-                @RenderNavItem("Audit Log", "/admin/audit-log", "fa fa-history")
+                @RenderNavItem("Lookup Tables", "جدول‌های مرجع", "/admin/lookup-tables", "fa fa-cog")
+                @RenderNavItem("Users", "کاربران", "/admin/users", "fa fa-user-shield")
+                @RenderNavItem("Roles", "نقش‌ها", "/admin/roles", "fa fa-shield-alt")
+                @RenderNavItem("Settings", "تنظیمات", "/admin/settings", "fa fa-wrench")
+                @RenderNavItem("Audit Log", "گزارش عملیات", "/admin/audit-log", "fa fa-history")
             </nav>
         </aside>
 
@@ -193,7 +193,7 @@
          Footer
          ============================================================ -->
     <footer class="bg-white border-t border-gray-200 py-4 px-6 text-center text-xs text-gray-500">
-        <p>&copy; @DateTime.Now.Year Music Encyclopedia Admin. All rights reserved.</p>
+        <p>&copy; @DateTime.Now.Year مدیریت دایرة‌المعارف موسیقی. کلیه حقوق محفوظ است.</p>
     </footer>
 
     <!-- ============================================================
@@ -237,10 +237,12 @@
 @functions {
     /// <summary>
     /// Helper to render a sidebar navigation item with active detection and icon.
+    /// The <paramref name="key"/> is the stable English match key used by
+    /// ViewData["ActiveMenu"]; <paramref name="label"/> is the Persian label.
     /// </summary>
-    private Microsoft.AspNetCore.Html.HtmlString RenderNavItem(string label, string url, string iconClass)
+    private Microsoft.AspNetCore.Html.HtmlString RenderNavItem(string key, string label, string url, string iconClass)
     {
-        var isActive = string.Equals(ViewData["ActiveMenu"]?.ToString(), label, StringComparison.OrdinalIgnoreCase);
+        var isActive = string.Equals(ViewData["ActiveMenu"]?.ToString(), key, StringComparison.OrdinalIgnoreCase);
         var activeClass = isActive ? "nav-active" : "";
         var html = $"<a href=\"{url}\" class=\"nav-link-admin flex items-center gap-3 px-3 py-2.5 rounded-md {activeClass}\">" +
                    $"<i class=\"{iconClass} w-5 text-center\"></i>" +

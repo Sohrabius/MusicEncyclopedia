@@ -3,6 +3,7 @@ using Dapper;
 using Microsoft.AspNetCore.Mvc;
 using MusicEncyclopedia.Core.DTOs;
 using MusicEncyclopedia.Data;
+using MusicEncyclopedia.Services.Infrastructure;
 using MusicEncyclopedia.Web.ViewModels.Admin;
 
 namespace MusicEncyclopedia.Web.Controllers.Admin;
@@ -39,6 +40,11 @@ public sealed class DashboardController : AdminBaseController
     {
         _logger.LogDebug("Loading admin dashboard");
 
+        var isSqlite = SqlDialect.IsSqliteConnection(_connection);
+        // SQL Server: SELECT TOP 10 … ; SQLite: … ORDER BY … LIMIT 10 (clause at the end)
+        var recentTop = isSqlite ? string.Empty : "TOP 10";
+        var recentLimit = isSqlite ? "LIMIT 10" : string.Empty;
+
         var viewModel = new AdminDashboardViewModel
         {
             AlbumCount = await _connection.ExecuteScalarAsync<int>(
@@ -52,21 +58,23 @@ public sealed class DashboardController : AdminBaseController
             PoemCount = await _connection.ExecuteScalarAsync<int>(
                 "SELECT COUNT(1) FROM Poem WHERE IsDeleted = 0"),
             RecentAlbums = (await _connection.QueryAsync<Core.DTOs.AlbumListItemDto>(
-                @"SELECT TOP 10 a.AlbumId, a.Slug, a.Title, a.OriginalTitle, a.EnglishTitle,
+                $@"SELECT {recentTop} a.AlbumId, a.Slug, a.Title, a.OriginalTitle, a.EnglishTitle,
                          ac.Name AS CategoryName, a.ReleaseDate, a.DurationSeconds, NULL AS CoverUrl
                   FROM Album a
                   LEFT JOIN AlbumCategory ac ON a.AlbumCategoryId = ac.AlbumCategoryId
                   WHERE a.IsDeleted = 0
-                  ORDER BY a.CreatedAt DESC"))
+                  ORDER BY a.CreatedAt DESC
+                  {recentLimit}"))
                 .ToList().AsReadOnly(),
             RecentTracks = (await _connection.QueryAsync<TrackListItemDto>(
-                @"SELECT TOP 10 t.TrackId, t.Title, t.Slug,
+                $@"SELECT {recentTop} t.TrackId, t.Title, t.Slug,
                          a.Title AS AlbumTitle, t.DurationSeconds
                   FROM Track t
                   LEFT JOIN AlbumTrack at ON t.TrackId = at.TrackId
                   LEFT JOIN Album a ON at.AlbumId = a.AlbumId
                   WHERE t.IsDeleted = 0
-                  ORDER BY t.CreatedAt DESC"))
+                  ORDER BY t.CreatedAt DESC
+                  {recentLimit}"))
                 .ToList().AsReadOnly()
         };
 

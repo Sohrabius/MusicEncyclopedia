@@ -142,7 +142,7 @@ public sealed class LocalizationsController : AdminBaseController
         await InvalidateEntityCacheAsync(localization.EntityTypeId, localization.EntityId, "Updated");
         await InvalidateBroadCacheAsync();
 
-        SetSuccessMessage("Localization created successfully.");
+        SetSuccessMessage("بومی‌سازی با موفقیت ایجاد شد.");
         return RedirectToAction(nameof(Index));
     }
 
@@ -161,7 +161,7 @@ public sealed class LocalizationsController : AdminBaseController
 
         if (localization is null)
         {
-            SetErrorMessage("Localization not found.");
+            SetErrorMessage("بومی‌سازی یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -193,7 +193,7 @@ public sealed class LocalizationsController : AdminBaseController
     {
         if (id != viewModel.LocalizationId)
         {
-            SetErrorMessage("Localization ID mismatch.");
+            SetErrorMessage("شناسه بومی‌سازی ناسازگار است.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -210,7 +210,7 @@ public sealed class LocalizationsController : AdminBaseController
 
         if (localization is null)
         {
-            SetErrorMessage("Localization not found.");
+            SetErrorMessage("بومی‌سازی یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -230,7 +230,7 @@ public sealed class LocalizationsController : AdminBaseController
         }
         await InvalidateBroadCacheAsync();
 
-        SetSuccessMessage("Localization updated successfully.");
+        SetSuccessMessage("بومی‌سازی با موفقیت به‌روزرسانی شد.");
         return RedirectToAction(nameof(Index));
     }
 
@@ -251,7 +251,7 @@ public sealed class LocalizationsController : AdminBaseController
 
         if (localization is null)
         {
-            SetErrorMessage("Localization not found.");
+            SetErrorMessage("بومی‌سازی یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -266,7 +266,7 @@ public sealed class LocalizationsController : AdminBaseController
         }
         await InvalidateBroadCacheAsync();
 
-        SetSuccessMessage("Localization deleted successfully.");
+        SetSuccessMessage("بومی‌سازی با موفقیت حذف شد.");
 
         return RedirectToAction(nameof(Index));
     }
