@@ -64,6 +64,13 @@ artifacts/
 *.pubxml.user
 web.config.release.config
 
+# ── AI agent skills ───────────────────────────────────────────────────
+# Portable skill copies live in .agents/skills/ and are pinned by
+# skills-lock.json. .claude/skills/ holds machine-local symlinks created by
+# `npx skills add` (absolute paths) — restore them with `npx skills
+# experimental_install` instead of committing them.
+.claude/skills/
+
 # ── Misc / OS files ───────────────────────────────────────────────────
 .DS_Store
 Thumbs.db
