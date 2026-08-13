@@ -1,10 +1,13 @@
 using System.Data;
 using Dapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using MusicEncyclopedia.Core.Constants;
+using MusicEncyclopedia.Core.DTOs;
 using MusicEncyclopedia.Core.Infrastructure;
 using MusicEncyclopedia.Core.Interfaces;
 using MusicEncyclopedia.Services.Infrastructure;
+using MusicEncyclopedia.Web.Constants;
 using MusicEncyclopedia.Web.ViewModels;
 
 namespace MusicEncyclopedia.Web.Controllers;
@@ -12,6 +15,10 @@ namespace MusicEncyclopedia.Web.Controllers;
 /// <summary>
 /// Home controller handling the main public landing page and error pages.
 /// Route is culture-aware per the application's localization strategy.
+///
+/// Home page layout (HOME_REDESIGN_PLAN.md):
+///   banner (search-first) → album catalog (category chips + lazy-load grid
+///   → numbered pagination past 100) with a sidebar (random poem + about card).
 /// </summary>
 [Route("{culture:regex(^(fa|en|ar|fr)$)}")]
 public sealed class HomeController : Controller
@@ -19,12 +26,21 @@ public sealed class HomeController : Controller
     private readonly IDbConnection _db;
     private readonly ILogger<HomeController> _logger;
     private readonly ICacheService _cache;
+    private readonly IAlbumQueryService _albums;
+    private readonly IStringLocalizer<SharedResources> _localizer;
 
-    public HomeController(IDbConnection db, ILogger<HomeController> logger, ICacheService cache)
+    public HomeController(
+        IDbConnection db,
+        ILogger<HomeController> logger,
+        ICacheService cache,
+        IAlbumQueryService albums,
+        IStringLocalizer<SharedResources> localizer)
     {
         _db = db;
         _logger = logger;
         _cache = cache;
+        _albums = albums;
+        _localizer = localizer;
     }
 
     /// <summary>
@@ -45,190 +61,150 @@ public sealed class HomeController : Controller
     }
 
     /// <summary>
-    /// Displays the home page with hero section, featured albums,
-    /// latest additions, and browse-by links.
-    /// Route: /{culture}
+    /// Displays the album-first home page: banner, category chips, first page of
+    /// albums (20), a random-poem sidebar card and an about card.
+    /// Route: /{culture}  (with optional ?page= and ?category=)
     /// </summary>
     [HttpGet]
     [Route("")]
     [Route("Home")]
     [Route("Home/Index")]
-    public async Task<IActionResult> Index(string culture, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> Index(
+        string culture,
+        int page = 1,
+        string? category = null,
+        CancellationToken cancellationToken = default)
     {
-        // Spec §15.1 home cache key: home:{culture}. Only successful loads are cached.
-        var cacheKey = CacheKeys.Home(culture);
-        var cached = await _cache.GetAsync<HomeViewModel>(cacheKey, cancellationToken);
-        if (cached is not null)
-            return View(cached);
+        _logger.LogDebug("Home page requested for culture={Culture}, page={Page}, category={Category}",
+            culture, page, category);
 
-        var viewModel = await LoadHomeViewModelAsync(culture, cancellationToken);
-
-        await _cache.SetAsync(cacheKey, viewModel, CacheKeys.HomeDuration, cancellationToken);
+        var viewModel = await LoadHomeViewModelAsync(culture, page, category, cancellationToken);
         return View(viewModel);
+    }
+
+    /// <summary>
+    /// Partial endpoint for the lazy-loaded album grid ("Load more").
+    /// Returns only the album cards for the requested page + category.
+    /// Route: /{culture}/home/albums?page=N&amp;category=C
+    /// </summary>
+    [HttpGet]
+    [Route("home/albums")]
+    [ResponseCache(Duration = 300, VaryByQueryKeys = ["page", "category"])]
+    public async Task<IActionResult> AlbumGrid(
+        string culture,
+        int page = 1,
+        string? category = null,
+        CancellationToken cancellationToken = default)
+    {
+        page = Math.Max(1, page);
+
+        var result = await _albums.GetAlbumsAsync(
+            culture,
+            page,
+            HomeConstants.InitialPageSize,
+            category: category,
+            cancellationToken: cancellationToken);
+
+        return PartialView("_AlbumCardGrid", result);
+    }
+
+    /// <summary>
+    /// Returns the random-poem sidebar card as HTML (used by the "show another
+    /// poem" shuffle button). Route: /{culture}/home/random-poem
+    /// </summary>
+    [HttpGet]
+    [Route("home/random-poem")]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
+    public async Task<IActionResult> RandomPoemCard(
+        string culture,
+        CancellationToken cancellationToken = default)
+    {
+        var poem = await LoadRandomPoemAsync(cancellationToken);
+        return PartialView("_RandomPoemCard", poem);
     }
 
     private async Task<HomeViewModel> LoadHomeViewModelAsync(
         string culture,
+        int page,
+        string? category,
         CancellationToken cancellationToken)
     {
-        _logger.LogDebug("Home page requested for culture: {Culture}", culture);
+        _logger.LogDebug("Loading home page content for culture: {Culture}", culture);
 
         var viewModel = new HomeViewModel
         {
             CurrentCulture = culture,
-            MetaDescription = "Explore the complete encyclopedia of music — albums, tracks, artists, lyrics, and more."
+            SelectedCategory = category,
+            MetaDescription = _localizer["Home.MetaDescription"]
         };
 
         try
         {
             var isSqlite = SqlDialect.IsSqliteConnection(_db);
             var top8 = SqlDialect.Pagination(isSqlite, "0", "8");
-            var top10 = SqlDialect.Pagination(isSqlite, "0", "10");
-            var top6 = SqlDialect.Pagination(isSqlite, "0", "6");
 
-            // ── Featured albums: most recently added, with the primary artist.
-            // The artist is aggregated with MIN() (instead of a correlated subquery)
-            // so the query works on both SQLite and SQL Server.
-            var featuredSql = $"""
-                SELECT
-                    a.Slug,
-                    a.Title,
-                    m.Url AS CoverUrl,
-                    a.ReleaseDate,
-                    art.Artist
-                FROM Album a
-                LEFT JOIN Media m ON m.MediaId = a.CoverMediaId AND m.IsDeleted = 0
-                LEFT JOIN (
-                    SELECT c.EntityId, MIN(p.FullName) AS Artist
-                    FROM Credit c
-                    INNER JOIN Person p ON p.PersonId = c.PersonId
-                    WHERE c.IsPrimary = 1 AND p.IsDeleted = 0
-                    GROUP BY c.EntityId
-                ) art ON art.EntityId = a.EntityId
-                WHERE a.IsDeleted = 0
-                ORDER BY a.CreatedAt DESC
-                {top8}
-                """;
+            // ── Banner hint chips: genres / moods / instruments (cached 1h).
+            var browse = await GetCachedAsync("home:browse", cancellationToken, async () =>
+            {
+                var genreRows = await _db.QueryAsync<(string Slug, string Name)>(
+                    $"SELECT Slug, Name FROM Genre WHERE IsDeleted = 0 ORDER BY Name {top8}");
+                var moodRows = await _db.QueryAsync<(string Slug, string Name)>(
+                    $"SELECT Slug, Name FROM Mood WHERE IsDeleted = 0 ORDER BY Name {top8}");
+                var instrumentRows = await _db.QueryAsync<(string Slug, string Name)>(
+                    $"SELECT Slug, Name FROM Instrument WHERE IsDeleted = 0 ORDER BY Name {top8}");
 
-            var featuredRows = await _db.QueryAsync<(string Slug, string Title, string? CoverUrl, DateTime? ReleaseDate, string? Artist)>(
-                featuredSql);
-
-            viewModel.FeaturedAlbums = featuredRows
-                .Select(r => new FeaturedAlbumItem
+                return new HomeBrowseData
                 {
-                    Slug = r.Slug,
-                    Title = r.Title,
-                    CoverUrl = r.CoverUrl,
-                    Artist = r.Artist,
-                    Year = r.ReleaseDate?.Year
-                })
-                .ToList();
+                    Genres = genreRows.Select(r => new BrowseLink { Slug = r.Slug, Name = r.Name }).ToList(),
+                    Moods = moodRows.Select(r => new BrowseLink { Slug = r.Slug, Name = r.Name }).ToList(),
+                    Instruments = instrumentRows.Select(r => new BrowseLink { Slug = r.Slug, Name = r.Name }).ToList()
+                };
+            });
 
-            // ── Latest albums: newest additions.
-            var latestSql = $"""
-                SELECT
-                    a.Slug,
-                    a.Title,
-                    m.Url AS CoverUrl,
-                    a.ReleaseDate,
-                    art.Artist
-                FROM Album a
-                LEFT JOIN Media m ON m.MediaId = a.CoverMediaId AND m.IsDeleted = 0
-                LEFT JOIN (
-                    SELECT c.EntityId, MIN(p.FullName) AS Artist
-                    FROM Credit c
-                    INNER JOIN Person p ON p.PersonId = c.PersonId
-                    WHERE c.IsPrimary = 1 AND p.IsDeleted = 0
-                    GROUP BY c.EntityId
-                ) art ON art.EntityId = a.EntityId
-                WHERE a.IsDeleted = 0
-                ORDER BY a.CreatedAt DESC
-                {top8}
-                """;
+            viewModel.Genres = browse.Genres;
+            viewModel.Moods = browse.Moods;
+            viewModel.Instruments = browse.Instruments;
 
-            var latestRows = await _db.QueryAsync<(string Slug, string Title, string? CoverUrl, DateTime? ReleaseDate, string? Artist)>(
-                latestSql);
+            // ── Category filter chips with album counts (cached 1h).
+            viewModel.Categories = await GetCachedAsync("home:categories", cancellationToken, async () =>
+            {
+                const string sql = """
+                    SELECT ac.Code, ac.Name, COUNT(a.AlbumId) AS AlbumCount
+                    FROM AlbumCategory ac
+                    LEFT JOIN Album a ON a.AlbumCategoryId = ac.AlbumCategoryId AND a.IsDeleted = 0
+                    GROUP BY ac.Code, ac.Name
+                    ORDER BY ac.Name
+                    """;
+                var rows = await _db.QueryAsync<AlbumCategoryChip>(sql);
+                return rows.AsList();
+            });
 
-            viewModel.LatestAlbums = latestRows
-                .Select(r => new FeaturedAlbumItem
-                {
-                    Slug = r.Slug,
-                    Title = r.Title,
-                    CoverUrl = r.CoverUrl,
-                    Artist = r.Artist,
-                    Year = r.ReleaseDate?.Year
-                })
-                .ToList();
+            // ── About card stats (cached 1h).
+            viewModel.About = await GetCachedAsync("home:about", cancellationToken, async () =>
+            {
+                const string sql = """
+                    SELECT
+                        (SELECT COUNT(1) FROM Album WHERE IsDeleted = 0)  AS Albums,
+                        (SELECT COUNT(1) FROM Track WHERE IsDeleted = 0)  AS Tracks,
+                        (SELECT COUNT(1) FROM Person WHERE IsDeleted = 0) AS People
+                    """;
+                var row = await _db.QuerySingleAsync<AboutStats>(sql);
+                return row;
+            });
 
-            // ── Essential tracks: recent tracks with their primary artist.
-            var tracksSql = $"""
-                SELECT
-                    t.Slug,
-                    t.Title,
-                    t.DurationSeconds,
-                    art.Artist
-                FROM Track t
-                LEFT JOIN (
-                    SELECT c.EntityId, MIN(p.FullName) AS Artist
-                    FROM Credit c
-                    INNER JOIN Person p ON p.PersonId = c.PersonId
-                    WHERE p.IsDeleted = 0
-                    GROUP BY c.EntityId
-                ) art ON art.EntityId = t.EntityId
-                WHERE t.IsDeleted = 0
-                ORDER BY t.CreatedAt DESC
-                {top10}
-                """;
+            // ── Album catalog: first page (20) — service caches per page/category.
+            var result = await _albums.GetAlbumsAsync(
+                culture,
+                page,
+                HomeConstants.InitialPageSize,
+                category: category,
+                cancellationToken: cancellationToken);
 
-            var trackRows = await _db.QueryAsync<(string Slug, string Title, int? DurationSeconds, string? Artist)>(
-                tracksSql);
+            viewModel.Albums = result;
+            viewModel.LoadedCount = Math.Min(page * HomeConstants.InitialPageSize, result.TotalItems);
 
-            viewModel.EssentialTracks = trackRows
-                .Select(r => new FeaturedTrackItem
-                {
-                    Slug = r.Slug,
-                    Title = r.Title,
-                    Artist = r.Artist,
-                    Duration = FormatDuration(r.DurationSeconds)
-                })
-                .ToList();
-
-            // ── Featured poems: recent poems with their poet.
-            var poemsSql = $"""
-                SELECT
-                    po.Slug,
-                    po.Title,
-                    pers.FullName AS Poet
-                FROM Poem po
-                LEFT JOIN Person pers ON pers.PersonId = po.PersonId AND pers.IsDeleted = 0
-                WHERE po.IsDeleted = 0
-                ORDER BY po.CreatedAt DESC
-                {top6}
-                """;
-
-            var poemRows = await _db.QueryAsync<(string Slug, string Title, string? Poet)>(poemsSql);
-
-            viewModel.FeaturedPoems = poemRows
-                .Select(r => new FeaturedPoemItem
-                {
-                    Slug = r.Slug,
-                    Title = r.Title,
-                    Poet = r.Poet
-                })
-                .ToList();
-
-            // ── Browse-by links: top genres, moods, and instruments.
-            var genreRows = await _db.QueryAsync<(string Slug, string Name)>(
-                $"SELECT Slug, Name FROM Genre WHERE IsDeleted = 0 ORDER BY Name {top8}");
-            viewModel.Genres = genreRows.Select(r => new BrowseLink { Slug = r.Slug, Name = r.Name }).ToList();
-
-            var moodRows = await _db.QueryAsync<(string Slug, string Name)>(
-                $"SELECT Slug, Name FROM Mood WHERE IsDeleted = 0 ORDER BY Name {top8}");
-            viewModel.Moods = moodRows.Select(r => new BrowseLink { Slug = r.Slug, Name = r.Name }).ToList();
-
-            var instrumentRows = await _db.QueryAsync<(string Slug, string Name)>(
-                $"SELECT Slug, Name FROM Instrument WHERE IsDeleted = 0 ORDER BY Name {top8}");
-            viewModel.Instruments = instrumentRows.Select(r => new BrowseLink { Slug = r.Slug, Name = r.Name }).ToList();
+            // ── Random poem: resolved per request, NEVER cached.
+            viewModel.RandomPoem = await LoadRandomPoemAsync(cancellationToken);
         }
         catch (Exception ex)
         {
@@ -237,6 +213,87 @@ public sealed class HomeController : Controller
         }
 
         return viewModel;
+    }
+
+    /// <summary>
+    /// Picks a random poem that has at least one sung-version track (and prefers
+    /// tracks that appear on an album), then falls back to a plain random poem.
+    /// Never cached — must change on every page load.
+    /// </summary>
+    private async Task<RandomPoemCard?> LoadRandomPoemAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            var isSqlite = SqlDialect.IsSqliteConnection(_db);
+            var random = SqlDialect.RandomOrder(isSqlite);
+            var limit = SqlDialect.Pagination(isSqlite, "0", "1");
+
+            // Prefer rows where the track belongs to an album.
+            var poemSql = $"""
+                SELECT
+                    p.Slug        AS PoemSlug,
+                    p.Title       AS PoemTitle,
+                    pers.FullName AS Poet,
+                    t.Slug        AS TrackSlug,
+                    t.Title       AS TrackTitle,
+                    a.Slug        AS AlbumSlug,
+                    a.Title       AS AlbumTitle
+                FROM Poem p
+                LEFT JOIN Person pers ON pers.PersonId = p.PersonId AND pers.IsDeleted = 0
+                INNER JOIN SungVersion sv ON sv.PoemId = p.PoemId AND sv.IsDeleted = 0
+                INNER JOIN TrackSungVersion tsv ON tsv.SungVersionId = sv.SungVersionId
+                INNER JOIN Track t ON t.TrackId = tsv.TrackId AND t.IsDeleted = 0
+                LEFT JOIN AlbumTrack at ON at.TrackId = t.TrackId
+                LEFT JOIN Album a ON a.AlbumId = at.AlbumId AND a.IsDeleted = 0
+                WHERE p.IsDeleted = 0
+                ORDER BY CASE WHEN a.AlbumId IS NULL THEN 1 ELSE 0 END, {random}
+                {limit}
+                """;
+
+            var poem = await _db.QuerySingleOrDefaultAsync<RandomPoemCard>(poemSql);
+
+            if (poem is not null)
+                return poem;
+
+            // Fallback: any poem, without track/album links.
+            var fallbackSql = $"""
+                SELECT
+                    p.Slug        AS PoemSlug,
+                    p.Title       AS PoemTitle,
+                    pers.FullName AS Poet
+                FROM Poem p
+                LEFT JOIN Person pers ON pers.PersonId = p.PersonId AND pers.IsDeleted = 0
+                WHERE p.IsDeleted = 0
+                ORDER BY {random}
+                {limit}
+                """;
+
+            return await _db.QuerySingleOrDefaultAsync<RandomPoemCard>(fallbackSql);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to load random poem for home sidebar");
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Reads a deterministic home fragment from cache or loads + caches it
+    /// (lookup duration — 1h — so it stays fresh enough after admin edits).
+    /// </summary>
+    private async Task<T> GetCachedAsync<T>(
+        string name,
+        CancellationToken cancellationToken,
+        Func<Task<T>> loader) where T : class
+    {
+        var key = CacheKeys.Lookup(name);
+        var cached = await _cache.GetAsync<T>(key, cancellationToken);
+        if (cached is not null)
+            return cached;
+
+        var value = await loader();
+        await _cache.SetAsync(key, value, CacheKeys.LookupDuration, cancellationToken);
+        return value;
     }
 
     /// <summary>
@@ -256,15 +313,5 @@ public sealed class HomeController : Controller
             RequestId = requestId,
             ShowRequestId = !string.IsNullOrEmpty(requestId)
         });
-    }
-
-    private static string FormatDuration(int? seconds)
-    {
-        if (!seconds.HasValue || seconds <= 0)
-            return "";
-
-        var minutes = seconds.Value / 60;
-        var remainder = seconds.Value % 60;
-        return $"{minutes}:{remainder:00}";
     }
 }

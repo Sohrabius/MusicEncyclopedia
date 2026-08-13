@@ -1,7 +1,9 @@
+using MusicEncyclopedia.Core.DTOs;
+
 namespace MusicEncyclopedia.Web.ViewModels;
 
 /// <summary>
-/// View model for the home page.
+/// View model for the album-first home page (HOME_REDESIGN_PLAN.md).
 /// </summary>
 public sealed class HomeViewModel
 {
@@ -10,57 +12,77 @@ public sealed class HomeViewModel
     public string? MetaKeywords { get; set; }
     public string? CanonicalUrl { get; set; }
 
-    // Featured content (will be populated from services later)
-    public IReadOnlyList<FeaturedAlbumItem> FeaturedAlbums { get; set; } = [];
-    public IReadOnlyList<FeaturedAlbumItem> LatestAlbums { get; set; } = [];
-    public IReadOnlyList<FeaturedTrackItem> EssentialTracks { get; set; } = [];
-    public IReadOnlyList<FeaturedPoemItem> FeaturedPoems { get; set; } = [];
-
-    // Browse-by links
+    // Banner hint chips (popular genres / moods / instruments)
     public IReadOnlyList<BrowseLink> Genres { get; set; } = [];
     public IReadOnlyList<BrowseLink> Moods { get; set; } = [];
     public IReadOnlyList<BrowseLink> Instruments { get; set; } = [];
+
+    // Album catalog — category filter chips + the first page of albums
+    public IReadOnlyList<AlbumCategoryChip> Categories { get; set; } = [];
+    public string? SelectedCategory { get; set; }
+    public PagedResult<AlbumListItemDto>? Albums { get; set; }
+
+    /// <summary>
+    /// Total albums visible after the currently rendered page (used by the
+    /// "Load more" counter and the lazy-load → pagination switch).
+    /// </summary>
+    public int LoadedCount { get; set; }
+
+    // Sidebar — random poem (per request, never cached) + About card
+    public RandomPoemCard? RandomPoem { get; set; }
+    public AboutStats About { get; set; } = new();
 }
 
 /// <summary>
-/// Represents a featured album card on the home page.
+/// A single album-category filter chip on the home page.
 /// </summary>
-public sealed class FeaturedAlbumItem
+public sealed class AlbumCategoryChip
 {
-    public string Slug { get; set; } = "";
-    public string Title { get; set; } = "";
-    public string? CoverUrl { get; set; }
-    public string? Artist { get; set; }
-    public int? Year { get; set; }
+    public string Code { get; set; } = "";
+    public string Name { get; set; } = "";
+    public int AlbumCount { get; set; }
 }
 
 /// <summary>
-/// Represents a featured track on the home page.
+/// A random poem displayed in the home sidebar, with the track (and its album)
+/// that performs the poem — resolved per page load, never cached.
 /// </summary>
-public sealed class FeaturedTrackItem
+public sealed class RandomPoemCard
 {
-    public string Slug { get; set; } = "";
-    public string Title { get; set; } = "";
-    public string? Artist { get; set; }
-    public string? Duration { get; set; }
-}
-
-/// <summary>
-/// Represents a featured poem on the home page.
-/// </summary>
-public sealed class FeaturedPoemItem
-{
-    public string Slug { get; set; } = "";
-    public string Title { get; set; } = "";
+    public string PoemSlug { get; set; } = "";
+    public string PoemTitle { get; set; } = "";
     public string? Poet { get; set; }
+    public string? TrackSlug { get; set; }
+    public string? TrackTitle { get; set; }
+    public string? AlbumSlug { get; set; }
+    public string? AlbumTitle { get; set; }
 }
 
 /// <summary>
-/// Represents a browse-by link (genre, mood, or instrument).
+/// Live catalog counts shown in the About card.
+/// </summary>
+public sealed class AboutStats
+{
+    public int Albums { get; set; }
+    public int Tracks { get; set; }
+    public int People { get; set; }
+}
+
+/// <summary>
+/// Represents a browse-by link (genre, mood, or instrument) on the home banner.
 /// </summary>
 public sealed class BrowseLink
 {
     public string Slug { get; set; } = "";
     public string Name { get; set; } = "";
-    public string Controller { get; set; } = "";
+}
+
+/// <summary>
+/// Cached banner hint chips (genres / moods / instruments) for the home page.
+/// </summary>
+public sealed class HomeBrowseData
+{
+    public IReadOnlyList<BrowseLink> Genres { get; set; } = [];
+    public IReadOnlyList<BrowseLink> Moods { get; set; } = [];
+    public IReadOnlyList<BrowseLink> Instruments { get; set; } = [];
 }

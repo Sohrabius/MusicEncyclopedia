@@ -48,4 +48,67 @@
   <data name="Footer.Copyright" xml:space="preserve">
     <value>© {0}</value>
   </data>
+  <data name="Home.Eyebrow" xml:space="preserve">
+    <value>موسوعة الموسيقى</value>
+  </data>
+  <data name="Home.Tagline" xml:space="preserve">
+    <value>استكشف الموسوعة الكاملة للموسيقى — الألبومات والأغاني والفنانين والقصائد وما وراءها.</value>
+  </data>
+  <data name="Home.SearchPlaceholder" xml:space="preserve">
+    <value>ابحث عن ألبوم أو أغنية أو فنان…</value>
+  </data>
+  <data name="Home.AllAlbums" xml:space="preserve">
+    <value>جميع الألبومات</value>
+  </data>
+  <data name="Home.AlbumCount" xml:space="preserve">
+    <value>{0} ألبومات</value>
+  </data>
+  <data name="Home.Categories" xml:space="preserve">
+    <value>الفئات</value>
+  </data>
+  <data name="Home.NoAlbums" xml:space="preserve">
+    <value>لا توجد ألبومات</value>
+  </data>
+  <data name="Home.NoAlbumsHint" xml:space="preserve">
+    <value>جرّب فئة مختلفة.</value>
+  </data>
+  <data name="Home.ClearCategory" xml:space="preserve">
+    <value>عرض كل الألبومات</value>
+  </data>
+  <data name="Home.LoadMore" xml:space="preserve">
+    <value>تحميل المزيد</value>
+  </data>
+  <data name="Home.ShowingOf" xml:space="preserve">
+    <value>عرض {0} من {1}</value>
+  </data>
+  <data name="Home.Sidebar" xml:space="preserve">
+    <value>الشريط الجانبي</value>
+  </data>
+  <data name="Home.RandomPoem" xml:space="preserve">
+    <value>قصيدة اليوم</value>
+  </data>
+  <data name="Home.ShufflePoem" xml:space="preserve">
+    <value>عرض قصيدة أخرى</value>
+  </data>
+  <data name="Home.RandomPoemSungBy" xml:space="preserve">
+    <value>أُديت في</value>
+  </data>
+  <data name="Home.AboutTitle" xml:space="preserve">
+    <value>من نحن</value>
+  </data>
+  <data name="Home.AboutText" xml:space="preserve">
+    <value>نوثّق عالم الموسيقى — موسوعة حية للألبومات والأغاني والفنانين والشعراء.</value>
+  </data>
+  <data name="Home.AboutArtists" xml:space="preserve">
+    <value>الفنانون</value>
+  </data>
+  <data name="Home.AboutCta" xml:space="preserve">
+    <value>اعرف المزيد</value>
+  </data>
+  <data name="Home.MetaDescription" xml:space="preserve">
+    <value>استكشف الموسوعة الكاملة للموسيقى — الألبومات والأغاني والفنانين وكلمات الأغاني والمزيد.</value>
+  </data>
+  <data name="Track" xml:space="preserve">
+    <value>أغنية</value>
+  </data>
 </root>

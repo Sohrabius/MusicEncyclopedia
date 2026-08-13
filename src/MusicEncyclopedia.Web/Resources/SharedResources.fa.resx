@@ -138,4 +138,67 @@
   <data name="Two-factor authentication is required but not yet configured." xml:space="preserve">
     <value>احراز هویت دو مرحله‌ای الزامی است اما هنوز پیکربندی نشده است.</value>
   </data>
+  <data name="Home.Eyebrow" xml:space="preserve">
+    <value>دایرةالمعارف موسیقی</value>
+  </data>
+  <data name="Home.Tagline" xml:space="preserve">
+    <value>دایرةالمعارف کامل موسیقی را کاوش کنید — آلبوم‌ها، ترانه‌ها، هنرمندان، اشعار و داستان‌های پشت آن‌ها.</value>
+  </data>
+  <data name="Home.SearchPlaceholder" xml:space="preserve">
+    <value>جستجوی آلبوم، ترانه، هنرمند…</value>
+  </data>
+  <data name="Home.AllAlbums" xml:space="preserve">
+    <value>همهٔ آلبوم‌ها</value>
+  </data>
+  <data name="Home.AlbumCount" xml:space="preserve">
+    <value>{0} آلبوم</value>
+  </data>
+  <data name="Home.Categories" xml:space="preserve">
+    <value>دسته‌بندی‌ها</value>
+  </data>
+  <data name="Home.NoAlbums" xml:space="preserve">
+    <value>آلبومی یافت نشد</value>
+  </data>
+  <data name="Home.NoAlbumsHint" xml:space="preserve">
+    <value>دسته‌بندی دیگری را امتحان کنید.</value>
+  </data>
+  <data name="Home.ClearCategory" xml:space="preserve">
+    <value>نمایش همهٔ آلبوم‌ها</value>
+  </data>
+  <data name="Home.LoadMore" xml:space="preserve">
+    <value>نمایش بیشتر</value>
+  </data>
+  <data name="Home.ShowingOf" xml:space="preserve">
+    <value>نمایش {0} از {1}</value>
+  </data>
+  <data name="Home.Sidebar" xml:space="preserve">
+    <value>نوار کناری</value>
+  </data>
+  <data name="Home.RandomPoem" xml:space="preserve">
+    <value>شعر روز</value>
+  </data>
+  <data name="Home.ShufflePoem" xml:space="preserve">
+    <value>نمایش شعر دیگر</value>
+  </data>
+  <data name="Home.RandomPoemSungBy" xml:space="preserve">
+    <value>اجرا شده در</value>
+  </data>
+  <data name="Home.AboutTitle" xml:space="preserve">
+    <value>دربارهٔ ما</value>
+  </data>
+  <data name="Home.AboutText" xml:space="preserve">
+    <value>ما دنیای موسیقی را مستند می‌کنیم — دایرةالمعارفی زنده از آلبوم‌ها، ترانه‌ها، هنرمندان و شاعران.</value>
+  </data>
+  <data name="Home.AboutArtists" xml:space="preserve">
+    <value>هنرمندان</value>
+  </data>
+  <data name="Home.AboutCta" xml:space="preserve">
+    <value>بیشتر بدانید</value>
+  </data>
+  <data name="Home.MetaDescription" xml:space="preserve">
+    <value>دایرةالمعارف کامل موسیقی را کاوش کنید — آلبوم‌ها، ترانه‌ها، هنرمندان، متن ترانه‌ها و بیشتر.</value>
+  </data>
+  <data name="Track" xml:space="preserve">
+    <value>ترانه</value>
+  </data>
 </root>

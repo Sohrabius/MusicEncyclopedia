@@ -219,4 +219,67 @@
   <data name="tracks" xml:space="preserve">
     <value>tracks</value>
   </data>
+  <data name="Home.Eyebrow" xml:space="preserve">
+    <value>Music Encyclopedia</value>
+  </data>
+  <data name="Home.Tagline" xml:space="preserve">
+    <value>Explore the complete encyclopedia of music — albums, tracks, artists, poems, and the stories behind them.</value>
+  </data>
+  <data name="Home.SearchPlaceholder" xml:space="preserve">
+    <value>Search albums, tracks, artists…</value>
+  </data>
+  <data name="Home.AllAlbums" xml:space="preserve">
+    <value>All Albums</value>
+  </data>
+  <data name="Home.AlbumCount" xml:space="preserve">
+    <value>{0} albums</value>
+  </data>
+  <data name="Home.Categories" xml:space="preserve">
+    <value>Categories</value>
+  </data>
+  <data name="Home.NoAlbums" xml:space="preserve">
+    <value>No albums found</value>
+  </data>
+  <data name="Home.NoAlbumsHint" xml:space="preserve">
+    <value>Try a different category.</value>
+  </data>
+  <data name="Home.ClearCategory" xml:space="preserve">
+    <value>Show all albums</value>
+  </data>
+  <data name="Home.LoadMore" xml:space="preserve">
+    <value>Load more</value>
+  </data>
+  <data name="Home.ShowingOf" xml:space="preserve">
+    <value>Showing {0} of {1}</value>
+  </data>
+  <data name="Home.Sidebar" xml:space="preserve">
+    <value>Sidebar</value>
+  </data>
+  <data name="Home.RandomPoem" xml:space="preserve">
+    <value>Poem of the Day</value>
+  </data>
+  <data name="Home.ShufflePoem" xml:space="preserve">
+    <value>Show another poem</value>
+  </data>
+  <data name="Home.RandomPoemSungBy" xml:space="preserve">
+    <value>Sung by</value>
+  </data>
+  <data name="Home.AboutTitle" xml:space="preserve">
+    <value>About Us</value>
+  </data>
+  <data name="Home.AboutText" xml:space="preserve">
+    <value>We document the world of music — a living encyclopedia of albums, tracks, artists, and poets.</value>
+  </data>
+  <data name="Home.AboutArtists" xml:space="preserve">
+    <value>Artists</value>
+  </data>
+  <data name="Home.AboutCta" xml:space="preserve">
+    <value>Learn more</value>
+  </data>
+  <data name="Home.MetaDescription" xml:space="preserve">
+    <value>Explore the complete encyclopedia of music — albums, tracks, artists, lyrics, and more.</value>
+  </data>
+  <data name="Track" xml:space="preserve">
+    <value>Track</value>
+  </data>
 </root>

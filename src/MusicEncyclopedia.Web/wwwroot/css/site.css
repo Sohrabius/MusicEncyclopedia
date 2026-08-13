@@ -1328,6 +1328,351 @@ html[dir="rtl"] {
 }
 
 /* ============================================================
+   Home page (HOME_REDESIGN_PLAN.md) — album-first landing
+   ============================================================ */
+
+  /* --- Utilities used by home views --- */
+  .relative {
+    position: relative;
+  }
+
+  .mt-2 {
+    margin-top: var(--space-sm);
+  }
+
+  /* --- Banner (search-first) --- */
+  .home-banner {
+    padding: var(--space-3xl) var(--space-lg) var(--space-2xl);
+    background:
+      radial-gradient(900px 380px at 85% -20%, rgb(37 99 235 / 0.09), transparent 60%),
+      var(--color-paper);
+    border-bottom: 1px solid var(--color-rule-light);
+  }
+
+  .home-banner__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .home-banner__eyebrow {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    margin: 0 0 var(--space-sm);
+  }
+
+  .home-banner__title {
+    font-family: var(--font-display);
+    font-size: var(--text-display);
+    font-weight: 700;
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    color: var(--color-ink);
+    margin: 0 0 var(--space-md);
+    max-width: 18ch;
+  }
+
+  .home-banner__subtitle {
+    font-size: var(--text-md);
+    color: var(--color-ink-2);
+    max-width: 52ch;
+    margin: 0 0 var(--space-xl);
+    line-height: 1.6;
+  }
+
+  /* --- Catalog + sidebar layout --- */
+  .home-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: var(--space-2xl);
+    align-items: start;
+  }
+
+  .home-main {
+    min-width: 0;
+  }
+
+  .home-result-count {
+    font-size: var(--text-xs);
+    color: var(--color-ink-3);
+    white-space: nowrap;
+  }
+
+  /* --- Category filter chips --- */
+  .chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    margin-bottom: var(--space-lg);
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-ink-2);
+    background: var(--color-surface);
+    border: 1px solid var(--color-rule);
+    padding: 6px 14px;
+    border-radius: var(--radius-pill);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: border-color var(--dur-micro) var(--ease-out),
+                background var(--dur-micro) var(--ease-out),
+                color var(--dur-micro) var(--ease-out);
+  }
+
+  .chip:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  .chip--active {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: var(--color-accent-ink);
+  }
+
+  .chip--active:hover {
+    color: var(--color-accent-ink);
+  }
+
+  .chip__count {
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 1;
+    padding: 2px 6px;
+    border-radius: var(--radius-pill);
+    background: var(--color-paper-2);
+    color: var(--color-ink-3);
+  }
+
+  .chip--active .chip__count {
+    background: rgb(255 255 255 / 0.22);
+    color: var(--color-accent-ink);
+  }
+
+  /* --- Load more (lazy zone) --- */
+  .home-loadmore {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-top: var(--space-2xl);
+  }
+
+  .home-loadmore .btn {
+    flex: 0 0 auto;
+    min-width: 210px;
+  }
+
+  .home-loadmore__icon {
+    display: inline-flex;
+    transition: transform var(--dur-short) var(--ease-out);
+  }
+
+  .home-loadmore .btn.is-loading {
+    opacity: 0.65;
+    cursor: progress;
+  }
+
+  .home-loadmore .btn.is-loading .home-loadmore__icon {
+    transform: rotate(180deg);
+  }
+
+  .home-loadmore__count {
+    font-size: var(--text-xs);
+    color: var(--color-ink-3);
+    margin: 0;
+  }
+
+  /* --- Sidebar: random poem --- */
+  .home-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    position: sticky;
+    top: calc(64px + var(--space-lg));
+  }
+
+  .home-poem {
+    background: linear-gradient(180deg, var(--color-accent-soft), var(--color-surface));
+    border: 1px solid var(--color-rule-light);
+    border-radius: var(--radius-md);
+    padding: var(--space-lg);
+  }
+
+  .home-poem__head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    margin-bottom: var(--space-sm);
+  }
+
+  .home-poem__icon {
+    display: inline-flex;
+    color: var(--color-accent);
+  }
+
+  .home-poem__title {
+    flex: 1;
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-ink);
+    margin: 0;
+  }
+
+  .home-poem__shuffle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: 1px solid var(--color-rule);
+    background: var(--color-surface);
+    color: var(--color-ink-2);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: border-color var(--dur-micro) var(--ease-out),
+                color var(--dur-micro) var(--ease-out),
+                background var(--dur-micro) var(--ease-out);
+  }
+
+  .home-poem__shuffle:hover {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+  }
+
+  .home-poem__shuffle:disabled {
+    opacity: 0.5;
+    cursor: wait;
+  }
+
+  .home-poem__verse {
+    display: block;
+    font-family: var(--font-display);
+    font-size: var(--text-md);
+    font-weight: 600;
+    line-height: 1.6;
+    color: var(--color-ink);
+    text-decoration: none;
+    margin: 0 0 var(--space-2xs);
+  }
+
+  .home-poem__verse:hover {
+    color: var(--color-accent);
+  }
+
+  .home-poem__poet {
+    font-size: var(--text-xs);
+    color: var(--color-ink-3);
+    margin: 0 0 var(--space-sm);
+  }
+
+  .home-poem__links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    border-top: 1px dashed var(--color-rule);
+    padding-top: var(--space-sm);
+    font-size: var(--text-xs);
+  }
+
+  .home-poem__label {
+    color: var(--color-ink-3);
+  }
+
+  .home-poem__links a {
+    font-weight: 500;
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .home-poem__links a:hover {
+    text-decoration: underline;
+  }
+
+  .home-poem__sep {
+    color: var(--color-ink-3);
+  }
+
+  /* --- Sidebar: about card --- */
+  .home-about {
+    background: var(--color-surface);
+    border: 1px solid var(--color-rule-light);
+    border-radius: var(--radius-md);
+    padding: var(--space-lg);
+  }
+
+  .home-about__title {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-ink);
+    margin: 0 0 var(--space-xs);
+  }
+
+  .home-about__text {
+    font-size: var(--text-xs);
+    color: var(--color-ink-2);
+    line-height: 1.7;
+    margin: 0 0 var(--space-md);
+  }
+
+  .home-about__stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-sm);
+    margin: 0 0 var(--space-md);
+  }
+
+  .home-about__stat {
+    text-align: center;
+  }
+
+  .home-about__stat-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-ink-3);
+    margin: 0 0 2px;
+  }
+
+  .home-about__stat-value {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--color-accent);
+    margin: 0;
+  }
+
+  .home-about__link {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .home-about__link:hover {
+    text-decoration: underline;
+  }
+
+  /* --- Home responsive --- */
+  @media (max-width: 960px) {
+    .home-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .home-sidebar {
+      position: static;
+    }
+  }
+
+/* ============================================================
    Reduced Motion
    ============================================================ */
 @media (prefers-reduced-motion: reduce) {
