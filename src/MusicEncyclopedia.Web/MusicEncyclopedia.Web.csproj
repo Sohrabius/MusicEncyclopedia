@@ -6,6 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <!-- SharedResources.cs is the strongly-typed accessor; keep the SDK from generating one too -->
     <GenerateResxSource>false</GenerateResxSource>
+    <!-- Enables `dotnet user-secrets` for local secrets (e.g. DbPassword) in Development -->
+    <UserSecretsId>MusicEncyclopedia-Web-8f3b1c2e-9a41-4d7e-8b5a-6c0f2e3d4a5b</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
