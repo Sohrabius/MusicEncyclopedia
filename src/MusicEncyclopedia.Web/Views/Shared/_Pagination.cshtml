@@ -1,0 +1,84 @@
+@{
+    // Shared pagination control.
+    // Usage:
+    //   @await Html.PartialAsync("_Pagination", new {
+    //       Items   = items,                       // PagedResult<T>
+    //       PageUrl = (Func<int, string>)GetPageUrl
+    //   })
+    // PageUrl(n) must return the URL for page n (with query params preserved).
+    var items = Model.Items;
+    var pageUrl = (Func<int, string>)Model.PageUrl;
+    var page = items.Page;
+    var totalPages = items.TotalPages;
+}
+
+@if (totalPages > 1)
+{
+    <nav class="pagination" aria-label="Pagination">
+        @if (page > 1)
+        {
+            <a href="@pageUrl(page - 1)" rel="prev" aria-label="Previous page">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+            </a>
+        }
+        else
+        {
+            <span aria-hidden="true" style="opacity: 0.3;">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+            </span>
+        }
+
+        @{
+            var startPage = Math.Max(1, page - 2);
+            var endPage = Math.Min(totalPages, page + 2);
+            if (startPage > 1)
+            {
+                <a href="@pageUrl(1)">1</a>
+                if (startPage > 2)
+                {
+                    <span aria-hidden="true">…</span>
+                }
+            }
+            for (var p = startPage; p <= endPage; p++)
+            {
+                if (p == page)
+                {
+                    <span class="active" aria-current="page">@p</span>
+                }
+                else
+                {
+                    <a href="@pageUrl(p)">@p</a>
+                }
+            }
+            if (endPage < totalPages)
+            {
+                if (endPage < totalPages - 1)
+                {
+                    <span aria-hidden="true">…</span>
+                }
+                <a href="@pageUrl(totalPages)">@totalPages</a>
+            }
+        }
+
+        @if (page < totalPages)
+        {
+            <a href="@pageUrl(page + 1)" rel="next" aria-label="Next page">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </a>
+        }
+        else
+        {
+            <span aria-hidden="true" style="opacity: 0.3;">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </span>
+        }
+    </nav>
+}

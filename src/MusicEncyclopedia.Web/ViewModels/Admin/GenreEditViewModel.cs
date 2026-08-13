@@ -11,17 +11,17 @@ public sealed class GenreEditViewModel
 {
     [Required(ErrorMessage = "Name is required.")]
     [StringLength(255, ErrorMessage = "Name must not exceed 255 characters.")]
-    [Display(Name = "Name")]
+    [Display(Name = "نام")]
     public string Name { get; set; } = "";
 
     [StringLength(255)]
-    [Display(Name = "Sort Name")]
+    [Display(Name = "نام مرتب‌سازی")]
     public string? NameSort { get; set; }
 
-    [Display(Name = "Description")]
+    [Display(Name = "توضیحات")]
     public string? Description { get; set; }
 
-    [Display(Name = "Parent Genre")]
+    [Display(Name = "سبک والد")]
     public int? ParentGenreId { get; set; }
 
     [Required(ErrorMessage = "Slug is required.")]

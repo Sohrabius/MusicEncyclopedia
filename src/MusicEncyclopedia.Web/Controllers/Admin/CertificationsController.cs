@@ -141,7 +141,7 @@ public sealed class CertificationsController : AdminBaseController
 
         await InvalidateEntityCacheAsync("Certification", certification.CertificationId, "Created");
 
-        SetSuccessMessage($"Certification \"{certification.Name}\" created successfully.");
+        SetSuccessMessage($"گواهینامه «{certification.Name}» با موفقیت ایجاد شد.");
         return RedirectToAction(nameof(Edit), new { id = certification.CertificationId });
     }
 
@@ -154,7 +154,7 @@ public sealed class CertificationsController : AdminBaseController
 
         if (certification is null)
         {
-            SetErrorMessage("Certification not found.");
+            SetErrorMessage("گواهینامه یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -186,7 +186,7 @@ public sealed class CertificationsController : AdminBaseController
     {
         if (id != viewModel.CertificationId)
         {
-            SetErrorMessage("Certification ID mismatch.");
+            SetErrorMessage("شناسه گواهینامه ناسازگار است.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -202,7 +202,7 @@ public sealed class CertificationsController : AdminBaseController
 
         if (certification is null)
         {
-            SetErrorMessage("Certification not found.");
+            SetErrorMessage("گواهینامه یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -232,12 +232,12 @@ public sealed class CertificationsController : AdminBaseController
 
             await InvalidateEntityCacheAsync("Certification", certification.CertificationId, "Updated");
 
-            SetSuccessMessage($"Certification \"{certification.Name}\" updated successfully.");
+            SetSuccessMessage($"گواهینامه «{certification.Name}» با موفقیت به‌روزرسانی شد.");
         }
         catch (DbUpdateConcurrencyException ex)
         {
             _logger.LogWarning(ex, "Concurrency conflict updating certification {CertificationId}", id);
-            SetErrorMessage("This certification was modified by another user. Please reload and try again.");
+            SetErrorMessage("این گواهینامه توسط کاربر دیگری تغییر کرده است. لطفاً دوباره بارگذاری و تلاش کنید.");
             viewModel.Countries = await _db.Countries.OrderBy(c => c.Name).ToListAsync(cancellationToken);
             viewModel.RowVersion = certification.RowVersion;
             return View(viewModel);
@@ -255,7 +255,7 @@ public sealed class CertificationsController : AdminBaseController
         var certification = await _db.Certifications.FirstOrDefaultAsync(c => c.CertificationId == id, cancellationToken);
         if (certification is null)
         {
-            SetErrorMessage("Certification not found.");
+            SetErrorMessage("گواهینامه یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -275,7 +275,7 @@ public sealed class CertificationsController : AdminBaseController
 
         await InvalidateEntityCacheAsync("Certification", certification.CertificationId, "Deleted");
 
-        SetSuccessMessage($"Certification \"{certification.Name}\" has been deleted (soft).");
+        SetSuccessMessage($"گواهینامه «{certification.Name}» به‌صورت نرم حذف شد.");
         return RedirectToAction(nameof(Index));
     }
 
@@ -288,7 +288,7 @@ public sealed class CertificationsController : AdminBaseController
             .FirstOrDefaultAsync(c => c.CertificationId == id, cancellationToken);
         if (certification is null)
         {
-            SetErrorMessage("Certification not found.");
+            SetErrorMessage("گواهینامه یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -309,7 +309,7 @@ public sealed class CertificationsController : AdminBaseController
 
         await InvalidateEntityCacheAsync("Certification", certification.CertificationId, "Restored");
 
-        SetSuccessMessage($"Certification \"{certification.Name}\" has been restored.");
+        SetSuccessMessage($"گواهینامه «{certification.Name}» بازیابی شد.");
         return RedirectToAction(nameof(Index));
     }
 }

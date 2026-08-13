@@ -32,20 +32,20 @@ public sealed class SourceEditViewModel
 {
     [Required(ErrorMessage = "Title is required.")]
     [StringLength(500, ErrorMessage = "Title must not exceed 500 characters.")]
-    [Display(Name = "Title")]
+    [Display(Name = "عنوان")]
     public string Title { get; set; } = "";
 
-    [Display(Name = "Source Type")]
+    [Display(Name = "نوع منبع")]
     public int? SourceTypeId { get; set; }
 
     [StringLength(500)]
-    [Display(Name = "Author")]
+    [Display(Name = "نویسنده")]
     public string? Author { get; set; }
 
-    [Display(Name = "Publisher")]
+    [Display(Name = "ناشر")]
     public int? PublisherId { get; set; }
 
-    [Display(Name = "Publication Date")]
+    [Display(Name = "تاریخ انتشار")]
     public DateOnly? PublicationDate { get; set; }
 
     [StringLength(2000)]

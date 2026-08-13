@@ -3,7 +3,7 @@
 }
 
 <div class="flex items-center justify-between mb-4">
-    <h3 class="text-lg font-semibold text-gray-900">Create New Source</h3>
+    <h3 class="text-lg font-semibold text-gray-900">ایجاد جدید منبع</h3>
     <button type="button" onclick="closeSourceModal()" class="text-gray-400 hover:text-gray-600">
         <i class="fas fa-times"></i>
     </button>
@@ -13,16 +13,16 @@
     @Html.AntiForgeryToken()
     <div class="space-y-4">
         <div>
-            <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+            <label for="title" class="block text-sm font-medium text-gray-700 mb-1">عنوان *</label>
             <input type="text" id="title" name="title" required
                    class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                   placeholder="Full title of the source" />
+                   placeholder="Full title از the source" />
         </div>
         <div>
-            <label for="sourceTypeId" class="block text-sm font-medium text-gray-700 mb-1">Source Type</label>
+            <label for="sourceTypeId" class="block text-sm font-medium text-gray-700 mb-1">نوع منبع</label>
             <select id="sourceTypeId" name="sourceTypeId"
                     class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                <option value="">-- Select Type --</option>
+                <option value="">-- انتخاب نوع --</option>
                 @foreach (var st in sourceTypes)
                 {
                     <option value="@st.SourceTypeId">@st.Name</option>
@@ -30,10 +30,10 @@
             </select>
         </div>
         <div>
-            <label for="author" class="block text-sm font-medium text-gray-700 mb-1">Author</label>
+            <label for="author" class="block text-sm font-medium text-gray-700 mb-1">نویسنده</label>
             <input type="text" id="author" name="author"
                    class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                   placeholder="Author name" />
+                   placeholder="نویسنده name" />
         </div>
         <div>
             <label for="url" class="block text-sm font-medium text-gray-700 mb-1">URL</label>
@@ -45,11 +45,11 @@
     <div class="mt-6 flex items-center gap-3 justify-end">
         <button type="button" onclick="closeSourceModal()"
                 class="px-4 py-2 text-sm text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">
-            Cancel
+            انصراف
         </button>
         <button type="submit"
                 class="px-4 py-2 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2">
-            <i class="fas fa-save"></i> Create Source
+            <i class="fas fa-save"></i> ایجاد منبع
         </button>
     </div>
 </form>

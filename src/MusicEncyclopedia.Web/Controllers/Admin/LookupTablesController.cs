@@ -95,7 +95,7 @@ public sealed class LookupTablesController : AdminBaseController
         var (label, entityType, dbSetName) = Resolve(key);
         if (label is null)
         {
-            SetErrorMessage("Unknown lookup table.");
+            SetErrorMessage("جدول مرجع ناشناخته است.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -131,13 +131,13 @@ public sealed class LookupTablesController : AdminBaseController
         var (label, entityType, dbSetName) = Resolve(key);
         if (label is null)
         {
-            SetErrorMessage("Unknown lookup table.");
+            SetErrorMessage("جدول مرجع ناشناخته است.");
             return RedirectToAction(nameof(Index));
         }
 
         if (!ModelState.IsValid)
         {
-            SetErrorMessage("Please fill in the required fields.");
+            SetErrorMessage("لطفاً فیلدهای الزامی را پر کنید.");
             return RedirectToAction(nameof(Items), new { key });
         }
 
@@ -148,7 +148,7 @@ public sealed class LookupTablesController : AdminBaseController
         _db.Add(entity);
         await _db.SaveChangesAsync(cancellationToken);
 
-        SetSuccessMessage($"\"{form.Name}\" added to {label}.");
+        SetSuccessMessage($"«{form.Name}» به {label}.");
         return RedirectToAction(nameof(Items), new { key });
     }
 
@@ -160,7 +160,7 @@ public sealed class LookupTablesController : AdminBaseController
         var (label, entityType, dbSetName) = Resolve(key);
         if (label is null)
         {
-            SetErrorMessage("Unknown lookup table.");
+            SetErrorMessage("جدول مرجع ناشناخته است.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -171,7 +171,7 @@ public sealed class LookupTablesController : AdminBaseController
 
         if (entity is null)
         {
-            SetErrorMessage("The item no longer exists.");
+            SetErrorMessage("مورد دیگر وجود ندارد.");
             return RedirectToAction(nameof(Items), new { key });
         }
 
@@ -180,7 +180,7 @@ public sealed class LookupTablesController : AdminBaseController
 
         await _db.SaveChangesAsync(cancellationToken);
 
-        SetSuccessMessage($"\"{form.Name}\" updated in {label}.");
+        SetSuccessMessage($"«{form.Name}» در {label}.");
         return RedirectToAction(nameof(Items), new { key });
     }
 
@@ -193,7 +193,7 @@ public sealed class LookupTablesController : AdminBaseController
         var (label, entityType, dbSetName) = Resolve(key);
         if (label is null)
         {
-            SetErrorMessage("Unknown lookup table.");
+            SetErrorMessage("جدول مرجع ناشناخته است.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -204,7 +204,7 @@ public sealed class LookupTablesController : AdminBaseController
 
         if (entity is null)
         {
-            SetErrorMessage("The item no longer exists.");
+            SetErrorMessage("مورد دیگر وجود ندارد.");
             return RedirectToAction(nameof(Items), new { key });
         }
 
@@ -214,12 +214,12 @@ public sealed class LookupTablesController : AdminBaseController
         {
             _db.Remove(entity);
             await _db.SaveChangesAsync(cancellationToken);
-            SetSuccessMessage($"\"{name}\" deleted from {label}.");
+            SetSuccessMessage($"«{name}» از {label}.");
         }
         catch (DbUpdateException)
         {
             // The row is referenced elsewhere — do not cascade or corrupt data.
-            SetErrorMessage($"\"{name}\" is in use and cannot be deleted.");
+            SetErrorMessage($"«{name}» در حال استفاده است و قابل حذف نیست.");
         }
 
         return RedirectToAction(nameof(Items), new { key });

@@ -148,7 +148,7 @@ public sealed class CitationsController : AdminBaseController
         await InvalidateEntityCacheAsync(citation.EntityTypeId, citation.EntityId, "Updated");
         await InvalidateBroadCacheAsync();
 
-        SetSuccessMessage("Citation created successfully.");
+        SetSuccessMessage("ارجاع با موفقیت ایجاد شد.");
         return RedirectToAction(nameof(Edit), new { id = citation.CitationId });
     }
 
@@ -168,7 +168,7 @@ public sealed class CitationsController : AdminBaseController
 
         if (citation is null)
         {
-            SetErrorMessage("Citation not found.");
+            SetErrorMessage("ارجاع یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -204,7 +204,7 @@ public sealed class CitationsController : AdminBaseController
     {
         if (id != viewModel.CitationId)
         {
-            SetErrorMessage("Citation ID mismatch.");
+            SetErrorMessage("شناسه ارجاع ناسازگار است.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -221,7 +221,7 @@ public sealed class CitationsController : AdminBaseController
 
         if (citation is null)
         {
-            SetErrorMessage("Citation not found.");
+            SetErrorMessage("ارجاع یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -247,7 +247,7 @@ public sealed class CitationsController : AdminBaseController
         }
         await InvalidateBroadCacheAsync();
 
-        SetSuccessMessage("Citation updated successfully.");
+        SetSuccessMessage("ارجاع با موفقیت به‌روزرسانی شد.");
 
         return RedirectToAction(nameof(Edit), new { id });
     }
@@ -269,7 +269,7 @@ public sealed class CitationsController : AdminBaseController
 
         if (citation is null)
         {
-            SetErrorMessage("Citation not found.");
+            SetErrorMessage("ارجاع یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -284,7 +284,7 @@ public sealed class CitationsController : AdminBaseController
         }
         await InvalidateBroadCacheAsync();
 
-        SetSuccessMessage("Citation deleted successfully.");
+        SetSuccessMessage("ارجاع با موفقیت حذف شد.");
 
         return RedirectToAction(nameof(Index));
     }

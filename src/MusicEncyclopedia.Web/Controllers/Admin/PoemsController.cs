@@ -153,7 +153,7 @@ public sealed class PoemsController : AdminBaseController
 
         await InvalidateEntityCacheAsync("Poem", poem.PoemId, "Created");
 
-        SetSuccessMessage($"Poem \"{poem.Title}\" created successfully.");
+        SetSuccessMessage($"شعر «{poem.Title}» با موفقیت ایجاد شد.");
         return RedirectToAction(nameof(Edit), new { id = poem.PoemId });
     }
 
@@ -166,7 +166,7 @@ public sealed class PoemsController : AdminBaseController
 
         if (poem is null)
         {
-            SetErrorMessage("Poem not found.");
+            SetErrorMessage("شعر یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -208,7 +208,7 @@ public sealed class PoemsController : AdminBaseController
     {
         if (id != viewModel.PoemId)
         {
-            SetErrorMessage("Poem ID mismatch.");
+            SetErrorMessage("شناسه شعر ناسازگار است.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -225,7 +225,7 @@ public sealed class PoemsController : AdminBaseController
 
         if (poem is null)
         {
-            SetErrorMessage("Poem not found.");
+            SetErrorMessage("شعر یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -264,12 +264,12 @@ public sealed class PoemsController : AdminBaseController
 
             await InvalidateEntityCacheAsync("Poem", poem.PoemId, "Updated");
 
-            SetSuccessMessage($"Poem \"{poem.Title}\" updated successfully.");
+            SetSuccessMessage($"شعر «{poem.Title}» با موفقیت به‌روزرسانی شد.");
         }
         catch (DbUpdateConcurrencyException ex)
         {
             _logger.LogWarning(ex, "Concurrency conflict updating poem {PoemId}", id);
-            SetErrorMessage("This poem was modified by another user. Please reload and try again.");
+            SetErrorMessage("این شعر توسط کاربر دیگری تغییر کرده است. لطفاً دوباره بارگذاری و تلاش کنید.");
             viewModel.Poets = await _db.People.OrderBy(p => p.FullName).ToListAsync(cancellationToken);
             viewModel.Publications = await _db.Publications.OrderBy(p => p.Title).ToListAsync(cancellationToken);
             viewModel.RowVersion = poem.RowVersion;
@@ -288,7 +288,7 @@ public sealed class PoemsController : AdminBaseController
         var poem = await _db.Poems.FirstOrDefaultAsync(p => p.PoemId == id, cancellationToken);
         if (poem is null)
         {
-            SetErrorMessage("Poem not found.");
+            SetErrorMessage("شعر یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -308,7 +308,7 @@ public sealed class PoemsController : AdminBaseController
 
         await InvalidateEntityCacheAsync("Poem", poem.PoemId, "Deleted");
 
-        SetSuccessMessage($"Poem \"{poem.Title}\" has been deleted (soft).");
+        SetSuccessMessage($"شعر «{poem.Title}» به‌صورت نرم حذف شد.");
         return RedirectToAction(nameof(Index));
     }
 
@@ -321,7 +321,7 @@ public sealed class PoemsController : AdminBaseController
             .FirstOrDefaultAsync(p => p.PoemId == id, cancellationToken);
         if (poem is null)
         {
-            SetErrorMessage("Poem not found.");
+            SetErrorMessage("شعر یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -342,7 +342,7 @@ public sealed class PoemsController : AdminBaseController
 
         await InvalidateEntityCacheAsync("Poem", poem.PoemId, "Restored");
 
-        SetSuccessMessage($"Poem \"{poem.Title}\" has been restored.");
+        SetSuccessMessage($"شعر «{poem.Title}» بازیابی شد.");
         return RedirectToAction(nameof(Index));
     }
 }

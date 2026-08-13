@@ -93,7 +93,7 @@ public sealed class AlbumTracklistController : AdminBaseController
 
         if (albumId == 0 || trackId == 0)
         {
-            return Json(new { success = false, errors = new[] { "Album and track are required." } });
+            return Json(new { success = false, errors = new[] { "آلبوم and track are required." } });
         }
 
         var exists = await _db.AlbumTracks.AnyAsync(at => at.AlbumId == albumId && at.TrackId == trackId, cancellationToken);
@@ -138,7 +138,7 @@ public sealed class AlbumTracklistController : AdminBaseController
 
         if (albumId == 0 || string.IsNullOrWhiteSpace(title))
         {
-            return Json(new { success = false, errors = new[] { "Album and track title are required." } });
+            return Json(new { success = false, errors = new[] { "آلبوم and track title are required." } });
         }
 
         var slugService = new SlugService();
@@ -216,7 +216,7 @@ public sealed class AlbumTracklistController : AdminBaseController
         var row = await _db.AlbumTracks.FirstOrDefaultAsync(at => at.AlbumTrackId == id, cancellationToken);
         if (row is null)
         {
-            return Json(new { success = false, errors = new[] { "Tracklist row not found." } });
+            return Json(new { success = false, errors = new[] { "فهرست ترک‌ها row not یافت نشد." } });
         }
 
         var oldDisc = row.DiscNumber;
@@ -255,7 +255,7 @@ public sealed class AlbumTracklistController : AdminBaseController
         var row = await _db.AlbumTracks.FirstOrDefaultAsync(at => at.AlbumTrackId == id, cancellationToken);
         if (row is null)
         {
-            return Json(new { success = false, errors = new[] { "Tracklist row not found." } });
+            return Json(new { success = false, errors = new[] { "فهرست ترک‌ها row not یافت نشد." } });
         }
 
         var albumId = row.AlbumId;
@@ -280,7 +280,7 @@ public sealed class AlbumTracklistController : AdminBaseController
         var row = await _db.AlbumTracks.FirstOrDefaultAsync(at => at.AlbumTrackId == id, cancellationToken);
         if (row is null)
         {
-            return Json(new { success = false, errors = new[] { "Tracklist row not found." } });
+            return Json(new { success = false, errors = new[] { "فهرست ترک‌ها row not یافت نشد." } });
         }
 
         var siblings = await _db.AlbumTracks

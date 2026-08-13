@@ -99,7 +99,7 @@ public sealed class UsersController : AdminBaseController
         var user = await _userManager.FindByIdAsync(id);
         if (user is null)
         {
-            SetErrorMessage("User not found.");
+            SetErrorMessage("کاربر یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -117,14 +117,14 @@ public sealed class UsersController : AdminBaseController
     {
         if (id != viewModel.Id)
         {
-            SetErrorMessage("User ID mismatch.");
+            SetErrorMessage("شناسه کاربر ناسازگار است.");
             return RedirectToAction(nameof(Index));
         }
 
         var user = await _userManager.FindByIdAsync(id);
         if (user is null)
         {
-            SetErrorMessage("User not found.");
+            SetErrorMessage("کاربر یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -199,7 +199,7 @@ public sealed class UsersController : AdminBaseController
             "User {Email} updated by {Admin}: roles {Roles}, permissions {PermissionCount}",
             user.Email, User.Identity?.Name, rolesToAdd.Count - rolesToRemove.Count, toAdd.Count);
 
-        SetSuccessMessage($"User \"{user.Email}\" updated successfully.");
+        SetSuccessMessage($"کاربر «{user.Email}» با موفقیت به‌روزرسانی شد.");
         return RedirectToAction(nameof(Edit), new { id });
     }
 
@@ -212,13 +212,13 @@ public sealed class UsersController : AdminBaseController
         var user = await _userManager.FindByIdAsync(id);
         if (user is null)
         {
-            SetErrorMessage("User not found.");
+            SetErrorMessage("کاربر یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
         if (string.Equals(user.Email, User.Identity?.Name, StringComparison.OrdinalIgnoreCase))
         {
-            SetErrorMessage("You cannot delete your own account.");
+            SetErrorMessage("شما نمی‌توانید حساب کاربری خود را حذف کنید.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -226,12 +226,12 @@ public sealed class UsersController : AdminBaseController
         if (result.Succeeded)
         {
             _logger.LogInformation("User {Email} deleted by {Admin}", user.Email, User.Identity?.Name);
-            SetSuccessMessage($"User \"{user.Email}\" has been deleted.");
+            SetSuccessMessage($"کاربر «{user.Email}» حذف شد.");
         }
         else
         {
             AddIdentityErrors(result);
-            SetErrorMessage("Failed to delete the user. See form errors for details.");
+            SetErrorMessage("حذف کاربر ناموفق بود. برای جزئیات، خطاهای فرم را ببینید.");
         }
 
         return RedirectToAction(nameof(Index));

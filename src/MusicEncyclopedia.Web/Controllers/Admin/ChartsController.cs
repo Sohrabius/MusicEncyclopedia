@@ -150,7 +150,7 @@ public sealed class ChartsController : AdminBaseController
 
         await InvalidateEntityCacheAsync("Chart", chart.ChartId, "Created");
 
-        SetSuccessMessage($"Chart \"{chart.Name}\" created successfully.");
+        SetSuccessMessage($"جدول «{chart.Name}» با موفقیت ایجاد شد.");
         return RedirectToAction(nameof(Edit), new { id = chart.ChartId });
     }
 
@@ -165,7 +165,7 @@ public sealed class ChartsController : AdminBaseController
 
         if (chart is null)
         {
-            SetErrorMessage("Chart not found.");
+            SetErrorMessage("جدول یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -197,7 +197,7 @@ public sealed class ChartsController : AdminBaseController
     {
         if (id != viewModel.ChartId)
         {
-            SetErrorMessage("Chart ID mismatch.");
+            SetErrorMessage("شناسه جدول ناسازگار است.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -213,7 +213,7 @@ public sealed class ChartsController : AdminBaseController
 
         if (chart is null)
         {
-            SetErrorMessage("Chart not found.");
+            SetErrorMessage("جدول یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -255,12 +255,12 @@ public sealed class ChartsController : AdminBaseController
 
             await InvalidateEntityCacheAsync("Chart", chart.ChartId, "Updated");
 
-            SetSuccessMessage($"Chart \"{chart.Name}\" updated successfully.");
+            SetSuccessMessage($"جدول «{chart.Name}» با موفقیت به‌روزرسانی شد.");
         }
         catch (DbUpdateConcurrencyException ex)
         {
             _logger.LogWarning(ex, "Concurrency conflict updating chart {Id}", id);
-            SetErrorMessage("This chart was modified by another user. Please reload and try again.");
+            SetErrorMessage("این جدول توسط کاربر دیگری تغییر کرده است. لطفاً دوباره بارگذاری و تلاش کنید.");
             viewModel.RowVersion = chart.RowVersion;
             viewModel.Countries = await _db.Countries.OrderBy(c => c.Name).ToListAsync(cancellationToken);
             return View(viewModel);
@@ -282,7 +282,7 @@ public sealed class ChartsController : AdminBaseController
 
         if (chart is null)
         {
-            SetErrorMessage("Chart not found.");
+            SetErrorMessage("جدول یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -305,7 +305,7 @@ public sealed class ChartsController : AdminBaseController
 
         await InvalidateEntityCacheAsync("Chart", chart.ChartId, "Deleted");
 
-        SetSuccessMessage($"Chart \"{chart.Name}\" has been deleted.");
+        SetSuccessMessage($"جدول «{chart.Name}» حذف شد.");
         return RedirectToAction(nameof(Index));
     }
 
@@ -322,7 +322,7 @@ public sealed class ChartsController : AdminBaseController
 
         if (chart is null)
         {
-            SetErrorMessage("Chart not found.");
+            SetErrorMessage("جدول یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -344,7 +344,7 @@ public sealed class ChartsController : AdminBaseController
 
         await InvalidateEntityCacheAsync("Chart", chart.ChartId, "Restored");
 
-        SetSuccessMessage($"Chart \"{chart.Name}\" has been restored.");
+        SetSuccessMessage($"جدول «{chart.Name}» بازیابی شد.");
         return RedirectToAction(nameof(Index));
     }
 }

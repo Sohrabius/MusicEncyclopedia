@@ -1,6 +1,6 @@
 @model GenreEditViewModel
 @{
-    ViewData["Title"] = "Create Genre";
+    ViewData["Title"] = "ایجاد سبک";
     ViewData["ActiveMenu"] = "Genres";
 }
 
@@ -10,7 +10,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="lg:col-span-2 space-y-6">
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">Basic Information</h2>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">اطلاعات پایه</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="md:col-span-2"><label asp-for="Name" class="block text-sm font-medium text-gray-700 mb-1"></label><input asp-for="Name" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" /><span asp-validation-for="Name" class="text-xs text-red-600"></span></div>
                     <div><label asp-for="NameSort" class="block text-sm font-medium text-gray-700 mb-1"></label><input asp-for="NameSort" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" /></div>
@@ -18,21 +18,21 @@
                 </div>
             </div>
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">Classification</h2>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">دسته‌بندی</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div><label asp-for="ParentGenreId" class="block text-sm font-medium text-gray-700 mb-1"></label><select asp-for="ParentGenreId" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"><option value="">-- None (Top Level) --</option>@foreach (var item in Model.ParentGenres) { <option value="@item.GenreId">@item.Name</option> }</select></div>
+                    <div><label asp-for="ParentGenreId" class="block text-sm font-medium text-gray-700 mb-1"></label><select asp-for="ParentGenreId" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"><option value="">-- هیچ‌کدام (سطح بالا) --</option>@foreach (var item in Model.ParentGenres) { <option value="@item.GenreId">@item.Name</option> }</select></div>
                 </div>
             </div>
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">Description</h2>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">توضیحات</h2>
                 <div><label asp-for="Description" class="block text-sm font-medium text-gray-700 mb-1"></label><textarea asp-for="Description" rows="5" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea></div>
             </div>
         </div>
         <div class="space-y-6">
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">Publish</h2>
-                <button type="submit" class="w-full px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"><i class="fas fa-save"></i> Create Genre</button>
-                <a href="/admin/genres" class="w-full block text-center mt-3 px-4 py-2.5 text-sm text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">Cancel</a>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">انتشار</h2>
+                <button type="submit" class="w-full px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"><i class="fas fa-save"></i> ایجاد سبک</button>
+                <a href="/admin/genres" class="w-full block text-center mt-3 px-4 py-2.5 text-sm text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">انصراف</a>
             </div>
         </div>
     </div>

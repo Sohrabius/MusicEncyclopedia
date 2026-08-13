@@ -12,23 +12,23 @@ public sealed class LocalizationEditViewModel
     public int LocalizationId { get; set; }
 
     [Required(ErrorMessage = "Entity type is required.")]
-    [Display(Name = "Entity Type")]
+    [Display(Name = "نوع موجودیت")]
     public int EntityTypeId { get; set; }
 
     [Required(ErrorMessage = "Entity ID is required.")]
-    [Display(Name = "Entity ID")]
+    [Display(Name = "شناسه موجودیت")]
     public int EntityId { get; set; }
 
-    [Display(Name = "Language")]
+    [Display(Name = "زبان")]
     public int? LanguageId { get; set; }
 
     [Required(ErrorMessage = "Field name is required.")]
     [StringLength(255, ErrorMessage = "Field name must not exceed 255 characters.")]
-    [Display(Name = "Field Name")]
+    [Display(Name = "نام فیلد")]
     public string FieldName { get; set; } = "";
 
     [Required(ErrorMessage = "Localized text is required.")]
-    [Display(Name = "Localized Text")]
+    [Display(Name = "متن بومی‌شده")]
     public string LocalizedText { get; set; } = "";
 
     // Dropdown data

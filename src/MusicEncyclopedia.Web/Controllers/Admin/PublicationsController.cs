@@ -151,7 +151,7 @@ public sealed class PublicationsController : AdminBaseController
         await InvalidateEntityCacheAsync("Publication", publication.PublicationId, "Created");
         await InvalidateEntityCacheAsync(EntityTypeConstants.Person, publication.PersonId, "Updated");
 
-        SetSuccessMessage($"Publication \"{publication.Title}\" created successfully.");
+        SetSuccessMessage($"انتشارات «{publication.Title}» با موفقیت ایجاد شد.");
         return RedirectToAction(nameof(Edit), new { id = publication.PublicationId });
     }
 
@@ -164,7 +164,7 @@ public sealed class PublicationsController : AdminBaseController
 
         if (publication is null)
         {
-            SetErrorMessage("Publication not found.");
+            SetErrorMessage("انتشارات یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -201,7 +201,7 @@ public sealed class PublicationsController : AdminBaseController
     {
         if (id != viewModel.PublicationId)
         {
-            SetErrorMessage("Publication ID mismatch.");
+            SetErrorMessage("شناسه انتشارات ناسازگار است.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -219,7 +219,7 @@ public sealed class PublicationsController : AdminBaseController
 
         if (publication is null)
         {
-            SetErrorMessage("Publication not found.");
+            SetErrorMessage("انتشارات یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -253,12 +253,12 @@ public sealed class PublicationsController : AdminBaseController
             await InvalidateEntityCacheAsync("Publication", publication.PublicationId, "Updated");
             await InvalidateEntityCacheAsync(EntityTypeConstants.Person, publication.PersonId, "Updated");
 
-            SetSuccessMessage($"Publication \"{publication.Title}\" updated successfully.");
+            SetSuccessMessage($"انتشارات «{publication.Title}» با موفقیت به‌روزرسانی شد.");
         }
         catch (DbUpdateConcurrencyException ex)
         {
             _logger.LogWarning(ex, "Concurrency conflict updating publication {PublicationId}", id);
-            SetErrorMessage("This publication was modified by another user. Please reload and try again.");
+            SetErrorMessage("این انتشارات توسط کاربر دیگری تغییر کرده است. لطفاً دوباره بارگذاری و تلاش کنید.");
             viewModel.PublicationTypes = await _db.PublicationTypes.OrderBy(t => t.Name).ToListAsync(cancellationToken);
             viewModel.People = await _db.People.OrderBy(p => p.FullName).ToListAsync(cancellationToken);
             viewModel.Companies = await _db.Companies.OrderBy(c => c.Name).ToListAsync(cancellationToken);
@@ -278,7 +278,7 @@ public sealed class PublicationsController : AdminBaseController
         var publication = await _db.Publications.FirstOrDefaultAsync(p => p.PublicationId == id, cancellationToken);
         if (publication is null)
         {
-            SetErrorMessage("Publication not found.");
+            SetErrorMessage("انتشارات یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -299,7 +299,7 @@ public sealed class PublicationsController : AdminBaseController
         await InvalidateEntityCacheAsync("Publication", publication.PublicationId, "Deleted");
         await InvalidateEntityCacheAsync(EntityTypeConstants.Person, publication.PersonId, "Updated");
 
-        SetSuccessMessage($"Publication \"{publication.Title}\" has been deleted (soft).");
+        SetSuccessMessage($"انتشارات «{publication.Title}» به‌صورت نرم حذف شد.");
         return RedirectToAction(nameof(Index));
     }
 
@@ -312,7 +312,7 @@ public sealed class PublicationsController : AdminBaseController
             .FirstOrDefaultAsync(p => p.PublicationId == id, cancellationToken);
         if (publication is null)
         {
-            SetErrorMessage("Publication not found.");
+            SetErrorMessage("انتشارات یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -334,7 +334,7 @@ public sealed class PublicationsController : AdminBaseController
         await InvalidateEntityCacheAsync("Publication", publication.PublicationId, "Restored");
         await InvalidateEntityCacheAsync(EntityTypeConstants.Person, publication.PersonId, "Updated");
 
-        SetSuccessMessage($"Publication \"{publication.Title}\" has been restored.");
+        SetSuccessMessage($"انتشارات «{publication.Title}» بازیابی شد.");
         return RedirectToAction(nameof(Index));
     }
 }

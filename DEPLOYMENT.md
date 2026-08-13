@@ -89,6 +89,7 @@ default on a dev database; change its password after first login).
 | `BEHIND_PROXY` | `false` | `true` when TLS terminates at an upstream proxy (honors X-Forwarded-For / X-Forwarded-Proto) |
 | `ENABLE_HTTPS_REDIRECTION` | `false` | the container serves plain HTTP on 8080 (TLS terminates at the proxy) — set `true` only if the app itself terminates TLS |
 | `SEED_SAMPLE_CONTENT` | `false` | `true` only for demo/staging (seeds sample artists/albums/poems) |
+| `DB_PASSWORD` | *(empty)* | SQL Server password for the app's `DefaultConnection`. Never commit the password to appsettings — set it as `DbPassword` (or `DB_PASSWORD`) env var / user secret; Program.cs injects it into the connection string at startup |
 | `WEB_PORT` / `MSSQL_PORT` | `8080` / `1433` | Host port mappings |
 
 ### 4.2 Runtime configuration (env vars read by the app)
@@ -97,11 +98,21 @@ Anything in `appsettings.Production.json` can be overridden with the standard
 `Section__Key` env-var syntax, e.g.:
 
 ```bash
+# No Password in the file — the app injects it from this variable:
+DbPassword=...
+
+# ...or supply the whole connection string (must include Password=):
 ConnectionStrings__DefaultConnection="Server=mssql;Database=MusicEncyclopedia;User Id=sa;Password=...;TrustServerCertificate=True"
 Site__BaseUrl=https://encyclopedia.example.com
 Media__CdnBaseUrl=https://cdn.example.com
 IpRateLimiting__GeneralRules__0__Limit=200
 ```
+
+> **Secrets policy:** `appsettings.Production.json` deliberately contains no
+> database password. Set `DbPassword` as an environment variable (Production) or
+> via `dotnet user-secrets set DbPassword ...` (Development). A
+> `ConnectionStrings__DefaultConnection` override that already contains
+> `Password=` takes precedence over the injected value.
 
 ### 4.3 Security posture (already wired in code)
 

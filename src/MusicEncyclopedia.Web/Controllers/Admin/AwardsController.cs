@@ -149,7 +149,7 @@ public sealed class AwardsController : AdminBaseController
 
         await InvalidateEntityCacheAsync("Award", award.AwardId, "Created");
 
-        SetSuccessMessage($"Award \"{award.Name}\" created successfully.");
+        SetSuccessMessage($"جایزه «{award.Name}» با موفقیت ایجاد شد.");
         return RedirectToAction(nameof(Edit), new { id = award.AwardId });
     }
 
@@ -164,7 +164,7 @@ public sealed class AwardsController : AdminBaseController
 
         if (award is null)
         {
-            SetErrorMessage("Award not found.");
+            SetErrorMessage("جایزه یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -196,7 +196,7 @@ public sealed class AwardsController : AdminBaseController
     {
         if (id != viewModel.AwardId)
         {
-            SetErrorMessage("Award ID mismatch.");
+            SetErrorMessage("شناسه جایزه ناسازگار است.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -212,7 +212,7 @@ public sealed class AwardsController : AdminBaseController
 
         if (award is null)
         {
-            SetErrorMessage("Award not found.");
+            SetErrorMessage("جایزه یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -254,12 +254,12 @@ public sealed class AwardsController : AdminBaseController
 
             await InvalidateEntityCacheAsync("Award", award.AwardId, "Updated");
 
-            SetSuccessMessage($"Award \"{award.Name}\" updated successfully.");
+            SetSuccessMessage($"جایزه «{award.Name}» با موفقیت به‌روزرسانی شد.");
         }
         catch (DbUpdateConcurrencyException ex)
         {
             _logger.LogWarning(ex, "Concurrency conflict updating award {Id}", id);
-            SetErrorMessage("This award was modified by another user. Please reload and try again.");
+            SetErrorMessage("این جایزه توسط کاربر دیگری تغییر کرده است. لطفاً دوباره بارگذاری و تلاش کنید.");
             viewModel.RowVersion = award.RowVersion;
             viewModel.Countries = await _db.Countries.OrderBy(c => c.Name).ToListAsync(cancellationToken);
             return View(viewModel);
@@ -281,7 +281,7 @@ public sealed class AwardsController : AdminBaseController
 
         if (award is null)
         {
-            SetErrorMessage("Award not found.");
+            SetErrorMessage("جایزه یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -304,7 +304,7 @@ public sealed class AwardsController : AdminBaseController
 
         await InvalidateEntityCacheAsync("Award", award.AwardId, "Deleted");
 
-        SetSuccessMessage($"Award \"{award.Name}\" has been deleted.");
+        SetSuccessMessage($"جایزه «{award.Name}» حذف شد.");
         return RedirectToAction(nameof(Index));
     }
 
@@ -321,7 +321,7 @@ public sealed class AwardsController : AdminBaseController
 
         if (award is null)
         {
-            SetErrorMessage("Award not found.");
+            SetErrorMessage("جایزه یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -343,7 +343,7 @@ public sealed class AwardsController : AdminBaseController
 
         await InvalidateEntityCacheAsync("Award", award.AwardId, "Restored");
 
-        SetSuccessMessage($"Award \"{award.Name}\" has been restored.");
+        SetSuccessMessage($"جایزه «{award.Name}» بازیابی شد.");
         return RedirectToAction(nameof(Index));
     }
 }

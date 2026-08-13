@@ -6,7 +6,7 @@
 
 <div class="album-tracklist-editor" id="@editorId" data-album-id="@Model.AlbumId">
     <div class="flex items-center justify-between mb-3">
-        <h3 class="text-sm font-semibold text-gray-700">Tracklist</h3>
+        <h3 class="text-sm font-semibold text-gray-700">فهرست ترک‌ها</h3>
         <span class="tl-count text-xs text-gray-500">@Model.Rows.Count tracks</span>
     </div>
 
@@ -14,7 +14,7 @@
     {
         <p class="tl-empty text-xs text-gray-500 mb-3">
             <i class="fas fa-info-circle text-blue-400 me-1"></i>
-            No tracks on this album yet. Add an existing track or create a new one inline.
+            هیچ tracks on this album هنوز. افزودن an existing track or create a new one inline.
         </p>
     }
 
@@ -23,13 +23,13 @@
             <thead class="bg-gray-50 border-b border-gray-200">
                 <tr>
                     <th class="text-start px-2 py-2 font-medium text-gray-600 w-8"></th>
-                    <th class="text-start px-2 py-2 font-medium text-gray-600 w-16">Disc</th>
+                    <th class="text-start px-2 py-2 font-medium text-gray-600 w-16">دیسک</th>
                     <th class="text-start px-2 py-2 font-medium text-gray-600 w-16">#</th>
-                    <th class="text-start px-2 py-2 font-medium text-gray-600">Track</th>
-                    <th class="text-start px-2 py-2 font-medium text-gray-600 w-24">Title override</th>
-                    <th class="text-start px-2 py-2 font-medium text-gray-600 w-20">Dur. (s)</th>
-                    <th class="text-center px-2 py-2 font-medium text-gray-600 w-16">Bonus</th>
-                    <th class="text-end px-2 py-2 font-medium text-gray-600 w-32">Actions</th>
+                    <th class="text-start px-2 py-2 font-medium text-gray-600">ترک</th>
+                    <th class="text-start px-2 py-2 font-medium text-gray-600 w-24">عنوان جایگزین</th>
+                    <th class="text-start px-2 py-2 font-medium text-gray-600 w-20">مدت (ثانیه)</th>
+                    <th class="text-center px-2 py-2 font-medium text-gray-600 w-16">آهنگ جایزه</th>
+                    <th class="text-end px-2 py-2 font-medium text-gray-600 w-32">عملیات</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
@@ -71,9 +71,9 @@
     <!-- Add existing track -->
     <div class="flex flex-wrap items-end gap-2 mb-2">
         <div class="flex-1 min-w-[200px]">
-            <label class="block text-xs font-medium text-gray-600 mb-1">Add existing track</label>
+            <label class="block text-xs font-medium text-gray-600 mb-1">افزودن ترک موجود</label>
             <select class="tl-track-option w-full text-xs px-2 py-1.5 border border-gray-300 rounded">
-                <option value="">-- Select track --</option>
+                <option value="">-- انتخاب ترک --</option>
                 @foreach (var option in Model.AvailableTracks)
                 {
                     <option value="@option.TrackId">@option.Title</option>
@@ -81,7 +81,7 @@
             </select>
         </div>
         <div class="w-20">
-            <label class="block text-xs font-medium text-gray-600 mb-1">Disc</label>
+            <label class="block text-xs font-medium text-gray-600 mb-1">دیسک</label>
             <input type="number" class="tl-new-disc w-full text-xs px-2 py-1.5 border border-gray-300 rounded" value="1" />
         </div>
         <div class="w-20">
@@ -89,20 +89,20 @@
             <input type="number" class="tl-new-no w-full text-xs px-2 py-1.5 border border-gray-300 rounded" value="0" placeholder="auto" />
         </div>
         <button type="button" class="tl-add-existing px-3 py-1.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-            <i class="fas fa-plus"></i> Add
+            <i class="fas fa-plus"></i> افزودن
         </button>
     </div>
 
     <!-- Create inline -->
     <details class="tl-create-inline mb-2">
-        <summary class="cursor-pointer text-xs text-blue-600 hover:text-blue-800">+ Create new track inline</summary>
+        <summary class="cursor-pointer text-xs text-blue-600 hover:text-blue-800">+ ایجاد ترک جدید درجا</summary>
         <div class="flex flex-wrap items-end gap-2 mt-2">
             <div class="flex-1 min-w-[200px]">
-                <label class="block text-xs font-medium text-gray-600 mb-1">Title</label>
+                <label class="block text-xs font-medium text-gray-600 mb-1">عنوان</label>
                 <input type="text" class="tl-new-title w-full text-xs px-2 py-1.5 border border-gray-300 rounded" />
             </div>
             <div class="w-20">
-                <label class="block text-xs font-medium text-gray-600 mb-1">Disc</label>
+                <label class="block text-xs font-medium text-gray-600 mb-1">دیسک</label>
                 <input type="number" class="tl-new-disc-inline w-full text-xs px-2 py-1.5 border border-gray-300 rounded" value="1" />
             </div>
             <div class="w-20">
@@ -110,11 +110,11 @@
                 <input type="number" class="tl-new-no-inline w-full text-xs px-2 py-1.5 border border-gray-300 rounded" value="0" placeholder="auto" />
             </div>
             <div class="w-24">
-                <label class="block text-xs font-medium text-gray-600 mb-1">Dur. (s)</label>
+                <label class="block text-xs font-medium text-gray-600 mb-1">مدت (ثانیه)</label>
                 <input type="number" class="tl-new-duration w-full text-xs px-2 py-1.5 border border-gray-300 rounded" />
             </div>
             <button type="button" class="tl-create px-3 py-1.5 text-xs bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">
-                <i class="fas fa-plus"></i> Create
+                <i class="fas fa-plus"></i> ایجاد
             </button>
         </div>
     </details>
@@ -197,7 +197,7 @@
 
         editor.querySelectorAll('.tl-remove').forEach(function (btn) {
             btn.addEventListener('click', function () {
-                if (!confirm('Remove this track from the album?')) return;
+                if (!confirm('این ترک از آلبوم حذف شود؟'))) return;
                 var form = new FormData();
                 form.append('__RequestVerificationToken', token());
                 fetch('/admin/album-tracklist/remove/' + btn.dataset.id, { method: 'POST', body: form })

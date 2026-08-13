@@ -15,53 +15,53 @@ public sealed class AlbumEditViewModel
 
     [Required(ErrorMessage = "Title is required.")]
     [StringLength(500, ErrorMessage = "Title must not exceed 500 characters.")]
-    [Display(Name = "Title")]
+    [Display(Name = "عنوان")]
     public string Title { get; set; } = "";
 
     [StringLength(500)]
-    [Display(Name = "Sort Title")]
+    [Display(Name = "عنوان مرتب‌سازی")]
     public string? TitleSort { get; set; }
 
     [StringLength(500)]
-    [Display(Name = "Original Title")]
+    [Display(Name = "عنوان اصلی")]
     public string? OriginalTitle { get; set; }
 
     [StringLength(500)]
-    [Display(Name = "English Title")]
+    [Display(Name = "عنوان انگلیسی")]
     public string? EnglishTitle { get; set; }
 
     [Required(ErrorMessage = "Album category is required.")]
-    [Display(Name = "Category")]
+    [Display(Name = "دسته‌بندی")]
     public int AlbumCategoryId { get; set; }
 
-    [Display(Name = "Release Date")]
+    [Display(Name = "تاریخ انتشار")]
     public DateOnly? ReleaseDate { get; set; }
 
     [StringLength(50)]
-    [Display(Name = "Release Date Precision")]
+    [Display(Name = "دقت تاریخ انتشار")]
     public string? ReleaseDatePrecision { get; set; }
 
-    [Display(Name = "Recording Start Date")]
+    [Display(Name = "تاریخ شروع ضبط")]
     public DateOnly? RecordingStartDate { get; set; }
 
-    [Display(Name = "Recording End Date")]
+    [Display(Name = "تاریخ پایان ضبط")]
     public DateOnly? RecordingEndDate { get; set; }
 
     [StringLength(50)]
-    [Display(Name = "Recording Date Precision")]
+    [Display(Name = "دقت تاریخ ضبط")]
     public string? RecordingDatePrecision { get; set; }
 
-    [Display(Name = "Description")]
+    [Display(Name = "توضیحات")]
     public string? Description { get; set; }
 
-    [Display(Name = "Cover Media")]
+    [Display(Name = "رسانه جلد")]
     public int? CoverMediaId { get; set; }
 
-    [Display(Name = "Duration (seconds)")]
+    [Display(Name = "مدت (ثانیه)")]
     public int? DurationSeconds { get; set; }
 
     [StringLength(1000)]
-    [Display(Name = "Copyright Notice")]
+    [Display(Name = "اعلامیه حق نشر")]
     public string? CopyrightNotice { get; set; }
 
     [Required(ErrorMessage = "Slug is required.")]
@@ -70,7 +70,7 @@ public sealed class AlbumEditViewModel
     [Display(Name = "Slug")]
     public string Slug { get; set; } = "";
 
-    [Display(Name = "Is Official")]
+    [Display(Name = "رسمی است")]
     public bool IsOfficial { get; set; }
 
     // ──────────────────────────────────────────────

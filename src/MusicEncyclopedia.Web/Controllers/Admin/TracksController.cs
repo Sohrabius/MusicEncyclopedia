@@ -201,7 +201,7 @@ public sealed class TracksController : AdminBaseController
 
         await InvalidateEntityCacheAsync("Track", track.TrackId, "Created");
 
-        SetSuccessMessage($"Track \"{track.Title}\" created successfully.");
+        SetSuccessMessage($"ترک «{track.Title}» با موفقیت ایجاد شد.");
         return RedirectToAction(nameof(Edit), new { id = track.TrackId });
     }
 
@@ -221,7 +221,7 @@ public sealed class TracksController : AdminBaseController
         if (track is null)
         {
             _logger.LogWarning("Track not found for edit: TrackId={TrackId}", id);
-            SetErrorMessage("Track not found.");
+            SetErrorMessage("ترک یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -273,7 +273,7 @@ public sealed class TracksController : AdminBaseController
     {
         if (id != viewModel.TrackId)
         {
-            SetErrorMessage("Track ID mismatch.");
+            SetErrorMessage("شناسه ترک ناسازگار است.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -313,7 +313,7 @@ public sealed class TracksController : AdminBaseController
         if (track is null)
         {
             _logger.LogWarning("Track not found for update: TrackId={TrackId}", id);
-            SetErrorMessage("Track not found. It may have been deleted.");
+            SetErrorMessage("ترک یافت نشد. احتمالاً حذف شده است.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -364,12 +364,12 @@ public sealed class TracksController : AdminBaseController
 
             await InvalidateEntityCacheAsync("Track", track.TrackId, "Updated");
 
-            SetSuccessMessage($"Track \"{track.Title}\" updated successfully.");
+            SetSuccessMessage($"ترک «{track.Title}» با موفقیت به‌روزرسانی شد.");
         }
         catch (DbUpdateConcurrencyException ex)
         {
             _logger.LogWarning(ex, "Concurrency conflict updating track {TrackId}", id);
-            SetErrorMessage("This track was modified by another user. Please reload and try again.");
+            SetErrorMessage("این ترک توسط کاربر دیگری تغییر کرده است. لطفاً دوباره بارگذاری و تلاش کنید.");
 
             viewModel.LyricsAvailabilityTypes = await _db.LyricsAvailabilityTypes
                 .OrderBy(l => l.Name).ToListAsync(cancellationToken);
@@ -402,7 +402,7 @@ public sealed class TracksController : AdminBaseController
 
         if (track is null)
         {
-            SetErrorMessage("Track not found.");
+            SetErrorMessage("ترک یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -425,7 +425,7 @@ public sealed class TracksController : AdminBaseController
 
         await InvalidateEntityCacheAsync("Track", id, "Deleted");
 
-        SetSuccessMessage($"Track \"{track.Title}\" has been deleted (soft).");
+        SetSuccessMessage($"ترک «{track.Title}» به‌صورت نرم حذف شد.");
         return RedirectToAction(nameof(Index));
     }
 
@@ -446,7 +446,7 @@ public sealed class TracksController : AdminBaseController
 
         if (track is null)
         {
-            SetErrorMessage("Track not found.");
+            SetErrorMessage("ترک یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -470,7 +470,7 @@ public sealed class TracksController : AdminBaseController
 
         await InvalidateEntityCacheAsync("Track", id, "Restored");
 
-        SetSuccessMessage($"Track \"{track.Title}\" has been restored.");
+        SetSuccessMessage($"ترک «{track.Title}» بازیابی شد.");
         return RedirectToAction(nameof(Index));
     }
 }

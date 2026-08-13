@@ -26,6 +26,10 @@ public static class ServiceRegistration
             var dbProvider = configuration.GetValue<string>("DatabaseProvider") ?? "SqlServer";
             var useSqlite = isSqlite || string.Equals(dbProvider, "Sqlite", StringComparison.OrdinalIgnoreCase);
 
+            // NOTE: Program.cs injects the DbPassword secret into
+            // "ConnectionStrings:DefaultConnection" at startup (ConfigurationManager
+            // override), so every consumer — including this service — reads the
+            // password-ready string from IConfiguration.
             var connectionString = useSqlite
                 ? configuration.GetConnectionString("SqliteConnection")
                     ?? throw new InvalidOperationException("Connection string 'SqliteConnection' not found in configuration.")

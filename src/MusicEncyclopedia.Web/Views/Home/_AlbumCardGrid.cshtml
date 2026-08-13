@@ -1,0 +1,44 @@
+@using MusicEncyclopedia.Core.DTOs
+@model PagedResult<AlbumListItemDto>
+
+@{
+    var culture = Context.Items["culture"] as string ?? "fa";
+}
+
+@foreach (var album in Model.Items)
+{
+    <a href="/@culture/albums/@album.Slug" class="card card--album">
+        <div class="card__image relative">
+            @if (!string.IsNullOrWhiteSpace(album.CoverUrl))
+            {
+                <img src="@album.CoverUrl" alt="@album.Title" loading="lazy" />
+            }
+            else
+            {
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                          d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z" />
+                </svg>
+            }
+            @if (!string.IsNullOrWhiteSpace(album.CategoryName))
+            {
+                <span class="card__badge">@album.CategoryName</span>
+            }
+        </div>
+        <div class="card__body">
+            <h3 class="card__title">@album.Title</h3>
+            @if (!string.IsNullOrWhiteSpace(album.OriginalTitle) && album.OriginalTitle != album.Title)
+            {
+                <p class="card__meta" dir="auto">@album.OriginalTitle</p>
+            }
+            @if (album.PrimaryArtists.Count > 0)
+            {
+                <p class="card__meta">@string.Join(", ", album.PrimaryArtists)</p>
+            }
+            @if (album.ReleaseDate.HasValue)
+            {
+                <p class="card__meta">@album.ReleaseDate.Value.Year</p>
+            }
+        </div>
+    </a>
+}

@@ -196,76 +196,11 @@
                         }
                     </div>
 
-                    @if (items.TotalPages > 1)
+                    @await Html.PartialAsync("_Pagination", new
                     {
-                        <nav class="pagination" aria-label="@Localizer["Pagination"]">
-                            @if (items.Page > 1)
-                            {
-                                <a href="@GetPageUrl(items.Page - 1)" rel="prev">
-                                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                                    </svg>
-                                </a>
-                            }
-                            else
-                            {
-                                <span style="opacity: 0.3;">
-                                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                                    </svg>
-                                </span>
-                            }
-
-                            @{
-                                var startPage = Math.Max(1, items.Page - 2);
-                                var endPage = Math.Min(items.TotalPages, items.Page + 2);
-                                if (startPage > 1)
-                                {
-                                    <a href="@GetPageUrl(1)">1</a>
-                                    if (startPage > 2)
-                                    {
-                                        <span style="padding: 0 4px; color: var(--color-ink-3);">...</span>
-                                    }
-                                }
-                                for (var p = startPage; p <= endPage; p++)
-                                {
-                                    if (p == items.Page)
-                                    {
-                                        <span class="active">@p</span>
-                                    }
-                                    else
-                                    {
-                                        <a href="@GetPageUrl(p)">@p</a>
-                                    }
-                                }
-                                if (endPage < items.TotalPages)
-                                {
-                                    if (endPage < items.TotalPages - 1)
-                                    {
-                                        <span style="padding: 0 4px; color: var(--color-ink-3);">...</span>
-                                    }
-                                    <a href="@GetPageUrl(items.TotalPages)">@items.TotalPages</a>
-                                }
-                            }
-
-                            @if (items.Page < items.TotalPages)
-                            {
-                                <a href="@GetPageUrl(items.Page + 1)" rel="next">
-                                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                                    </svg>
-                                </a>
-                            }
-                            else
-                            {
-                                <span style="opacity: 0.3;">
-                                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                                    </svg>
-                                </span>
-                            }
-                        </nav>
-                    }
+                        Items = items,
+                        PageUrl = (Func<int, string>)GetPageUrl
+                    })
                 }
             </div>
         </div>

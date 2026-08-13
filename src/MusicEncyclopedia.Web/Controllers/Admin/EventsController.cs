@@ -155,7 +155,7 @@ public sealed class EventsController : AdminBaseController
 
         await InvalidateEntityCacheAsync("PerformanceEvent", evt.PerformanceEventId, "Created");
 
-        SetSuccessMessage($"Performance event \"{evt.Slug}\" created successfully.");
+        SetSuccessMessage($"رویداد اجرا «{evt.Slug}» با موفقیت ایجاد شد.");
         return RedirectToAction(nameof(Edit), new { id = evt.PerformanceEventId });
     }
 
@@ -170,7 +170,7 @@ public sealed class EventsController : AdminBaseController
 
         if (evt is null)
         {
-            SetErrorMessage("Performance event not found.");
+            SetErrorMessage("رویداد اجرا یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -205,7 +205,7 @@ public sealed class EventsController : AdminBaseController
     {
         if (id != viewModel.PerformanceEventId)
         {
-            SetErrorMessage("Event ID mismatch.");
+            SetErrorMessage("شناسه رویداد ناسازگار است.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -222,7 +222,7 @@ public sealed class EventsController : AdminBaseController
 
         if (evt is null)
         {
-            SetErrorMessage("Performance event not found.");
+            SetErrorMessage("رویداد اجرا یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -267,12 +267,12 @@ public sealed class EventsController : AdminBaseController
 
             await InvalidateEntityCacheAsync("PerformanceEvent", evt.PerformanceEventId, "Updated");
 
-            SetSuccessMessage($"Performance event \"{evt.Slug}\" updated successfully.");
+            SetSuccessMessage($"رویداد اجرا «{evt.Slug}» با موفقیت به‌روزرسانی شد.");
         }
         catch (DbUpdateConcurrencyException ex)
         {
             _logger.LogWarning(ex, "Concurrency conflict updating performance event {Id}", id);
-            SetErrorMessage("This event was modified by another user. Please reload and try again.");
+            SetErrorMessage("این رویداد توسط کاربر دیگری تغییر کرده است. لطفاً دوباره بارگذاری و تلاش کنید.");
             viewModel.RowVersion = evt.RowVersion;
             viewModel.EventTypes = await _db.EventTypes.OrderBy(et => et.Name).ToListAsync(cancellationToken);
             viewModel.Locations = await _db.Locations.Where(l => !l.IsDeleted).OrderBy(l => l.Name).ToListAsync(cancellationToken);
@@ -295,7 +295,7 @@ public sealed class EventsController : AdminBaseController
 
         if (evt is null)
         {
-            SetErrorMessage("Performance event not found.");
+            SetErrorMessage("رویداد اجرا یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -318,7 +318,7 @@ public sealed class EventsController : AdminBaseController
 
         await InvalidateEntityCacheAsync("PerformanceEvent", evt.PerformanceEventId, "Deleted");
 
-        SetSuccessMessage($"Performance event \"{evt.Slug}\" has been deleted.");
+        SetSuccessMessage($"رویداد اجرا «{evt.Slug}» حذف شد.");
         return RedirectToAction(nameof(Index));
     }
 
@@ -335,7 +335,7 @@ public sealed class EventsController : AdminBaseController
 
         if (evt is null)
         {
-            SetErrorMessage("Performance event not found.");
+            SetErrorMessage("رویداد اجرا یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -357,7 +357,7 @@ public sealed class EventsController : AdminBaseController
 
         await InvalidateEntityCacheAsync("PerformanceEvent", evt.PerformanceEventId, "Restored");
 
-        SetSuccessMessage($"Performance event \"{evt.Slug}\" has been restored.");
+        SetSuccessMessage($"رویداد اجرا «{evt.Slug}» بازیابی شد.");
         return RedirectToAction(nameof(Index));
     }
 }

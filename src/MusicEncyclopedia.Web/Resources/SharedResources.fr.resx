@@ -30,6 +30,9 @@
   <data name="Nav.People" xml:space="preserve">
     <value>Personnes</value>
   </data>
+  <data name="Nav.Search" xml:space="preserve">
+    <value>Rechercher</value>
+  </data>
   <data name="Nav.MainNavigation" xml:space="preserve">
     <value>Navigation principale</value>
   </data>
@@ -44,5 +47,68 @@
   </data>
   <data name="Footer.Copyright" xml:space="preserve">
     <value>© {0}</value>
+  </data>
+  <data name="Home.Eyebrow" xml:space="preserve">
+    <value>Encyclopédie de la musique</value>
+  </data>
+  <data name="Home.Tagline" xml:space="preserve">
+    <value>Explorez l&#x27;encyclopédie complète de la musique — albums, morceaux, artistes, poèmes et leurs histoires.</value>
+  </data>
+  <data name="Home.SearchPlaceholder" xml:space="preserve">
+    <value>Rechercher un album, un morceau, un artiste…</value>
+  </data>
+  <data name="Home.AllAlbums" xml:space="preserve">
+    <value>Tous les albums</value>
+  </data>
+  <data name="Home.AlbumCount" xml:space="preserve">
+    <value>{0} albums</value>
+  </data>
+  <data name="Home.Categories" xml:space="preserve">
+    <value>Catégories</value>
+  </data>
+  <data name="Home.NoAlbums" xml:space="preserve">
+    <value>Aucun album trouvé</value>
+  </data>
+  <data name="Home.NoAlbumsHint" xml:space="preserve">
+    <value>Essayez une autre catégorie.</value>
+  </data>
+  <data name="Home.ClearCategory" xml:space="preserve">
+    <value>Voir tous les albums</value>
+  </data>
+  <data name="Home.LoadMore" xml:space="preserve">
+    <value>Charger plus</value>
+  </data>
+  <data name="Home.ShowingOf" xml:space="preserve">
+    <value>Affichage de {0} sur {1}</value>
+  </data>
+  <data name="Home.Sidebar" xml:space="preserve">
+    <value>Barre latérale</value>
+  </data>
+  <data name="Home.RandomPoem" xml:space="preserve">
+    <value>Poème du jour</value>
+  </data>
+  <data name="Home.ShufflePoem" xml:space="preserve">
+    <value>Afficher un autre poème</value>
+  </data>
+  <data name="Home.RandomPoemSungBy" xml:space="preserve">
+    <value>Interprété dans</value>
+  </data>
+  <data name="Home.AboutTitle" xml:space="preserve">
+    <value>À propos</value>
+  </data>
+  <data name="Home.AboutText" xml:space="preserve">
+    <value>Nous documentons le monde de la musique — une encyclopédie vivante d&#x27;albums, de morceaux, d&#x27;artistes et de poètes.</value>
+  </data>
+  <data name="Home.AboutArtists" xml:space="preserve">
+    <value>Artistes</value>
+  </data>
+  <data name="Home.AboutCta" xml:space="preserve">
+    <value>En savoir plus</value>
+  </data>
+  <data name="Home.MetaDescription" xml:space="preserve">
+    <value>Explorez l&#x27;encyclopédie complète de la musique — albums, morceaux, artistes, paroles et plus encore.</value>
+  </data>
+  <data name="Track" xml:space="preserve">
+    <value>Morceau</value>
   </data>
 </root>

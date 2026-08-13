@@ -9,22 +9,22 @@ public sealed class LocationEditViewModel
 
     [Required(ErrorMessage = "Name is required.")]
     [StringLength(255, ErrorMessage = "Name must not exceed 255 characters.")]
-    [Display(Name = "Name")]
+    [Display(Name = "نام")]
     public string Name { get; set; } = "";
 
-    [Display(Name = "Location Type")]
+    [Display(Name = "نوع مکان")]
     public int? LocationTypeId { get; set; }
 
-    [Display(Name = "Parent Location")]
+    [Display(Name = "مکان والد")]
     public int? ParentLocationId { get; set; }
 
-    [Display(Name = "Country")]
+    [Display(Name = "کشور")]
     public int? CountryId { get; set; }
 
-    [Display(Name = "Latitude")]
+    [Display(Name = "عرض جغرافیایی")]
     public decimal? Latitude { get; set; }
 
-    [Display(Name = "Longitude")]
+    [Display(Name = "طول جغرافیایی")]
     public decimal? Longitude { get; set; }
 
     [Required(ErrorMessage = "Slug is required.")]

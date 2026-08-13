@@ -1,6 +1,6 @@
 @model LocalizationEditViewModel
 @{
-    ViewData["Title"] = "Create Localization";
+    ViewData["Title"] = "ایجاد بومی‌سازی";
     ViewData["ActiveMenu"] = "Localizations";
 }
 
@@ -11,12 +11,12 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="lg:col-span-2 space-y-6">
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">Localization Details</h2>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">بومی‌سازی جزئیات</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label asp-for="EntityTypeId" class="block text-sm font-medium text-gray-700 mb-1"></label>
                         <select asp-for="EntityTypeId" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">-- Select Entity Type --</option>
+                            <option value="">-- انتخاب نوع موجودیت --</option>
                             @foreach (var et in Model.EntityTypes)
                             {
                                 <option value="@et.EntityTypeId">@et.Name (@et.Code)</option>
@@ -26,13 +26,13 @@
                     </div>
                     <div>
                         <label asp-for="EntityId" class="block text-sm font-medium text-gray-700 mb-1"></label>
-                        <input asp-for="EntityId" type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Entity ID" />
+                        <input asp-for="EntityId" type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="شناسه موجودیت" />
                         <span asp-validation-for="EntityId" class="text-xs text-red-600"></span>
                     </div>
                     <div>
                         <label asp-for="LanguageId" class="block text-sm font-medium text-gray-700 mb-1"></label>
                         <select asp-for="LanguageId" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">-- Select Language --</option>
+                            <option value="">-- انتخاب زبان --</option>
                             @foreach (var lang in Model.Languages)
                             {
                                 <option value="@lang.LanguageId">@lang.Name (@lang.Code)</option>
@@ -42,13 +42,13 @@
                     </div>
                     <div>
                         <label asp-for="FieldName" class="block text-sm font-medium text-gray-700 mb-1"></label>
-                        <input asp-for="FieldName" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g. Title, Description" />
+                        <input asp-for="FieldName" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="مثلاً عنوان, توضیحات" />
                         <span asp-validation-for="FieldName" class="text-xs text-red-600"></span>
                     </div>
                 </div>
             </div>
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">Localized Text</h2>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">متن بومی‌شده</h2>
                 <div>
                     <label asp-for="LocalizedText" class="block text-sm font-medium text-gray-700 mb-1"></label>
                     <textarea asp-for="LocalizedText" rows="6" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
@@ -58,16 +58,16 @@
         </div>
         <div class="space-y-6">
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">Publish</h2>
-                <button type="submit" class="w-full px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"><i class="fas fa-save"></i> Create Localization</button>
-                <a href="/admin/localizations" class="w-full block text-center mt-3 px-4 py-2.5 text-sm text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">Cancel</a>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">انتشار</h2>
+                <button type="submit" class="w-full px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"><i class="fas fa-save"></i> ایجاد بومی‌سازی</button>
+                <a href="/admin/localizations" class="w-full block text-center mt-3 px-4 py-2.5 text-sm text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">انصراف</a>
             </div>
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                <h2 class="text-sm font-semibold text-gray-700 mb-2">About Localizations</h2>
+                <h2 class="text-sm font-semibold text-gray-700 mb-2">درباره بومی‌سازی‌ها</h2>
                 <ul class="text-xs text-gray-500 space-y-1 list-disc list-inside">
-                    <li>Localizations store translated field values for entities.</li>
-                    <li>Select the entity type and ID to associate this translation.</li>
-                    <li>The field name should match the property name (e.g., "Title", "Description").</li>
+                    <li>بومی‌سازی‌ها مقادیر ترجمه‌شده فیلدها را برای موجودیت‌ها ذخیره می‌کنند.</li>
+                    <li>نوع موجودیت و شناسه را برای مرتبط‌کردن این ترجمه انتخاب کنید.</li>
+                    <li>نام فیلد باید با نام ویژگی مطابقت داشته باشد (مثلاً, "عنوان", "توضیحات").</li>
                 </ul>
             </div>
         </div>

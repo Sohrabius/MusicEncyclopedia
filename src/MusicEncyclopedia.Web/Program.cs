@@ -75,6 +75,29 @@ try
             ?? throw new InvalidOperationException(
                 "Connection string 'DefaultConnection' not found. " +
                 "Ensure it is configured in appsettings.json or environment variables.");
+
+        // The database password is a secret and must never live in appsettings
+        // files. Read it from configuration instead — env var `DbPassword`
+        // (or `DB_PASSWORD`) in Production, or ASP.NET Core user secrets in
+        // Development — and inject it into the connection string.
+        // A fully-specified ConnectionStrings__DefaultConnection override that
+        // already contains Password= wins untouched.
+        var dbPassword = builder.Configuration["DbPassword"];
+        if (!string.IsNullOrWhiteSpace(dbPassword) &&
+            !connectionString.Contains("Password=", StringComparison.OrdinalIgnoreCase))
+        {
+            var csb = new SqlConnectionStringBuilder(connectionString)
+            {
+                Password = dbPassword
+            };
+            connectionString = csb.ConnectionString;
+        }
+
+        // Override the configuration value so every consumer that reads
+        // DefaultConnection from IConfiguration at resolve time (Dapper query
+        // services in MusicEncyclopedia.Services, the search service, and the
+        // admin/API controllers) receives the password-ready connection string.
+        builder.Configuration["ConnectionStrings:DefaultConnection"] = connectionString;
     }
 
     // ---- Database Context & Data Services ----
@@ -86,12 +109,20 @@ try
         builder.Services.AddScoped<IDbConnection>(_ => new SqliteConnection(connectionString));
 
         // SQLite stores dates as TEXT; register a Dapper type handler so
-        // DateOnly columns map correctly (SQL Server handles DateOnly natively).
+        // DateOnly columns map correctly.
         Dapper.SqlMapper.AddTypeHandler(new SqliteDateOnlyHandler());
     }
     else
     {
         builder.Services.AddScoped<IDbConnection>(_ => new SqlConnection(connectionString));
+
+        // SQL Server returns date/datetime2 columns as DateTime; without a
+        // registered handler Dapper falls back to Convert.ChangeType, which
+        // cannot cast DateTime to DateOnly (queries reading ReleaseDate and
+        // other date columns fail with InvalidCastException). Register an
+        // explicit handler that converts DateTime -> DateOnly on read and
+        // writes DateOnly as datetime2 on write.
+        Dapper.SqlMapper.AddTypeHandler(new SqlServerDateOnlyHandler());
     }
 
     // ---- Application Services ----
@@ -501,6 +532,27 @@ internal sealed class SqliteDateOnlyHandler : Dapper.SqlMapper.TypeHandler<DateO
     {
         parameter.DbType = DbType.String;
         parameter.Value = value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+    }
+}
+
+/// <summary>
+/// Dapper type handler that maps SQL Server date/datetime2 values (returned by
+/// ADO.NET as <see cref="DateTime"/>) to <see cref="DateOnly"/>.
+/// </summary>
+internal sealed class SqlServerDateOnlyHandler : Dapper.SqlMapper.TypeHandler<DateOnly>
+{
+    public override DateOnly Parse(object value) => value switch
+    {
+        DateOnly date => date,
+        DateTime dateTime => DateOnly.FromDateTime(dateTime),
+        string text when DateOnly.TryParse(text, CultureInfo.InvariantCulture, out var parsed) => parsed,
+        _ => DateOnly.MinValue
+    };
+
+    public override void SetValue(IDbDataParameter parameter, DateOnly value)
+    {
+        parameter.DbType = DbType.Date;
+        parameter.Value = value.ToDateTime(TimeOnly.MinValue);
     }
 }
 

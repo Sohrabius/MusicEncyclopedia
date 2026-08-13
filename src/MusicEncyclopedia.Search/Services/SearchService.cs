@@ -9,14 +9,22 @@ namespace MusicEncyclopedia.Search.Services;
 
 /// <summary>
 /// Implements full-text search across all indexed entities.
-/// For SQL Server, uses FREETEXTTABLE for ranked results.
-/// For SQLite, uses LIKE-based search.
+/// For SQL Server, uses FREETEXTTABLE for ranked results when the database has
+/// full-text indexes (see FullTextSearch.sql); otherwise falls back to LIKE-based
+/// search so a SQL Server instance without the Full-Text Search feature (or
+/// without the indexes applied) still returns results. SQLite always uses LIKE.
 /// </summary>
 public sealed class SearchService : ISearchService
 {
     private readonly string _connectionString;
     private readonly bool _isSqlite;
     private readonly ICacheService? _cache;
+
+    // Process-wide memo of whether the SQL Server database has full-text
+    // indexes. Probed lazily on the first search and cached; a probe failure
+    // (e.g. Full-Text Search component not installed) resolves to "not available".
+    private static bool _fullTextProbeAttempted;
+    private static bool _fullTextAvailable;
 
     public SearchService(string connectionString, bool isSqlite = false, ICacheService? cache = null)
     {
@@ -64,6 +72,48 @@ public sealed class SearchService : ISearchService
         return await SearchCoreAsync(query, cancellationToken);
     }
 
+    /// <summary>
+    /// Determines whether the SQL Server database can answer FREETEXTTABLE
+    /// queries. SQLite always returns false. The result is memoized process-wide
+    /// after the first probe (an empty result set is itself a failure signal).
+    /// </summary>
+    private async Task<bool> CanUseFullTextAsync(
+        IDbConnection connection, CancellationToken cancellationToken)
+    {
+        if (_isSqlite || _fullTextProbeAttempted)
+        {
+            return !_isSqlite && _fullTextAvailable;
+        }
+
+        try
+        {
+            const string probeSql = """
+                SELECT COUNT(*) FROM sys.fulltext_indexes
+                WHERE object_id IN (
+                    OBJECT_ID(N'Album'), OBJECT_ID(N'Track'), OBJECT_ID(N'Person'),
+                    OBJECT_ID(N'Company'), OBJECT_ID(N'Poem'), OBJECT_ID(N'SungVersion'),
+                    OBJECT_ID(N'Genre'), OBJECT_ID(N'Mood'), OBJECT_ID(N'Instrument'),
+                    OBJECT_ID(N'Source'), OBJECT_ID(N'Location'), OBJECT_ID(N'Publication'),
+                    OBJECT_ID(N'RecordingSession'), OBJECT_ID(N'PerformanceEvent'))
+                """;
+            var indexCount = await connection.ExecuteScalarAsync<int>(
+                probeSql, commandTimeout: 10);
+            _fullTextAvailable = indexCount > 0;
+        }
+        catch
+        {
+            // Full-Text Search component not installed (or permission denied) —
+            // fall back to LIKE for the lifetime of this process.
+            _fullTextAvailable = false;
+        }
+        finally
+        {
+            _fullTextProbeAttempted = true;
+        }
+
+        return _fullTextAvailable;
+    }
+
     private async Task<PagedResult<SearchResultDto>> SearchCoreAsync(
         SearchQuery query,
         CancellationToken cancellationToken)
@@ -77,9 +127,12 @@ public sealed class SearchService : ISearchService
         using var connection = CreateConnection();
         connection.Open();
 
-        // Generate the UNION ALL fragments for each entity table
+        // Generate the UNION ALL fragments for each entity table. SQL Server only
+        // uses FREETEXTTABLE when the database actually has full-text indexes;
+        // otherwise (and on SQLite) the LIKE path is used.
+        var useFullText = await CanUseFullTextAsync(connection, cancellationToken);
         var fragments = BuildSearchFragments(
-            query.EntityType, query.Genre, query.Mood, query.Instrument);
+            query.EntityType, query.Genre, query.Mood, query.Instrument, useFullText);
 
         // Count query
         var countSql = $@"
@@ -106,8 +159,9 @@ FROM (
             return PagedResult<SearchResultDto>.Create([], page, pageSize, 0);
         }
 
-        // Data query
-        var orderByClause = _isSqlite ? "Title ASC" : "Rank DESC";
+        // Data query. Ranking (Rank DESC) is only available on the full-text path;
+        // the LIKE path orders by title. Pagination syntax is provider-specific.
+        var orderByClause = useFullText ? "Rank DESC" : "Title ASC";
         var pagination = _isSqlite
             ? "LIMIT @pageSize OFFSET @offset"
             : "OFFSET @offset ROWS FETCH NEXT @pageSize ROWS ONLY";
@@ -145,7 +199,8 @@ ORDER BY {orderByClause}
     /// Column names and join tables match the EF Core schema exactly.
     /// </summary>
     private List<SearchFragment> BuildSearchFragments(
-        string? entityType, string? genre, string? mood, string? instrument)
+        string? entityType, string? genre, string? mood, string? instrument,
+        bool useFullText)
     {
         // Facet joins for Album (genres and moods only — instruments attach to tracks)
         var albumFilterJoin = "";
@@ -176,7 +231,7 @@ ORDER BY {orderByClause}
             string rankExpr;
             string whereClause;
 
-            if (_isSqlite)
+            if (!useFullText)
             {
                 fromClause = $"FROM {table} {tableAlias}";
                 rankExpr = "0 AS Rank";

@@ -7,22 +7,22 @@ public sealed class EventEditViewModel
 {
     public int PerformanceEventId { get; set; }
 
-    [Display(Name = "Event Type")]
+    [Display(Name = "نوع رویداد")]
     public int? EventTypeId { get; set; }
 
-    [Display(Name = "Location / Venue")]
+    [Display(Name = "مکان / محل برگزاری")]
     public int? LocationId { get; set; }
 
-    [Display(Name = "Date / Time")]
+    [Display(Name = "تاریخ / زمان")]
     public DateTime? Date { get; set; }
 
-    [Display(Name = "Audience Info")]
+    [Display(Name = "اطلاعات مخاطب")]
     public string? AudienceInfo { get; set; }
 
-    [Display(Name = "Performance Notes")]
+    [Display(Name = "یادداشت‌های اجرا")]
     public string? PerformanceNotes { get; set; }
 
-    [Display(Name = "Improvisation Notes")]
+    [Display(Name = "یادداشت‌های بداهه‌نوازی")]
     public string? ImprovisationNotes { get; set; }
 
     [Required(ErrorMessage = "Slug is required.")]

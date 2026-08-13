@@ -250,7 +250,7 @@ public sealed class MediaController : AdminBaseController
         await InvalidateEntityCacheAsync("Media", media.MediaId, "Created");
         await InvalidateBroadCacheAsync();
 
-        SetSuccessMessage($"File \"{media.FileName}\" uploaded successfully.");
+        SetSuccessMessage($"فایل «{media.FileName}» با موفقیت بارگذاری شد.");
         return RedirectToAction(nameof(Edit), new { id = media.MediaId });
     }
 
@@ -269,7 +269,7 @@ public sealed class MediaController : AdminBaseController
 
         if (media is null)
         {
-            SetErrorMessage("Media not found.");
+            SetErrorMessage("رسانه یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -307,7 +307,7 @@ public sealed class MediaController : AdminBaseController
     {
         if (id != viewModel.MediaId)
         {
-            SetErrorMessage("Media ID mismatch.");
+            SetErrorMessage("شناسه رسانه ناسازگار است.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -323,7 +323,7 @@ public sealed class MediaController : AdminBaseController
 
         if (media is null)
         {
-            SetErrorMessage("Media not found.");
+            SetErrorMessage("رسانه یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -342,7 +342,7 @@ public sealed class MediaController : AdminBaseController
         await InvalidateEntityCacheAsync("Media", media.MediaId, "Updated");
         await InvalidateBroadCacheAsync();
 
-        SetSuccessMessage($"Media \"{media.FileName}\" updated successfully.");
+        SetSuccessMessage($"رسانه «{media.FileName}» با موفقیت به‌روزرسانی شد.");
 
         return RedirectToAction(nameof(Edit), new { id });
     }
@@ -364,13 +364,13 @@ public sealed class MediaController : AdminBaseController
 
         if (media is null)
         {
-            SetErrorMessage("Media not found.");
+            SetErrorMessage("رسانه یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
         if (file is null || file.Length == 0)
         {
-            SetErrorMessage("Please select a file to replace with.");
+            SetErrorMessage("لطفاً فایلی را برای جایگزینی انتخاب کنید.");
             return RedirectToAction(nameof(Edit), new { id });
         }
 
@@ -420,7 +420,7 @@ public sealed class MediaController : AdminBaseController
         await InvalidateEntityCacheAsync("Media", media.MediaId, "Updated");
         await InvalidateBroadCacheAsync();
 
-        SetSuccessMessage($"File replaced successfully for \"{media.FileName}\".");
+        SetSuccessMessage($"فایل با موفقیت برای «{media.FileName}».");
 
         return RedirectToAction(nameof(Edit), new { id });
     }
@@ -442,7 +442,7 @@ public sealed class MediaController : AdminBaseController
 
         if (media is null)
         {
-            SetErrorMessage("Media not found.");
+            SetErrorMessage("رسانه یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -454,7 +454,7 @@ public sealed class MediaController : AdminBaseController
         await InvalidateEntityCacheAsync("Media", media.MediaId, "Deleted");
         await InvalidateBroadCacheAsync();
 
-        SetSuccessMessage($"Media \"{media.FileName}\" has been deleted (soft).");
+        SetSuccessMessage($"رسانه «{media.FileName}» به‌صورت نرم حذف شد.");
 
         return RedirectToAction(nameof(Index));
     }
@@ -476,7 +476,7 @@ public sealed class MediaController : AdminBaseController
 
         if (media is null)
         {
-            SetErrorMessage("Media not found.");
+            SetErrorMessage("رسانه یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -486,7 +486,7 @@ public sealed class MediaController : AdminBaseController
         await InvalidateEntityCacheAsync("Media", media.MediaId, "Restored");
         await InvalidateBroadCacheAsync();
 
-        SetSuccessMessage($"Media \"{media.FileName}\" has been restored.");
+        SetSuccessMessage($"رسانه «{media.FileName}» بازیابی شد.");
         return RedirectToAction(nameof(Index));
     }
 
@@ -503,7 +503,7 @@ public sealed class MediaController : AdminBaseController
     {
         if (!ModelState.IsValid)
         {
-            SetErrorMessage("Invalid assignment data.");
+            SetErrorMessage("داده‌های تخصیص نامعتبر است.");
             return RedirectToAction(nameof(Edit), new { id = viewModel.MediaId });
         }
 
@@ -561,7 +561,7 @@ public sealed class MediaController : AdminBaseController
         await InvalidateEntityCacheAsync("Media", viewModel.MediaId, "Updated");
         await InvalidateBroadCacheAsync();
 
-        SetSuccessMessage("Media assigned to entity successfully.");
+        SetSuccessMessage("رسانه با موفقیت به موجودیت تخصیص یافت.");
         return RedirectToAction(nameof(Edit), new { id = viewModel.MediaId });
     }
 
@@ -581,7 +581,7 @@ public sealed class MediaController : AdminBaseController
 
         if (assignment is null)
         {
-            SetErrorMessage("Assignment not found.");
+            SetErrorMessage("تخصیص یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -596,7 +596,7 @@ public sealed class MediaController : AdminBaseController
         await InvalidateEntityCacheAsync("Media", mediaId, "Updated");
         await InvalidateBroadCacheAsync();
 
-        SetSuccessMessage("Media assignment removed.");
+        SetSuccessMessage("تخصیص رسانه حذف شد.");
         return RedirectToAction(nameof(Edit), new { id = mediaId });
     }
 

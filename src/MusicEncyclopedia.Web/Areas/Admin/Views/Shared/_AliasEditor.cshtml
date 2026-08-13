@@ -5,9 +5,9 @@
 
 <div class="alias-editor" data-entity-type-id="@Model.EntityTypeId" data-entity-id="@Model.EntityId">
     <div class="flex items-center justify-between mb-3">
-        <h3 class="text-sm font-semibold text-gray-700">Aliases</h3>
+        <h3 class="text-sm font-semibold text-gray-700">نام‌های مستعار</h3>
         <button type="button" class="btn-add-alias px-3 py-1.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-            <i class="fas fa-plus"></i> Add Alias
+            <i class="fas fa-plus"></i> افزودن Alias
         </button>
     </div>
 
@@ -15,17 +15,17 @@
         <table class="w-full text-sm">
             <thead class="bg-gray-50 border-b border-gray-200">
                 <tr>
-                    <th class="text-start px-3 py-2 font-medium text-gray-600">Alias Name</th>
-                    <th class="text-start px-3 py-2 font-medium text-gray-600">Type</th>
-                    <th class="text-start px-3 py-2 font-medium text-gray-600">Language</th>
-                    <th class="text-center px-3 py-2 font-medium text-gray-600">Primary</th>
-                    <th class="text-end px-3 py-2 font-medium text-gray-600">Actions</th>
+                    <th class="text-start px-3 py-2 font-medium text-gray-600">نام مستعار</th>
+                    <th class="text-start px-3 py-2 font-medium text-gray-600">نوع</th>
+                    <th class="text-start px-3 py-2 font-medium text-gray-600">زبان</th>
+                    <th class="text-center px-3 py-2 font-medium text-gray-600">اصلی</th>
+                    <th class="text-end px-3 py-2 font-medium text-gray-600">عملیات</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
                 @if (Model.Aliases.Count == 0)
                 {
-                    <tr class="empty-row"><td colspan="5" class="px-3 py-6 text-center text-gray-500 text-xs">No aliases yet.</td></tr>
+                    <tr class="empty-row"><td colspan="5" class="px-3 py-6 text-center text-gray-500 text-xs">هنوز نام مستعاری وجود ندارد.</td></tr>
                 }
                 else
                 {
@@ -50,20 +50,20 @@
         <input type="hidden" class="alias-id" value="0" />
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
             <div class="md:col-span-2">
-                <label class="block text-xs font-medium text-gray-600 mb-1">Alias Name</label>
+                <label class="block text-xs font-medium text-gray-600 mb-1">نام مستعار</label>
                 <input type="text" class="alias-name w-full text-xs px-2 py-1.5 border border-gray-300 rounded" />
             </div>
             <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">Type</label>
+                <label class="block text-xs font-medium text-gray-600 mb-1">نوع</label>
                 <select class="alias-type-id w-full text-xs px-2 py-1.5 border border-gray-300 rounded">
-                    <option value="">-- Select --</option>
+                    <option value="">-- انتخاب --</option>
                     @foreach (var at in Model.AliasTypes) { <option value="@at.AliasTypeId">@at.Name</option> }
                 </select>
             </div>
             <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">Language</label>
+                <label class="block text-xs font-medium text-gray-600 mb-1">زبان</label>
                 <select class="language-id w-full text-xs px-2 py-1.5 border border-gray-300 rounded">
-                    <option value="">-- Select --</option>
+                    <option value="">-- انتخاب --</option>
                     @foreach (var lang in Model.Languages) { <option value="@lang.LanguageId">@lang.Name</option> }
                 </select>
             </div>
@@ -71,12 +71,12 @@
         <div class="flex items-center gap-4 mt-3">
             <label class="inline-flex items-center gap-1 cursor-pointer">
                 <input type="checkbox" class="is-primary-alias rounded border-gray-300 text-blue-600" />
-                <span class="text-xs text-gray-600">Primary</span>
+                <span class="text-xs text-gray-600">اصلی</span>
             </label>
         </div>
         <div class="flex items-center gap-2 mt-3">
-            <button type="button" class="btn-save-alias px-3 py-1.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700">Save</button>
-            <button type="button" class="btn-cancel-alias px-3 py-1.5 text-xs text-gray-600 bg-gray-200 rounded-md hover:bg-gray-300">Cancel</button>
+            <button type="button" class="btn-save-alias px-3 py-1.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700">ذخیره</button>
+            <button type="button" class="btn-cancel-alias px-3 py-1.5 text-xs text-gray-600 bg-gray-200 rounded-md hover:bg-gray-300">انصراف</button>
         </div>
     </div>
 </div>
@@ -120,7 +120,7 @@
 
         editor.querySelectorAll('.btn-delete-alias').forEach(function(btn) {
             btn.addEventListener('click', function() {
-                if (!confirm('Delete this alias?')) return;
+                if (!confirm('حذف this alias?'))) return;
                 var row = this.closest('tr');
                 var aliasId = row.dataset.aliasId;
                 var data = new FormData();

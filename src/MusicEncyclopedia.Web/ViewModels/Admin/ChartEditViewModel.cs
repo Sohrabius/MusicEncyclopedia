@@ -9,18 +9,18 @@ public sealed class ChartEditViewModel
 
     [Required(ErrorMessage = "Name is required.")]
     [StringLength(255, ErrorMessage = "Name must not exceed 255 characters.")]
-    [Display(Name = "Name")]
+    [Display(Name = "نام")]
     public string Name { get; set; } = "";
 
     [StringLength(500)]
-    [Display(Name = "Publisher")]
+    [Display(Name = "ناشر")]
     public string? Publisher { get; set; }
 
-    [Display(Name = "Country")]
+    [Display(Name = "کشور")]
     public int? CountryId { get; set; }
 
     [StringLength(50)]
-    [Display(Name = "Frequency")]
+    [Display(Name = "بسامد")]
     public string? Frequency { get; set; }
 
     [Required(ErrorMessage = "Slug is required.")]

@@ -40,7 +40,7 @@
                 </span>
                 <button type="button"
                         class="ri-remove text-red-600 hover:text-red-800 text-xs shrink-0"
-                        title="Remove"
+                        title="حذف"
                         data-id="@item.Id">
                     <i class="fas fa-times"></i>
                 </button>
@@ -53,9 +53,9 @@
         @if (Model.UsesDropdown)
         {
             <div class="flex-1 min-w-[180px]">
-                <label class="block text-xs font-medium text-gray-600 mb-1">Add</label>
+                <label class="block text-xs font-medium text-gray-600 mb-1">افزودن</label>
                 <select class="ri-option w-full text-xs px-2 py-1.5 border border-gray-300 rounded">
-                    <option value="">-- Select --</option>
+                    <option value="">-- انتخاب --</option>
                     @foreach (var option in Model.Options)
                     {
                         <option value="@option.Id">@option.Label</option>
@@ -77,7 +77,7 @@
             <div class="min-w-[140px]">
                 <label class="block text-xs font-medium text-gray-600 mb-1">@Model.RoleFieldLabel</label>
                 <select class="ri-role w-full text-xs px-2 py-1.5 border border-gray-300 rounded">
-                    <option value="">-- Select --</option>
+                    <option value="">-- انتخاب --</option>
                     @foreach (var role in Model.RoleOptions)
                     {
                         <option value="@role.Id">@role.Label</option>
@@ -97,7 +97,7 @@
 
         <button type="button"
                 class="ri-add px-3 py-1.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-            <i class="fas fa-plus"></i> Add
+            <i class="fas fa-plus"></i> افزودن
         </button>
     </div>
 
@@ -162,7 +162,7 @@
 
         editor.querySelectorAll('.ri-remove').forEach(function (btn) {
             btn.addEventListener('click', function () {
-                if (!confirm('Remove this item?')) return;
+                if (!confirm('حذف this item?'))) return;
                 var form = new FormData();
                 form.append('__RequestVerificationToken', antiForgeryToken());
                 fetch('/admin/related-items/remove/' + editor.dataset.kind + '/' + btn.dataset.id, { method: 'POST', body: form })

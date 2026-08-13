@@ -639,7 +639,7 @@ namespace MusicEncyclopedia.Data.Migrations
                         column: x => x.EntityId,
                         principalTable: "Entity",
                         principalColumn: "EntityId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -674,7 +674,7 @@ namespace MusicEncyclopedia.Data.Migrations
                         column: x => x.EntityId,
                         principalTable: "Entity",
                         principalColumn: "EntityId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -709,7 +709,7 @@ namespace MusicEncyclopedia.Data.Migrations
                         column: x => x.EntityId,
                         principalTable: "Entity",
                         principalColumn: "EntityId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -753,7 +753,7 @@ namespace MusicEncyclopedia.Data.Migrations
                         column: x => x.EntityId,
                         principalTable: "Entity",
                         principalColumn: "EntityId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -783,7 +783,7 @@ namespace MusicEncyclopedia.Data.Migrations
                         column: x => x.EntityId,
                         principalTable: "Entity",
                         principalColumn: "EntityId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Genre_Genre_ParentGenreId",
                         column: x => x.ParentGenreId,
@@ -824,7 +824,7 @@ namespace MusicEncyclopedia.Data.Migrations
                         column: x => x.EntityId,
                         principalTable: "Entity",
                         principalColumn: "EntityId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Instrument_InstrumentFamily_InstrumentFamilyId",
                         column: x => x.InstrumentFamilyId,
@@ -866,7 +866,7 @@ namespace MusicEncyclopedia.Data.Migrations
                         column: x => x.EntityId,
                         principalTable: "Entity",
                         principalColumn: "EntityId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Location_LocationType_LocationTypeId",
                         column: x => x.LocationTypeId,
@@ -904,7 +904,7 @@ namespace MusicEncyclopedia.Data.Migrations
                         column: x => x.EntityId,
                         principalTable: "Entity",
                         principalColumn: "EntityId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -932,7 +932,7 @@ namespace MusicEncyclopedia.Data.Migrations
                         column: x => x.EntityId,
                         principalTable: "Entity",
                         principalColumn: "EntityId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -977,7 +977,7 @@ namespace MusicEncyclopedia.Data.Migrations
                         column: x => x.EntityId,
                         principalTable: "Entity",
                         principalColumn: "EntityId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Track_LyricsAvailabilityType_LyricsAvailabilityTypeId",
                         column: x => x.LyricsAvailabilityTypeId,
@@ -1039,7 +1039,7 @@ namespace MusicEncyclopedia.Data.Migrations
                         column: x => x.EntityId,
                         principalTable: "Entity",
                         principalColumn: "EntityId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Album_Media_CoverMediaId",
                         column: x => x.CoverMediaId,
@@ -1215,7 +1215,7 @@ namespace MusicEncyclopedia.Data.Migrations
                         column: x => x.EntityId,
                         principalTable: "Entity",
                         principalColumn: "EntityId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Source_SourceType_SourceTypeId",
                         column: x => x.SourceTypeId,
@@ -1252,7 +1252,7 @@ namespace MusicEncyclopedia.Data.Migrations
                         column: x => x.EntityId,
                         principalTable: "Entity",
                         principalColumn: "EntityId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_PerformanceEvent_EventType_EventTypeId",
                         column: x => x.EventTypeId,
@@ -1307,7 +1307,7 @@ namespace MusicEncyclopedia.Data.Migrations
                         column: x => x.EntityId,
                         principalTable: "Entity",
                         principalColumn: "EntityId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Person_Location_BirthLocationId",
                         column: x => x.BirthLocationId,
@@ -1361,7 +1361,7 @@ namespace MusicEncyclopedia.Data.Migrations
                         column: x => x.EntityId,
                         principalTable: "Entity",
                         principalColumn: "EntityId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_RecordingSession_Location_LocationId",
                         column: x => x.LocationId,
@@ -1882,7 +1882,7 @@ namespace MusicEncyclopedia.Data.Migrations
                         column: x => x.CreditRoleId,
                         principalTable: "CreditRole",
                         principalColumn: "CreditRoleId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Credit_Instrument_InstrumentId",
                         column: x => x.InstrumentId,
@@ -1898,7 +1898,7 @@ namespace MusicEncyclopedia.Data.Migrations
                         column: x => x.RoleScopeTypeId,
                         principalTable: "RoleScopeType",
                         principalColumn: "RoleScopeTypeId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -1989,7 +1989,7 @@ namespace MusicEncyclopedia.Data.Migrations
                         column: x => x.EntityId,
                         principalTable: "Entity",
                         principalColumn: "EntityId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Publication_Person_PersonId",
                         column: x => x.PersonId,
@@ -2091,7 +2091,7 @@ namespace MusicEncyclopedia.Data.Migrations
                         column: x => x.EntityId,
                         principalTable: "Entity",
                         principalColumn: "EntityId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Poem_Person_PersonId",
                         column: x => x.PersonId,
@@ -2133,7 +2133,7 @@ namespace MusicEncyclopedia.Data.Migrations
                         column: x => x.EntityId,
                         principalTable: "Entity",
                         principalColumn: "EntityId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_SungVersion_Poem_PoemId",
                         column: x => x.PoemId,

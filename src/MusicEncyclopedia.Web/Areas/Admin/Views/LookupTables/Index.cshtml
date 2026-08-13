@@ -1,11 +1,11 @@
 @model LookupTableListViewModel
 @{
-    ViewData["Title"] = "Lookup Tables";
+    ViewData["Title"] = "جدول‌های مرجع";
     ViewData["ActiveMenu"] = "Lookup Tables";
 }
 
 <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
-    <p class="text-sm text-gray-500">Manage the small <strong>Code + Name</strong> reference tables used across the encyclopedia (types, categories, roles, ...). Rows that are in use by content cannot be deleted.</p>
+    <p class="text-sm text-gray-500">مدیریت جدول‌های مرجع کوچک <strong>کد + نام</strong> مرجع که در سراسر دایرة‌المعارف استفاده می‌شوند (انواع، دسته‌بندی‌ها، نقش‌ها، ...). ردیف‌هایی که در محتوا استفاده شده‌اند قابل حذف نیستند.</p>
 </div>
 
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -17,7 +17,7 @@
                 <span class="inline-block px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-600">@table.RowCount</span>
             </div>
             <p class="text-xs font-mono text-gray-400">@table.EntityName</p>
-            <p class="mt-3 text-sm text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity"><i class="fas fa-arrow-right me-1"></i> Manage rows</p>
+            <p class="mt-3 text-sm text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity"><i class="fas fa-arrow-right me-1"></i> مدیریت ردیف‌ها</p>
         </a>
     }
 </div>

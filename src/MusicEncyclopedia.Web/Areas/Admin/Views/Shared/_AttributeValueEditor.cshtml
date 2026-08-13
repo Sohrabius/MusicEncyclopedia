@@ -5,9 +5,9 @@
 
 <div class="attribute-value-editor" data-entity-type-id="@Model.EntityTypeId" data-entity-id="@Model.EntityId">
     <div class="flex items-center justify-between mb-3">
-        <h3 class="text-sm font-semibold text-gray-700">Attribute Values</h3>
+        <h3 class="text-sm font-semibold text-gray-700">مقادیر ویژگی</h3>
         <button type="button" class="btn-add-attr-value px-3 py-1.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-            <i class="fas fa-plus"></i> Add Attribute Value
+            <i class="fas fa-plus"></i> افزودن Attribute مقدار
         </button>
     </div>
 
@@ -15,16 +15,16 @@
         <table class="w-full text-sm">
             <thead class="bg-gray-50 border-b border-gray-200">
                 <tr>
-                    <th class="text-start px-3 py-2 font-medium text-gray-600">Definition</th>
-                    <th class="text-start px-3 py-2 font-medium text-gray-600">Value</th>
-                    <th class="text-start px-3 py-2 font-medium text-gray-600">Language</th>
-                    <th class="text-end px-3 py-2 font-medium text-gray-600">Actions</th>
+                    <th class="text-start px-3 py-2 font-medium text-gray-600">تعریف</th>
+                    <th class="text-start px-3 py-2 font-medium text-gray-600">مقدار</th>
+                    <th class="text-start px-3 py-2 font-medium text-gray-600">زبان</th>
+                    <th class="text-end px-3 py-2 font-medium text-gray-600">عملیات</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
                 @if (Model.AttributeValues.Count == 0)
                 {
-                    <tr class="empty-row"><td colspan="4" class="px-3 py-6 text-center text-gray-500 text-xs">No attribute values yet.</td></tr>
+                    <tr class="empty-row"><td colspan="4" class="px-3 py-6 text-center text-gray-500 text-xs">هنوز مقدار ویژگی‌ای وجود ندارد.</td></tr>
                 }
                 else
                 {
@@ -48,27 +48,27 @@
         <input type="hidden" class="attr-value-id" value="0" />
         <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
             <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">Definition</label>
+                <label class="block text-xs font-medium text-gray-600 mb-1">تعریف</label>
                 <select class="attribute-definition-id w-full text-xs px-2 py-1.5 border border-gray-300 rounded">
-                    <option value="">-- Select --</option>
+                    <option value="">-- انتخاب --</option>
                     @foreach (var def in Model.AttributeDefinitions) { <option value="@def.AttributeDefinitionId">@def.Name</option> }
                 </select>
             </div>
             <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">Value (string)</label>
+                <label class="block text-xs font-medium text-gray-600 mb-1">مقدار (متن)</label>
                 <input type="text" class="value-string w-full text-xs px-2 py-1.5 border border-gray-300 rounded" />
             </div>
             <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">Language</label>
+                <label class="block text-xs font-medium text-gray-600 mb-1">زبان</label>
                 <select class="language-id w-full text-xs px-2 py-1.5 border border-gray-300 rounded">
-                    <option value="">-- Select --</option>
+                    <option value="">-- انتخاب --</option>
                     @foreach (var lang in Model.Languages) { <option value="@lang.LanguageId">@lang.Name</option> }
                 </select>
             </div>
         </div>
         <div class="flex items-center gap-2 mt-3">
-            <button type="button" class="btn-save-attr-value px-3 py-1.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700">Save</button>
-            <button type="button" class="btn-cancel-attr-value px-3 py-1.5 text-xs text-gray-600 bg-gray-200 rounded-md hover:bg-gray-300">Cancel</button>
+            <button type="button" class="btn-save-attr-value px-3 py-1.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700">ذخیره</button>
+            <button type="button" class="btn-cancel-attr-value px-3 py-1.5 text-xs text-gray-600 bg-gray-200 rounded-md hover:bg-gray-300">انصراف</button>
         </div>
     </div>
 </div>
@@ -110,7 +110,7 @@
 
         editor.querySelectorAll('.btn-delete-attr-value').forEach(function(btn) {
             btn.addEventListener('click', function() {
-                if (!confirm('Delete this attribute value?')) return;
+                if (!confirm('حذف this attribute value?'))) return;
                 var row = this.closest('tr');
                 var attrValueId = row.dataset.attrValueId;
                 var data = new FormData();

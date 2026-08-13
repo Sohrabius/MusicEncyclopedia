@@ -82,7 +82,7 @@ public sealed class RolesController : AdminBaseController
         var role = await _roleManager.FindByIdAsync(id);
         if (role is null)
         {
-            SetErrorMessage("Role not found.");
+            SetErrorMessage("نقش یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -143,7 +143,7 @@ public sealed class RolesController : AdminBaseController
         _logger.LogInformation("Role {Role} created by {Admin} with {Count} permissions",
             roleName, User.Identity?.Name, (viewModel.SelectedPermissions ?? []).Count);
 
-        SetSuccessMessage($"Role \"{roleName}\" created successfully.");
+        SetSuccessMessage($"نقش «{roleName}» با موفقیت ایجاد شد.");
         return RedirectToAction(nameof(Index));
     }
 
@@ -155,7 +155,7 @@ public sealed class RolesController : AdminBaseController
         var role = await _roleManager.FindByIdAsync(id);
         if (role is null)
         {
-            SetErrorMessage("Role not found.");
+            SetErrorMessage("نقش یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -196,7 +196,7 @@ public sealed class RolesController : AdminBaseController
         _logger.LogInformation("Role {Role} updated by {Admin}",
             role.Name, User.Identity?.Name);
 
-        SetSuccessMessage($"Role \"{role.Name}\" updated successfully.");
+        SetSuccessMessage($"نقش «{role.Name}» با موفقیت به‌روزرسانی شد.");
         return RedirectToAction(nameof(Edit), new { id = role.Id });
     }
 
@@ -209,20 +209,20 @@ public sealed class RolesController : AdminBaseController
         var role = await _roleManager.FindByIdAsync(id);
         if (role is null)
         {
-            SetErrorMessage("Role not found.");
+            SetErrorMessage("نقش یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
         if (string.Equals(role.Name, RoleConstants.Administrator, StringComparison.OrdinalIgnoreCase))
         {
-            SetErrorMessage("The Administrator role cannot be deleted.");
+            SetErrorMessage("نقش Administrator قابل حذف نیست.");
             return RedirectToAction(nameof(Index));
         }
 
         var usersInRole = await _userManager.GetUsersInRoleAsync(role.Name ?? "");
         if (usersInRole.Count > 0)
         {
-            SetErrorMessage($"Role \"{role.Name}\" cannot be deleted because {usersInRole.Count} user(s) are assigned to it.");
+            SetErrorMessage($"نقش «{role.Name}» قابل حذف نیست، زیرا {usersInRole.Count} کاربر در آن تخصیص داده شده است.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -230,12 +230,12 @@ public sealed class RolesController : AdminBaseController
         if (result.Succeeded)
         {
             _logger.LogInformation("Role {Role} deleted by {Admin}", role.Name, User.Identity?.Name);
-            SetSuccessMessage($"Role \"{role.Name}\" has been deleted.");
+            SetSuccessMessage($"نقش «{role.Name}» حذف شد.");
         }
         else
         {
             AddIdentityErrors(result);
-            SetErrorMessage("Failed to delete the role. See form errors for details.");
+            SetErrorMessage("حذف نقش ناموفق بود. برای جزئیات، خطاهای فرم را ببینید.");
         }
 
         return RedirectToAction(nameof(Index));

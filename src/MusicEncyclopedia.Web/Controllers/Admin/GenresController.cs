@@ -137,7 +137,7 @@ public sealed class GenresController : AdminBaseController
 
         await InvalidateEntityCacheAsync("Genre", genre.GenreId, "Created");
 
-        SetSuccessMessage($"Genre \"{genre.Name}\" created successfully.");
+        SetSuccessMessage($"سبک «{genre.Name}» با موفقیت ایجاد شد.");
         return RedirectToAction(nameof(Edit), new { id = genre.GenreId });
     }
 
@@ -150,7 +150,7 @@ public sealed class GenresController : AdminBaseController
 
         if (genre is null)
         {
-            SetErrorMessage("Genre not found.");
+            SetErrorMessage("سبک یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -185,7 +185,7 @@ public sealed class GenresController : AdminBaseController
     {
         if (id != viewModel.GenreId)
         {
-            SetErrorMessage("Genre ID mismatch.");
+            SetErrorMessage("شناسه سبک ناسازگار است.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -204,7 +204,7 @@ public sealed class GenresController : AdminBaseController
 
         if (genre is null)
         {
-            SetErrorMessage("Genre not found.");
+            SetErrorMessage("سبک یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -234,12 +234,12 @@ public sealed class GenresController : AdminBaseController
 
             await InvalidateEntityCacheAsync("Genre", genre.GenreId, "Updated");
 
-            SetSuccessMessage($"Genre \"{genre.Name}\" updated successfully.");
+            SetSuccessMessage($"سبک «{genre.Name}» با موفقیت به‌روزرسانی شد.");
         }
         catch (DbUpdateConcurrencyException ex)
         {
             _logger.LogWarning(ex, "Concurrency conflict updating genre {GenreId}", id);
-            SetErrorMessage("This genre was modified by another user. Please reload and try again.");
+            SetErrorMessage("این سبک توسط کاربر دیگری تغییر کرده است. لطفاً دوباره بارگذاری و تلاش کنید.");
             viewModel.ParentGenres = await _db.Genres
                 .Where(g => g.GenreId != id)
                 .OrderBy(g => g.Name)
@@ -260,7 +260,7 @@ public sealed class GenresController : AdminBaseController
         var genre = await _db.Genres.FirstOrDefaultAsync(g => g.GenreId == id, cancellationToken);
         if (genre is null)
         {
-            SetErrorMessage("Genre not found.");
+            SetErrorMessage("سبک یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -280,7 +280,7 @@ public sealed class GenresController : AdminBaseController
 
         await InvalidateEntityCacheAsync("Genre", genre.GenreId, "Deleted");
 
-        SetSuccessMessage($"Genre \"{genre.Name}\" has been deleted (soft).");
+        SetSuccessMessage($"سبک «{genre.Name}» به‌صورت نرم حذف شد.");
         return RedirectToAction(nameof(Index));
     }
 
@@ -293,7 +293,7 @@ public sealed class GenresController : AdminBaseController
             .FirstOrDefaultAsync(g => g.GenreId == id, cancellationToken);
         if (genre is null)
         {
-            SetErrorMessage("Genre not found.");
+            SetErrorMessage("سبک یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -314,7 +314,7 @@ public sealed class GenresController : AdminBaseController
 
         await InvalidateEntityCacheAsync("Genre", genre.GenreId, "Restored");
 
-        SetSuccessMessage($"Genre \"{genre.Name}\" has been restored.");
+        SetSuccessMessage($"سبک «{genre.Name}» بازیابی شد.");
         return RedirectToAction(nameof(Index));
     }
 }

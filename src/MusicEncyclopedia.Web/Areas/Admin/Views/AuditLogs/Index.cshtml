@@ -1,38 +1,38 @@
 @model AuditLogListViewModel
 @{
-    ViewData["Title"] = "Audit Log";
+    ViewData["Title"] = "گزارش عملیات";
     ViewData["ActiveMenu"] = "Audit Log";
 }
 
 <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
     <form method="get" action="/admin/audit-log" class="flex flex-col md:flex-row gap-3 items-end md:items-center">
-        <div class="relative flex-1 max-w-md"><i class="fas fa-search absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i><input type="text" name="q" value="@Model.SearchQuery" placeholder="Search user, action, details..." class="w-full ps-9 pe-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" /></div>
-        <div><label class="block text-xs font-medium text-gray-500 mb-1">Entity Type</label><input type="text" name="entityType" value="@Model.EntityTypeFilter" placeholder="e.g. Album" class="w-full md:w-44 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" /></div>
-        <div><label class="block text-xs font-medium text-gray-500 mb-1">Result</label>
+        <div class="relative flex-1 max-w-md"><i class="fas fa-search absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i><input type="text" name="q" value="@Model.SearchQuery" placeholder="جستجو user, action, details..." class="w-full ps-9 pe-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" /></div>
+        <div><label class="block text-xs font-medium text-gray-500 mb-1">نوع موجودیت</label><input type="text" name="entityType" value="@Model.EntityTypeFilter" placeholder="مثلاً آلبوم" class="w-full md:w-44 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" /></div>
+        <div><label class="block text-xs font-medium text-gray-500 mb-1">نتیجه</label>
             <select name="success" class="w-full md:w-36 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                <option value="">All</option>
+                <option value="">همه</option>
                 @if (Model.SuccessFilter == true)
                 {
-                    <option value="true" selected>Success</option>
+                    <option value="true" selected>موفق</option>
                 }
                 else
                 {
-                    <option value="true">Success</option>
+                    <option value="true">موفق</option>
                 }
                 @if (Model.SuccessFilter == false)
                 {
-                    <option value="false" selected>Failed</option>
+                    <option value="false" selected>ناموفق</option>
                 }
                 else
                 {
-                    <option value="false">Failed</option>
+                    <option value="false">ناموفق</option>
                 }
             </select>
         </div>
-        <button type="submit" class="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors"><i class="fas fa-filter"></i> Filter</button>
+        <button type="submit" class="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors"><i class="fas fa-filter"></i> فیلتر</button>
         @if (!string.IsNullOrWhiteSpace(Model.SearchQuery) || !string.IsNullOrWhiteSpace(Model.EntityTypeFilter) || Model.SuccessFilter.HasValue)
         {
-            <a href="/admin/audit-log" class="px-3 py-2 text-sm text-gray-600 hover:text-gray-900"><i class="fas fa-times"></i> Clear</a>
+            <a href="/admin/audit-log" class="px-3 py-2 text-sm text-gray-600 hover:text-gray-900"><i class="fas fa-times"></i> پاک کردن</a>
         }
     </form>
 </div>
@@ -42,18 +42,18 @@
         <table class="w-full text-sm">
             <thead class="bg-gray-50 border-b border-gray-200">
                 <tr>
-                    <th class="text-start px-4 py-3 font-medium text-gray-600">Timestamp</th>
-                    <th class="text-start px-4 py-3 font-medium text-gray-600">User</th>
-                    <th class="text-start px-4 py-3 font-medium text-gray-600">Action</th>
-                    <th class="text-start px-4 py-3 font-medium text-gray-600">Entity</th>
-                    <th class="text-center px-4 py-3 font-medium text-gray-600">Result</th>
-                    <th class="text-end px-4 py-3 font-medium text-gray-600">Details</th>
+                    <th class="text-start px-4 py-3 font-medium text-gray-600">زمان‌بندی</th>
+                    <th class="text-start px-4 py-3 font-medium text-gray-600">کاربر</th>
+                    <th class="text-start px-4 py-3 font-medium text-gray-600">عملیات</th>
+                    <th class="text-start px-4 py-3 font-medium text-gray-600">موجودیت</th>
+                    <th class="text-center px-4 py-3 font-medium text-gray-600">نتیجه</th>
+                    <th class="text-end px-4 py-3 font-medium text-gray-600">جزئیات</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
                 @if (Model.Items.Items.Count == 0)
                 {
-                    <tr><td colspan="6" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-history text-3xl text-gray-300 mb-2 block"></i>No audit entries found.</td></tr>
+                    <tr><td colspan="6" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-history text-3xl text-gray-300 mb-2 block"></i>هیچ موردی در گزارش عملیات یافت نشد.</td></tr>
                 }
                 else
                 {
@@ -71,11 +71,11 @@
                                 }
                                 else
                                 {
-                                    <span class="inline-block px-2 py-0.5 text-xs rounded-full bg-red-50 text-red-700">Failed</span>
+                                    <span class="inline-block px-2 py-0.5 text-xs rounded-full bg-red-50 text-red-700">ناموفق</span>
                                 }
                             </td>
                             <td class="px-4 py-3 text-end">
-                                <a href="/admin/audit-log/@item.AuditLogId" class="inline-flex items-center gap-1 px-2 py-1 text-xs text-blue-600 hover:bg-blue-50 rounded"><i class="fas fa-eye"></i> View</a>
+                                <a href="/admin/audit-log/@item.AuditLogId" class="inline-flex items-center gap-1 px-2 py-1 text-xs text-blue-600 hover:bg-blue-50 rounded"><i class="fas fa-eye"></i> مشاهده</a>
                             </td>
                         </tr>
                     }
@@ -86,10 +86,10 @@
     @if (Model.Items.TotalPages > 1)
     {
         <div class="flex items-center justify-between px-4 py-3 bg-gray-50 border-t border-gray-200">
-            <p class="text-sm text-gray-500">Page <strong>@Model.Items.Page</strong> of <strong>@Model.Items.TotalPages</strong> (@Model.Items.TotalItems total)</p>
+            <p class="text-sm text-gray-500">صفحه <strong>@Model.Items.Page</strong> از <strong>@Model.Items.TotalPages</strong> (@Model.Items.TotalItems total)</p>
             <nav class="flex items-center gap-1">
-                @if (Model.Items.Page > 1) { <a href="/admin/audit-log?page=@(Model.Items.Page - 1)&q=@Model.SearchQuery&entityType=@Model.EntityTypeFilter&success=@(Model.SuccessFilter?.ToString().ToLowerInvariant())" class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-200 rounded"><i class="fas fa-chevron-right"></i> Previous</a> }
-                @if (Model.Items.Page < Model.Items.TotalPages) { <a href="/admin/audit-log?page=@(Model.Items.Page + 1)&q=@Model.SearchQuery&entityType=@Model.EntityTypeFilter&success=@(Model.SuccessFilter?.ToString().ToLowerInvariant())" class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-200 rounded">Next <i class="fas fa-chevron-left"></i></a> }
+                @if (Model.Items.Page > 1) { <a href="/admin/audit-log?page=@(Model.Items.Page - 1)&q=@Model.SearchQuery&entityType=@Model.EntityTypeFilter&success=@(Model.SuccessFilter?.ToString().ToLowerInvariant())" class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-200 rounded"><i class="fas fa-chevron-right"></i> قبلی</a> }
+                @if (Model.Items.Page < Model.Items.TotalPages) { <a href="/admin/audit-log?page=@(Model.Items.Page + 1)&q=@Model.SearchQuery&entityType=@Model.EntityTypeFilter&success=@(Model.SuccessFilter?.ToString().ToLowerInvariant())" class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-200 rounded">بعدی <i class="fas fa-chevron-left"></i></a> }
             </nav>
         </div>
     }

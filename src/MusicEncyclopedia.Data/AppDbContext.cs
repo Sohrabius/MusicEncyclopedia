@@ -373,6 +373,18 @@ public class AppDbContext : IdentityDbContext<IdentityUser, IdentityRole, string
         // ---- Credit ----
         modelBuilder.Entity<Credit>(entity =>
         {
+            // Restrict (not cascade): deleting a role or scope lookup must not
+            // silently delete Credits. Also avoids SQL Server error 1785 —
+            // RoleScopeType would otherwise reach Credit via two cascade paths
+            // (direct + through CreditRole).
+            entity.HasOne(c => c.CreditRole)
+                .WithMany(r => r.Credits)
+                .HasForeignKey(c => c.CreditRoleId)
+                .OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(c => c.RoleScopeType)
+                .WithMany(r => r.Credits)
+                .HasForeignKey(c => c.RoleScopeTypeId)
+                .OnDelete(DeleteBehavior.Restrict);
             entity.HasIndex(c => c.CreditRoleId).HasDatabaseName("IX_Credit_CreditRoleId");
             entity.HasIndex(c => c.RoleScopeTypeId).HasDatabaseName("IX_Credit_RoleScopeTypeId");
             entity.HasIndex(c => c.PersonId).HasDatabaseName("IX_Credit_PersonId");
@@ -627,91 +639,109 @@ public class AppDbContext : IdentityDbContext<IdentityUser, IdentityRole, string
         modelBuilder.Entity<Entities.Entity>()
             .HasOne(e => e.Album)
             .WithOne(a => a.Entity)
-            .HasForeignKey<Album>(a => a.EntityId);
+            .HasForeignKey<Album>(a => a.EntityId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Entities.Entity>()
             .HasOne(e => e.Track)
             .WithOne(t => t.Entity)
-            .HasForeignKey<Track>(t => t.EntityId);
+            .HasForeignKey<Track>(t => t.EntityId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Entities.Entity>()
             .HasOne(e => e.Person)
             .WithOne(p => p.Entity)
-            .HasForeignKey<Person>(p => p.EntityId);
+            .HasForeignKey<Person>(p => p.EntityId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Entities.Entity>()
             .HasOne(e => e.Company)
             .WithOne(c => c.Entity)
-            .HasForeignKey<Company>(c => c.EntityId);
+            .HasForeignKey<Company>(c => c.EntityId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Entities.Entity>()
             .HasOne(e => e.Genre)
             .WithOne(g => g.Entity)
-            .HasForeignKey<Genre>(g => g.EntityId);
+            .HasForeignKey<Genre>(g => g.EntityId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Entities.Entity>()
             .HasOne(e => e.Mood)
             .WithOne(m => m.Entity)
-            .HasForeignKey<Mood>(m => m.EntityId);
+            .HasForeignKey<Mood>(m => m.EntityId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Entities.Entity>()
             .HasOne(e => e.Instrument)
             .WithOne(i => i.Entity)
-            .HasForeignKey<Instrument>(i => i.EntityId);
+            .HasForeignKey<Instrument>(i => i.EntityId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Entities.Entity>()
             .HasOne(e => e.Poem)
             .WithOne(p => p.Entity)
-            .HasForeignKey<Poem>(p => p.EntityId);
+            .HasForeignKey<Poem>(p => p.EntityId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Entities.Entity>()
             .HasOne(e => e.SungVersion)
             .WithOne(sv => sv.Entity)
-            .HasForeignKey<SungVersion>(sv => sv.EntityId);
+            .HasForeignKey<SungVersion>(sv => sv.EntityId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Entities.Entity>()
             .HasOne(e => e.Publication)
             .WithOne(p => p.Entity)
-            .HasForeignKey<Publication>(p => p.EntityId);
+            .HasForeignKey<Publication>(p => p.EntityId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Entities.Entity>()
             .HasOne(e => e.RecordingSession)
             .WithOne(rs => rs.Entity)
-            .HasForeignKey<RecordingSession>(rs => rs.EntityId);
+            .HasForeignKey<RecordingSession>(rs => rs.EntityId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Entities.Entity>()
             .HasOne(e => e.PerformanceEvent)
             .WithOne(pe => pe.Entity)
-            .HasForeignKey<PerformanceEvent>(pe => pe.EntityId);
+            .HasForeignKey<PerformanceEvent>(pe => pe.EntityId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Entities.Entity>()
             .HasOne(e => e.Location)
             .WithOne(l => l.Entity)
-            .HasForeignKey<Location>(l => l.EntityId);
+            .HasForeignKey<Location>(l => l.EntityId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Entities.Entity>()
             .HasOne(e => e.Tag)
             .WithOne(t => t.Entity)
-            .HasForeignKey<Tag>(t => t.EntityId);
+            .HasForeignKey<Tag>(t => t.EntityId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Entities.Entity>()
             .HasOne(e => e.Source)
             .WithOne(s => s.Entity)
-            .HasForeignKey<Source>(s => s.EntityId);
+            .HasForeignKey<Source>(s => s.EntityId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Entities.Entity>()
             .HasOne(e => e.Award)
             .WithOne(a => a.Entity)
-            .HasForeignKey<Award>(a => a.EntityId);
+            .HasForeignKey<Award>(a => a.EntityId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Entities.Entity>()
             .HasOne(e => e.Certification)
             .WithOne(c => c.Entity)
-            .HasForeignKey<Certification>(c => c.EntityId);
+            .HasForeignKey<Certification>(c => c.EntityId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Entities.Entity>()
             .HasOne(e => e.Chart)
             .WithOne(c => c.Entity)
-            .HasForeignKey<Chart>(c => c.EntityId);
+            .HasForeignKey<Chart>(c => c.EntityId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

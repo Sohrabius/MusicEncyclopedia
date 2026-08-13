@@ -1,6 +1,6 @@
 @model AlbumEditViewModel
 @{
-    ViewData["Title"] = "Create Album";
+    ViewData["Title"] = "ایجاد آلبوم";
     ViewData["ActiveMenu"] = "Albums";
 }
 
@@ -22,7 +22,7 @@
 
             <!-- Basic Information -->
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">Basic Information</h2>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">اطلاعات پایه</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <!-- Title -->
                     <div class="md:col-span-2">
@@ -63,13 +63,13 @@
 
             <!-- Classification -->
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">Classification</h2>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">دسته‌بندی</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <!-- Category -->
                     <div>
                         <label asp-for="AlbumCategoryId" class="block text-sm font-medium text-gray-700 mb-1"></label>
                         <select asp-for="AlbumCategoryId" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">-- Select Category --</option>
+                            <option value="">-- انتخاب دسته‌بندی --</option>
                             @foreach (var cat in Model.Categories)
                             {
                                 <option value="@cat.AlbumCategoryId">@cat.Name</option>
@@ -90,7 +90,7 @@
 
             <!-- Dates -->
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">Dates</h2>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">تاریخ‌ها</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <!-- Release Date -->
                     <div>
@@ -103,10 +103,10 @@
                     <div>
                         <label asp-for="ReleaseDatePrecision" class="block text-sm font-medium text-gray-700 mb-1"></label>
                         <select asp-for="ReleaseDatePrecision" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">-- Precision --</option>
-                            <option value="day">Day</option>
-                            <option value="month">Month</option>
-                            <option value="year">Year</option>
+                            <option value="">-- دقت --</option>
+                            <option value="day">روز</option>
+                            <option value="month">ماه</option>
+                            <option value="year">سال</option>
                         </select>
                         <span asp-validation-for="ReleaseDatePrecision" class="text-xs text-red-600"></span>
                     </div>
@@ -129,10 +129,10 @@
                     <div>
                         <label asp-for="RecordingDatePrecision" class="block text-sm font-medium text-gray-700 mb-1"></label>
                         <select asp-for="RecordingDatePrecision" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">-- Precision --</option>
-                            <option value="day">Day</option>
-                            <option value="month">Month</option>
-                            <option value="year">Year</option>
+                            <option value="">-- دقت --</option>
+                            <option value="day">روز</option>
+                            <option value="month">ماه</option>
+                            <option value="year">سال</option>
                         </select>
                         <span asp-validation-for="RecordingDatePrecision" class="text-xs text-red-600"></span>
                     </div>
@@ -141,7 +141,7 @@
 
             <!-- Description & Media -->
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">Description & Media</h2>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">توضیحات و رسانه</h2>
                 <div class="space-y-4">
                     <!-- Description -->
                     <div>
@@ -154,14 +154,14 @@
                         <!-- Cover Media -->
                         <div>
                             <label asp-for="CoverMediaId" class="block text-sm font-medium text-gray-700 mb-1"></label>
-                            <input asp-for="CoverMediaId" type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Media ID" />
+                            <input asp-for="CoverMediaId" type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="شناسه رسانه" />
                             <span asp-validation-for="CoverMediaId" class="text-xs text-red-600"></span>
                         </div>
 
                         <!-- Duration -->
                         <div>
                             <label asp-for="DurationSeconds" class="block text-sm font-medium text-gray-700 mb-1"></label>
-                            <input asp-for="DurationSeconds" type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Duration in seconds" />
+                            <input asp-for="DurationSeconds" type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="مدت به ثانیه" />
                             <span asp-validation-for="DurationSeconds" class="text-xs text-red-600"></span>
                         </div>
 
@@ -183,27 +183,27 @@
 
             <!-- Publish / Save -->
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">Publish</h2>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">انتشار</h2>
                 <div class="space-y-3">
                     <button type="submit"
                             class="w-full px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
-                        <i class="fas fa-save"></i> Create Album
+                        <i class="fas fa-save"></i> ایجاد آلبوم
                     </button>
                     <a href="/admin/albums"
                        class="w-full block text-center px-4 py-2.5 text-sm text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">
-                        Cancel
+                        انصراف
                     </a>
                 </div>
             </div>
 
             <!-- Info Card -->
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                <h2 class="text-sm font-semibold text-gray-700 mb-2">About Album Creation</h2>
+                <h2 class="text-sm font-semibold text-gray-700 mb-2">درباره ایجاد آلبوم</h2>
                 <ul class="text-xs text-gray-500 space-y-1 list-disc list-inside">
-                    <li>All fields marked with * are required.</li>
-                    <li>The slug is auto-generated from the title if left empty.</li>
-                    <li>Duration is specified in total seconds.</li>
-                    <li>After creation, you can manage genres, moods, tracks, and more on the edit page.</li>
+                    <li>تمام فیلدهای مشخص‌شده با * الزامی هستند.</li>
+                    <li>در صورت خالی بودن، Slug به‌صورت خودکار از عنوان ساخته می‌شود.</li>
+                    <li>مدت به ثانیه مشخص می‌شود.</li>
+                    <li>پس از ایجاد، می‌توانید سبک‌ها، حالت‌ها، ترک‌ها و موارد دیگر را در صفحه ویرایش مدیریت کنید.</li>
                 </ul>
             </div>
         </div>

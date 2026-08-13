@@ -24,7 +24,7 @@
 
             <!-- Basic Information -->
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">Basic Information</h2>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">اطلاعات پایه</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="md:col-span-2">
                         <label asp-for="Title" class="block text-sm font-medium text-gray-700 mb-1"></label>
@@ -60,12 +60,12 @@
 
             <!-- Classification -->
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">Classification</h2>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">دسته‌بندی</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label asp-for="AlbumCategoryId" class="block text-sm font-medium text-gray-700 mb-1"></label>
                         <select asp-for="AlbumCategoryId" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">-- Select Category --</option>
+                            <option value="">-- انتخاب دسته‌بندی --</option>
                             @foreach (var cat in Model.Categories)
                             {
                                 <option value="@cat.AlbumCategoryId">@cat.Name</option>
@@ -85,7 +85,7 @@
 
             <!-- Dates -->
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">Dates</h2>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">تاریخ‌ها</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label asp-for="ReleaseDate" class="block text-sm font-medium text-gray-700 mb-1"></label>
@@ -96,10 +96,10 @@
                     <div>
                         <label asp-for="ReleaseDatePrecision" class="block text-sm font-medium text-gray-700 mb-1"></label>
                         <select asp-for="ReleaseDatePrecision" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">-- Precision --</option>
-                            <option value="day">Day</option>
-                            <option value="month">Month</option>
-                            <option value="year">Year</option>
+                            <option value="">-- دقت --</option>
+                            <option value="day">روز</option>
+                            <option value="month">ماه</option>
+                            <option value="year">سال</option>
                         </select>
                         <span asp-validation-for="ReleaseDatePrecision" class="text-xs text-red-600"></span>
                     </div>
@@ -119,10 +119,10 @@
                     <div>
                         <label asp-for="RecordingDatePrecision" class="block text-sm font-medium text-gray-700 mb-1"></label>
                         <select asp-for="RecordingDatePrecision" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">-- Precision --</option>
-                            <option value="day">Day</option>
-                            <option value="month">Month</option>
-                            <option value="year">Year</option>
+                            <option value="">-- دقت --</option>
+                            <option value="day">روز</option>
+                            <option value="month">ماه</option>
+                            <option value="year">سال</option>
                         </select>
                         <span asp-validation-for="RecordingDatePrecision" class="text-xs text-red-600"></span>
                     </div>
@@ -131,7 +131,7 @@
 
             <!-- Description & Media -->
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">Description & Media</h2>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">توضیحات و رسانه</h2>
                 <div class="space-y-4">
                     <div>
                         <label asp-for="Description" class="block text-sm font-medium text-gray-700 mb-1"></label>
@@ -142,13 +142,13 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label asp-for="CoverMediaId" class="block text-sm font-medium text-gray-700 mb-1"></label>
-                            <input asp-for="CoverMediaId" type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Media ID" />
+                            <input asp-for="CoverMediaId" type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="شناسه رسانه" />
                             <span asp-validation-for="CoverMediaId" class="text-xs text-red-600"></span>
                         </div>
 
                         <div>
                             <label asp-for="DurationSeconds" class="block text-sm font-medium text-gray-700 mb-1"></label>
-                            <input asp-for="DurationSeconds" type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Duration in seconds" />
+                            <input asp-for="DurationSeconds" type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="مدت به ثانیه" />
                             <span asp-validation-for="DurationSeconds" class="text-xs text-red-600"></span>
                         </div>
 
@@ -168,49 +168,49 @@
                 <div class="border-b border-gray-200">
                     <nav class="flex overflow-x-auto" aria-label="Related editors tabs">
                         <button type="button" class="tab-btn active px-4 py-3 text-sm font-medium text-blue-600 border-b-2 border-blue-600 whitespace-nowrap" data-tab="tab-genres">
-                            <i class="fas fa-tag me-1"></i> Genres
+                            <i class="fas fa-tag me-1"></i> سبک‌ها
                         </button>
                         <button type="button" class="tab-btn px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700 whitespace-nowrap" data-tab="tab-moods">
-                            <i class="fas fa-smile me-1"></i> Moods
+                            <i class="fas fa-smile me-1"></i> حالت‌ها
                         </button>
                         <button type="button" class="tab-btn px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700 whitespace-nowrap" data-tab="tab-languages">
-                            <i class="fas fa-language me-1"></i> Languages
+                            <i class="fas fa-language me-1"></i> زبان‌ها
                         </button>
                         <button type="button" class="tab-btn px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700 whitespace-nowrap" data-tab="tab-countries">
-                            <i class="fas fa-globe me-1"></i> Countries
+                            <i class="fas fa-globe me-1"></i> کشورها
                         </button>
                         <button type="button" class="tab-btn px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700 whitespace-nowrap" data-tab="tab-companies">
-                            <i class="fas fa-building me-1"></i> Companies
+                            <i class="fas fa-building me-1"></i> شرکت‌ها
                         </button>
                         <button type="button" class="tab-btn px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700 whitespace-nowrap" data-tab="tab-identifiers">
-                            <i class="fas fa-barcode me-1"></i> Identifiers
+                            <i class="fas fa-barcode me-1"></i> شناسه‌ها
                         </button>
                         <button type="button" class="tab-btn px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700 whitespace-nowrap" data-tab="tab-tracklist">
-                            <i class="fas fa-list me-1"></i> Tracklist
+                            <i class="fas fa-list me-1"></i> فهرست ترک‌ها
                         </button>
                         <button type="button" class="tab-btn px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700 whitespace-nowrap" data-tab="tab-credits">
-                            <i class="fas fa-users me-1"></i> Credits
+                            <i class="fas fa-users me-1"></i> عوامل
                         </button>
                         <button type="button" class="tab-btn px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700 whitespace-nowrap" data-tab="tab-aliases">
-                            <i class="fas fa-tag me-1"></i> Aliases
+                            <i class="fas fa-tag me-1"></i> نام‌های مستعار
                         </button>
                         <button type="button" class="tab-btn px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700 whitespace-nowrap" data-tab="tab-localizations">
-                            <i class="fas fa-language me-1"></i> Localizations
+                            <i class="fas fa-language me-1"></i> بومی‌سازی‌ها
                         </button>
                         <button type="button" class="tab-btn px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700 whitespace-nowrap" data-tab="tab-tags">
-                            <i class="fas fa-hashtag me-1"></i> Tags
+                            <i class="fas fa-hashtag me-1"></i> برچسب‌ها
                         </button>
                         <button type="button" class="tab-btn px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700 whitespace-nowrap" data-tab="tab-links">
-                            <i class="fas fa-link me-1"></i> Links
+                            <i class="fas fa-link me-1"></i> پیوندها
                         </button>
                         <button type="button" class="tab-btn px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700 whitespace-nowrap" data-tab="tab-media">
-                            <i class="fas fa-photo-video me-1"></i> Media
+                            <i class="fas fa-photo-video me-1"></i> رسانه
                         </button>
                         <button type="button" class="tab-btn px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700 whitespace-nowrap" data-tab="tab-citations">
-                            <i class="fas fa-quote-right me-1"></i> Citations
+                            <i class="fas fa-quote-right me-1"></i> ارجاع‌ها
                         </button>
                         <button type="button" class="tab-btn px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700 whitespace-nowrap" data-tab="tab-attributes">
-                            <i class="fas fa-list-ul me-1"></i> Attributes
+                            <i class="fas fa-list-ul me-1"></i> ویژگی‌ها
                         </button>
                     </nav>
                 </div>
@@ -267,7 +267,7 @@
                         <p class="text-sm text-gray-500">
                             <i class="fas fa-language text-pink-400 me-1"></i>
                             Manage localized field values for this album from the
-                            <a href="/admin/localizations" class="text-blue-600 hover:underline">Localizations</a>
+                            <a href="/admin/localizations" class="text-blue-600 hover:underline">بومی‌سازی‌ها</a>
                             section (EntityType Album, EntityId @Model.AlbumId).
                         </p>
                     </div>
@@ -276,8 +276,8 @@
                     <div id="tab-tags" class="tab-panel hidden">
                         <p class="text-sm text-gray-500">
                             <i class="fas fa-hashtag text-violet-400 me-1"></i>
-                            Attach tags from the
-                            <a href="/admin/tags" class="text-blue-600 hover:underline">Tags</a>
+                            Attach برچسبی from the
+                            <a href="/admin/tags" class="text-blue-600 hover:underline">برچسب‌ها</a>
                             section.
                         </p>
                     </div>
@@ -286,8 +286,8 @@
                     <div id="tab-links" class="tab-panel hidden">
                         <p class="text-sm text-gray-500">
                             <i class="fas fa-link text-sky-400 me-1"></i>
-                            Manage external links from the
-                            <a href="/admin/links" class="text-blue-600 hover:underline">Links</a>
+                            Manage external پیوندی from the
+                            <a href="/admin/links" class="text-blue-600 hover:underline">پیوندها</a>
                             section (EntityType Album, EntityId @Model.AlbumId).
                         </p>
                     </div>
@@ -296,8 +296,8 @@
                     <div id="tab-media" class="tab-panel hidden">
                         <p class="text-sm text-gray-500">
                             <i class="fas fa-photo-video text-emerald-400 me-1"></i>
-                            Upload and assign media from the
-                            <a href="/admin/media" class="text-blue-600 hover:underline">Media</a>
+                            بارگذاری and assign رسانه‌ای from the
+                            <a href="/admin/media" class="text-blue-600 hover:underline">رسانه</a>
                             section.
                         </p>
                     </div>
@@ -306,8 +306,8 @@
                     <div id="tab-citations" class="tab-panel hidden">
                         <p class="text-sm text-gray-500">
                             <i class="fas fa-quote-right text-amber-400 me-1"></i>
-                            Add citations from the
-                            <a href="/admin/citations" class="text-blue-600 hover:underline">Citations</a>
+                            افزودن ارجاعی from the
+                            <a href="/admin/citations" class="text-blue-600 hover:underline">ارجاع‌ها</a>
                             section (EntityType Album, EntityId @Model.AlbumId).
                         </p>
                     </div>
@@ -327,15 +327,15 @@
 
             <!-- Save / Actions -->
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">Actions</h2>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">عملیات</h2>
                 <div class="space-y-3">
                     <button type="submit"
                             class="w-full px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
-                        <i class="fas fa-save"></i> Save Changes
+                        <i class="fas fa-save"></i> ذخیره تغییرات
                     </button>
                     <a href="/admin/albums"
                        class="w-full block text-center px-4 py-2.5 text-sm text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">
-                        <i class="fas fa-arrow-left me-1"></i> Back to List
+                        <i class="fas fa-arrow-left me-1"></i> بازگشت به فهرست
                     </a>
 
                     <hr class="border-gray-200" />
@@ -346,7 +346,7 @@
                         @Html.AntiForgeryToken()
                         <button type="submit"
                                 class="w-full px-4 py-2 text-sm text-red-600 border border-red-200 rounded-md hover:bg-red-50 transition-colors flex items-center justify-center gap-2">
-                            <i class="fas fa-trash-alt"></i> Delete Album
+                            <i class="fas fa-trash-alt"></i> حذف آلبوم
                         </button>
                     </form>
                 </div>
@@ -354,18 +354,18 @@
 
             <!-- Album Info -->
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                <h2 class="text-sm font-semibold text-gray-700 mb-3">Album Info</h2>
+                <h2 class="text-sm font-semibold text-gray-700 mb-3">اطلاعات آلبوم</h2>
                 <dl class="space-y-2 text-xs">
                     <div class="flex justify-between">
                         <dt class="text-gray-500">ID</dt>
                         <dd class="text-gray-900 font-mono">@Model.AlbumId</dd>
                     </div>
                     <div class="flex justify-between">
-                        <dt class="text-gray-500">Created</dt>
+                        <dt class="text-gray-500">ایجادشده</dt>
                         <dd class="text-gray-900">—</dd>
                     </div>
                     <div class="flex justify-between">
-                        <dt class="text-gray-500">Modified</dt>
+                        <dt class="text-gray-500">ویرایش‌شده</dt>
                         <dd class="text-gray-900">—</dd>
                     </div>
                 </dl>
@@ -388,7 +388,7 @@
                 if (!holder || holder.dataset.loaded) return;
                 holder.dataset.loaded = '1';
                 var url = holder.dataset.editorUrl;
-                holder.innerHTML = '<p class="text-sm text-gray-400"><i class="fas fa-spinner fa-spin me-1"></i>Loading…</p>';
+                holder.innerHTML = '<p class="text-sm text-gray-400"><i class="fas fa-spinner fa-spin me-1"></i>در حال بارگذاری…</p>';
                 fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
                     .then(function (r) {
                         if (!r.ok) throw new Error('Failed to load editor');
@@ -398,7 +398,7 @@
                         holder.innerHTML = html;
                     })
                     .catch(function () {
-                        holder.innerHTML = '<p class="text-sm text-red-600">Failed to load editor.</p>';
+                        holder.innerHTML = '<p class="text-sm text-red-600">بارگذاری ویرایشگر ناموفق بود.</p>';
                     });
             }
 

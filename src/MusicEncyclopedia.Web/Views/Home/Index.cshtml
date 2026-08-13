@@ -1,22 +1,43 @@
 @model MusicEncyclopedia.Web.ViewModels.HomeViewModel
-@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer Localizer
+@inject Microsoft.Extensions.Localization.IStringLocalizer<MusicEncyclopedia.Web.SharedResources> L
+@using MusicEncyclopedia.Web.Constants
+@using MusicEncyclopedia.Core.DTOs
 
 @{
-    ViewData["Title"] = Localizer["Music Encyclopedia"];
+    ViewData["Title"] = L["Brand.Name"];
     ViewData["MetaDescription"] = Model.MetaDescription;
     var culture = Model.CurrentCulture;
     var dir = Context.Items["dir"] as string ?? "ltr";
+
+    var totalItems = Model.Albums?.TotalItems ?? 0;
+    var hasAlbums = Model.Albums is not null && Model.Albums.Items.Count > 0;
+    var currentPage = Model.Albums?.Page ?? 1;
+    // Inside the lazy zone only while fewer than the cap (100) albums are shown;
+    // once 100 are loaded the numbered pagination takes over.
+    var lazyZone = currentPage * HomeConstants.InitialPageSize < HomeConstants.LazyLoadCap;
+
+    // "Load more" shows while we're inside the lazy zone (first 100) and more remain.
+    var showLoadMore = hasAlbums
+        && currentPage * HomeConstants.InitialPageSize < totalItems
+        && currentPage * HomeConstants.InitialPageSize < HomeConstants.LazyLoadCap;
+
+    // Numbered pagination takes over once the catalog exceeds the lazy-load cap.
+    var showPagination = totalItems > HomeConstants.LazyLoadCap;
 }
 
-<!-- Hero -->
-<section class="hero">
-    <div class="hero__inner">
-        <h1 class="hero__title">
-            @Localizer["Music Encyclopedia"]
-        </h1>
-        <p class="hero__subtitle">
-            @Localizer["Explore the complete history of music — albums, tracks, artists, lyrics, and more."]
-        </p>
+<!-- Canonical + Open Graph -->
+<link rel="canonical" href="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.PathBase}{Context.Request.Path}")" />
+<meta property="og:title" content="@ViewData["Title"]" />
+<meta property="og:description" content="@Model.MetaDescription" />
+<meta property="og:url" content="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.PathBase}{Context.Request.Path}")" />
+<meta property="og:type" content="website" />
+
+<!-- Banner · search-first -->
+<section class="home-banner">
+    <div class="home-banner__inner">
+        <p class="home-banner__eyebrow">@L["Home.Eyebrow"]</p>
+        <h1 class="home-banner__title">@ViewData["Title"]</h1>
+        <p class="home-banner__subtitle">@L["Home.Tagline"]</p>
 
         <form action="/@culture/search" method="get" class="search" role="search">
             <div class="relative">
@@ -27,189 +48,23 @@
                 <input type="search"
                        name="q"
                        class="search__input"
-                       placeholder="@Localizer["Search albums, tracks, artists..."]"
-                       aria-label="@Localizer["Search"]" />
+                       placeholder="@L["Home.SearchPlaceholder"]"
+                       aria-label="@L["Nav.Search"]" />
             </div>
         </form>
-    </div>
-</section>
-
-<!-- Featured Albums -->
-@if (Model.FeaturedAlbums.Count > 0)
-{
-    <section class="section">
-        <div class="section__inner">
-            <div class="section__head">
-                <h2 class="section__title">@Localizer["Featured Albums"]</h2>
-                <a href="/@culture/albums" class="section__more">
-                    @Localizer["View All"]
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                    </svg>
-                </a>
-            </div>
-            <div class="card-grid">
-                @foreach (var album in Model.FeaturedAlbums)
-                {
-                    <a href="/@culture/albums/@album.Slug" class="card">
-                        <div class="card__image relative">
-                            @if (!string.IsNullOrEmpty(album.CoverUrl))
-                            {
-                                <img src="@album.CoverUrl" alt="@album.Title" loading="lazy" />
-                            }
-                            else
-                            {
-                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                          d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z" />
-                                </svg>
-                            }
-                            @if (album.Year.HasValue)
-                            {
-                                <span class="card__badge">@album.Year</span>
-                            }
-                        </div>
-                        <div class="card__body">
-                            <h3 class="card__title">@album.Title</h3>
-                            @if (!string.IsNullOrEmpty(album.Artist))
-                            {
-                                <p class="card__meta">@album.Artist</p>
-                            }
-                        </div>
-                    </a>
-                }
-            </div>
-        </div>
-    </section>
-}
-
-<!-- Latest Albums -->
-@if (Model.LatestAlbums.Count > 0)
-{
-    <section class="section section--alt">
-        <div class="section__inner">
-            <div class="section__head">
-                <h2 class="section__title">@Localizer["Latest Albums"]</h2>
-                <a href="/@culture/albums?sort=createdAt" class="section__more">
-                    @Localizer["View All"]
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                    </svg>
-                </a>
-            </div>
-            <div class="card-grid">
-                @foreach (var album in Model.LatestAlbums)
-                {
-                    <a href="/@culture/albums/@album.Slug" class="card">
-                        <div class="card__image">
-                            @if (!string.IsNullOrEmpty(album.CoverUrl))
-                            {
-                                <img src="@album.CoverUrl" alt="@album.Title" loading="lazy" />
-                            }
-                            else
-                            {
-                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                          d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z" />
-                                </svg>
-                            }
-                        </div>
-                        <div class="card__body">
-                            <h3 class="card__title">@album.Title</h3>
-                            @if (!string.IsNullOrEmpty(album.Artist))
-                            {
-                                <p class="card__meta">@album.Artist</p>
-                            }
-                        </div>
-                    </a>
-                }
-            </div>
-        </div>
-    </section>
-}
-
-<!-- Browse by Category -->
-<section class="section">
-    <div class="section__inner">
-        <div class="section__head">
-            <h2 class="section__title">@Localizer["Explore by Category"]</h2>
-        </div>
-
-        <div class="cat-grid">
-            <a href="/@culture/genres" class="cat-card">
-                <div class="cat-card__icon">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z" />
-                    </svg>
-                </div>
-                <div>
-                    <div class="cat-card__label">@Localizer["Genres"]</div>
-                    @if (Model.Genres.Count > 0)
-                    {
-                        <div class="cat-card__count">@Localizer["{0} available", Model.Genres.Count]</div>
-                    }
-                </div>
-            </a>
-
-            <a href="/@culture/moods" class="cat-card">
-                <div class="cat-card__icon">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </div>
-                <div>
-                    <div class="cat-card__label">@Localizer["Moods"]</div>
-                    @if (Model.Moods.Count > 0)
-                    {
-                        <div class="cat-card__count">@Localizer["{0} available", Model.Moods.Count]</div>
-                    }
-                </div>
-            </a>
-
-            <a href="/@culture/instruments" class="cat-card">
-                <div class="cat-card__icon">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-                    </svg>
-                </div>
-                <div>
-                    <div class="cat-card__label">@Localizer["Instruments"]</div>
-                    @if (Model.Instruments.Count > 0)
-                    {
-                        <div class="cat-card__count">@Localizer["{0} available", Model.Instruments.Count]</div>
-                    }
-                </div>
-            </a>
-
-            <a href="/@culture/search" class="cat-card">
-                <div class="cat-card__icon">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                </div>
-                <div>
-                    <div class="cat-card__label">@Localizer["Advanced Search"]</div>
-                    <div class="cat-card__count">@Localizer["Find exactly what you're looking for"]</div>
-                </div>
-            </a>
-        </div>
 
         @if (Model.Genres.Count > 0 || Model.Moods.Count > 0 || Model.Instruments.Count > 0)
         {
-            <div class="mt-8 flex flex-wrap gap-2">
-                @foreach (var genre in Model.Genres)
+            <div class="hero__hints">
+                @foreach (var genre in Model.Genres.Take(4))
                 {
                     <a href="/@culture/genres/@genre.Slug" class="tag">@genre.Name</a>
                 }
-                @foreach (var mood in Model.Moods)
+                @foreach (var mood in Model.Moods.Take(3))
                 {
                     <a href="/@culture/moods/@mood.Slug" class="tag">@mood.Name</a>
                 }
-                @foreach (var instrument in Model.Instruments)
+                @foreach (var instrument in Model.Instruments.Take(3))
                 {
                     <a href="/@culture/instruments/@instrument.Slug" class="tag">@instrument.Name</a>
                 }
@@ -218,69 +73,126 @@
     </div>
 </section>
 
-<!-- Essential Tracks -->
-@if (Model.EssentialTracks.Count > 0)
-{
-    <section class="section section--alt">
-        <div class="section__inner">
-            <div class="section__head">
-                <h2 class="section__title">@Localizer["Essential Tracks"]</h2>
-            </div>
-            <div>
-                @foreach (var track in Model.EssentialTracks)
+<!-- Catalog + Sidebar -->
+<section class="section" style="padding-top: 0;">
+    <div class="section__inner">
+        <div class="home-layout">
+
+            <!-- Main column: category chips + album grid -->
+            <div class="home-main">
+                <div class="section__head">
+                    <h2 class="section__title">@L["Home.AllAlbums"]</h2>
+                    @if (totalItems > 0)
+                    {
+                        <span class="home-result-count">@L["Home.AlbumCount", totalItems]</span>
+                    }
+                </div>
+
+                @if (Model.Categories.Count > 0)
                 {
-                    <a href="/@culture/tracks/@track.Slug" class="track-row">
-                        <div class="track-row__num">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
-                            </svg>
-                        </div>
-                        <div class="track-row__info">
-                            <div class="track-row__title">@track.Title</div>
-                            @if (!string.IsNullOrEmpty(track.Artist))
-                            {
-                                <div class="track-row__artist">@track.Artist</div>
-                            }
-                        </div>
-                        @if (!string.IsNullOrEmpty(track.Duration))
+                    <div class="chip-row" role="group" aria-label="@L["Home.Categories"]">
+                        <a href="/@culture" class="chip @(string.IsNullOrEmpty(Model.SelectedCategory) ? "chip--active" : "")">
+                            @L["All"]
+                        </a>
+                        @foreach (var c in Model.Categories)
                         {
-                            <span class="track-row__duration">@track.Duration</span>
+                            var active = string.Equals(c.Code, Model.SelectedCategory, StringComparison.OrdinalIgnoreCase);
+                            <a href="/@culture?category=@Uri.EscapeDataString(c.Code)"
+                               class="chip @(active ? "chip--active" : "")"
+                               aria-current="@(active ? "page" : null)">
+                                @c.Name
+                                <span class="chip__count">@c.AlbumCount</span>
+                            </a>
                         }
-                    </a>
+                    </div>
+                }
+
+                @if (!hasAlbums)
+                {
+                    <div class="empty">
+                        <svg class="empty__icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                  d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z" />
+                        </svg>
+                        <h3 class="empty__title">@L["Home.NoAlbums"]</h3>
+                        <p class="empty__text">@L["Home.NoAlbumsHint"]</p>
+                        <a href="/@culture" class="empty__link">@L["Home.ClearCategory"]</a>
+                    </div>
+                }
+                else
+                {
+                    <div class="card-grid" id="home-album-grid">
+                        @await Html.PartialAsync("_AlbumCardGrid", Model.Albums)
+                    </div>
+
+                    @if (showLoadMore)
+                    {
+                        <div class="home-loadmore">
+                            <button type="button"
+                                    id="home-load-more"
+                                    class="btn btn--secondary"
+                                    data-culture="@culture"
+                                    data-category="@Model.SelectedCategory"
+                                    data-next-page="@(currentPage + 1)"
+                                    data-total="@totalItems"
+                                    data-cap="@HomeConstants.LazyLoadCap"
+                                    data-pagesize="@HomeConstants.InitialPageSize">
+                                <span class="home-loadmore__icon" aria-hidden="true">
+                                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </span>
+                                <span id="home-load-more-label">@L["Home.LoadMore"]</span>
+                            </button>
+                            <p id="home-loaded-count" class="home-loadmore__count"
+                               data-template="@L["Home.ShowingOf"]">
+                                @L["Home.ShowingOf", Model.LoadedCount, totalItems]
+                            </p>
+                        </div>
+                    }
+
+                    @if (showPagination)
+                    {
+                        @* Hidden while in the lazy zone; the load-more script reveals it
+                           once the first 100 albums have been lazy-loaded. *@
+                        <div id="home-pagination" @(lazyZone ? "hidden" : "")>
+                            @await Html.PartialAsync("_Pagination", new
+                            {
+                                Items = PagedResult<AlbumListItemDto>.Create(
+                                    Array.Empty<AlbumListItemDto>(),
+                                    lazyZone ? HomeConstants.LazyLoadCapPages : currentPage,
+                                    HomeConstants.PaginationPageSize,
+                                    totalItems),
+                                PageUrl = (Func<int, string>)GetPageUrl
+                            })
+                        </div>
+                    }
                 }
             </div>
+
+            <!-- Sidebar: random poem + about -->
+            <aside class="home-sidebar" role="complementary" aria-label="@L["Home.Sidebar"]">
+                @if (Model.RandomPoem is not null)
+                {
+                    @await Html.PartialAsync("_RandomPoemCard", Model.RandomPoem)
+                }
+                @await Html.PartialAsync("_AboutCard", Model.About)
+            </aside>
+
         </div>
-    </section>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="~/js/home.js" defer></script>
 }
 
-<!-- Featured Poems -->
-@if (Model.FeaturedPoems.Count > 0)
-{
-    <section class="section">
-        <div class="section__inner">
-            <div class="section__head">
-                <h2 class="section__title">@Localizer["Featured Poems"]</h2>
-            </div>
-            <div>
-                @foreach (var poem in Model.FeaturedPoems)
-                {
-                    <a href="/@culture/poems/@poem.Slug" class="track-row">
-                        <div class="track-row__num" style="background: var(--color-accent); color: var(--color-accent-ink);">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                            </svg>
-                        </div>
-                        <div class="track-row__info">
-                            <div class="track-row__title">@poem.Title</div>
-                            @if (!string.IsNullOrEmpty(poem.Poet))
-                            {
-                                <div class="track-row__artist">@poem.Poet</div>
-                            }
-                        </div>
-                    </a>
-                }
-            </div>
-        </div>
-    </section>
+@functions {
+    string GetPageUrl(int page)
+    {
+        var query = $"page={page}";
+        if (!string.IsNullOrWhiteSpace(Model.SelectedCategory))
+            query += $"&category={Uri.EscapeDataString(Model.SelectedCategory)}";
+        return $"/{Model.CurrentCulture}?{query}";
+    }
 }

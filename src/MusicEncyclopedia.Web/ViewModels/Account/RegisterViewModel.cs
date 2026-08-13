@@ -11,16 +11,16 @@ public sealed class RegisterViewModel
     /// <summary>
     /// The user's email address (used as the username).
     /// </summary>
-    [Required(ErrorMessage = "Email is required.")]
-    [EmailAddress(ErrorMessage = "Invalid email address.")]
+    [Required(ErrorMessage = "ایمیل الزامی است.")]
+    [EmailAddress(ErrorMessage = "آدرس ایمیل نامعتبر است.")]
     [Display(Name = "Email")]
     public string Email { get; set; } = string.Empty;
 
     /// <summary>
     /// The user's password.
     /// </summary>
-    [Required(ErrorMessage = "Password is required.")]
-    [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at most {1} characters long.", MinimumLength = 10)]
+    [Required(ErrorMessage = "رمز عبور الزامی است.")]
+    [StringLength(100, ErrorMessage = "رمز عبور باید حداقل {2} و حداکثر {1} کاراکتر باشد.", MinimumLength = 10)]
     [DataType(DataType.Password)]
     [Display(Name = "Password")]
     public string Password { get; set; } = string.Empty;
@@ -28,10 +28,10 @@ public sealed class RegisterViewModel
     /// <summary>
     /// Confirmation of the password.
     /// </summary>
-    [Required(ErrorMessage = "Confirm password is required.")]
+    [Required(ErrorMessage = "تأیید رمز عبور الزامی است.")]
     [DataType(DataType.Password)]
     [Display(Name = "Confirm password")]
-    [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+    [Compare("Password", ErrorMessage = "رمز عبور و تأیید آن یکسان نیستند.")]
     public string ConfirmPassword { get; set; } = string.Empty;
 
     /// <summary>

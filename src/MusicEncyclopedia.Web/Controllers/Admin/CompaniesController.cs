@@ -149,7 +149,7 @@ public sealed class CompaniesController : AdminBaseController
 
         await InvalidateEntityCacheAsync("Company", company.CompanyId, "Created");
 
-        SetSuccessMessage($"Company \"{company.Name}\" created successfully.");
+        SetSuccessMessage($"شرکت «{company.Name}» با موفقیت ایجاد شد.");
         return RedirectToAction(nameof(Edit), new { id = company.CompanyId });
     }
 
@@ -162,7 +162,7 @@ public sealed class CompaniesController : AdminBaseController
 
         if (company is null)
         {
-            SetErrorMessage("Company not found.");
+            SetErrorMessage("شرکت یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -199,7 +199,7 @@ public sealed class CompaniesController : AdminBaseController
     {
         if (id != viewModel.CompanyId)
         {
-            SetErrorMessage("Company ID mismatch.");
+            SetErrorMessage("شناسه شرکت ناسازگار است.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -216,7 +216,7 @@ public sealed class CompaniesController : AdminBaseController
 
         if (company is null)
         {
-            SetErrorMessage("Company not found.");
+            SetErrorMessage("شرکت یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -250,12 +250,12 @@ public sealed class CompaniesController : AdminBaseController
 
             await InvalidateEntityCacheAsync("Company", company.CompanyId, "Updated");
 
-            SetSuccessMessage($"Company \"{company.Name}\" updated successfully.");
+            SetSuccessMessage($"شرکت «{company.Name}» با موفقیت به‌روزرسانی شد.");
         }
         catch (DbUpdateConcurrencyException ex)
         {
             _logger.LogWarning(ex, "Concurrency conflict updating company {CompanyId}", id);
-            SetErrorMessage("This company was modified by another user. Please reload and try again.");
+            SetErrorMessage("این شرکت توسط کاربر دیگری تغییر کرده است. لطفاً دوباره بارگذاری و تلاش کنید.");
             viewModel.CompanyTypes = await _db.CompanyTypes.OrderBy(t => t.Name).ToListAsync(cancellationToken);
             viewModel.Countries = await _db.Countries.OrderBy(c => c.Name).ToListAsync(cancellationToken);
             viewModel.RowVersion = company.RowVersion;
@@ -274,7 +274,7 @@ public sealed class CompaniesController : AdminBaseController
         var company = await _db.Companies.FirstOrDefaultAsync(c => c.CompanyId == id, cancellationToken);
         if (company is null)
         {
-            SetErrorMessage("Company not found.");
+            SetErrorMessage("شرکت یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -294,7 +294,7 @@ public sealed class CompaniesController : AdminBaseController
 
         await InvalidateEntityCacheAsync("Company", company.CompanyId, "Deleted");
 
-        SetSuccessMessage($"Company \"{company.Name}\" has been deleted (soft).");
+        SetSuccessMessage($"شرکت «{company.Name}» به‌صورت نرم حذف شد.");
         return RedirectToAction(nameof(Index));
     }
 
@@ -307,7 +307,7 @@ public sealed class CompaniesController : AdminBaseController
             .FirstOrDefaultAsync(c => c.CompanyId == id, cancellationToken);
         if (company is null)
         {
-            SetErrorMessage("Company not found.");
+            SetErrorMessage("شرکت یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -328,7 +328,7 @@ public sealed class CompaniesController : AdminBaseController
 
         await InvalidateEntityCacheAsync("Company", company.CompanyId, "Restored");
 
-        SetSuccessMessage($"Company \"{company.Name}\" has been restored.");
+        SetSuccessMessage($"شرکت «{company.Name}» بازیابی شد.");
         return RedirectToAction(nameof(Index));
     }
 }

@@ -45,6 +45,15 @@ public static class SqlDialect
     }
 
     /// <summary>
+    /// Returns a random-ordering expression for the given dialect:
+    /// SQL Server uses NEWID(), SQLite uses RANDOM().
+    /// </summary>
+    public static string RandomOrder(bool isSqlite)
+    {
+        return isSqlite ? "RANDOM()" : "NEWID()";
+    }
+
+    /// <summary>
     /// Returns a pagination clause for the given dialect:
     /// SQL Server uses OFFSET/FETCH NEXT, SQLite uses LIMIT/OFFSET.
     /// </summary>

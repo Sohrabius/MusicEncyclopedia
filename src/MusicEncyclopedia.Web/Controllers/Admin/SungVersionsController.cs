@@ -145,7 +145,7 @@ public sealed class SungVersionsController : AdminBaseController
 
         await InvalidateEntityCacheAsync("SungVersion", sungVersion.SungVersionId, "Created");
 
-        SetSuccessMessage($"Sung version \"{sungVersion.Title}\" created successfully.");
+        SetSuccessMessage($"نسخه خوانده‌شده «{sungVersion.Title}» با موفقیت ایجاد شد.");
         return RedirectToAction(nameof(Edit), new { id = sungVersion.SungVersionId });
     }
 
@@ -158,7 +158,7 @@ public sealed class SungVersionsController : AdminBaseController
 
         if (sungVersion is null)
         {
-            SetErrorMessage("Sung version not found.");
+            SetErrorMessage("نسخه خوانده‌شده یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -193,7 +193,7 @@ public sealed class SungVersionsController : AdminBaseController
     {
         if (id != viewModel.SungVersionId)
         {
-            SetErrorMessage("Sung version ID mismatch.");
+            SetErrorMessage("نسخه شناسه خوانده‌شده ناسازگار است.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -210,7 +210,7 @@ public sealed class SungVersionsController : AdminBaseController
 
         if (sungVersion is null)
         {
-            SetErrorMessage("Sung version not found.");
+            SetErrorMessage("نسخه خوانده‌شده یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -242,12 +242,12 @@ public sealed class SungVersionsController : AdminBaseController
 
             await InvalidateEntityCacheAsync("SungVersion", sungVersion.SungVersionId, "Updated");
 
-            SetSuccessMessage($"Sung version \"{sungVersion.Title}\" updated successfully.");
+            SetSuccessMessage($"نسخه خوانده‌شده «{sungVersion.Title}» با موفقیت به‌روزرسانی شد.");
         }
         catch (DbUpdateConcurrencyException ex)
         {
             _logger.LogWarning(ex, "Concurrency conflict updating sung version {SungVersionId}", id);
-            SetErrorMessage("This sung version was modified by another user. Please reload and try again.");
+            SetErrorMessage("این نسخه خوانده‌شده توسط کاربر دیگری تغییر کرده است. لطفاً دوباره بارگذاری و تلاش کنید.");
             viewModel.Poems = await _db.Poems.OrderBy(p => p.Title).ToListAsync(cancellationToken);
             viewModel.VocalStyles = await _db.VocalStyles.OrderBy(v => v.Name).ToListAsync(cancellationToken);
             viewModel.RowVersion = sungVersion.RowVersion;
@@ -266,7 +266,7 @@ public sealed class SungVersionsController : AdminBaseController
         var sungVersion = await _db.SungVersions.FirstOrDefaultAsync(sv => sv.SungVersionId == id, cancellationToken);
         if (sungVersion is null)
         {
-            SetErrorMessage("Sung version not found.");
+            SetErrorMessage("نسخه خوانده‌شده یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -286,7 +286,7 @@ public sealed class SungVersionsController : AdminBaseController
 
         await InvalidateEntityCacheAsync("SungVersion", sungVersion.SungVersionId, "Deleted");
 
-        SetSuccessMessage($"Sung version \"{sungVersion.Title}\" has been deleted (soft).");
+        SetSuccessMessage($"نسخه خوانده‌شده «{sungVersion.Title}» به‌صورت نرم حذف شد.");
         return RedirectToAction(nameof(Index));
     }
 
@@ -299,7 +299,7 @@ public sealed class SungVersionsController : AdminBaseController
             .FirstOrDefaultAsync(sv => sv.SungVersionId == id, cancellationToken);
         if (sungVersion is null)
         {
-            SetErrorMessage("Sung version not found.");
+            SetErrorMessage("نسخه خوانده‌شده یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -320,7 +320,7 @@ public sealed class SungVersionsController : AdminBaseController
 
         await InvalidateEntityCacheAsync("SungVersion", sungVersion.SungVersionId, "Restored");
 
-        SetSuccessMessage($"Sung version \"{sungVersion.Title}\" has been restored.");
+        SetSuccessMessage($"نسخه خوانده‌شده «{sungVersion.Title}» بازیابی شد.");
         return RedirectToAction(nameof(Index));
     }
 }

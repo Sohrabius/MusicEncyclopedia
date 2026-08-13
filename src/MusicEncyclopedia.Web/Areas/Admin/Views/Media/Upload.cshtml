@@ -1,6 +1,6 @@
 @model MediaUploadViewModel
 @{
-    ViewData["Title"] = "Upload Media";
+    ViewData["Title"] = "بارگذاری رسانه";
     ViewData["ActiveMenu"] = "Media";
 }
 
@@ -12,11 +12,11 @@
         <div class="lg:col-span-2 space-y-6">
             <!-- File Upload Area -->
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">Select File</h2>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">انتخاب فایل</h2>
                 <div id="drop-zone" class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition-colors cursor-pointer" onclick="document.getElementById('file-input').click()">
                     <i class="fas fa-cloud-upload-alt text-4xl text-gray-300 mb-3 block"></i>
-                    <p class="text-sm text-gray-500 mb-1">Drag and drop a file here, or click to select</p>
-                    <p class="text-xs text-gray-400">Allowed: JPEG, PNG, GIF, WebP, SVG, MP3, WAV, FLAC, AAC, MP4, WebM, PDF (max 200 MB)</p>
+                    <p class="text-sm text-gray-500 mb-1">فایل را اینجا بکشید و رها کنید، یا برای انتخاب کلیک کنید</p>
+                    <p class="text-xs text-gray-400">مجاز: JPEG، PNG، GIF، WebP، SVG، MP3، WAV، FLAC، AAC، MP4، WebM، PDF (حداکثر ۲۰۰ مگابایت)</p>
                     <input type="file" id="file-input" asp-for="File" class="hidden" onchange="handleFileSelect(event)" />
                     <span asp-validation-for="File" class="text-xs text-red-600"></span>
                 </div>
@@ -36,12 +36,12 @@
 
             <!-- Metadata -->
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">Media Metadata</h2>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">رسانه فراداده</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label asp-for="MediaTypeId" class="block text-sm font-medium text-gray-700 mb-1"></label>
                         <select asp-for="MediaTypeId" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">-- Auto-detect --</option>
+                            <option value="">-- تشخیص خودکار --</option>
                             @foreach (var mt in Model.MediaTypes)
                             {
                                 <option value="@mt.MediaTypeId">@mt.Name</option>
@@ -65,21 +65,21 @@
 
         <div class="space-y-6">
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">Upload</h2>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">بارگذاری</h2>
                 <button type="submit" id="btn-upload" class="w-full px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
-                    <i class="fas fa-upload"></i> Upload File
+                    <i class="fas fa-upload"></i> بارگذاری فایل
                 </button>
-                <a href="/admin/media" class="w-full block text-center mt-3 px-4 py-2.5 text-sm text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">Cancel</a>
+                <a href="/admin/media" class="w-full block text-center mt-3 px-4 py-2.5 text-sm text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">انصراف</a>
             </div>
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                <h2 class="text-sm font-semibold text-gray-700 mb-2">Upload Guidelines</h2>
+                <h2 class="text-sm font-semibold text-gray-700 mb-2">راهنمای بارگذاری</h2>
                 <ul class="text-xs text-gray-500 space-y-1 list-disc list-inside">
-                    <li>Maximum file size: 200 MB</li>
-                    <li>Supported image formats: JPEG, PNG, GIF, WebP, SVG</li>
-                    <li>Supported audio formats: MP3, WAV, FLAC, AAC</li>
-                    <li>Supported video formats: MP4, WebM, AVI</li>
-                    <li>PDF documents are also supported</li>
-                    <li>Files are stored in /uploads/media/</li>
+                    <li>حداکثر حجم فایل: ۲۰۰ مگابایت</li>
+                    <li>فرمت‌های تصویری پشتیبانی‌شده: JPEG، PNG، GIF، WebP، SVG</li>
+                    <li>فرمت‌های صوتی پشتیبانی‌شده: MP3، WAV، FLAC، AAC</li>
+                    <li>فرمت‌های ویدیویی پشتیبانی‌شده: MP4، WebM، AVI</li>
+                    <li>اسناد PDF نیز پشتیبانی می‌شوند</li>
+                    <li>فایل‌ها در /uploads/media/ ذخیره می‌شوند</li>
                 </ul>
             </div>
         </div>

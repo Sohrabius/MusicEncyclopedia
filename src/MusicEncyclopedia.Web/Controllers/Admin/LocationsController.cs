@@ -159,7 +159,7 @@ public sealed class LocationsController : AdminBaseController
 
         await InvalidateEntityCacheAsync("Location", location.LocationId, "Created");
 
-        SetSuccessMessage($"Location \"{location.Name}\" created successfully.");
+        SetSuccessMessage($"مکان «{location.Name}» با موفقیت ایجاد شد.");
         return RedirectToAction(nameof(Edit), new { id = location.LocationId });
     }
 
@@ -174,7 +174,7 @@ public sealed class LocationsController : AdminBaseController
 
         if (location is null)
         {
-            SetErrorMessage("Location not found.");
+            SetErrorMessage("مکان یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -210,7 +210,7 @@ public sealed class LocationsController : AdminBaseController
     {
         if (id != viewModel.LocationId)
         {
-            SetErrorMessage("Location ID mismatch.");
+            SetErrorMessage("شناسه مکان ناسازگار است.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -228,7 +228,7 @@ public sealed class LocationsController : AdminBaseController
 
         if (location is null)
         {
-            SetErrorMessage("Location not found.");
+            SetErrorMessage("مکان یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -274,12 +274,12 @@ public sealed class LocationsController : AdminBaseController
 
             await InvalidateEntityCacheAsync("Location", location.LocationId, "Updated");
 
-            SetSuccessMessage($"Location \"{location.Name}\" updated successfully.");
+            SetSuccessMessage($"مکان «{location.Name}» با موفقیت به‌روزرسانی شد.");
         }
         catch (DbUpdateConcurrencyException ex)
         {
             _logger.LogWarning(ex, "Concurrency conflict updating location {Id}", id);
-            SetErrorMessage("This location was modified by another user. Please reload and try again.");
+            SetErrorMessage("این مکان توسط کاربر دیگری تغییر کرده است. لطفاً دوباره بارگذاری و تلاش کنید.");
             viewModel.RowVersion = location.RowVersion;
             viewModel.LocationTypes = await _db.LocationTypes.OrderBy(lt => lt.Name).ToListAsync(cancellationToken);
             viewModel.ParentLocations = await _db.Locations.Where(l => !l.IsDeleted && l.LocationId != id).OrderBy(l => l.Name).ToListAsync(cancellationToken);
@@ -303,7 +303,7 @@ public sealed class LocationsController : AdminBaseController
 
         if (location is null)
         {
-            SetErrorMessage("Location not found.");
+            SetErrorMessage("مکان یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -326,7 +326,7 @@ public sealed class LocationsController : AdminBaseController
 
         await InvalidateEntityCacheAsync("Location", location.LocationId, "Deleted");
 
-        SetSuccessMessage($"Location \"{location.Name}\" has been deleted.");
+        SetSuccessMessage($"مکان «{location.Name}» حذف شد.");
         return RedirectToAction(nameof(Index));
     }
 
@@ -343,7 +343,7 @@ public sealed class LocationsController : AdminBaseController
 
         if (location is null)
         {
-            SetErrorMessage("Location not found.");
+            SetErrorMessage("مکان یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -365,7 +365,7 @@ public sealed class LocationsController : AdminBaseController
 
         await InvalidateEntityCacheAsync("Location", location.LocationId, "Restored");
 
-        SetSuccessMessage($"Location \"{location.Name}\" has been restored.");
+        SetSuccessMessage($"مکان «{location.Name}» بازیابی شد.");
         return RedirectToAction(nameof(Index));
     }
 }

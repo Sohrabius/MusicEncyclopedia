@@ -13,31 +13,31 @@ public sealed class MediaEditViewModel
 
     [Required(ErrorMessage = "File name is required.")]
     [StringLength(500, ErrorMessage = "File name must not exceed 500 characters.")]
-    [Display(Name = "File Name")]
+    [Display(Name = "نام فایل")]
     public string FileName { get; set; } = "";
 
-    [Display(Name = "Media Type")]
+    [Display(Name = "نوع رسانه")]
     public int? MediaTypeId { get; set; }
 
     [StringLength(2000, ErrorMessage = "URL must not exceed 2000 characters.")]
     [Display(Name = "URL")]
     public string? Url { get; set; }
 
-    [Display(Name = "Alt Text")]
+    [Display(Name = "متن جایگزین")]
     public string? AltText { get; set; }
 
-    [Display(Name = "Width (px)")]
+    [Display(Name = "عرض (پیکسل)")]
     public int? Width { get; set; }
 
-    [Display(Name = "Height (px)")]
+    [Display(Name = "ارتفاع (پیکسل)")]
     public int? Height { get; set; }
 
-    [Display(Name = "File Size (bytes)")]
+    [Display(Name = "اندازه فایل (بایت)")]
     public long FileSize { get; set; }
 
     [Required(ErrorMessage = "MIME type is required.")]
     [StringLength(50, ErrorMessage = "MIME type must not exceed 50 characters.")]
-    [Display(Name = "MIME Type")]
+    [Display(Name = "نوع MIME")]
     public string MimeType { get; set; } = "";
 
     public string? FilePath { get; set; }
@@ -56,17 +56,17 @@ public sealed class MediaEditViewModel
 public sealed class MediaUploadViewModel
 {
     [Required(ErrorMessage = "Please select a file to upload.")]
-    [Display(Name = "File")]
+    [Display(Name = "فایل")]
     public IFormFile? File { get; set; }
 
-    [Display(Name = "Media Type")]
+    [Display(Name = "نوع رسانه")]
     public int? MediaTypeId { get; set; }
 
     [StringLength(500, ErrorMessage = "File name must not exceed 500 characters.")]
-    [Display(Name = "File Name (optional, defaults to uploaded file name)")]
+    [Display(Name = "نام فایل (اختیاری؛ در صورت خالی بودن، نام فایل بارگذاری‌شده استفاده می‌شود)")]
     public string? FileName { get; set; }
 
-    [Display(Name = "Alt Text")]
+    [Display(Name = "متن جایگزین")]
     public string? AltText { get; set; }
 
     // Dropdown data
@@ -82,20 +82,20 @@ public sealed class MediaAssignViewModel
     public int MediaId { get; set; }
 
     [Required(ErrorMessage = "Entity type is required.")]
-    [Display(Name = "Entity Type")]
+    [Display(Name = "نوع موجودیت")]
     public int EntityTypeId { get; set; }
 
     [Required(ErrorMessage = "Entity ID is required.")]
-    [Display(Name = "Entity ID")]
+    [Display(Name = "شناسه موجودیت")]
     public int EntityId { get; set; }
 
-    [Display(Name = "Media Role")]
+    [Display(Name = "نقش رسانه")]
     public int? MediaRoleTypeId { get; set; }
 
-    [Display(Name = "Primary")]
+    [Display(Name = "اصلی")]
     public bool IsPrimary { get; set; }
 
-    [Display(Name = "Display Order")]
+    [Display(Name = "ترتیب نمایش")]
     public int DisplayOrder { get; set; }
 
     public IReadOnlyList<MediaRoleType> MediaRoleTypes { get; set; } = [];

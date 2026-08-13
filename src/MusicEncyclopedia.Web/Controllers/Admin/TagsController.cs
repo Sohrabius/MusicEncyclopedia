@@ -157,7 +157,7 @@ public sealed class TagsController : AdminBaseController
 
         await InvalidateEntityCacheAsync("Tag", tag.TagId, "Created");
 
-        SetSuccessMessage($"Tag \"{tag.Name}\" created successfully.");
+        SetSuccessMessage($"برچسب «{tag.Name}» با موفقیت ایجاد شد.");
         return RedirectToAction(nameof(Edit), new { id = tag.TagId });
     }
 
@@ -176,7 +176,7 @@ public sealed class TagsController : AdminBaseController
 
         if (tag is null)
         {
-            SetErrorMessage("Tag not found.");
+            SetErrorMessage("برچسب یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -205,7 +205,7 @@ public sealed class TagsController : AdminBaseController
     {
         if (id != viewModel.TagId)
         {
-            SetErrorMessage("Tag ID mismatch.");
+            SetErrorMessage("شناسه برچسب ناسازگار است.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -220,7 +220,7 @@ public sealed class TagsController : AdminBaseController
 
         if (tag is null)
         {
-            SetErrorMessage("Tag not found.");
+            SetErrorMessage("برچسب یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -261,12 +261,12 @@ public sealed class TagsController : AdminBaseController
 
             await InvalidateEntityCacheAsync("Tag", tag.TagId, "Updated");
 
-            SetSuccessMessage($"Tag \"{tag.Name}\" updated successfully.");
+            SetSuccessMessage($"برچسب «{tag.Name}» با موفقیت به‌روزرسانی شد.");
         }
         catch (DbUpdateConcurrencyException ex)
         {
             _logger.LogWarning(ex, "Concurrency conflict updating tag {TagId}", id);
-            SetErrorMessage("This tag was modified by another user. Please reload and try again.");
+            SetErrorMessage("این برچسب توسط کاربر دیگری تغییر کرده است. لطفاً دوباره بارگذاری و تلاش کنید.");
             viewModel.RowVersion = tag.RowVersion;
             return View(viewModel);
         }
@@ -291,7 +291,7 @@ public sealed class TagsController : AdminBaseController
 
         if (tag is null)
         {
-            SetErrorMessage("Tag not found.");
+            SetErrorMessage("برچسب یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -329,7 +329,7 @@ public sealed class TagsController : AdminBaseController
 
         await InvalidateEntityCacheAsync("Tag", tag.TagId, "Deleted");
 
-        SetSuccessMessage($"Tag \"{tag.Name}\" has been deleted.");
+        SetSuccessMessage($"برچسب «{tag.Name}» حذف شد.");
         return RedirectToAction(nameof(Index));
     }
 
@@ -350,7 +350,7 @@ public sealed class TagsController : AdminBaseController
 
         if (tag is null)
         {
-            SetErrorMessage("Tag not found.");
+            SetErrorMessage("برچسب یافت نشد.");
             return RedirectToAction(nameof(Index));
         }
 
@@ -372,7 +372,7 @@ public sealed class TagsController : AdminBaseController
 
         await InvalidateEntityCacheAsync("Tag", tag.TagId, "Restored");
 
-        SetSuccessMessage($"Tag \"{tag.Name}\" has been restored.");
+        SetSuccessMessage($"برچسب «{tag.Name}» بازیابی شد.");
         return RedirectToAction(nameof(Index));
     }
 
