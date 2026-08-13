@@ -244,15 +244,15 @@ public static class DatabaseInitializer
         if (await context.MediaTypes.AnyAsync())
         {
             await SeedOptionalContentAsync(context, seedSampleContent);
-            await SeedLocalizationsAsync(context);
+            await SeedLocalizationsAsync(context, isSqlite);
             return; // Lookup data already seeded
         }
 
-        await SeedLookupDataAsync(context);
+        await SeedLookupDataAsync(context, isSqlite);
 
         await SeedOptionalContentAsync(context, seedSampleContent);
 
-        await SeedLocalizationsAsync(context);
+        await SeedLocalizationsAsync(context, isSqlite);
     }
 
     /// <summary>
@@ -277,7 +277,7 @@ public static class DatabaseInitializer
     /// while other cultures fall back to the English base columns.
     /// Every section is guarded so re-runs never duplicate data.
     /// </summary>
-    private static async Task SeedLocalizationsAsync(AppDbContext context)
+    private static async Task SeedLocalizationsAsync(AppDbContext context, bool isSqlite)
     {
         // Languages (idempotent — existing databases won't have en/ar/fr)
         if (!await context.Languages.AnyAsync(l => l.Code == "en"))
@@ -287,7 +287,9 @@ public static class DatabaseInitializer
                 new Language { LanguageId = 3, Code = "ar", Name = "Arabic" },
                 new Language { LanguageId = 4, Code = "fr", Name = "French" }
             );
-            await context.SaveChangesAsync();
+        await SaveLookupTableAsync(context, "Language", isSqlite, useIdentityInsert: true);
+
+
         }
 
         // Guard: seed sample localizations only once
@@ -1071,7 +1073,7 @@ public static class DatabaseInitializer
         return ids;
     }
 
-    private static async Task SeedLookupDataAsync(AppDbContext context)
+    private static async Task SeedLookupDataAsync(AppDbContext context, bool isSqlite)
     {
         // ──────────────────────────────────────────────
         // EntityType (1-18)
@@ -1096,6 +1098,7 @@ public static class DatabaseInitializer
             new EntityType { EntityTypeId = 17, Code = "Source", Name = "Source" },
             new EntityType { EntityTypeId = 18, Code = "Tag", Name = "Tag" }
         );
+        await SaveLookupTableAsync(context, "EntityType", isSqlite, useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // Language (1)
@@ -1106,6 +1109,7 @@ public static class DatabaseInitializer
             new Language { LanguageId = 3, Code = "ar", Name = "Arabic" },
             new Language { LanguageId = 4, Code = "fr", Name = "French" }
         );
+        await SaveLookupTableAsync(context, "Language", isSqlite, useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // Country (1-14)
@@ -1126,6 +1130,7 @@ public static class DatabaseInitializer
             new Country { CountryId = 13, Code = "IN", Name = "India" },
             new Country { CountryId = 14, Code = "PK", Name = "Pakistan" }
         );
+        await SaveLookupTableAsync(context, "Country", isSqlite, useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // AlbumCategory (1-10)
@@ -1142,6 +1147,7 @@ public static class DatabaseInitializer
             new AlbumCategory { AlbumCategoryId = 9, Code = "Mixtape", Name = "Mixtape" },
             new AlbumCategory { AlbumCategoryId = 10, Code = "Remix", Name = "Remix Album" }
         );
+        await SaveLookupTableAsync(context, "AlbumCategory", isSqlite, useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // CompanyType (1-6)
@@ -1154,6 +1160,7 @@ public static class DatabaseInitializer
             new CompanyType { CompanyTypeId = 5, Code = "Distributor", Name = "Distributor" },
             new CompanyType { CompanyTypeId = 6, Code = "Manufacturer", Name = "Manufacturer" }
         );
+        await SaveLookupTableAsync(context, "CompanyType", isSqlite, useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // CompanyRoleType (1-5)
@@ -1165,6 +1172,7 @@ public static class DatabaseInitializer
             new CompanyRoleType { CompanyRoleTypeId = 4, Code = "Production", Name = "Production Company" },
             new CompanyRoleType { CompanyRoleTypeId = 5, Code = "Studio", Name = "Recording Studio" }
         );
+        await SaveLookupTableAsync(context, "CompanyRoleType", isSqlite, useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // RoleScopeType (1-3)
@@ -1174,6 +1182,7 @@ public static class DatabaseInitializer
             new RoleScopeType { RoleScopeTypeId = 2, Code = "Company", Name = "Company only" },
             new RoleScopeType { RoleScopeTypeId = 3, Code = "Both", Name = "Person or Company" }
         );
+        await SaveLookupTableAsync(context, "RoleScopeType", isSqlite, useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // CreditRole (1-20)
@@ -1200,6 +1209,7 @@ public static class DatabaseInitializer
             new CreditRole { CreditRoleId = 19, Code = "DISTRIBUTOR", Name = "Distributor", DisplayOrder = 52, RoleScopeTypeId = 2 },
             new CreditRole { CreditRoleId = 20, Code = "COLLABORATOR", Name = "Collaborator", DisplayOrder = 60, RoleScopeTypeId = 3 }
         );
+        await SaveLookupTableAsync(context, "CreditRole", isSqlite, useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // AliasType (1-6)
@@ -1212,6 +1222,7 @@ public static class DatabaseInitializer
             new AliasType { AliasTypeId = 5, Code = "ORIGINAL_SCRIPT", Name = "Original Script" },
             new AliasType { AliasTypeId = 6, Code = "SLUG", Name = "Slug" }
         );
+        await SaveLookupTableAsync(context, "AliasType", isSqlite, useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // MediaType (1-4)
@@ -1222,6 +1233,7 @@ public static class DatabaseInitializer
             new MediaType { MediaTypeId = 3, Code = "VIDEO", Name = "Video" },
             new MediaType { MediaTypeId = 4, Code = "PDF", Name = "Document" }
         );
+        await SaveLookupTableAsync(context, "MediaType", isSqlite, useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // MediaRoleType (1-14)
@@ -1242,6 +1254,7 @@ public static class DatabaseInitializer
             new MediaRoleType { MediaRoleTypeId = 13, Code = "SCORE", Name = "Musical Score" },
             new MediaRoleType { MediaRoleTypeId = 14, Code = "INTERVIEW", Name = "Interview" }
         );
+        await SaveLookupTableAsync(context, "MediaRoleType", isSqlite, useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // LinkType (1-19)
@@ -1267,6 +1280,7 @@ public static class DatabaseInitializer
             new LinkType { LinkTypeId = 18, Code = "PURCHASE", Name = "Purchase Link" },
             new LinkType { LinkTypeId = 19, Code = "STREAMING", Name = "Streaming Link" }
         );
+        await SaveLookupTableAsync(context, "LinkType", isSqlite, useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // SourceType (1-10)
@@ -1283,6 +1297,7 @@ public static class DatabaseInitializer
             new SourceType { SourceTypeId = 9, Code = "ACADEMIC", Name = "Academic Publication" },
             new SourceType { SourceTypeId = 10, Code = "SOCIAL_MEDIA", Name = "Social Media" }
         );
+        await SaveLookupTableAsync(context, "SourceType", isSqlite, useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // IdentifierType (1-5)
@@ -1294,6 +1309,7 @@ public static class DatabaseInitializer
             new IdentifierType { IdentifierTypeId = 4, Code = "UPC", Name = "UPC" },
             new IdentifierType { IdentifierTypeId = 5, Code = "MATRIX", Name = "Matrix/Runout" }
         );
+        await SaveLookupTableAsync(context, "IdentifierType", isSqlite, useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // PersonKind (1-5)
@@ -1305,6 +1321,7 @@ public static class DatabaseInitializer
             new PersonKind { PersonKindId = 4, Code = "ORCHESTRA", Name = "Orchestra" },
             new PersonKind { PersonKindId = 5, Code = "ENSEMBLE", Name = "Ensemble" }
         );
+        await SaveLookupTableAsync(context, "PersonKind", isSqlite, useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // PersonType (1-8)
@@ -1319,6 +1336,7 @@ public static class DatabaseInitializer
             new PersonType { PersonTypeId = 7, Code = "ENGINEER", Name = "Engineer" },
             new PersonType { PersonTypeId = 8, Code = "CONDUCTOR", Name = "Conductor" }
         );
+        await SaveLookupTableAsync(context, "PersonType", isSqlite, useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // LocationType (1-6)
@@ -1331,6 +1349,7 @@ public static class DatabaseInitializer
             new LocationType { LocationTypeId = 5, Code = "REGION", Name = "Region" },
             new LocationType { LocationTypeId = 6, Code = "PROVINCE", Name = "Province/State" }
         );
+        await SaveLookupTableAsync(context, "LocationType", isSqlite, useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // EventType (1-8)
@@ -1345,6 +1364,7 @@ public static class DatabaseInitializer
             new EventType { EventTypeId = 7, Code = "BOOK_SIGNING", Name = "Book Signing" },
             new EventType { EventTypeId = 8, Code = "MEET_AND_GREET", Name = "Meet and Greet" }
         );
+        await SaveLookupTableAsync(context, "EventType", isSqlite, useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // SessionType (1-7)
@@ -1358,6 +1378,7 @@ public static class DatabaseInitializer
             new SessionType { SessionTypeId = 6, Code = "MASTERING", Name = "Mastering Session" },
             new SessionType { SessionTypeId = 7, Code = "LIVE_RECORDING", Name = "Live Recording Session" }
         );
+        await SaveLookupTableAsync(context, "SessionType", isSqlite, useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // PublicationType (1-5)
@@ -1369,6 +1390,7 @@ public static class DatabaseInitializer
             new PublicationType { PublicationTypeId = 4, Code = "DIGITAL", Name = "Digital Publication" },
             new PublicationType { PublicationTypeId = 5, Code = "COLLECTION", Name = "Collection" }
         );
+        await SaveLookupTableAsync(context, "PublicationType", isSqlite, useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // AwardResultType (1-6)
@@ -1381,6 +1403,7 @@ public static class DatabaseInitializer
             new AwardResultType { AwardResultTypeId = 5, Code = "PLACE_3", Name = "Third Place" },
             new AwardResultType { AwardResultTypeId = 6, Code = "HONORABLE", Name = "Honorable Mention" }
         );
+        await SaveLookupTableAsync(context, "AwardResultType", isSqlite, useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // TrackRelationType (1-10)
@@ -1397,6 +1420,7 @@ public static class DatabaseInitializer
             new TrackRelationType { TrackRelationTypeId = 9, Code = "SAMPLED_IN", Name = "Sampled In" },
             new TrackRelationType { TrackRelationTypeId = 10, Code = "SAMPLES", Name = "Samples" }
         );
+        await SaveLookupTableAsync(context, "TrackRelationType", isSqlite, useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // AlbumRelationType (1-6)
@@ -1409,6 +1433,7 @@ public static class DatabaseInitializer
             new AlbumRelationType { AlbumRelationTypeId = 5, Code = "FOLLOW_UP", Name = "Follow-up" },
             new AlbumRelationType { AlbumRelationTypeId = 6, Code = "COMPILATION", Name = "Compilation Contains" }
         );
+        await SaveLookupTableAsync(context, "AlbumRelationType", isSqlite, useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // TrackVersionType (1-11)
@@ -1426,6 +1451,7 @@ public static class DatabaseInitializer
             new TrackVersionType { TrackVersionTypeId = 10, Code = "EXTENDED", Name = "Extended Mix" },
             new TrackVersionType { TrackVersionTypeId = 11, Code = "ORIGINAL", Name = "Original Version" }
         );
+        await SaveLookupTableAsync(context, "TrackVersionType", isSqlite, useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // VocalStyle (1-12)
@@ -1444,6 +1470,7 @@ public static class DatabaseInitializer
             new VocalStyle { VocalStyleId = 11, Code = "SCREAM", Name = "Scream" },
             new VocalStyle { VocalStyleId = 12, Code = "WHISPER", Name = "Whisper" }
         );
+        await SaveLookupTableAsync(context, "VocalStyle", isSqlite, useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // MusicalKey (1-28)
@@ -1478,6 +1505,7 @@ public static class DatabaseInitializer
             new MusicalKey { MusicalKeyId = 27, Code = "B", Name = "B Major" },
             new MusicalKey { MusicalKeyId = 28, Code = "Bm", Name = "B Minor" }
         );
+        await SaveLookupTableAsync(context, "MusicalKey", isSqlite, useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // LyricsAvailabilityType (1-5)
@@ -1489,6 +1517,7 @@ public static class DatabaseInitializer
             new LyricsAvailabilityType { LyricsAvailabilityTypeId = 4, Code = "REQUEST", Name = "Available Upon Request" },
             new LyricsAvailabilityType { LyricsAvailabilityTypeId = 5, Code = "RESTRICTED", Name = "Restricted Access" }
         );
+        await SaveLookupTableAsync(context, "LyricsAvailabilityType", isSqlite, useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // CountryRoleType (1-4)
@@ -1499,6 +1528,7 @@ public static class DatabaseInitializer
             new CountryRoleType { CountryRoleTypeId = 3, Code = "OPERATION", Name = "Country of Operation" },
             new CountryRoleType { CountryRoleTypeId = 4, Code = "REGISTRATION", Name = "Country of Registration" }
         );
+        await SaveLookupTableAsync(context, "CountryRoleType", isSqlite, useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // InstrumentFamily (1-9)
@@ -1514,7 +1544,50 @@ public static class DatabaseInitializer
             new InstrumentFamily { InstrumentFamilyId = 8, Code = "FOLK", Name = "Folk/Traditional Instruments" },
             new InstrumentFamily { InstrumentFamilyId = 9, Code = "OTHER", Name = "Other Instruments" }
         );
+        await SaveLookupTableAsync(context, "InstrumentFamily", isSqlite, useIdentityInsert: true);
+    }
 
-        await context.SaveChangesAsync();
+    /// <summary>
+    /// Saves the pending rows for a single lookup table. The seed data uses
+    /// explicit identity primary keys, which SQL Server rejects unless
+    /// <c>SET IDENTITY_INSERT</c> is enabled for that table — and SQL Server
+    /// only allows that flag for one table per session. Saving per table in
+    /// its own transaction keeps the flag scoped and the seed transactional.
+    /// SQLite accepts explicit ids natively, so there is nothing special to do.
+    /// </summary>
+    private static async Task SaveLookupTableAsync(AppDbContext context, string tableName, bool isSqlite, bool useIdentityInsert)
+    {
+        if (isSqlite)
+        {
+            // SQLite accepts explicit identity values natively.
+            await context.SaveChangesAsync();
+            return;
+        }
+
+        // SQL Server: the retrying execution strategy does not support
+        // user-initiated transactions, so the whole per-table unit (including
+        // the IDENTITY_INSERT toggling) must run through the strategy.
+        var strategy = context.Database.CreateExecutionStrategy();
+        await strategy.ExecuteAsync(async () =>
+        {
+            await using var tx = await context.Database.BeginTransactionAsync();
+            if (useIdentityInsert)
+            {
+                await context.Database.ExecuteSqlRawAsync($"SET IDENTITY_INSERT [{tableName}] ON");
+            }
+            try
+            {
+                await context.SaveChangesAsync();
+            }
+            finally
+            {
+                if (useIdentityInsert)
+                {
+                    await context.Database.ExecuteSqlRawAsync($"SET IDENTITY_INSERT [{tableName}] OFF");
+                }
+            }
+            await tx.CommitAsync();
+        });
     }
 }
+

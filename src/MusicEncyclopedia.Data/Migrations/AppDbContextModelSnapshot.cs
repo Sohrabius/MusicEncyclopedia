@@ -3995,7 +3995,7 @@ namespace MusicEncyclopedia.Data.Migrations
                     b.HasOne("MusicEncyclopedia.Data.Entities.Entity", "Entity")
                         .WithOne("Album")
                         .HasForeignKey("MusicEncyclopedia.Data.Entities.Album", "EntityId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("AlbumCategory");
@@ -4212,7 +4212,7 @@ namespace MusicEncyclopedia.Data.Migrations
                     b.HasOne("MusicEncyclopedia.Data.Entities.Entity", "Entity")
                         .WithOne("Award")
                         .HasForeignKey("MusicEncyclopedia.Data.Entities.Award", "EntityId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Country");
@@ -4246,7 +4246,7 @@ namespace MusicEncyclopedia.Data.Migrations
                     b.HasOne("MusicEncyclopedia.Data.Entities.Entity", "Entity")
                         .WithOne("Certification")
                         .HasForeignKey("MusicEncyclopedia.Data.Entities.Certification", "EntityId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Country");
@@ -4274,7 +4274,7 @@ namespace MusicEncyclopedia.Data.Migrations
                     b.HasOne("MusicEncyclopedia.Data.Entities.Entity", "Entity")
                         .WithOne("Chart")
                         .HasForeignKey("MusicEncyclopedia.Data.Entities.Chart", "EntityId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Country");
@@ -4315,7 +4315,7 @@ namespace MusicEncyclopedia.Data.Migrations
                     b.HasOne("MusicEncyclopedia.Data.Entities.Entity", "Entity")
                         .WithOne("Company")
                         .HasForeignKey("MusicEncyclopedia.Data.Entities.Company", "EntityId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("CompanyType");
@@ -4334,7 +4334,7 @@ namespace MusicEncyclopedia.Data.Migrations
                     b.HasOne("MusicEncyclopedia.Data.Entities.CreditRole", "CreditRole")
                         .WithMany("Credits")
                         .HasForeignKey("CreditRoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("MusicEncyclopedia.Data.Entities.Instrument", "Instrument")
@@ -4348,7 +4348,7 @@ namespace MusicEncyclopedia.Data.Migrations
                     b.HasOne("MusicEncyclopedia.Data.Entities.RoleScopeType", "RoleScopeType")
                         .WithMany("Credits")
                         .HasForeignKey("RoleScopeTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Company");
@@ -4417,7 +4417,7 @@ namespace MusicEncyclopedia.Data.Migrations
                     b.HasOne("MusicEncyclopedia.Data.Entities.Entity", "Entity")
                         .WithOne("Genre")
                         .HasForeignKey("MusicEncyclopedia.Data.Entities.Genre", "EntityId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("MusicEncyclopedia.Data.Entities.Genre", "ParentGenre")
@@ -4438,7 +4438,7 @@ namespace MusicEncyclopedia.Data.Migrations
                     b.HasOne("MusicEncyclopedia.Data.Entities.Entity", "Entity")
                         .WithOne("Instrument")
                         .HasForeignKey("MusicEncyclopedia.Data.Entities.Instrument", "EntityId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("MusicEncyclopedia.Data.Entities.InstrumentFamily", "InstrumentFamily")
@@ -4470,7 +4470,7 @@ namespace MusicEncyclopedia.Data.Migrations
                     b.HasOne("MusicEncyclopedia.Data.Entities.Entity", "Entity")
                         .WithOne("Location")
                         .HasForeignKey("MusicEncyclopedia.Data.Entities.Location", "EntityId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("MusicEncyclopedia.Data.Entities.LocationType", "LocationType")
@@ -4521,7 +4521,7 @@ namespace MusicEncyclopedia.Data.Migrations
                     b.HasOne("MusicEncyclopedia.Data.Entities.Entity", "Entity")
                         .WithOne("Mood")
                         .HasForeignKey("MusicEncyclopedia.Data.Entities.Mood", "EntityId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Entity");
@@ -4551,7 +4551,7 @@ namespace MusicEncyclopedia.Data.Migrations
                     b.HasOne("MusicEncyclopedia.Data.Entities.Entity", "Entity")
                         .WithOne("PerformanceEvent")
                         .HasForeignKey("MusicEncyclopedia.Data.Entities.PerformanceEvent", "EntityId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("MusicEncyclopedia.Data.Entities.EventType", "EventType")
@@ -4622,7 +4622,7 @@ namespace MusicEncyclopedia.Data.Migrations
                     b.HasOne("MusicEncyclopedia.Data.Entities.Entity", "Entity")
                         .WithOne("Person")
                         .HasForeignKey("MusicEncyclopedia.Data.Entities.Person", "EntityId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("MusicEncyclopedia.Data.Entities.Media", "ImageMedia")
@@ -4674,7 +4674,7 @@ namespace MusicEncyclopedia.Data.Migrations
                     b.HasOne("MusicEncyclopedia.Data.Entities.Entity", "Entity")
                         .WithOne("Poem")
                         .HasForeignKey("MusicEncyclopedia.Data.Entities.Poem", "EntityId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("MusicEncyclopedia.Data.Entities.Person", "Person")
@@ -4697,7 +4697,7 @@ namespace MusicEncyclopedia.Data.Migrations
                     b.HasOne("MusicEncyclopedia.Data.Entities.Entity", "Entity")
                         .WithOne("Publication")
                         .HasForeignKey("MusicEncyclopedia.Data.Entities.Publication", "EntityId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("MusicEncyclopedia.Data.Entities.Person", "Person")
@@ -4728,7 +4728,7 @@ namespace MusicEncyclopedia.Data.Migrations
                     b.HasOne("MusicEncyclopedia.Data.Entities.Entity", "Entity")
                         .WithOne("RecordingSession")
                         .HasForeignKey("MusicEncyclopedia.Data.Entities.RecordingSession", "EntityId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("MusicEncyclopedia.Data.Entities.Location", "Location")
@@ -4789,7 +4789,7 @@ namespace MusicEncyclopedia.Data.Migrations
                     b.HasOne("MusicEncyclopedia.Data.Entities.Entity", "Entity")
                         .WithOne("Source")
                         .HasForeignKey("MusicEncyclopedia.Data.Entities.Source", "EntityId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("MusicEncyclopedia.Data.Entities.Company", "Publisher")
@@ -4812,7 +4812,7 @@ namespace MusicEncyclopedia.Data.Migrations
                     b.HasOne("MusicEncyclopedia.Data.Entities.Entity", "Entity")
                         .WithOne("SungVersion")
                         .HasForeignKey("MusicEncyclopedia.Data.Entities.SungVersion", "EntityId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("MusicEncyclopedia.Data.Entities.Poem", "Poem")
@@ -4837,7 +4837,7 @@ namespace MusicEncyclopedia.Data.Migrations
                     b.HasOne("MusicEncyclopedia.Data.Entities.Entity", "Entity")
                         .WithOne("Tag")
                         .HasForeignKey("MusicEncyclopedia.Data.Entities.Tag", "EntityId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Entity");
@@ -4859,7 +4859,7 @@ namespace MusicEncyclopedia.Data.Migrations
                     b.HasOne("MusicEncyclopedia.Data.Entities.Entity", "Entity")
                         .WithOne("Track")
                         .HasForeignKey("MusicEncyclopedia.Data.Entities.Track", "EntityId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("MusicEncyclopedia.Data.Entities.LyricsAvailabilityType", "LyricsAvailabilityType")
