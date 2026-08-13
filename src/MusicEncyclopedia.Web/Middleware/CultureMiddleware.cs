@@ -1,21 +1,26 @@
 using System.Globalization;
-using MusicEncyclopedia.Core.Constants;
 
 namespace MusicEncyclopedia.Web.Middleware;
 
 /// <summary>
-/// Middleware that reads the culture from the first route segment,
-/// validates it against supported cultures, and sets the thread culture
-/// along with HttpContext items for culture and text direction.
+/// Middleware that sets the thread culture and HttpContext items (culture,
+/// text direction) for the current request.
+///
+/// LAUNCH MODE: the site currently ships Persian (fa) only. Every request
+/// resolves to "fa", and any /en, /ar or /fr URL is redirected (302) to its
+/// /fa equivalent so visitors can never reach a non-Persian page. Remove or
+/// relax this when multilingual support is re-enabled — the surrounding
+/// infrastructure (routes, resources, supported-culture lists) is untouched.
 /// </summary>
 public class CultureMiddleware
 {
     private readonly RequestDelegate _next;
 
-    private static readonly HashSet<string> SupportedCultures = new(
-        CultureConstants.SupportedCultures, StringComparer.OrdinalIgnoreCase);
-
-    private const string DefaultCulture = CultureConstants.DefaultCulture;
+    /// <summary>
+    /// Cultures that are still routable but temporarily redirected to Persian.
+    /// </summary>
+    private static readonly HashSet<string> RedirectCultures = new(
+        ["en", "ar", "fr"], StringComparer.OrdinalIgnoreCase);
 
     public CultureMiddleware(RequestDelegate next)
     {
@@ -27,7 +32,25 @@ public class CultureMiddleware
     /// </summary>
     public async Task InvokeAsync(HttpContext context)
     {
-        var culture = ResolveCulture(context);
+        // fa-only launch: fold any other culture-prefixed URL into /fa.
+        var path = context.Request.Path.Value;
+        if (!string.IsNullOrEmpty(path))
+        {
+            var firstSegment = path.TrimStart('/').Split('/')[0];
+            if (RedirectCultures.Contains(firstSegment))
+            {
+                var suffix = path.Length > firstSegment.Length + 1
+                    ? path.Substring(firstSegment.Length + 1)
+                    : "/";
+                // 302 (temporary) so browsers don't cache the redirect once
+                // multilingual support is switched back on.
+                context.Response.Redirect("/fa" + suffix + context.Request.QueryString, permanent: false);
+                return;
+            }
+        }
+
+        // Persian only — the site resolves every request to "fa".
+        const string culture = "fa";
 
         // Set the culture on the current thread
         var cultureInfo = new CultureInfo(culture);
@@ -36,102 +59,13 @@ public class CultureMiddleware
 
         // Store culture and direction in HttpContext.Items for use in views
         context.Items["culture"] = culture;
-        context.Items["dir"] = IsRtl(culture) ? "rtl" : "ltr";
+        context.Items["dir"] = "rtl";
 
         // Store in a culture feature for downstream middleware
-        context.Features.Set(new CultureFeature(culture, IsRtl(culture)));
+        context.Features.Set(new CultureFeature(culture, isRtl: true));
 
         await _next(context);
     }
-
-    /// <summary>
-    /// Resolves the culture from the route data, falling back to default.
-    /// </summary>
-    private static string ResolveCulture(HttpContext context)
-    {
-        // The Admin area is Persian (fa) only — force the culture so the
-        // admin login entry and every admin page render RTL in Persian
-        // regardless of the user's language cookie or Accept-Language header.
-        var path = context.Request.Path.Value;
-        if (path is not null &&
-            (path.Equals("/admin", StringComparison.OrdinalIgnoreCase) ||
-             path.StartsWith("/admin/", StringComparison.OrdinalIgnoreCase)))
-        {
-            return "fa";
-        }
-
-        // The admin login entry: /auth/login (etc.) redirected from an admin
-        // URL carries ?ReturnUrl=/admin… — keep that entry Persian as well.
-        if (path is not null && path.StartsWith("/auth/", StringComparison.OrdinalIgnoreCase))
-        {
-            var returnUrl = context.Request.Query["ReturnUrl"].FirstOrDefault()
-                            ?? context.Request.Query["returnUrl"].FirstOrDefault();
-            if (!string.IsNullOrWhiteSpace(returnUrl) &&
-                (returnUrl.Equals("/admin", StringComparison.OrdinalIgnoreCase) ||
-                 returnUrl.StartsWith("/admin/", StringComparison.OrdinalIgnoreCase)))
-            {
-                return "fa";
-            }
-        }
-
-        // First, try from route data (set by the routing middleware)
-        var routeCulture = context.Request.RouteValues["culture"] as string;
-
-        if (!string.IsNullOrWhiteSpace(routeCulture) && SupportedCultures.Contains(routeCulture))
-        {
-            return routeCulture.ToLowerInvariant();
-        }
-
-        // Second, try from query string
-        var queryCulture = context.Request.Query["culture"].FirstOrDefault();
-        if (!string.IsNullOrWhiteSpace(queryCulture) && SupportedCultures.Contains(queryCulture))
-        {
-            return queryCulture.ToLowerInvariant();
-        }
-
-        // Third, try from cookie
-        var cookieCulture = context.Request.Cookies["culture"];
-        if (!string.IsNullOrWhiteSpace(cookieCulture) && SupportedCultures.Contains(cookieCulture))
-        {
-            return cookieCulture.ToLowerInvariant();
-        }
-
-        // Fourth, try from Accept-Language header
-        try
-        {
-            var acceptLanguage = context.Request.GetTypedHeaders().AcceptLanguage;
-            if (acceptLanguage is not null && acceptLanguage.Count > 0)
-            {
-                foreach (var lang in acceptLanguage)
-                {
-                    if (lang.Value.HasValue)
-                    {
-                        var langValue = lang.Value.Value;
-                        if (!string.IsNullOrWhiteSpace(langValue))
-                        {
-                            var culturePart = langValue.Split('-')[0].ToLowerInvariant();
-                            if (SupportedCultures.Contains(culturePart))
-                            {
-                                return culturePart;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        catch
-        {
-            // Ignore parsing errors
-        }
-
-        // Fall back to default
-        return DefaultCulture;
-    }
-
-    /// <summary>
-    /// Determines if the given culture is right-to-left.
-    /// </summary>
-    private static bool IsRtl(string culture) => CultureConstants.IsRtl(culture);
 }
 
 /// <summary>

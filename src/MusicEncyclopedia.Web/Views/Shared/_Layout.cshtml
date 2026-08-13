@@ -26,11 +26,8 @@
 
     <title>@ViewData["Title"] · @L["Brand.Name"]</title>
 
-    <!-- Hreflang alternates · Spec 7.4 -->
-    @foreach (var targetCulture in CultureConstants.SupportedCultures)
-    {
-        <link rel="alternate" hreflang="@targetCulture" href="@CultureUrl(targetCulture)" />
-    }
+    <!-- Hreflang · fa-only launch (multilingual disabled — see CultureMiddleware) -->
+    <link rel="alternate" hreflang="fa" href="@CultureUrl("fa")" />
     <link rel="alternate" hreflang="x-default" href="@CultureUrl(CultureConstants.DefaultCulture)" />
 
     <!-- Fonts (self-hosted: Vazirmatn for fa/ar RTL, Inter for en/fr LTR) -->
@@ -73,18 +70,7 @@
                     <span>@L["Nav.Search"]</span>
                 </a>
 
-                <!-- Language switcher · Spec 7.5 -->
-                <div class="nav__lang">
-                    <label class="nav__lang-label" for="lang-select">@L["Nav.Language"]</label>
-                    <select id="lang-select" class="nav__lang-select" aria-label="@L["Nav.Language"]"
-                            onchange="window.location.href = this.value;">
-                        @foreach (var targetCulture in CultureConstants.SupportedCultures)
-                        {
-                            var nativeName = System.Globalization.CultureInfo.GetCultureInfo(targetCulture).NativeName;
-                            <option value="@CultureUrl(targetCulture)" selected="@(string.Equals(targetCulture, culture, StringComparison.OrdinalIgnoreCase) ? "selected" : null)">@nativeName</option>
-                        }
-                    </select>
-                </div>
+                @* Language switcher disabled for the fa-only launch (see CultureMiddleware). *@
 
                 <button class="nav__toggle" aria-label="@L["Nav.OpenMenu"]" aria-expanded="false" aria-controls="mobile-nav">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
