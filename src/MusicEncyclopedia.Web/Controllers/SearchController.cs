@@ -88,10 +88,13 @@ public sealed class SearchController : Controller
             results = await _searchService.SearchAsync(searchQuery, cancellationToken);
         }
 
-        var genresTask = LoadLookupsAsync("Genre", cancellationToken);
-        var moodsTask = LoadLookupsAsync("Mood", cancellationToken);
-        var instrumentsTask = LoadLookupsAsync("Instrument", cancellationToken);
-        await Task.WhenAll(genresTask, moodsTask, instrumentsTask);
+        // Run lookup queries sequentially: they share one scoped IDbConnection,
+        // which SQL Server does not allow concurrent readers on (SQLite tolerated
+        // it, SqlConnection does not). Results are cached, so this only matters on
+        // a cold cache.
+        var genres = await LoadLookupsAsync("Genre", cancellationToken);
+        var moods = await LoadLookupsAsync("Mood", cancellationToken);
+        var instruments = await LoadLookupsAsync("Instrument", cancellationToken);
 
         var viewModel = new SearchIndexViewModel
         {
@@ -102,9 +105,9 @@ public sealed class SearchController : Controller
             Instrument = instrument,
             Results = results,
             Culture = culture,
-            Genres = await genresTask,
-            Moods = await moodsTask,
-            Instruments = await instrumentsTask
+            Genres = genres,
+            Moods = moods,
+            Instruments = instruments
         };
 
         ViewData["Title"] = !string.IsNullOrWhiteSpace(q)
