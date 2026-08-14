@@ -52,7 +52,7 @@ public sealed class LocationsController : Controller
             LEFT JOIN Country c ON l.CountryId = c.CountryId
             WHERE l.IsDeleted = 0
             ORDER BY l.Name
-            " + SqlDialect.Pagination(SqlDialect.IsSqliteConnection(_db));
+            " + SqlDialect.Pagination();
 
         var items = (await _db.QueryAsync<LocationListItemDto>(sql, new { Offset = offset, PageSize = pageSize })).ToList();
         var result = MusicEncyclopedia.Core.DTOs.PagedResult<LocationListItemDto>.Create(items.AsReadOnly(), page, pageSize, totalItems);

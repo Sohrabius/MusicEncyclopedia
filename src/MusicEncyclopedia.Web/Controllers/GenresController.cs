@@ -52,8 +52,8 @@ public sealed class GenresController : Controller
         var totalItems = await _db.ExecuteScalarAsync<int>(countSql);
 
         var itemsSql = q is null
-            ? "SELECT GenreId, Name, Slug FROM Genre WHERE IsDeleted = 0 ORDER BY Name " + SqlDialect.Pagination(SqlDialect.IsSqliteConnection(_db))
-            : "SELECT GenreId, Name, Slug FROM Genre WHERE IsDeleted = 0 AND (Name LIKE @Q OR Description LIKE @Q) ORDER BY Name " + SqlDialect.Pagination(SqlDialect.IsSqliteConnection(_db));
+            ? "SELECT GenreId, Name, Slug FROM Genre WHERE IsDeleted = 0 ORDER BY Name " + SqlDialect.Pagination()
+            : "SELECT GenreId, Name, Slug FROM Genre WHERE IsDeleted = 0 AND (Name LIKE @Q OR Description LIKE @Q) ORDER BY Name " + SqlDialect.Pagination();
 
         var items = await _db.QueryAsync<NamedLinkDto>(
             itemsSql,

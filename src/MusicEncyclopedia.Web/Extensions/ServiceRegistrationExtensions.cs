@@ -2,15 +2,15 @@ using Microsoft.Extensions.DependencyInjection;
 
 public static class ServiceRegistrationExtensions
 {
-    public static IServiceCollection AddServices(this IServiceCollection services, bool isSqlite = false)
+    public static IServiceCollection AddServices(this IServiceCollection services)
     {
-        MusicEncyclopedia.Services.ServiceRegistration.AddServices(services, isSqlite);
+        MusicEncyclopedia.Services.ServiceRegistration.AddServices(services);
         return services;
     }
 
-    public static IServiceCollection AddSearchServices(this IServiceCollection services, bool isSqlite = false)
+    public static IServiceCollection AddSearchServices(this IServiceCollection services)
     {
-        MusicEncyclopedia.Search.ServiceRegistration.AddSearchServices(services, isSqlite);
+        MusicEncyclopedia.Search.ServiceRegistration.AddSearchServices(services);
         return services;
     }
 

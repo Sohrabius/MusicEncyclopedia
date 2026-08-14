@@ -89,9 +89,8 @@ public sealed class SearchController : Controller
         }
 
         // Run lookup queries sequentially: they share one scoped IDbConnection,
-        // which SQL Server does not allow concurrent readers on (SQLite tolerated
-        // it, SqlConnection does not). Results are cached, so this only matters on
-        // a cold cache.
+        // which SqlConnection does not allow concurrent readers on. Results are
+        // cached, so this only matters on a cold cache.
         var genres = await LoadLookupsAsync("Genre", cancellationToken);
         var moods = await LoadLookupsAsync("Mood", cancellationToken);
         var instruments = await LoadLookupsAsync("Instrument", cancellationToken);

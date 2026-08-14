@@ -14,30 +14,16 @@ public static class ServiceRegistration
 {
     /// <summary>
     /// Registers all application services and validators for the MusicEncyclopedia.Services project.
-    /// When <paramref name="isSqlite"/> is true, registers EF Core-based query services
-    /// that work with SQLite; otherwise registers Dapper-based services for SQL Server.
     /// </summary>
     /// <param name="services">The service collection.</param>
-    /// <param name="isSqlite">If true, register SQLite-compatible query services.</param>
     /// <returns>The service collection for chaining.</returns>
-    public static IServiceCollection AddServices(this IServiceCollection services, bool isSqlite = false)
+    public static IServiceCollection AddServices(this IServiceCollection services)
     {
-        if (isSqlite)
-        {
-            // Register EF Core-based query services that work with SQLite
-            services.AddScoped<IAlbumQueryService, AlbumQueryService>();
-            services.AddScoped<ITrackQueryService, TrackQueryService>();
-            services.AddScoped<IPersonQueryService, PersonQueryService>();
-            services.AddScoped<ICompanyQueryService, CompanyQueryService>();
-        }
-        else
-        {
-            // Register Dapper-based query services optimized for SQL Server
-            services.AddScoped<IAlbumQueryService, AlbumQueryService>();
-            services.AddScoped<ITrackQueryService, TrackQueryService>();
-            services.AddScoped<IPersonQueryService, PersonQueryService>();
-            services.AddScoped<ICompanyQueryService, CompanyQueryService>();
-        }
+        // Register Dapper-based query services optimized for SQL Server
+        services.AddScoped<IAlbumQueryService, AlbumQueryService>();
+        services.AddScoped<ITrackQueryService, TrackQueryService>();
+        services.AddScoped<IPersonQueryService, PersonQueryService>();
+        services.AddScoped<ICompanyQueryService, CompanyQueryService>();
 
         // Business services (scoped)
         services.AddScoped<ICreditService, CreditService>();

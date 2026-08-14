@@ -50,7 +50,7 @@ public sealed class ChartsController : Controller
             LEFT JOIN Country co ON c.CountryId = co.CountryId
             WHERE c.IsDeleted = 0
             ORDER BY c.Name
-            " + SqlDialect.Pagination(SqlDialect.IsSqliteConnection(_db));
+            " + SqlDialect.Pagination();
 
         var items = (await _db.QueryAsync<ChartListItemDto>(sql, new { Offset = offset, PageSize = pageSize })).ToList();
         var result = MusicEncyclopedia.Core.DTOs.PagedResult<ChartListItemDto>.Create(items.AsReadOnly(), page, pageSize, totalItems);

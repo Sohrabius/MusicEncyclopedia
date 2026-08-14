@@ -4,8 +4,9 @@ This runbook covers standing up the production stack (web + SQL Server 2022),
 configuring it, and operating it: database backup/restore, monitoring, full-text
 search setup, and load testing.
 
-> Dev workflow is unaffected: the default `appsettings.json`/`appsettings.Development.json`
-> still run on SQLite with seeded sample content (`dotnet run --project src/MusicEncyclopedia.Web`).
+> Dev workflow is unaffected: the app now targets SQL Server exclusively — point
+> `DefaultConnection` at a local SQL Server / LocalDB and sample content seeds on
+> startup (`dotnet run --project src/MusicEncyclopedia.Web`).
 
 ---
 
@@ -66,7 +67,7 @@ On first boot the app:
 4. seeds roles + Administrator permissions and creates the first admin user —
    `ADMIN_EMAIL`/`ADMIN_PASSWORD` when set; otherwise the built-in seed default
    (`admin@example.com` / `Admin@123456`) only when `SEED_ADMIN_USER=true`
-   (the SQLite/dev default — keep false in production).
+   (the dev default — keep false in production).
 
 Log in at `/auth/login` with the configured admin credentials (or the seeded
 default on a dev database; change its password after first login).
@@ -275,6 +276,6 @@ block) to the proxy's IP.
 | --- | --- |
 | `web` never becomes healthy | SQL Server not ready or `MSSQL_SA_PASSWORD` mismatch — check `docker compose logs mssql` |
 | Login fails with weak-password errors | `ADMIN_PASSWORD` must meet policy (10+, digit, upper, lower, symbol) |
-| Search returns nothing | FTS script (§5) not run yet — the LIKE fallback only exists on SQLite |
+| Search returns nothing | FTS script (§5) not run yet — search falls back to a LIKE query until the full-text catalog is created |
 | `429 Too Many Requests` | Rate limits hit — tune `IpRateLimiting` or verify `BEHIND_PROXY` is set so client IPs are real |
 | HTTPS redirect loop | `ENABLE_HTTPS_REDIRECTION=false` when the proxy already terminates TLS |

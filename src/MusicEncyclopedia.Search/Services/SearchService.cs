@@ -12,12 +12,11 @@ namespace MusicEncyclopedia.Search.Services;
 /// For SQL Server, uses FREETEXTTABLE for ranked results when the database has
 /// full-text indexes (see FullTextSearch.sql); otherwise falls back to LIKE-based
 /// search so a SQL Server instance without the Full-Text Search feature (or
-/// without the indexes applied) still returns results. SQLite always uses LIKE.
+/// without the indexes applied) still returns results.
 /// </summary>
 public sealed class SearchService : ISearchService
 {
     private readonly string _connectionString;
-    private readonly bool _isSqlite;
     private readonly ICacheService? _cache;
 
     // Process-wide memo of whether the SQL Server database has full-text
@@ -26,18 +25,15 @@ public sealed class SearchService : ISearchService
     private static bool _fullTextProbeAttempted;
     private static bool _fullTextAvailable;
 
-    public SearchService(string connectionString, bool isSqlite = false, ICacheService? cache = null)
+    public SearchService(string connectionString, ICacheService? cache = null)
     {
         _connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
-        _isSqlite = isSqlite;
         _cache = cache;
     }
 
     private IDbConnection CreateConnection()
     {
-        return _isSqlite
-            ? (IDbConnection)new Microsoft.Data.Sqlite.SqliteConnection(_connectionString)
-            : new SqlConnection(_connectionString);
+        return new SqlConnection(_connectionString);
     }
 
     /// <inheritdoc />
@@ -74,15 +70,15 @@ public sealed class SearchService : ISearchService
 
     /// <summary>
     /// Determines whether the SQL Server database can answer FREETEXTTABLE
-    /// queries. SQLite always returns false. The result is memoized process-wide
-    /// after the first probe (an empty result set is itself a failure signal).
+    /// queries. The result is memoized process-wide after the first probe
+    /// (an empty result set is itself a failure signal).
     /// </summary>
     private async Task<bool> CanUseFullTextAsync(
         IDbConnection connection, CancellationToken cancellationToken)
     {
-        if (_isSqlite || _fullTextProbeAttempted)
+        if (_fullTextProbeAttempted)
         {
-            return !_isSqlite && _fullTextAvailable;
+            return _fullTextAvailable;
         }
 
         try
@@ -129,7 +125,7 @@ public sealed class SearchService : ISearchService
 
         // Generate the UNION ALL fragments for each entity table. SQL Server only
         // uses FREETEXTTABLE when the database actually has full-text indexes;
-        // otherwise (and on SQLite) the LIKE path is used.
+        // otherwise the LIKE path is used.
         var useFullText = await CanUseFullTextAsync(connection, cancellationToken);
         var fragments = BuildSearchFragments(
             query.EntityType, query.Genre, query.Mood, query.Instrument, useFullText);
@@ -160,11 +156,9 @@ FROM (
         }
 
         // Data query. Ranking (Rank DESC) is only available on the full-text path;
-        // the LIKE path orders by title. Pagination syntax is provider-specific.
+        // the LIKE path orders by title.
         var orderByClause = useFullText ? "Rank DESC" : "Title ASC";
-        var pagination = _isSqlite
-            ? "LIMIT @pageSize OFFSET @offset"
-            : "OFFSET @offset ROWS FETCH NEXT @pageSize ROWS ONLY";
+        var pagination = "OFFSET @offset ROWS FETCH NEXT @pageSize ROWS ONLY";
 
         var dataSql = $@"
 SELECT EntityType, EntityId, Title, Subtitle, Description, ImageUrl, UrlSlug, Rank

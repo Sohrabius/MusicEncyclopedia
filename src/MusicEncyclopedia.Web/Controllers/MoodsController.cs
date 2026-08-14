@@ -52,8 +52,8 @@ public sealed class MoodsController : Controller
         var totalItems = await _db.ExecuteScalarAsync<int>(countSql);
 
         var itemsSql = q is null
-            ? "SELECT MoodId, Name, Slug FROM Mood WHERE IsDeleted = 0 ORDER BY Name " + SqlDialect.Pagination(SqlDialect.IsSqliteConnection(_db))
-            : "SELECT MoodId, Name, Slug FROM Mood WHERE IsDeleted = 0 AND (Name LIKE @Q OR Description LIKE @Q) ORDER BY Name " + SqlDialect.Pagination(SqlDialect.IsSqliteConnection(_db));
+            ? "SELECT MoodId, Name, Slug FROM Mood WHERE IsDeleted = 0 ORDER BY Name " + SqlDialect.Pagination()
+            : "SELECT MoodId, Name, Slug FROM Mood WHERE IsDeleted = 0 AND (Name LIKE @Q OR Description LIKE @Q) ORDER BY Name " + SqlDialect.Pagination();
 
         var items = await _db.QueryAsync<NamedLinkDto>(
             itemsSql,

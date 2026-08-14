@@ -112,23 +112,6 @@ public class AppDbContext : IdentityDbContext<IdentityUser, IdentityRole, string
     {
         base.OnModelCreating(modelBuilder);
 
-        // SQLite has no server-generated rowversion type. EF Core's convention marks
-        // byte[] RowVersion properties as ValueGeneratedOnAddOrUpdate, which omits them
-        // from INSERT statements (expecting the database to fill them). On SQLite that
-        // leaves the NOT NULL column unset and every insert fails, so tell EF to persist
-        // the explicitly-provided values instead.
-        if (Database.IsSqlite())
-        {
-            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
-            {
-                var rowVersion = entityType.FindProperty("RowVersion");
-                if (rowVersion is not null && rowVersion.ClrType == typeof(byte[]))
-                {
-                    rowVersion.ValueGenerated = ValueGenerated.Never;
-                }
-            }
-        }
-
         ConfigureLookupTables(modelBuilder);
         ConfigureCoreEntities(modelBuilder);
         ConfigureJoinTables(modelBuilder);

@@ -56,7 +56,7 @@ public sealed class SessionsController : Controller
             LEFT JOIN Location l ON rs.LocationId = l.LocationId
             WHERE rs.IsDeleted = 0
             ORDER BY rs.StartDate DESC, rs.RecordingSessionId DESC
-            " + SqlDialect.Pagination(SqlDialect.IsSqliteConnection(_db));
+            " + SqlDialect.Pagination();
 
         var items = (await _db.QueryAsync<SessionListItemDto>(sql, new { Offset = offset, PageSize = pageSize })).ToList();
 

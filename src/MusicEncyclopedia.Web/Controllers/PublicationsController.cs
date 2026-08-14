@@ -52,7 +52,7 @@ public sealed class PublicationsController : Controller
             LEFT JOIN Company cp ON p.PublisherId = cp.CompanyId
             WHERE p.IsDeleted = 0
             ORDER BY p.PublicationDate DESC, p.Title
-            " + SqlDialect.Pagination(SqlDialect.IsSqliteConnection(_db));
+            " + SqlDialect.Pagination();
 
         var items = (await _db.QueryAsync<PublicationListItemDto>(sql, new { Offset = offset, PageSize = pageSize })).ToList();
         var result = MusicEncyclopedia.Core.DTOs.PagedResult<PublicationListItemDto>.Create(items.AsReadOnly(), page, pageSize, totalItems);

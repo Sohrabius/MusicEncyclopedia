@@ -1,23 +1,21 @@
 namespace MusicEncyclopedia.Services.Infrastructure;
 
 /// <summary>
-/// Helper methods for writing cross-dialect SQL that works
-/// with both SQL Server and SQLite.
+/// Helper methods for writing SQL Server SQL.
 /// </summary>
 public static class SqlDialect
 {
     /// <summary>
-    /// Returns a SQL expression for LEFT(string, length) that works
-    /// on both SQL Server (LEFT) and SQLite (SUBSTR).
+    /// Returns a SQL expression for LEFT(string, length) (SQL Server syntax).
     /// </summary>
-    public static string Left(string column, int length, bool isSqlite)
+    public static string Left(string column, int length)
     {
-        return isSqlite ? $"SUBSTR({column}, 1, {length})" : $"LEFT({column}, {length})";
+        return $"LEFT({column}, {length})";
     }
 
     /// <summary>
     /// Returns a SQL concatenation expression using the || operator,
-    /// which works on both SQL Server (2012+) and SQLite.
+    /// which works on SQL Server 2012+.
     /// </summary>
     public static string Concat(params string[] parts)
     {
@@ -25,8 +23,7 @@ public static class SqlDialect
     }
 
     /// <summary>
-    /// Returns a CAST(column AS TEXT) expression for cross-dialect
-    /// string coercion.
+    /// Returns a CAST(column AS TEXT) expression for string coercion.
     /// </summary>
     public static string CastToText(string column)
     {
@@ -34,39 +31,22 @@ public static class SqlDialect
     }
 
     /// <summary>
-    /// Returns true when <paramref name="connection"/> is a SQLite connection.
-    /// The registered <see cref="System.Data.IDbConnection"/> type is chosen
-    /// in Program.cs based on the configured provider, so the concrete type
-    /// reliably identifies the dialect.
+    /// Returns a random-ordering expression for SQL Server (NEWID()).
     /// </summary>
-    public static bool IsSqliteConnection(System.Data.IDbConnection connection)
+    public static string RandomOrder()
     {
-        return connection is not null && connection.GetType().Name == "SqliteConnection";
+        return "NEWID()";
     }
 
     /// <summary>
-    /// Returns a random-ordering expression for the given dialect:
-    /// SQL Server uses NEWID(), SQLite uses RANDOM().
+    /// Returns a pagination clause for SQL Server (OFFSET/FETCH NEXT).
     /// </summary>
-    public static string RandomOrder(bool isSqlite)
-    {
-        return isSqlite ? "RANDOM()" : "NEWID()";
-    }
-
-    /// <summary>
-    /// Returns a pagination clause for the given dialect:
-    /// SQL Server uses OFFSET/FETCH NEXT, SQLite uses LIMIT/OFFSET.
-    /// </summary>
-    /// <param name="isSqlite">True for SQLite, false for SQL Server.</param>
     /// <param name="offsetParam">Name of the offset parameter.</param>
     /// <param name="pageSizeParam">Name of the page-size parameter.</param>
     public static string Pagination(
-        bool isSqlite,
         string offsetParam = "@Offset",
         string pageSizeParam = "@PageSize")
     {
-        return isSqlite
-            ? $"LIMIT {pageSizeParam} OFFSET {offsetParam}"
-            : $"OFFSET {offsetParam} ROWS FETCH NEXT {pageSizeParam} ROWS ONLY";
+        return $"OFFSET {offsetParam} ROWS FETCH NEXT {pageSizeParam} ROWS ONLY";
     }
 }

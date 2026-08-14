@@ -75,7 +75,7 @@ public sealed class SungVersionsController : Controller
             var entityId = (int)((dynamic)sv).EntityId;
             var sungVersionId = (int)((dynamic)sv).SungVersionId;
 
-            // Load related data sequentially (safe for both SQL Server and SQLite)
+            // Load related data sequentially (shared scoped connection)
             var tracks = await GetTracksForSungVersionAsync(_db, sungVersionId, cancellationToken);
             var media = await GetEntityMediaAsync(_db, entityId, cancellationToken);
             var links = await GetEntityLinksAsync(_db, entityId, cancellationToken);

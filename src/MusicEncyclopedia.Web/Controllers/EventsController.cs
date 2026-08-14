@@ -51,7 +51,7 @@ public sealed class EventsController : Controller
             LEFT JOIN Location l ON pe.LocationId = l.LocationId
             WHERE pe.IsDeleted = 0
             ORDER BY pe.Date DESC, pe.PerformanceEventId DESC
-            " + SqlDialect.Pagination(SqlDialect.IsSqliteConnection(_db));
+            " + SqlDialect.Pagination();
 
         var items = (await _db.QueryAsync<EventListItemDto>(sql, new { Offset = offset, PageSize = pageSize })).ToList();
 

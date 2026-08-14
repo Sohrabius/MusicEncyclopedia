@@ -10,34 +10,25 @@ namespace MusicEncyclopedia.Services.Services;
 /// <summary>
 /// Provides localized content values from the database Localization table.
 /// Uses the Language table (LanguageId FK → Language.Code) to resolve cultures,
-/// works on both SQLite and SQL Server, and supports batched lookups.
+/// and supports batched lookups.
 /// </summary>
 public sealed class ContentLocalizationService : IContentLocalizationService
 {
     private readonly string _connectionString;
-    private readonly bool _isSqlite;
     private readonly ILogger<ContentLocalizationService> _logger;
 
     public ContentLocalizationService(
         IConfiguration configuration,
         ILogger<ContentLocalizationService> logger)
     {
-        var dbProvider = configuration.GetValue<string>("DatabaseProvider") ?? "SqlServer";
-        _isSqlite = string.Equals(dbProvider, "Sqlite", StringComparison.OrdinalIgnoreCase);
-
-        _connectionString = _isSqlite
-            ? configuration.GetConnectionString("SqliteConnection")
-                ?? throw new InvalidOperationException("Connection string 'SqliteConnection' not found.")
-            : configuration.GetConnectionString("DefaultConnection")
-                ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+        _connectionString = configuration.GetConnectionString("DefaultConnection")
+            ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
         _logger = logger;
     }
 
     private IDbConnection CreateConnection()
     {
-        return _isSqlite
-            ? (IDbConnection)new Microsoft.Data.Sqlite.SqliteConnection(_connectionString)
-            : new Microsoft.Data.SqlClient.SqlConnection(_connectionString);
+        return new Microsoft.Data.SqlClient.SqlConnection(_connectionString);
     }
 
     /// <inheritdoc />

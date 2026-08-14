@@ -140,8 +140,7 @@ public sealed class HomeController : Controller
 
         try
         {
-            var isSqlite = SqlDialect.IsSqliteConnection(_db);
-            var top8 = SqlDialect.Pagination(isSqlite, "0", "8");
+            var top8 = SqlDialect.Pagination("0", "8");
 
             // ── Banner hint chips: genres / moods / instruments (cached 1h).
             var browse = await GetCachedAsync("home:browse", cancellationToken, async () =>
@@ -224,9 +223,8 @@ public sealed class HomeController : Controller
     {
         try
         {
-            var isSqlite = SqlDialect.IsSqliteConnection(_db);
-            var random = SqlDialect.RandomOrder(isSqlite);
-            var limit = SqlDialect.Pagination(isSqlite, "0", "1");
+            var random = SqlDialect.RandomOrder();
+            var limit = SqlDialect.Pagination("0", "1");
 
             // Prefer rows where the track belongs to an album.
             var poemSql = $"""

@@ -52,8 +52,8 @@ public sealed class InstrumentsController : Controller
         var totalItems = await _db.ExecuteScalarAsync<int>(countSql);
 
         var itemsSql = q is null
-            ? "SELECT InstrumentId, Name, Slug FROM Instrument WHERE IsDeleted = 0 ORDER BY Name " + SqlDialect.Pagination(SqlDialect.IsSqliteConnection(_db))
-            : "SELECT InstrumentId, Name, Slug FROM Instrument WHERE IsDeleted = 0 AND (Name LIKE @Q OR Description LIKE @Q) ORDER BY Name " + SqlDialect.Pagination(SqlDialect.IsSqliteConnection(_db));
+            ? "SELECT InstrumentId, Name, Slug FROM Instrument WHERE IsDeleted = 0 ORDER BY Name " + SqlDialect.Pagination()
+            : "SELECT InstrumentId, Name, Slug FROM Instrument WHERE IsDeleted = 0 AND (Name LIKE @Q OR Description LIKE @Q) ORDER BY Name " + SqlDialect.Pagination();
 
         // Use named mapping since column is InstrumentId not Id
         var items = (await _db.QueryAsync<(int InstrumentId, string Name, string Slug)>(
