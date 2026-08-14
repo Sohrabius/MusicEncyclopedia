@@ -19,5 +19,4 @@ public sealed class SettingsViewModel
     public int MaxLoginAttempts { get; init; }
     public string MediaStoragePath { get; init; } = "";
     public string SearchProvider { get; init; } = "";
-    public bool IsSqlite { get; init; }
 }

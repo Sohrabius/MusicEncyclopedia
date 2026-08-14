@@ -17,7 +17,6 @@ namespace MusicEncyclopedia.Services.Services;
 public sealed class CompanyQueryService : ICompanyQueryService
 {
     private readonly string _connectionString;
-    private readonly bool _isSqlite;
     private readonly ILogger<CompanyQueryService> _logger;
     private readonly IContentLocalizationService _localizationService;
     private readonly ICacheService _cache;
@@ -31,22 +30,14 @@ public sealed class CompanyQueryService : ICompanyQueryService
         _localizationService = localizationService;
         _cache = cache;
 
-        var dbProvider = configuration.GetValue<string>("DatabaseProvider") ?? "SqlServer";
-        _isSqlite = string.Equals(dbProvider, "Sqlite", StringComparison.OrdinalIgnoreCase);
-
-        _connectionString = _isSqlite
-            ? configuration.GetConnectionString("SqliteConnection")
-                ?? throw new InvalidOperationException("Connection string 'SqliteConnection' not found.")
-            : configuration.GetConnectionString("DefaultConnection")
-                ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+        _connectionString = configuration.GetConnectionString("DefaultConnection")
+            ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
         _logger = logger;
     }
 
     private IDbConnection CreateConnection()
     {
-        return _isSqlite
-            ? (IDbConnection)new Microsoft.Data.Sqlite.SqliteConnection(_connectionString)
-            : new SqlConnection(_connectionString);
+        return new SqlConnection(_connectionString);
     }
 
     /// <inheritdoc />
@@ -120,7 +111,7 @@ public sealed class CompanyQueryService : ICompanyQueryService
             FROM Company AS c
             WHERE {whereSql}
             ORDER BY {orderBy}
-            {SqlDialect.Pagination(_isSqlite)}
+            {SqlDialect.Pagination()}
             """;
 
         parameters.Add("Offset", (page - 1) * pageSize);
@@ -216,15 +207,6 @@ public sealed class CompanyQueryService : ICompanyQueryService
                     entityId, LocalizedCompanyFields, culture, cancellationToken);
             }
 
-            if (_isSqlite)
-            {
-                media = await GetEntityMediaAsync(connection, entityId, cancellationToken);
-                links = await GetEntityLinksAsync(connection, entityId, cancellationToken);
-                aliases = await GetEntityAliasesAsync(connection, entityId, cancellationToken);
-                tags = await GetEntityTagsAsync(connection, entityId, cancellationToken);
-                citations = await GetEntityCitationsAsync(connection, entityId, cancellationToken);
-            }
-            else
             {
                 var mediaTask = GetEntityMediaAsync(connection, entityId, cancellationToken);
                 var linksTask = GetEntityLinksAsync(connection, entityId, cancellationToken);

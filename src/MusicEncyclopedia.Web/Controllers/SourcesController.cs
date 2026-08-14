@@ -52,7 +52,7 @@ public sealed class SourcesController : Controller
             LEFT JOIN Company cp ON s.PublisherId = cp.CompanyId
             WHERE s.IsDeleted = 0
             ORDER BY s.Title
-            " + SqlDialect.Pagination(SqlDialect.IsSqliteConnection(_db));
+            " + SqlDialect.Pagination();
 
         var items = (await _db.QueryAsync<SourceListItemDto>(sql, new { Offset = offset, PageSize = pageSize })).ToList();
         var result = MusicEncyclopedia.Core.DTOs.PagedResult<SourceListItemDto>.Create(items.AsReadOnly(), page, pageSize, totalItems);

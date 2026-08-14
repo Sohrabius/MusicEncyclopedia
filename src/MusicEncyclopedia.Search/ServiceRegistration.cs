@@ -11,32 +11,26 @@ namespace MusicEncyclopedia.Search;
 public static class ServiceRegistration
 {
     /// <summary>
-    /// Registers the search-related services.
-    /// When <paramref name="isSqlite"/> is true, registers a LIKE-based search service
-    /// that works with SQLite; otherwise registers a FREETEXTTABLE-based service for SQL Server.
+    /// Registers the search-related services. Registers a FREETEXTTABLE-based
+    /// service for SQL Server (with a LIKE fallback when full-text indexes
+    /// are unavailable).
     /// </summary>
     /// <param name="services">The <see cref="IServiceCollection"/> to add services to.</param>
-    /// <param name="isSqlite">If true, register SQLite-compatible search service.</param>
     /// <returns>The same service collection so calls can be chained.</returns>
-    public static IServiceCollection AddSearchServices(this IServiceCollection services, bool isSqlite = false)
+    public static IServiceCollection AddSearchServices(this IServiceCollection services)
     {
         services.AddScoped<ISearchService>(sp =>
         {
             var configuration = sp.GetRequiredService<IConfiguration>();
-            var dbProvider = configuration.GetValue<string>("DatabaseProvider") ?? "SqlServer";
-            var useSqlite = isSqlite || string.Equals(dbProvider, "Sqlite", StringComparison.OrdinalIgnoreCase);
 
             // NOTE: Program.cs injects the DbPassword secret into
             // "ConnectionStrings:DefaultConnection" at startup (ConfigurationManager
             // override), so every consumer — including this service — reads the
             // password-ready string from IConfiguration.
-            var connectionString = useSqlite
-                ? configuration.GetConnectionString("SqliteConnection")
-                    ?? throw new InvalidOperationException("Connection string 'SqliteConnection' not found in configuration.")
-                : configuration.GetConnectionString("DefaultConnection")
-                    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found in configuration.");
+            var connectionString = configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found in configuration.");
 
-            return new SearchService(connectionString, useSqlite, sp.GetService<ICacheService>());
+            return new SearchService(connectionString, sp.GetService<ICacheService>());
         });
 
         return services;
@@ -47,16 +41,14 @@ public static class ServiceRegistration
     /// </summary>
     /// <param name="services">The <see cref="IServiceCollection"/> to add services to.</param>
     /// <param name="connectionString">The connection string to use.</param>
-    /// <param name="isSqlite">If true, use SQLite-compatible search queries.</param>
     /// <returns>The same service collection so calls can be chained.</returns>
     public static IServiceCollection AddSearchServices(
         this IServiceCollection services,
-        string connectionString,
-        bool isSqlite = false)
+        string connectionString)
     {
         ArgumentNullException.ThrowIfNull(connectionString);
 
-        services.AddScoped<ISearchService>(_ => new SearchService(connectionString, isSqlite));
+        services.AddScoped<ISearchService>(_ => new SearchService(connectionString));
 
         return services;
     }

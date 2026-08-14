@@ -17,7 +17,6 @@ namespace MusicEncyclopedia.Services.Services;
 public sealed class PersonQueryService : IPersonQueryService
 {
     private readonly string _connectionString;
-    private readonly bool _isSqlite;
     private readonly ILogger<PersonQueryService> _logger;
     private readonly IContentLocalizationService _localizationService;
     private readonly ICacheService _cache;
@@ -31,22 +30,14 @@ public sealed class PersonQueryService : IPersonQueryService
         _localizationService = localizationService;
         _cache = cache;
 
-        var dbProvider = configuration.GetValue<string>("DatabaseProvider") ?? "SqlServer";
-        _isSqlite = string.Equals(dbProvider, "Sqlite", StringComparison.OrdinalIgnoreCase);
-
-        _connectionString = _isSqlite
-            ? configuration.GetConnectionString("SqliteConnection")
-                ?? throw new InvalidOperationException("Connection string 'SqliteConnection' not found.")
-            : configuration.GetConnectionString("DefaultConnection")
-                ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+        _connectionString = configuration.GetConnectionString("DefaultConnection")
+            ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
         _logger = logger;
     }
 
     private IDbConnection CreateConnection()
     {
-        return _isSqlite
-            ? (IDbConnection)new Microsoft.Data.Sqlite.SqliteConnection(_connectionString)
-            : new SqlConnection(_connectionString);
+        return new SqlConnection(_connectionString);
     }
 
     /// <inheritdoc />
@@ -138,7 +129,7 @@ public sealed class PersonQueryService : IPersonQueryService
             FROM Person AS p
             WHERE {whereSql}
             ORDER BY {orderBy}
-            {SqlDialect.Pagination(_isSqlite)}
+            {SqlDialect.Pagination()}
             """;
 
         parameters.Add("Offset", (page - 1) * pageSize);
@@ -253,22 +244,6 @@ public sealed class PersonQueryService : IPersonQueryService
             IReadOnlyList<TrackContributionDto> contributions;
             IReadOnlyList<TrackCreditRow> trackCredits;
 
-            if (_isSqlite)
-            {
-                // No MARS support: run sequentially.
-                media = await GetEntityMediaAsync(connection, entityId, cancellationToken);
-                links = await GetEntityLinksAsync(connection, entityId, cancellationToken);
-                aliases = await GetEntityAliasesAsync(connection, entityId, cancellationToken);
-                tags = await GetEntityTagsAsync(connection, entityId, cancellationToken);
-                citations = await GetEntityCitationsAsync(connection, entityId, cancellationToken);
-                instruments = await GetPersonInstrumentsAsync(connection, personId, cancellationToken);
-                roles = await GetPersonRolesAsync(connection, personId, cancellationToken);
-                albums = await GetPersonAlbumsAsync(connection, personId, cancellationToken);
-                albumCredits = await GetPersonAlbumCreditsAsync(connection, personId, cancellationToken);
-                contributions = await GetPersonTrackContributionsAsync(connection, personId, cancellationToken);
-                trackCredits = await GetPersonTrackCreditsAsync(connection, personId, cancellationToken);
-            }
-            else
             {
                 var mediaTask = GetEntityMediaAsync(connection, entityId, cancellationToken);
                 var linksTask = GetEntityLinksAsync(connection, entityId, cancellationToken);
@@ -341,18 +316,6 @@ public sealed class PersonQueryService : IPersonQueryService
             IReadOnlyList<ChartTimelineRow> chartRows;
             IReadOnlyList<PublicationTimelineRow> publications;
 
-            if (_isSqlite)
-            {
-                trackGenres = trackIds.Length > 0
-                    ? await GetTrackGenresMapAsync(connection, trackIds, cancellationToken)
-                    : new Dictionary<int, IReadOnlyList<string>>();
-                sessions = await GetPersonSessionsAsync(connection, albumIds, trackIds, cancellationToken);
-                events = await GetPersonEventsAsync(connection, albumIds, trackIds, cancellationToken);
-                awards = await GetPersonAwardsAsync(connection, albumIds, cancellationToken);
-                chartRows = await GetPersonChartsAsync(connection, albumIds, cancellationToken);
-                publications = await GetPersonPublicationsAsync(connection, personId, cancellationToken);
-            }
-            else
             {
                 var genresTask = trackIds.Length > 0
                     ? GetTrackGenresMapAsync(connection, trackIds, cancellationToken)

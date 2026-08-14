@@ -17,7 +17,6 @@ namespace MusicEncyclopedia.Services.Services;
 public sealed class TrackQueryService : ITrackQueryService
 {
     private readonly string _connectionString;
-    private readonly bool _isSqlite;
     private readonly ILogger<TrackQueryService> _logger;
     private readonly IContentLocalizationService _localizationService;
     private readonly ICacheService _cache;
@@ -31,22 +30,14 @@ public sealed class TrackQueryService : ITrackQueryService
         _localizationService = localizationService;
         _cache = cache;
 
-        var dbProvider = configuration.GetValue<string>("DatabaseProvider") ?? "SqlServer";
-        _isSqlite = string.Equals(dbProvider, "Sqlite", StringComparison.OrdinalIgnoreCase);
-
-        _connectionString = _isSqlite
-            ? configuration.GetConnectionString("SqliteConnection")
-                ?? throw new InvalidOperationException("Connection string 'SqliteConnection' not found.")
-            : configuration.GetConnectionString("DefaultConnection")
-                ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+        _connectionString = configuration.GetConnectionString("DefaultConnection")
+            ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
         _logger = logger;
     }
 
     private IDbConnection CreateConnection()
     {
-        return _isSqlite
-            ? (IDbConnection)new Microsoft.Data.Sqlite.SqliteConnection(_connectionString)
-            : new SqlConnection(_connectionString);
+        return new SqlConnection(_connectionString);
     }
 
     /// <inheritdoc />
@@ -174,7 +165,7 @@ public sealed class TrackQueryService : ITrackQueryService
             LEFT JOIN LyricsAvailabilityType AS lat ON lat.LyricsAvailabilityTypeId = t.LyricsAvailabilityTypeId
             WHERE {whereSql}
             ORDER BY {orderBy}
-            {SqlDialect.Pagination(_isSqlite)}
+            {SqlDialect.Pagination()}
             """;
 
         parameters.Add("Offset", (page - 1) * pageSize);
@@ -262,32 +253,6 @@ public sealed class TrackQueryService : ITrackQueryService
             var entityId = track.EntityId;
 
             TrackDetailDto result;
-
-            if (_isSqlite)
-            {
-                var albums = await GetTrackAlbumsAsync(connection, trackId, cancellationToken);
-                var credits = await GetTrackCreditsAsync(connection, entityId, cancellationToken);
-                var musicians = await GetTrackMusiciansAsync(connection, entityId, cancellationToken);
-                var genres = await GetTrackGenresAsync(connection, trackId, cancellationToken);
-                var moods = await GetTrackMoodsAsync(connection, trackId, cancellationToken);
-                var instruments = await GetTrackInstrumentsAsync(connection, trackId, cancellationToken);
-                var media = await GetEntityMediaAsync(connection, entityId, cancellationToken);
-                var links = await GetEntityLinksAsync(connection, entityId, cancellationToken);
-                var citations = await GetEntityCitationsAsync(connection, entityId, cancellationToken);
-                var tags = await GetEntityTagsAsync(connection, entityId, cancellationToken);
-                var aliases = await GetEntityAliasesAsync(connection, entityId, cancellationToken);
-                var awards = await GetEntityAwardsAsync(connection, entityId, cancellationToken);
-                var certifications = await GetEntityCertificationsAsync(connection, entityId, cancellationToken);
-                var chartEntries = await GetEntityChartEntriesAsync(connection, entityId, cancellationToken);
-                var relatedTracks = await GetTrackRelationsAsync(connection, trackId, cancellationToken);
-                var sessions = await GetTrackRecordingSessionsAsync(connection, trackId, cancellationToken);
-                var events = await GetTrackPerformanceEventsAsync(connection, trackId, cancellationToken);
-
-                result = CreateTrackDetail(track, albums, credits, musicians, genres, moods, instruments,
-                    media, links, citations, tags, aliases, awards, certifications, chartEntries,
-                    relatedTracks, sessions, events);
-            }
-            else
             {
                 var albumsTask = GetTrackAlbumsAsync(connection, trackId, cancellationToken);
                 var creditsTask = GetTrackCreditsAsync(connection, entityId, cancellationToken);

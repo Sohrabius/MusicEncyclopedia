@@ -50,11 +50,11 @@ public sealed class AwardsController : Controller
             LEFT JOIN Country c ON a.CountryId = c.CountryId
             WHERE a.IsDeleted = 0
             ORDER BY a.Name
-            " + SqlDialect.Pagination(SqlDialect.IsSqliteConnection(_db));
+            " + SqlDialect.Pagination();
 
         var items = (await _db.QueryAsync<AwardListItemDto>(sql, new { Offset = offset, PageSize = pageSize })).ToList();
 
-        // Truncate DescriptionPreview to 200 chars (LEFT() is SQL Server-specific; SQLite uses SUBSTR)
+        // Truncate DescriptionPreview to 200 chars
         foreach (var item in items)
         {
             if (item.DescriptionPreview?.Length > 200)

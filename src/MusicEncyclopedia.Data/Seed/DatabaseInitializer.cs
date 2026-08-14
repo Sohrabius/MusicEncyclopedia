@@ -5,7 +5,8 @@ namespace MusicEncyclopedia.Data.Seed;
 
 /// <summary>
 /// Seeds the database with initial lookup data required by the application.
-/// For SQLite, also creates the schema via EnsureCreatedAsync.
+/// Schema creation is handled by EF migrations (applied by the caller before
+/// InitializeAsync runs).
 /// </summary>
 public static class DatabaseInitializer
 {
@@ -13,246 +14,145 @@ public static class DatabaseInitializer
     /// Initializes schema and seed data.
     /// </summary>
     /// <param name="context">The application database context.</param>
-    /// <param name="isSqlite">True when running on SQLite (EnsureCreated); false applies on SQL Server (migrations are applied by the caller).</param>
     /// <param name="seedSampleContent">
     /// When false, only lookup data is seeded — the demo artists/albums/tracks/
     /// poems and Phase 4 content are skipped. Production deployments should set
     /// this to false (config <c>Seed:SampleContent</c>).
     /// </param>
     public static async Task InitializeAsync(
-        AppDbContext context, bool isSqlite, bool seedSampleContent = true)
+        AppDbContext context, bool seedSampleContent = true)
     {
-        if (isSqlite)
-        {
-            // Create the schema for SQLite (migrations handle SQL Server).
-            // EnsureCreated does not alter an existing database, so tables added
-            // after the initial schema creation are created explicitly here.
-            await context.Database.EnsureCreatedAsync();
-
-            await context.Database.ExecuteSqlRawAsync(
-                """
-                CREATE TABLE IF NOT EXISTS "AuditLog" (
-                    "AuditLogId" INTEGER NOT NULL CONSTRAINT "PK_AuditLog" PRIMARY KEY AUTOINCREMENT,
-                    "Timestamp" TEXT NOT NULL,
-                    "UserName" TEXT NOT NULL,
-                    "Action" TEXT NOT NULL,
-                    "EntityType" TEXT NULL,
-                    "EntityId" INTEGER NULL,
-                    "IsSuccess" INTEGER NOT NULL,
-                    "Details" TEXT NULL,
-                    "IpAddress" TEXT NULL
+        // EnsureCreated does not alter an existing database, so the
+        // AuditLog table is created explicitly when missing (matches EF's mapping:
+        // DateTime → datetime2, bool → bit, strings → nvarchar with lengths).
+        await context.Database.ExecuteSqlRawAsync(
+            """
+            IF OBJECT_ID(N'[AuditLog]', N'U') IS NULL
+            BEGIN
+                CREATE TABLE [AuditLog] (
+                    [AuditLogId] int NOT NULL IDENTITY(1,1) CONSTRAINT [PK_AuditLog] PRIMARY KEY,
+                    [Timestamp] datetime2 NOT NULL,
+                    [UserName] nvarchar(255) NOT NULL,
+                    [Action] nvarchar(255) NOT NULL,
+                    [EntityType] nvarchar(100) NULL,
+                    [EntityId] int NULL,
+                    [IsSuccess] bit NOT NULL,
+                    [Details] nvarchar(4000) NULL,
+                    [IpAddress] nvarchar(100) NULL
                 )
-                """);
+            END
+            """);
 
-            // ASP.NET Core Identity tables. Fresh databases get these from the
-            // model (EnsureCreated) / migration (MigrateAsync); the CREATE TABLE
-            // IF NOT EXISTS guards below are a backward-compat safety net for
-            // existing databases created before Identity was added to the model.
-            await context.Database.ExecuteSqlRawAsync(
-                """
-                CREATE TABLE IF NOT EXISTS "AspNetRoles" (
-                    "Id" TEXT NOT NULL CONSTRAINT "PK_AspNetRoles" PRIMARY KEY,
-                    "Name" TEXT NULL,
-                    "NormalizedName" TEXT NULL,
-                    "ConcurrencyStamp" TEXT NULL
+        // ASP.NET Core Identity tables. On a fresh SQL Server the
+        // AddCurrentModelTables migration creates them (idempotent DDL below
+        // no-ops via the IF OBJECT_ID guards); these remain as a
+        // backward-compat safety net for databases created before the
+        // migration existed. Types match the IdentityDbContext mapping.
+        await context.Database.ExecuteSqlRawAsync(
+            """
+            IF OBJECT_ID(N'[AspNetRoles]', N'U') IS NULL
+            BEGIN
+                CREATE TABLE [AspNetRoles] (
+                    [Id] nvarchar(450) NOT NULL CONSTRAINT [PK_AspNetRoles] PRIMARY KEY,
+                    [Name] nvarchar(256) NULL,
+                    [NormalizedName] nvarchar(256) NULL,
+                    [ConcurrencyStamp] nvarchar(max) NULL
                 );
-                CREATE UNIQUE INDEX IF NOT EXISTS "RoleNameIndex" ON "AspNetRoles" ("NormalizedName");
+                CREATE UNIQUE INDEX [RoleNameIndex] ON [AspNetRoles] ([NormalizedName]) WHERE [NormalizedName] IS NOT NULL;
+            END
 
-                CREATE TABLE IF NOT EXISTS "AspNetUsers" (
-                    "Id" TEXT NOT NULL CONSTRAINT "PK_AspNetUsers" PRIMARY KEY,
-                    "UserName" TEXT NULL,
-                    "NormalizedUserName" TEXT NULL,
-                    "Email" TEXT NULL,
-                    "NormalizedEmail" TEXT NULL,
-                    "EmailConfirmed" INTEGER NOT NULL,
-                    "PasswordHash" TEXT NULL,
-                    "SecurityStamp" TEXT NULL,
-                    "ConcurrencyStamp" TEXT NULL,
-                    "PhoneNumber" TEXT NULL,
-                    "PhoneNumberConfirmed" INTEGER NOT NULL,
-                    "TwoFactorEnabled" INTEGER NOT NULL,
-                    "LockoutEnd" TEXT NULL,
-                    "LockoutEnabled" INTEGER NOT NULL,
-                    "AccessFailedCount" INTEGER NOT NULL
+            IF OBJECT_ID(N'[AspNetUsers]', N'U') IS NULL
+            BEGIN
+                CREATE TABLE [AspNetUsers] (
+                    [Id] nvarchar(450) NOT NULL CONSTRAINT [PK_AspNetUsers] PRIMARY KEY,
+                    [UserName] nvarchar(256) NULL,
+                    [NormalizedUserName] nvarchar(256) NULL,
+                    [Email] nvarchar(256) NULL,
+                    [NormalizedEmail] nvarchar(256) NULL,
+                    [EmailConfirmed] bit NOT NULL,
+                    [PasswordHash] nvarchar(max) NULL,
+                    [SecurityStamp] nvarchar(max) NULL,
+                    [ConcurrencyStamp] nvarchar(max) NULL,
+                    [PhoneNumber] nvarchar(max) NULL,
+                    [PhoneNumberConfirmed] bit NOT NULL,
+                    [TwoFactorEnabled] bit NOT NULL,
+                    [LockoutEnd] datetimeoffset NULL,
+                    [LockoutEnabled] bit NOT NULL,
+                    [AccessFailedCount] int NOT NULL
                 );
-                CREATE UNIQUE INDEX IF NOT EXISTS "UserNameIndex" ON "AspNetUsers" ("NormalizedUserName");
-                CREATE UNIQUE INDEX IF NOT EXISTS "EmailIndex" ON "AspNetUsers" ("NormalizedEmail");
+                CREATE UNIQUE INDEX [UserNameIndex] ON [AspNetUsers] ([NormalizedUserName]) WHERE [NormalizedUserName] IS NOT NULL;
+                CREATE UNIQUE INDEX [EmailIndex] ON [AspNetUsers] ([NormalizedEmail]) WHERE [NormalizedEmail] IS NOT NULL;
+            END
 
-                CREATE TABLE IF NOT EXISTS "AspNetRoleClaims" (
-                    "Id" INTEGER NOT NULL CONSTRAINT "PK_AspNetRoleClaims" PRIMARY KEY AUTOINCREMENT,
-                    "RoleId" TEXT NOT NULL,
-                    "ClaimType" TEXT NULL,
-                    "ClaimValue" TEXT NULL
+            IF OBJECT_ID(N'[AspNetRoleClaims]', N'U') IS NULL
+            BEGIN
+                CREATE TABLE [AspNetRoleClaims] (
+                    [Id] int NOT NULL IDENTITY(1,1) CONSTRAINT [PK_AspNetRoleClaims] PRIMARY KEY,
+                    [RoleId] nvarchar(450) NOT NULL,
+                    [ClaimType] nvarchar(max) NULL,
+                    [ClaimValue] nvarchar(max) NULL
                 );
-                CREATE INDEX IF NOT EXISTS "IX_AspNetRoleClaims_RoleId" ON "AspNetRoleClaims" ("RoleId");
+                CREATE INDEX [IX_AspNetRoleClaims_RoleId] ON [AspNetRoleClaims] ([RoleId]);
+            END
 
-                CREATE TABLE IF NOT EXISTS "AspNetUserClaims" (
-                    "Id" INTEGER NOT NULL CONSTRAINT "PK_AspNetUserClaims" PRIMARY KEY AUTOINCREMENT,
-                    "UserId" TEXT NOT NULL,
-                    "ClaimType" TEXT NULL,
-                    "ClaimValue" TEXT NULL
+            IF OBJECT_ID(N'[AspNetUserClaims]', N'U') IS NULL
+            BEGIN
+                CREATE TABLE [AspNetUserClaims] (
+                    [Id] int NOT NULL IDENTITY(1,1) CONSTRAINT [PK_AspNetUserClaims] PRIMARY KEY,
+                    [UserId] nvarchar(450) NOT NULL,
+                    [ClaimType] nvarchar(max) NULL,
+                    [ClaimValue] nvarchar(max) NULL
                 );
-                CREATE INDEX IF NOT EXISTS "IX_AspNetUserClaims_UserId" ON "AspNetUserClaims" ("UserId");
+                CREATE INDEX [IX_AspNetUserClaims_UserId] ON [AspNetUserClaims] ([UserId]);
+            END
 
-                CREATE TABLE IF NOT EXISTS "AspNetUserLogins" (
-                    "LoginProvider" TEXT NOT NULL,
-                    "ProviderKey" TEXT NOT NULL,
-                    "ProviderDisplayName" TEXT NULL,
-                    "UserId" TEXT NOT NULL,
-                    CONSTRAINT "PK_AspNetUserLogins" PRIMARY KEY ("LoginProvider", "ProviderKey")
+            IF OBJECT_ID(N'[AspNetUserLogins]', N'U') IS NULL
+            BEGIN
+                CREATE TABLE [AspNetUserLogins] (
+                    [LoginProvider] nvarchar(128) NOT NULL,
+                    [ProviderKey] nvarchar(128) NOT NULL,
+                    [ProviderDisplayName] nvarchar(max) NULL,
+                    [UserId] nvarchar(450) NOT NULL,
+                    CONSTRAINT [PK_AspNetUserLogins] PRIMARY KEY ([LoginProvider], [ProviderKey])
                 );
-                CREATE INDEX IF NOT EXISTS "IX_AspNetUserLogins_UserId" ON "AspNetUserLogins" ("UserId");
+                CREATE INDEX [IX_AspNetUserLogins_UserId] ON [AspNetUserLogins] ([UserId]);
+            END
 
-                CREATE TABLE IF NOT EXISTS "AspNetUserRoles" (
-                    "UserId" TEXT NOT NULL,
-                    "RoleId" TEXT NOT NULL,
-                    CONSTRAINT "PK_AspNetUserRoles" PRIMARY KEY ("UserId", "RoleId")
+            IF OBJECT_ID(N'[AspNetUserRoles]', N'U') IS NULL
+            BEGIN
+                CREATE TABLE [AspNetUserRoles] (
+                    [UserId] nvarchar(450) NOT NULL,
+                    [RoleId] nvarchar(450) NOT NULL,
+                    CONSTRAINT [PK_AspNetUserRoles] PRIMARY KEY ([UserId], [RoleId])
                 );
-                CREATE INDEX IF NOT EXISTS "IX_AspNetUserRoles_RoleId" ON "AspNetUserRoles" ("RoleId");
+                CREATE INDEX [IX_AspNetUserRoles_RoleId] ON [AspNetUserRoles] ([RoleId]);
+            END
 
-                CREATE TABLE IF NOT EXISTS "AspNetUserTokens" (
-                    "UserId" TEXT NOT NULL,
-                    "LoginProvider" TEXT NOT NULL,
-                    "Name" TEXT NOT NULL,
-                    "Value" TEXT NULL,
-                    CONSTRAINT "PK_AspNetUserTokens" PRIMARY KEY ("UserId", "LoginProvider", "Name")
+            IF OBJECT_ID(N'[AspNetUserTokens]', N'U') IS NULL
+            BEGIN
+                CREATE TABLE [AspNetUserTokens] (
+                    [UserId] nvarchar(450) NOT NULL,
+                    [LoginProvider] nvarchar(128) NOT NULL,
+                    [Name] nvarchar(128) NOT NULL,
+                    [Value] nvarchar(max) NULL,
+                    CONSTRAINT [PK_AspNetUserTokens] PRIMARY KEY ([UserId], [LoginProvider], [Name])
                 );
-                """);
-        }
-        else
-        {
-            // SQL Server: EnsureCreated does not alter an existing database, so the
-            // AuditLog table is created explicitly when missing (matches EF's mapping:
-            // DateTime → datetime2, bool → bit, strings → nvarchar with lengths).
-            await context.Database.ExecuteSqlRawAsync(
-                """
-                IF OBJECT_ID(N'[AuditLog]', N'U') IS NULL
-                BEGIN
-                    CREATE TABLE [AuditLog] (
-                        [AuditLogId] int NOT NULL IDENTITY(1,1) CONSTRAINT [PK_AuditLog] PRIMARY KEY,
-                        [Timestamp] datetime2 NOT NULL,
-                        [UserName] nvarchar(255) NOT NULL,
-                        [Action] nvarchar(255) NOT NULL,
-                        [EntityType] nvarchar(100) NULL,
-                        [EntityId] int NULL,
-                        [IsSuccess] bit NOT NULL,
-                        [Details] nvarchar(4000) NULL,
-                        [IpAddress] nvarchar(100) NULL
-                    )
-                END
-                """);
-
-            // ASP.NET Core Identity tables. On a fresh SQL Server the
-            // AddCurrentModelTables migration creates them (idempotent DDL below
-            // no-ops via the IF OBJECT_ID guards); these remain as a
-            // backward-compat safety net for databases created before the
-            // migration existed. Types match the IdentityDbContext mapping.
-            await context.Database.ExecuteSqlRawAsync(
-                """
-                IF OBJECT_ID(N'[AspNetRoles]', N'U') IS NULL
-                BEGIN
-                    CREATE TABLE [AspNetRoles] (
-                        [Id] nvarchar(450) NOT NULL CONSTRAINT [PK_AspNetRoles] PRIMARY KEY,
-                        [Name] nvarchar(256) NULL,
-                        [NormalizedName] nvarchar(256) NULL,
-                        [ConcurrencyStamp] nvarchar(max) NULL
-                    );
-                    CREATE UNIQUE INDEX [RoleNameIndex] ON [AspNetRoles] ([NormalizedName]) WHERE [NormalizedName] IS NOT NULL;
-                END
-
-                IF OBJECT_ID(N'[AspNetUsers]', N'U') IS NULL
-                BEGIN
-                    CREATE TABLE [AspNetUsers] (
-                        [Id] nvarchar(450) NOT NULL CONSTRAINT [PK_AspNetUsers] PRIMARY KEY,
-                        [UserName] nvarchar(256) NULL,
-                        [NormalizedUserName] nvarchar(256) NULL,
-                        [Email] nvarchar(256) NULL,
-                        [NormalizedEmail] nvarchar(256) NULL,
-                        [EmailConfirmed] bit NOT NULL,
-                        [PasswordHash] nvarchar(max) NULL,
-                        [SecurityStamp] nvarchar(max) NULL,
-                        [ConcurrencyStamp] nvarchar(max) NULL,
-                        [PhoneNumber] nvarchar(max) NULL,
-                        [PhoneNumberConfirmed] bit NOT NULL,
-                        [TwoFactorEnabled] bit NOT NULL,
-                        [LockoutEnd] datetimeoffset NULL,
-                        [LockoutEnabled] bit NOT NULL,
-                        [AccessFailedCount] int NOT NULL
-                    );
-                    CREATE UNIQUE INDEX [UserNameIndex] ON [AspNetUsers] ([NormalizedUserName]) WHERE [NormalizedUserName] IS NOT NULL;
-                    CREATE UNIQUE INDEX [EmailIndex] ON [AspNetUsers] ([NormalizedEmail]) WHERE [NormalizedEmail] IS NOT NULL;
-                END
-
-                IF OBJECT_ID(N'[AspNetRoleClaims]', N'U') IS NULL
-                BEGIN
-                    CREATE TABLE [AspNetRoleClaims] (
-                        [Id] int NOT NULL IDENTITY(1,1) CONSTRAINT [PK_AspNetRoleClaims] PRIMARY KEY,
-                        [RoleId] nvarchar(450) NOT NULL,
-                        [ClaimType] nvarchar(max) NULL,
-                        [ClaimValue] nvarchar(max) NULL
-                    );
-                    CREATE INDEX [IX_AspNetRoleClaims_RoleId] ON [AspNetRoleClaims] ([RoleId]);
-                END
-
-                IF OBJECT_ID(N'[AspNetUserClaims]', N'U') IS NULL
-                BEGIN
-                    CREATE TABLE [AspNetUserClaims] (
-                        [Id] int NOT NULL IDENTITY(1,1) CONSTRAINT [PK_AspNetUserClaims] PRIMARY KEY,
-                        [UserId] nvarchar(450) NOT NULL,
-                        [ClaimType] nvarchar(max) NULL,
-                        [ClaimValue] nvarchar(max) NULL
-                    );
-                    CREATE INDEX [IX_AspNetUserClaims_UserId] ON [AspNetUserClaims] ([UserId]);
-                END
-
-                IF OBJECT_ID(N'[AspNetUserLogins]', N'U') IS NULL
-                BEGIN
-                    CREATE TABLE [AspNetUserLogins] (
-                        [LoginProvider] nvarchar(128) NOT NULL,
-                        [ProviderKey] nvarchar(128) NOT NULL,
-                        [ProviderDisplayName] nvarchar(max) NULL,
-                        [UserId] nvarchar(450) NOT NULL,
-                        CONSTRAINT [PK_AspNetUserLogins] PRIMARY KEY ([LoginProvider], [ProviderKey])
-                    );
-                    CREATE INDEX [IX_AspNetUserLogins_UserId] ON [AspNetUserLogins] ([UserId]);
-                END
-
-                IF OBJECT_ID(N'[AspNetUserRoles]', N'U') IS NULL
-                BEGIN
-                    CREATE TABLE [AspNetUserRoles] (
-                        [UserId] nvarchar(450) NOT NULL,
-                        [RoleId] nvarchar(450) NOT NULL,
-                        CONSTRAINT [PK_AspNetUserRoles] PRIMARY KEY ([UserId], [RoleId])
-                    );
-                    CREATE INDEX [IX_AspNetUserRoles_RoleId] ON [AspNetUserRoles] ([RoleId]);
-                END
-
-                IF OBJECT_ID(N'[AspNetUserTokens]', N'U') IS NULL
-                BEGIN
-                    CREATE TABLE [AspNetUserTokens] (
-                        [UserId] nvarchar(450) NOT NULL,
-                        [LoginProvider] nvarchar(128) NOT NULL,
-                        [Name] nvarchar(128) NOT NULL,
-                        [Value] nvarchar(max) NULL,
-                        CONSTRAINT [PK_AspNetUserTokens] PRIMARY KEY ([UserId], [LoginProvider], [Name])
-                    );
-                END
-                """);
-        }
+            END
+            """);
 
         // Check if data already exists (using MediaTypes as a sentinel table)
         if (await context.MediaTypes.AnyAsync())
         {
             await SeedOptionalContentAsync(context, seedSampleContent);
-            await SeedLocalizationsAsync(context, isSqlite);
+            await SeedLocalizationsAsync(context);
             return; // Lookup data already seeded
         }
 
-        await SeedLookupDataAsync(context, isSqlite);
+        await SeedLookupDataAsync(context);
 
         await SeedOptionalContentAsync(context, seedSampleContent);
 
-        await SeedLocalizationsAsync(context, isSqlite);
+        await SeedLocalizationsAsync(context);
     }
 
     /// <summary>
@@ -277,7 +177,7 @@ public static class DatabaseInitializer
     /// while other cultures fall back to the English base columns.
     /// Every section is guarded so re-runs never duplicate data.
     /// </summary>
-    private static async Task SeedLocalizationsAsync(AppDbContext context, bool isSqlite)
+    private static async Task SeedLocalizationsAsync(AppDbContext context)
     {
         // Languages (idempotent — existing databases won't have en/ar/fr)
         if (!await context.Languages.AnyAsync(l => l.Code == "en"))
@@ -287,7 +187,7 @@ public static class DatabaseInitializer
                 new Language { LanguageId = 3, Code = "ar", Name = "Arabic" },
                 new Language { LanguageId = 4, Code = "fr", Name = "French" }
             );
-        await SaveLookupTableAsync(context, "Language", isSqlite, useIdentityInsert: true);
+        await SaveLookupTableAsync(context, "Language", useIdentityInsert: true);
 
 
         }
@@ -970,7 +870,7 @@ public static class DatabaseInitializer
             EntityTypeId = entityTypeId,
             Slug = slug,
             IsDeleted = false,
-            RowVersion = new byte[8], // SQLite has no server-generated rowversion
+            RowVersion = new byte[8], // SQL Server generates this on INSERT
             CreatedBy = "seed",
             CreatedAt = DateTime.UtcNow
         };
@@ -1073,7 +973,7 @@ public static class DatabaseInitializer
         return ids;
     }
 
-    private static async Task SeedLookupDataAsync(AppDbContext context, bool isSqlite)
+    private static async Task SeedLookupDataAsync(AppDbContext context)
     {
         // ──────────────────────────────────────────────
         // EntityType (1-18)
@@ -1098,7 +998,7 @@ public static class DatabaseInitializer
             new EntityType { EntityTypeId = 17, Code = "Source", Name = "Source" },
             new EntityType { EntityTypeId = 18, Code = "Tag", Name = "Tag" }
         );
-        await SaveLookupTableAsync(context, "EntityType", isSqlite, useIdentityInsert: true);
+        await SaveLookupTableAsync(context, "EntityType", useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // Language (1)
@@ -1109,7 +1009,7 @@ public static class DatabaseInitializer
             new Language { LanguageId = 3, Code = "ar", Name = "Arabic" },
             new Language { LanguageId = 4, Code = "fr", Name = "French" }
         );
-        await SaveLookupTableAsync(context, "Language", isSqlite, useIdentityInsert: true);
+        await SaveLookupTableAsync(context, "Language", useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // Country (1-14)
@@ -1130,7 +1030,7 @@ public static class DatabaseInitializer
             new Country { CountryId = 13, Code = "IN", Name = "India" },
             new Country { CountryId = 14, Code = "PK", Name = "Pakistan" }
         );
-        await SaveLookupTableAsync(context, "Country", isSqlite, useIdentityInsert: true);
+        await SaveLookupTableAsync(context, "Country", useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // AlbumCategory (1-10)
@@ -1147,7 +1047,7 @@ public static class DatabaseInitializer
             new AlbumCategory { AlbumCategoryId = 9, Code = "Mixtape", Name = "Mixtape" },
             new AlbumCategory { AlbumCategoryId = 10, Code = "Remix", Name = "Remix Album" }
         );
-        await SaveLookupTableAsync(context, "AlbumCategory", isSqlite, useIdentityInsert: true);
+        await SaveLookupTableAsync(context, "AlbumCategory", useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // CompanyType (1-6)
@@ -1160,7 +1060,7 @@ public static class DatabaseInitializer
             new CompanyType { CompanyTypeId = 5, Code = "Distributor", Name = "Distributor" },
             new CompanyType { CompanyTypeId = 6, Code = "Manufacturer", Name = "Manufacturer" }
         );
-        await SaveLookupTableAsync(context, "CompanyType", isSqlite, useIdentityInsert: true);
+        await SaveLookupTableAsync(context, "CompanyType", useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // CompanyRoleType (1-5)
@@ -1172,7 +1072,7 @@ public static class DatabaseInitializer
             new CompanyRoleType { CompanyRoleTypeId = 4, Code = "Production", Name = "Production Company" },
             new CompanyRoleType { CompanyRoleTypeId = 5, Code = "Studio", Name = "Recording Studio" }
         );
-        await SaveLookupTableAsync(context, "CompanyRoleType", isSqlite, useIdentityInsert: true);
+        await SaveLookupTableAsync(context, "CompanyRoleType", useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // RoleScopeType (1-3)
@@ -1182,7 +1082,7 @@ public static class DatabaseInitializer
             new RoleScopeType { RoleScopeTypeId = 2, Code = "Company", Name = "Company only" },
             new RoleScopeType { RoleScopeTypeId = 3, Code = "Both", Name = "Person or Company" }
         );
-        await SaveLookupTableAsync(context, "RoleScopeType", isSqlite, useIdentityInsert: true);
+        await SaveLookupTableAsync(context, "RoleScopeType", useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // CreditRole (1-20)
@@ -1209,7 +1109,7 @@ public static class DatabaseInitializer
             new CreditRole { CreditRoleId = 19, Code = "DISTRIBUTOR", Name = "Distributor", DisplayOrder = 52, RoleScopeTypeId = 2 },
             new CreditRole { CreditRoleId = 20, Code = "COLLABORATOR", Name = "Collaborator", DisplayOrder = 60, RoleScopeTypeId = 3 }
         );
-        await SaveLookupTableAsync(context, "CreditRole", isSqlite, useIdentityInsert: true);
+        await SaveLookupTableAsync(context, "CreditRole", useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // AliasType (1-6)
@@ -1222,7 +1122,7 @@ public static class DatabaseInitializer
             new AliasType { AliasTypeId = 5, Code = "ORIGINAL_SCRIPT", Name = "Original Script" },
             new AliasType { AliasTypeId = 6, Code = "SLUG", Name = "Slug" }
         );
-        await SaveLookupTableAsync(context, "AliasType", isSqlite, useIdentityInsert: true);
+        await SaveLookupTableAsync(context, "AliasType", useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // MediaType (1-4)
@@ -1233,7 +1133,7 @@ public static class DatabaseInitializer
             new MediaType { MediaTypeId = 3, Code = "VIDEO", Name = "Video" },
             new MediaType { MediaTypeId = 4, Code = "PDF", Name = "Document" }
         );
-        await SaveLookupTableAsync(context, "MediaType", isSqlite, useIdentityInsert: true);
+        await SaveLookupTableAsync(context, "MediaType", useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // MediaRoleType (1-14)
@@ -1254,7 +1154,7 @@ public static class DatabaseInitializer
             new MediaRoleType { MediaRoleTypeId = 13, Code = "SCORE", Name = "Musical Score" },
             new MediaRoleType { MediaRoleTypeId = 14, Code = "INTERVIEW", Name = "Interview" }
         );
-        await SaveLookupTableAsync(context, "MediaRoleType", isSqlite, useIdentityInsert: true);
+        await SaveLookupTableAsync(context, "MediaRoleType", useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // LinkType (1-19)
@@ -1280,7 +1180,7 @@ public static class DatabaseInitializer
             new LinkType { LinkTypeId = 18, Code = "PURCHASE", Name = "Purchase Link" },
             new LinkType { LinkTypeId = 19, Code = "STREAMING", Name = "Streaming Link" }
         );
-        await SaveLookupTableAsync(context, "LinkType", isSqlite, useIdentityInsert: true);
+        await SaveLookupTableAsync(context, "LinkType", useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // SourceType (1-10)
@@ -1297,7 +1197,7 @@ public static class DatabaseInitializer
             new SourceType { SourceTypeId = 9, Code = "ACADEMIC", Name = "Academic Publication" },
             new SourceType { SourceTypeId = 10, Code = "SOCIAL_MEDIA", Name = "Social Media" }
         );
-        await SaveLookupTableAsync(context, "SourceType", isSqlite, useIdentityInsert: true);
+        await SaveLookupTableAsync(context, "SourceType", useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // IdentifierType (1-5)
@@ -1309,7 +1209,7 @@ public static class DatabaseInitializer
             new IdentifierType { IdentifierTypeId = 4, Code = "UPC", Name = "UPC" },
             new IdentifierType { IdentifierTypeId = 5, Code = "MATRIX", Name = "Matrix/Runout" }
         );
-        await SaveLookupTableAsync(context, "IdentifierType", isSqlite, useIdentityInsert: true);
+        await SaveLookupTableAsync(context, "IdentifierType", useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // PersonKind (1-5)
@@ -1321,7 +1221,7 @@ public static class DatabaseInitializer
             new PersonKind { PersonKindId = 4, Code = "ORCHESTRA", Name = "Orchestra" },
             new PersonKind { PersonKindId = 5, Code = "ENSEMBLE", Name = "Ensemble" }
         );
-        await SaveLookupTableAsync(context, "PersonKind", isSqlite, useIdentityInsert: true);
+        await SaveLookupTableAsync(context, "PersonKind", useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // PersonType (1-8)
@@ -1336,7 +1236,7 @@ public static class DatabaseInitializer
             new PersonType { PersonTypeId = 7, Code = "ENGINEER", Name = "Engineer" },
             new PersonType { PersonTypeId = 8, Code = "CONDUCTOR", Name = "Conductor" }
         );
-        await SaveLookupTableAsync(context, "PersonType", isSqlite, useIdentityInsert: true);
+        await SaveLookupTableAsync(context, "PersonType", useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // LocationType (1-6)
@@ -1349,7 +1249,7 @@ public static class DatabaseInitializer
             new LocationType { LocationTypeId = 5, Code = "REGION", Name = "Region" },
             new LocationType { LocationTypeId = 6, Code = "PROVINCE", Name = "Province/State" }
         );
-        await SaveLookupTableAsync(context, "LocationType", isSqlite, useIdentityInsert: true);
+        await SaveLookupTableAsync(context, "LocationType", useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // EventType (1-8)
@@ -1364,7 +1264,7 @@ public static class DatabaseInitializer
             new EventType { EventTypeId = 7, Code = "BOOK_SIGNING", Name = "Book Signing" },
             new EventType { EventTypeId = 8, Code = "MEET_AND_GREET", Name = "Meet and Greet" }
         );
-        await SaveLookupTableAsync(context, "EventType", isSqlite, useIdentityInsert: true);
+        await SaveLookupTableAsync(context, "EventType", useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // SessionType (1-7)
@@ -1378,7 +1278,7 @@ public static class DatabaseInitializer
             new SessionType { SessionTypeId = 6, Code = "MASTERING", Name = "Mastering Session" },
             new SessionType { SessionTypeId = 7, Code = "LIVE_RECORDING", Name = "Live Recording Session" }
         );
-        await SaveLookupTableAsync(context, "SessionType", isSqlite, useIdentityInsert: true);
+        await SaveLookupTableAsync(context, "SessionType", useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // PublicationType (1-5)
@@ -1390,7 +1290,7 @@ public static class DatabaseInitializer
             new PublicationType { PublicationTypeId = 4, Code = "DIGITAL", Name = "Digital Publication" },
             new PublicationType { PublicationTypeId = 5, Code = "COLLECTION", Name = "Collection" }
         );
-        await SaveLookupTableAsync(context, "PublicationType", isSqlite, useIdentityInsert: true);
+        await SaveLookupTableAsync(context, "PublicationType", useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // AwardResultType (1-6)
@@ -1403,7 +1303,7 @@ public static class DatabaseInitializer
             new AwardResultType { AwardResultTypeId = 5, Code = "PLACE_3", Name = "Third Place" },
             new AwardResultType { AwardResultTypeId = 6, Code = "HONORABLE", Name = "Honorable Mention" }
         );
-        await SaveLookupTableAsync(context, "AwardResultType", isSqlite, useIdentityInsert: true);
+        await SaveLookupTableAsync(context, "AwardResultType", useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // TrackRelationType (1-10)
@@ -1420,7 +1320,7 @@ public static class DatabaseInitializer
             new TrackRelationType { TrackRelationTypeId = 9, Code = "SAMPLED_IN", Name = "Sampled In" },
             new TrackRelationType { TrackRelationTypeId = 10, Code = "SAMPLES", Name = "Samples" }
         );
-        await SaveLookupTableAsync(context, "TrackRelationType", isSqlite, useIdentityInsert: true);
+        await SaveLookupTableAsync(context, "TrackRelationType", useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // AlbumRelationType (1-6)
@@ -1433,7 +1333,7 @@ public static class DatabaseInitializer
             new AlbumRelationType { AlbumRelationTypeId = 5, Code = "FOLLOW_UP", Name = "Follow-up" },
             new AlbumRelationType { AlbumRelationTypeId = 6, Code = "COMPILATION", Name = "Compilation Contains" }
         );
-        await SaveLookupTableAsync(context, "AlbumRelationType", isSqlite, useIdentityInsert: true);
+        await SaveLookupTableAsync(context, "AlbumRelationType", useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // TrackVersionType (1-11)
@@ -1451,7 +1351,7 @@ public static class DatabaseInitializer
             new TrackVersionType { TrackVersionTypeId = 10, Code = "EXTENDED", Name = "Extended Mix" },
             new TrackVersionType { TrackVersionTypeId = 11, Code = "ORIGINAL", Name = "Original Version" }
         );
-        await SaveLookupTableAsync(context, "TrackVersionType", isSqlite, useIdentityInsert: true);
+        await SaveLookupTableAsync(context, "TrackVersionType", useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // VocalStyle (1-12)
@@ -1470,7 +1370,7 @@ public static class DatabaseInitializer
             new VocalStyle { VocalStyleId = 11, Code = "SCREAM", Name = "Scream" },
             new VocalStyle { VocalStyleId = 12, Code = "WHISPER", Name = "Whisper" }
         );
-        await SaveLookupTableAsync(context, "VocalStyle", isSqlite, useIdentityInsert: true);
+        await SaveLookupTableAsync(context, "VocalStyle", useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // MusicalKey (1-28)
@@ -1505,7 +1405,7 @@ public static class DatabaseInitializer
             new MusicalKey { MusicalKeyId = 27, Code = "B", Name = "B Major" },
             new MusicalKey { MusicalKeyId = 28, Code = "Bm", Name = "B Minor" }
         );
-        await SaveLookupTableAsync(context, "MusicalKey", isSqlite, useIdentityInsert: true);
+        await SaveLookupTableAsync(context, "MusicalKey", useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // LyricsAvailabilityType (1-5)
@@ -1517,7 +1417,7 @@ public static class DatabaseInitializer
             new LyricsAvailabilityType { LyricsAvailabilityTypeId = 4, Code = "REQUEST", Name = "Available Upon Request" },
             new LyricsAvailabilityType { LyricsAvailabilityTypeId = 5, Code = "RESTRICTED", Name = "Restricted Access" }
         );
-        await SaveLookupTableAsync(context, "LyricsAvailabilityType", isSqlite, useIdentityInsert: true);
+        await SaveLookupTableAsync(context, "LyricsAvailabilityType", useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // CountryRoleType (1-4)
@@ -1528,7 +1428,7 @@ public static class DatabaseInitializer
             new CountryRoleType { CountryRoleTypeId = 3, Code = "OPERATION", Name = "Country of Operation" },
             new CountryRoleType { CountryRoleTypeId = 4, Code = "REGISTRATION", Name = "Country of Registration" }
         );
-        await SaveLookupTableAsync(context, "CountryRoleType", isSqlite, useIdentityInsert: true);
+        await SaveLookupTableAsync(context, "CountryRoleType", useIdentityInsert: true);
 
         // ──────────────────────────────────────────────
         // InstrumentFamily (1-9)
@@ -1544,7 +1444,7 @@ public static class DatabaseInitializer
             new InstrumentFamily { InstrumentFamilyId = 8, Code = "FOLK", Name = "Folk/Traditional Instruments" },
             new InstrumentFamily { InstrumentFamilyId = 9, Code = "OTHER", Name = "Other Instruments" }
         );
-        await SaveLookupTableAsync(context, "InstrumentFamily", isSqlite, useIdentityInsert: true);
+        await SaveLookupTableAsync(context, "InstrumentFamily", useIdentityInsert: true);
     }
 
     /// <summary>
@@ -1553,18 +1453,10 @@ public static class DatabaseInitializer
     /// <c>SET IDENTITY_INSERT</c> is enabled for that table — and SQL Server
     /// only allows that flag for one table per session. Saving per table in
     /// its own transaction keeps the flag scoped and the seed transactional.
-    /// SQLite accepts explicit ids natively, so there is nothing special to do.
     /// </summary>
-    private static async Task SaveLookupTableAsync(AppDbContext context, string tableName, bool isSqlite, bool useIdentityInsert)
+    private static async Task SaveLookupTableAsync(AppDbContext context, string tableName, bool useIdentityInsert)
     {
-        if (isSqlite)
-        {
-            // SQLite accepts explicit identity values natively.
-            await context.SaveChangesAsync();
-            return;
-        }
-
-        // SQL Server: the retrying execution strategy does not support
+        // The retrying execution strategy does not support
         // user-initiated transactions, so the whole per-table unit (including
         // the IDENTITY_INSERT toggling) must run through the strategy.
         var strategy = context.Database.CreateExecutionStrategy();

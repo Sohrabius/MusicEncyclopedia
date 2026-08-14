@@ -15,7 +15,7 @@ namespace MusicEncyclopedia.Web.Seed;
 ///     bootstrapped admin can use the whole admin area without manual setup.
 ///  3. Creates an admin user and assigns the Administrator role. Precedence:
 ///     <c>Admin:Email</c> (plus <c>Admin:Password</c>) when configured; otherwise,
-///     when <paramref name="seedDefaultAdmin"/> is true (the SQLite/dev path),
+///     when <paramref name="seedDefaultAdmin"/> is true (the dev path),
 ///     the built-in seed default (admin@example.com / Admin@123456) so a fresh
 ///     dev database has a usable administrator with no env setup.
 ///
@@ -115,8 +115,8 @@ public static class AdminBootstrap
 
         // 3) Admin user -----------------------------------------------------
         // Precedence: the operator-configured Admin:Email/Admin:Password wins;
-        // when those are absent and seedDefaultAdmin is enabled (the dev/SQLite
-        // path, config Seed:AdminUser), fall back to the built-in seed default
+        // when those are absent and seedDefaultAdmin is enabled (the dev path,
+        // config Seed:AdminUser), fall back to the built-in seed default
         // so a fresh dev database has a usable administrator out of the box.
         var adminEmail = configuration["Admin:Email"];
         var password = configuration["Admin:Password"];

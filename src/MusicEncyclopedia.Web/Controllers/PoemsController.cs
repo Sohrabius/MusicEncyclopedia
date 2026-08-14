@@ -67,7 +67,7 @@ public sealed class PoemsController : Controller
                 LEFT JOIN Publication pub ON pub.PublicationId = p.PublicationId AND pub.IsDeleted = 0
                 WHERE p.IsDeleted = 0
                 ORDER BY p.CreatedAt DESC
-                {SqlDialect.Pagination(SqlDialect.IsSqliteConnection(_db))}
+                {SqlDialect.Pagination()}
                 """;
 
             var rows = await _db.QueryAsync<PoemListViewModel.PoemRow>(dataSql, new { Offset = offset, PageSize = pageSize });
@@ -172,7 +172,7 @@ public sealed class PoemsController : Controller
             var poemId = (int)((dynamic)poem).PoemId;
             var entityId = (int)((dynamic)poem).EntityId;
 
-            // Load related data sequentially (safe for both SQL Server and SQLite)
+            // Load related data sequentially (shared scoped connection)
             var sungVersions = await GetSungVersionsAsync(_db, poemId, cancellationToken);
             var tracks = await GetTracksForPoemAsync(_db, poemId, cancellationToken);
             var media = await GetEntityMediaAsync(_db, entityId, cancellationToken);

@@ -10,7 +10,6 @@ using Hangfire.SqlServer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Data.SqlClient;
-using Microsoft.Data.Sqlite;
 using Serilog;
 using AspNetCoreRateLimit;
 using MusicEncyclopedia.Core.Constants;
@@ -57,78 +56,53 @@ try
     // Service Registration
     // ────────────────────────────────────────────────────────────
 
-    // ---- Database Provider Detection ----
-    var dbProvider = builder.Configuration.GetValue<string>("DatabaseProvider") ?? "SqlServer";
-    var isSqlite = string.Equals(dbProvider, "Sqlite", StringComparison.OrdinalIgnoreCase);
+    // ---- Database Connection ----
+    string connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+        ?? throw new InvalidOperationException(
+            "Connection string 'DefaultConnection' not found. " +
+            "Ensure it is configured in appsettings.json or environment variables.");
 
-    string connectionString;
-    if (isSqlite)
+    // The database password is a secret and must never live in appsettings
+    // files. Read it from configuration instead — env var `DbPassword`
+    // (or `DB_PASSWORD`) in Production, or ASP.NET Core user secrets in
+    // Development — and inject it into the connection string.
+    // A fully-specified ConnectionStrings__DefaultConnection override that
+    // already contains Password= wins untouched.
+    var dbPassword = builder.Configuration["DbPassword"];
+    if (!string.IsNullOrWhiteSpace(dbPassword) &&
+        !connectionString.Contains("Password=", StringComparison.OrdinalIgnoreCase))
     {
-        connectionString = builder.Configuration.GetConnectionString("SqliteConnection")
-            ?? throw new InvalidOperationException(
-                "Connection string 'SqliteConnection' not found. " +
-                "Ensure it is configured in appsettings.Development.json.");
-    }
-    else
-    {
-        connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-            ?? throw new InvalidOperationException(
-                "Connection string 'DefaultConnection' not found. " +
-                "Ensure it is configured in appsettings.json or environment variables.");
-
-        // The database password is a secret and must never live in appsettings
-        // files. Read it from configuration instead — env var `DbPassword`
-        // (or `DB_PASSWORD`) in Production, or ASP.NET Core user secrets in
-        // Development — and inject it into the connection string.
-        // A fully-specified ConnectionStrings__DefaultConnection override that
-        // already contains Password= wins untouched.
-        var dbPassword = builder.Configuration["DbPassword"];
-        if (!string.IsNullOrWhiteSpace(dbPassword) &&
-            !connectionString.Contains("Password=", StringComparison.OrdinalIgnoreCase))
+        var csb = new SqlConnectionStringBuilder(connectionString)
         {
-            var csb = new SqlConnectionStringBuilder(connectionString)
-            {
-                Password = dbPassword
-            };
-            connectionString = csb.ConnectionString;
-        }
-
-        // Override the configuration value so every consumer that reads
-        // DefaultConnection from IConfiguration at resolve time (Dapper query
-        // services in MusicEncyclopedia.Services, the search service, and the
-        // admin/API controllers) receives the password-ready connection string.
-        builder.Configuration["ConnectionStrings:DefaultConnection"] = connectionString;
+            Password = dbPassword
+        };
+        connectionString = csb.ConnectionString;
     }
+
+    // Override the configuration value so every consumer that reads
+    // DefaultConnection from IConfiguration at resolve time (Dapper query
+    // services in MusicEncyclopedia.Services, the search service, and the
+    // admin/API controllers) receives the password-ready connection string.
+    builder.Configuration["ConnectionStrings:DefaultConnection"] = connectionString;
 
     // ---- Database Context & Data Services ----
-    builder.Services.AddDataServices(connectionString, useSqlite: isSqlite);
+    builder.Services.AddDataServices(connectionString);
 
     // Register Dapper IDbConnection for admin dashboard and other quick queries
-    if (isSqlite)
-    {
-        builder.Services.AddScoped<IDbConnection>(_ => new SqliteConnection(connectionString));
+    builder.Services.AddScoped<IDbConnection>(_ => new SqlConnection(connectionString));
 
-        // SQLite stores dates as TEXT; register a Dapper type handler so
-        // DateOnly columns map correctly.
-        Dapper.SqlMapper.AddTypeHandler(new SqliteDateOnlyHandler());
-    }
-    else
-    {
-        builder.Services.AddScoped<IDbConnection>(_ => new SqlConnection(connectionString));
-
-        // SQL Server returns date/datetime2 columns as DateTime; without a
-        // registered handler Dapper falls back to Convert.ChangeType, which
-        // cannot cast DateTime to DateOnly (queries reading ReleaseDate and
-        // other date columns fail with InvalidCastException). Register an
-        // explicit handler that converts DateTime -> DateOnly on read and
-        // writes DateOnly as datetime2 on write.
-        Dapper.SqlMapper.AddTypeHandler(new SqlServerDateOnlyHandler());
-    }
+    // SQL Server returns date/datetime2 columns as DateTime; without a
+    // registered handler Dapper falls back to Convert.ChangeType, which
+    // cannot cast DateTime to DateOnly (queries reading ReleaseDate and
+    // other date columns fail with InvalidCastException). Register an
+    // explicit handler that converts DateTime -> DateOnly on read and
+    // writes DateOnly as datetime2 on write.
+    Dapper.SqlMapper.AddTypeHandler(new SqlServerDateOnlyHandler());
 
     // ---- Application Services ----
     // Register services from MusicEncyclopedia.Services, .Search, .Media projects.
-    builder.Services.AddServices(isSqlite);
-    builder.Services.AddSearchServices(isSqlite);
+    builder.Services.AddServices();
+    builder.Services.AddSearchServices();
     builder.Services.AddMediaServices();
 
     // ---- ASP.NET Core Identity ----
@@ -226,14 +200,11 @@ try
 
     // ---- Health Checks (Section 23) ----
     var healthChecksBuilder = builder.Services.AddHealthChecks();
-    if (!isSqlite)
-    {
-        healthChecksBuilder.AddSqlServer(
-            connectionString: connectionString,
-            name: "sql-server",
-            failureStatus: Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Unhealthy,
-            tags: ["db", "sql", "ready"]);
-    }
+    healthChecksBuilder.AddSqlServer(
+        connectionString: connectionString,
+        name: "sql-server",
+        failureStatus: Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Unhealthy,
+        tags: ["db", "sql", "ready"]);
 
     // ---- Response Caching ----
     builder.Services.AddResponseCaching();
@@ -247,29 +218,25 @@ try
     builder.Services.AddSingleton<IProcessingStrategy, AsyncKeyLockProcessingStrategy>();
 
     // ---- Hangfire Background Jobs (Section 20) ----
-    // Hangfire requires SQL Server; skip in SQLite mode
-    if (!isSqlite)
+    builder.Services.AddHangfire(config =>
     {
-        builder.Services.AddHangfire(config =>
+        config.UseSqlServerStorage(connectionString, new SqlServerStorageOptions
         {
-            config.UseSqlServerStorage(connectionString, new SqlServerStorageOptions
-            {
-                CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
-                SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
-                QueuePollInterval = TimeSpan.FromSeconds(15),
-                UseRecommendedIsolationLevel = true,
-                DisableGlobalLocks = true,
-            });
+            CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+            SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+            QueuePollInterval = TimeSpan.FromSeconds(15),
+            UseRecommendedIsolationLevel = true,
+            DisableGlobalLocks = true,
         });
-        builder.Services.AddHangfireServer(options =>
-        {
-            options.WorkerCount = Environment.ProcessorCount * 2;
-            options.Queues = ["default", "media", "search"];
-        });
+    });
+    builder.Services.AddHangfireServer(options =>
+    {
+        options.WorkerCount = Environment.ProcessorCount * 2;
+        options.Queues = ["default", "media", "search"];
+    });
 
-        // Recurring jobs (spec §20) are resolved from DI by Hangfire.
-        builder.Services.AddScoped<CacheWarmJob>();
-    }
+    // Recurring jobs (spec §20) are resolved from DI by Hangfire.
+    builder.Services.AddScoped<CacheWarmJob>();
 
     // ---- Anti-Forgery Tokens (Section 17.3) ----
     builder.Services.AddAntiforgery(options =>
@@ -305,38 +272,30 @@ try
     }
 
     // ---- Database initialization ----
-    // SQLite: EnsureCreated creates the schema. SQL Server: EF migrations are
-    // applied (idempotent) before seeding.
+    // SQL Server: EF migrations are applied (idempotent) before seeding.
     // Controlled by Seed:OnStartup (default true) and Seed:SampleContent
-    // (default: true for the SQLite/dev path, false for SQL Server so production
+    // (default: true for the dev path, false in production so production
     // deploys seed lookup data only — set explicitly in appsettings.Production.json).
     var seedOnStartup = builder.Configuration.GetValue("Seed:OnStartup", true);
-    var seedSampleContent = builder.Configuration.GetValue("Seed:SampleContent", isSqlite);
+    var seedSampleContent = builder.Configuration.GetValue("Seed:SampleContent", isDevelopment);
 
     if (seedOnStartup)
     {
         using var scope = app.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        if (isSqlite)
-        {
-            await DatabaseInitializer.InitializeAsync(context, isSqlite, seedSampleContent);
-        }
-        else
-        {
-            await context.Database.MigrateAsync();
-            await DatabaseInitializer.InitializeAsync(context, isSqlite, seedSampleContent);
-        }
+        await context.Database.MigrateAsync();
+        await DatabaseInitializer.InitializeAsync(context, seedSampleContent);
     }
 
     // ---- First-run admin bootstrap ----
     // Seeds roles + Administrator permissions and creates an admin user:
     // Admin:Email/Admin:Password when configured, otherwise the built-in seed
-    // default (admin@example.com) on the SQLite/dev path. Seed:AdminUser
-    // defaults to true for SQLite (dev convenience) and false for SQL Server
-    // (production must supply Admin:Email/Admin:Password). Fully idempotent.
+    // default (admin@example.com) on the dev path. Seed:AdminUser defaults to
+    // true for dev (convenience) and false in production (which must supply
+    // Admin:Email/Admin:Password). Fully idempotent.
     try
     {
-        var seedDefaultAdmin = builder.Configuration.GetValue("Seed:AdminUser", isSqlite);
+        var seedDefaultAdmin = builder.Configuration.GetValue("Seed:AdminUser", isDevelopment);
         var bootstrapLogger = app.Services
             .GetRequiredService<ILoggerFactory>()
             .CreateLogger("AdminBootstrap");
@@ -442,28 +401,25 @@ try
     app.UseAuthentication();
     app.UseAuthorization();
 
-    // ---- Hangfire Dashboard & Recurring Jobs (SQL Server only) ----
-    if (!isSqlite)
+    // ---- Hangfire Dashboard & Recurring Jobs ----
+    app.UseHangfireDashboard("/hangfire", new DashboardOptions
     {
-        app.UseHangfireDashboard("/hangfire", new DashboardOptions
-        {
-            Authorization = [new HangfireDashboardAuthorizationFilter()]
-        });
+        Authorization = [new HangfireDashboardAuthorizationFilter()]
+    });
 
-        // Nightly cache warm-up (spec §20 / §15) so the public site starts the
-        // day with warm list caches. Registration is best-effort: on first deploy
-        // the database may not exist yet and the job is registered on next start.
-        try
-        {
-            RecurringJob.AddOrUpdate<CacheWarmJob>(
-                "cache-warm",
-                job => job.WarmAsync(),
-                Cron.Daily(3, 0));
-        }
-        catch (Exception ex)
-        {
-            Log.Warning(ex, "Failed to register Hangfire recurring jobs");
-        }
+    // Nightly cache warm-up (spec §20 / §15) so the public site starts the
+    // day with warm list caches. Registration is best-effort: on first deploy
+    // the database may not exist yet and the job is registered on next start.
+    try
+    {
+        RecurringJob.AddOrUpdate<CacheWarmJob>(
+            "cache-warm",
+            job => job.WarmAsync(),
+            Cron.Daily(3, 0));
+    }
+    catch (Exception ex)
+    {
+        Log.Warning(ex, "Failed to register Hangfire recurring jobs");
     }
 
     // ---- Conventional Routes (Section 28) ----
@@ -514,26 +470,6 @@ finally
 // ────────────────────────────────────────────────────────────────
 // Health Check Response Writer
 // ────────────────────────────────────────────────────────────────
-
-/// <summary>
-/// Dapper type handler that maps SQLite TEXT dates to <see cref="DateOnly"/>.
-/// </summary>
-internal sealed class SqliteDateOnlyHandler : Dapper.SqlMapper.TypeHandler<DateOnly>
-{
-    public override DateOnly Parse(object value) => value switch
-    {
-        DateOnly date => date,
-        DateTime dateTime => DateOnly.FromDateTime(dateTime),
-        string text when DateOnly.TryParse(text, CultureInfo.InvariantCulture, out var parsed) => parsed,
-        _ => DateOnly.MinValue
-    };
-
-    public override void SetValue(IDbDataParameter parameter, DateOnly value)
-    {
-        parameter.DbType = DbType.String;
-        parameter.Value = value.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
-    }
-}
 
 /// <summary>
 /// Dapper type handler that maps SQL Server date/datetime2 values (returned by

@@ -52,8 +52,7 @@ public sealed class SettingsController : AdminBaseController
             DefaultPageSize = _config.GetValue<int>("Search:PageSize"),
             MaxLoginAttempts = _identityOptions.Value.Lockout.MaxFailedAccessAttempts,
             MediaStoragePath = _config["Media:StoragePath"] ?? "media",
-            SearchProvider = _config["Search:Provider"] ?? "None",
-            IsSqlite = string.Equals(dbProvider, "Sqlite", StringComparison.OrdinalIgnoreCase)
+            SearchProvider = _config["Search:Provider"] ?? "None"
         };
 
         ViewData["Title"] = "Settings";

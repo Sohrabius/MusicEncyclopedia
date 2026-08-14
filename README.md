@@ -8,20 +8,24 @@ search, and per-culture localization (fa / en / ar / fr, RTL-aware).
 ## Stack
 
 - **.NET 8** / ASP.NET Core MVC (Razor, server-rendered, Tailwind CSS)
-- **EF Core 8** + Dapper — SQL Server (production) and SQLite (local dev)
+- **EF Core 8** + Dapper — SQL Server (all environments)
 - **ASP.NET Core Identity** — roles + 21 permission policies, audit logging
 - **Hangfire** — background jobs (cache warm-up), SQL Server only
 - **In-process cache** with real invalidation on admin writes
 - **Serilog** logging, health checks (`/health`, `/health/ready`, `/health/live`),
   per-IP rate limiting, security headers + CSP
 
-## Local development (SQLite)
+## Local development
 
 ```bash
 dotnet restore MusicEncyclopedia.sln
 dotnet run --project src/MusicEncyclopedia.Web
 # http://localhost:5000  (or 5090/5178 per launchSettings) — /fa/albums etc.
 ```
+
+The app requires SQL Server — set `DefaultConnection` in
+`appsettings.Development.json` (or `DB_PASSWORD`/env overrides per
+`DEPLOYMENT.md` §4) and run against a local SQL Server / LocalDB instance.
 
 Development mode seeds schema + lookup data + sample content automatically on
 startup. Register a user in the UI, then grant yourself roles/permissions via the

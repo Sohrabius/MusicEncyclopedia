@@ -40,10 +40,9 @@ public sealed class DashboardController : AdminBaseController
     {
         _logger.LogDebug("Loading admin dashboard");
 
-        var isSqlite = SqlDialect.IsSqliteConnection(_connection);
-        // SQL Server: SELECT TOP 10 … ; SQLite: … ORDER BY … LIMIT 10 (clause at the end)
-        var recentTop = isSqlite ? string.Empty : "TOP 10";
-        var recentLimit = isSqlite ? "LIMIT 10" : string.Empty;
+        // SQL Server: SELECT TOP 10 …
+        const string recentTop = "TOP 10";
+        const string recentLimit = "";
 
         var viewModel = new AdminDashboardViewModel
         {
