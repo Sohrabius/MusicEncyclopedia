@@ -13,6 +13,14 @@ namespace MusicEncyclopedia.Web.ViewModels.Admin;
 public sealed class AlbumWizardViewModel
 {
     // ──────────────────────────────────────────────
+    // Identity — 0 means the wizard is in create mode;
+    // a positive value loads that album for step-by-step editing.
+    // ──────────────────────────────────────────────
+
+    [Display(Name = "شناسه آلبوم")]
+    public int AlbumId { get; set; }
+
+    // ──────────────────────────────────────────────
     // Step 1 — Album basics
     // ──────────────────────────────────────────────
 
@@ -146,6 +154,10 @@ public sealed class AlbumWizardViewModel
 /// </summary>
 public sealed class TrackWizardItem
 {
+    /// <summary>Existing track id when editing an album; 0 for a brand-new track.</summary>
+    [Display(Name = "شناسه ترک")]
+    public int TrackId { get; set; }
+
     [Required(ErrorMessage = "Title is required.")]
     [StringLength(500, ErrorMessage = "Title must not exceed 500 characters.")]
     [Display(Name = "عنوان")]

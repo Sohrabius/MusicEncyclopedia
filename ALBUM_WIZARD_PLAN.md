@@ -366,6 +366,27 @@ Recorded so the fixes aren't lost and similar traps are avoided elsewhere:
    `-c` (cookie jar) so the antiforgery cookie from that response is saved
    alongside the extracted hidden token.
 
+6. **Edit mode silently dropped every update (NoTracking context).** The app
+   registers the DbContext with `UseQueryTrackingBehavior(NoTrackingWithIdentityResolution)`
+   (`DataServiceRegistration.cs`), so `LoadAlbumGraphAsync` returned **detached**
+   entities. `UpdateCoreAsync` mutated the detached `album` (Title, ModifiedAt, …)
+   and EF never emitted `UPDATE [Album]` — the POST 302'd, the album row stayed
+   stale (`ModifiedAt = NULL`), and the entity rows were untouched. Only the track
+   update "worked" by accident (it got tracked through `_db.RemoveRange(...)` on
+   its join collections). **Fix:** `.AsTracking()` on `LoadAlbumGraphAsync` and on
+   every read-modify query in `UpdateCoreAsync` (`_db.Entities` lookups for
+   album/track/entity slugs and the orphan-soft-delete queries). Re-verified:
+   album row, both `Entity` rows and the in-place track now persist `ModifiedAt`;
+   removed tracks + their entities soft-delete (`IsDeleted=1`) and the `AlbumTrack`
+   row is deleted.
+
+7. **Track diff could reference a track no longer on the album.** The update path
+   resolved existing tracks via `album.AlbumTracks.FirstOrDefault(x => x.TrackId == …)`
+   and threw `InvalidOperationException` if the posted id wasn't on the album —
+   correct behaviour (a stale form would otherwise resurrect a removed track), but
+   it surfaces as a generic 500 if the admin's form is out of date. Acceptable for
+   v1; the catch-all in the POST action converts it to a Persian error message.
+
 ### Verification evidence (LocalDB, live run)
 
 | POST exercised | Result | DB proof |
@@ -373,11 +394,19 @@ Recorded so the fixes aren't lost and similar traps are avoided elsewhere:
 | Album + genre + track + genre + album credit | 302 → `/admin/albums/6/Edit` | `Album` 6, `Track` 14, `AlbumGenre`(6,3), `TrackGenre`(14,3), `Credit`(EntityType=Album, role 8 / scope 2 / person 1), `Entity` rows for album+track |
 | Track with **new** sung version (Poem 1, canonical) + track credit | 302 → `/admin/albums/7/Edit` | `SungVersion` 1 (Poem 1, IsCanonical), `TrackSungVersion`(track 15 → sv 1, seq 1, primary), `Credit`(EntityType=Track, EntityId=15), `Entity`(type SungVersion) |
 | Track with **existing** sung version (id=1) | 302 → `/admin/albums/8/Edit` | `TrackSungVersion`(track 16 → sv 1) and `SV_COUNT=1` — reused, not duplicated |
+| **Edit mode:** POST album 6 with changed title + in-place track | 302 → `/admin/albums/6/Edit` | `Album` 6 `ModifiedAt` set + title changed, `Track` updated in place, **both** `Entity` rows (`ModifiedAt` set) — proves the AsTracking fix (bug #6) |
+| **Edit mode:** POST album 6 with the track removed | 302 → `/admin/albums/6/Edit` | `Track` 20 + its `Entity` → `IsDeleted=1`, `AlbumTrack` row deleted — soft-delete path now persists |
+| Quick-add endpoints (person/company/poem/genre/language/category) | `{success:true}` + real id; duplicate code → 400 | Rows created; reused immediately by the wizard POST |
 
 Also verified: anonymous GET → 302 to `/auth/login` (auth policy works); authenticated
 GET renders all 6 steps + 15 populated dropdowns; `GET /admin/albums/wizard/track-card`
 returns the partial with correct `Tracks[0].*` names; target Edit page returns 200.
 Build: **0 errors / 0 warnings**, all 13 tests pass.
+
+After verification, all test albums/tracks/quick-added entities were removed from
+LocalDB (a FK-safe transactional cleanup) — the DB is back to the seeded state
+(3 albums, 13 tracks, 2 people, 1 company, 6 genres, 2 poems, 4 languages, 10
+categories).
 
 ## 11. Risks & edge cases
 

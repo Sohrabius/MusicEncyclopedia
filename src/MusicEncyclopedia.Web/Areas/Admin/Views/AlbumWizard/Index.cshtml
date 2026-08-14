@@ -1,6 +1,7 @@
 @model AlbumWizardViewModel
 @{
-    ViewData["Title"] = "ایجاد آلبوم (گام‌به‌گام)";
+    var isEdit = Model.AlbumId > 0;
+    ViewData["Title"] = isEdit ? "ویرایش آلبوم (گام‌به‌گام)" : "ایجاد آلبوم (گام‌به‌گام)";
     ViewData["ActiveMenu"] = "Albums";
     string fieldClasses = "w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500";
     var stepMeta = new[]
@@ -10,7 +11,7 @@
         (Label: "ترک‌ها", Icon: "fa-music"),
         (Label: "عوامل", Icon: "fa-users"),
         (Label: "برچسب‌ها و پیوندها", Icon: "fa-hashtag"),
-        (Label: "مرور و ایجاد", Icon: "fa-check-circle")
+        (Label: isEdit ? "مرور و ذخیره" : "مرور و ایجاد", Icon: "fa-check-circle")
     };
 }
 
@@ -20,6 +21,14 @@
 <form id="wizardForm" method="post" action="/admin/albums/wizard">
     @Html.AntiForgeryToken()
     <input type="hidden" asp-for="ActiveStep" id="activeStep" />
+    <input type="hidden" asp-for="AlbumId" />
+    @if (isEdit)
+    {
+        <div class="mb-4 px-4 py-3 rounded-md bg-blue-50 border border-blue-200 text-blue-800 text-sm flex items-center gap-2">
+            <i class="fas fa-pen"></i>
+            در حال ویرایش آلبوم «@Model.Title». پس از ذخیره، به صفحه ویرایش آلبوم بازمی‌گردید.
+        </div>
+    }
 
     <div asp-validation-summary="ModelOnly" class="mb-4 px-4 py-3 rounded-md bg-red-50 border border-red-200 text-red-800 text-sm" role="alert"></div>
 
@@ -758,11 +767,18 @@
          Step 6 — Review & submit
          ============================================================ -->
     <section class="wizard-step bg-white rounded-lg shadow-sm border border-gray-200 p-5 mb-6 hidden" data-step="6">
-        <h2 class="text-lg font-semibold text-gray-900 mb-4"><i class="fas fa-check-circle text-blue-500 me-2"></i>مرور و ایجاد</h2>
+        <h2 class="text-lg font-semibold text-gray-900 mb-4"><i class="fas fa-check-circle text-blue-500 me-2"></i>@(isEdit ? "مرور و ذخیره" : "مرور و ایجاد")</h2>
         <div id="review-summary" class="text-sm text-gray-700 space-y-1"></div>
         <div class="mt-4 px-4 py-3 rounded-md bg-amber-50 border border-amber-200 text-amber-800 text-xs">
             <i class="fas fa-info-circle me-1"></i>
-            با کلیک روی «ایجاد آلبوم»، آلبوم و تمام ترک‌ها و وابستگی‌های آن یک‌جا و به‌صورت اتمی ذخیره می‌شود. بارگذاری رسانه، ارجاع‌ها، ویژگی‌ها و بومی‌سازی‌ها پس از ایجاد از صفحه ویرایش آلبوم قابل انجام است.
+            @if (isEdit)
+            {
+                <span>با کلیک روی «ذخیره تغییرات»، تغییرات آلبوم و تمام ترک‌ها و وابستگی‌های آن یک‌جا و به‌صورت اتمی اعمال می‌شود. ترک‌هایی که در این‌جا حذف شوند، به‌صورت نرم حذف می‌شوند.</span>
+            }
+            else
+            {
+                <span>با کلیک روی «ایجاد آلبوم»، آلبوم و تمام ترک‌ها و وابستگی‌های آن یک‌جا و به‌صورت اتمی ذخیره می‌شود. بارگذاری رسانه، ارجاع‌ها، ویژگی‌ها و بومی‌سازی‌ها پس از ایجاد از صفحه ویرایش آلبوم قابل انجام است.</span>
+            }
         </div>
     </section>
 
@@ -780,7 +796,7 @@
         </button>
         <button type="submit" id="btnSubmit"
                 class="hidden px-5 py-2.5 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 transition-colors">
-            <i class="fas fa-save me-1"></i>ایجاد آلبوم
+            <i class="fas fa-save me-1"></i>@(isEdit ? "ذخیره تغییرات" : "ایجاد آلبوم")
         </button>
     </div>
 </form>
