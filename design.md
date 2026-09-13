@@ -2,6 +2,7 @@
 
 > Hallmark v2 · minimal-flat · Encyclopedia · link-blue theme
 > Full redesign plan: `UI_REDESIGN_PLAN.md`
+> Launch scope: Persian (`fa`) only, RTL. Additional culture assets are dormant future infrastructure.
 
 ---
 
@@ -30,14 +31,14 @@ All contrast pairs ≥ 4.5:1 (WCAG AA).
 
 ## Typography
 
-| Token | LTR (`en`, `fr`) | RTL (`fa`, `ar`) |
-|-------|------------------|------------------|
-| Display | Inter | **Vazirmatn (Vazir)** |
-| Body | Inter | **Vazirmatn (Vazir)** |
-| Mono | JetBrains Mono | JetBrains Mono |
+| Token | Persian launch value |
+|-------|------------------------|
+| Display | **Vazirmatn (Vazir)** |
+| Body | **Vazirmatn (Vazir)** |
+| Mono | JetBrains Mono |
 
 - Fonts are **self-hosted** in `wwwroot/fonts/` and declared in `wwwroot/css/fonts.css`.
-- Direction-aware font selection is automatic via `html[dir="rtl"]` rules — **no per-view font markup**.
+- RTL font selection is automatic via `html[dir="rtl"]` rules — **no per-view font markup**.
 - Vazirmatn is the maintained successor of the Vazir font (same designer). The legacy `Vazir` family name remains in the fallback chain.
 
 Scale (major third 1.25):
@@ -53,7 +54,7 @@ In RTL: `letter-spacing: 0` on headings.
 
 ## Components
 
-- **Nav**: sticky top bar — white/92 blur, hairline bottom border, brand + links + search + language switcher
+- **Nav**: sticky top bar — white/92 blur, hairline bottom border, brand + links + search; no language switcher in the launch UI
 - **Hero**: search-first — statement + subtitle + prominent search + hint chips
 - **Footer**: single line — brand + copyright + links
 - **Cards**: flat — 1px rule border, hover lift with subtle shadow, image scale 1.03
@@ -69,7 +70,7 @@ In RTL: `letter-spacing: 0` on headings.
 - Easing: `cubic-bezier(0.2, 0, 0, 1)` out
 - Respects `prefers-reduced-motion`
 
-## RTL Strategy (`fa`, `ar`)
+## RTL Strategy (`fa`)
 
 1. **Vazirmatn (Vazir) font** applied automatically via `html[dir="rtl"]` rules in `fonts.css`.
 2. Logical properties only: `margin-inline-start`, `inset-inline-end`, `text-align: start`.

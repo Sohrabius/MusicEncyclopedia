@@ -203,7 +203,7 @@
                                     var releaseYear = track.Albums
                                         .Where(a => a.ReleaseDate.HasValue)
                                         .OrderBy(a => a.ReleaseDate)
-                                        .Select(a => a.ReleaseDate.Value.Year)
+                                        .Select(a => a.ReleaseDate.GetValueOrDefault().Year)
                                         .FirstOrDefault();
                                 }
                                 @if (releaseYear > 0)

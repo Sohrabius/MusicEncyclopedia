@@ -244,7 +244,7 @@
 
                     <!-- Artist Credits -->
                     <div id="tab-artist-credits" class="tab-panel hidden">
-                        <div data-editor-url="/admin/credits/@Model.EntityTypeId/@Model.TrackId"></div>
+                        <div data-editor-url="/admin/credits/@Model.EntityTypeId/@Model.EntityId"></div>
                     </div>
 
                     <!-- Genres -->
@@ -264,7 +264,7 @@
 
                     <!-- Musician Credits -->
                     <div id="tab-musician-credits" class="tab-panel hidden">
-                        <div data-editor-url="/admin/credits/@Model.EntityTypeId/@Model.TrackId"></div>
+                        <div data-editor-url="/admin/credits/@Model.EntityTypeId/@Model.EntityId"></div>
                     </div>
 
                     <!-- Sung Version -->
@@ -314,7 +314,7 @@
 
                     <!-- Aliases -->
                     <div id="tab-aliases" class="tab-panel hidden">
-                        <div data-editor-url="/admin/aliases/@Model.EntityTypeId/@Model.TrackId"></div>
+                        <div data-editor-url="/admin/aliases/@Model.EntityTypeId/@Model.EntityId"></div>
                     </div>
 
                     <!-- Localization -->
@@ -323,7 +323,7 @@
                             <i class="fas fa-language text-pink-400 me-1"></i>
                             Manage localized field values from the
                             <a href="/admin/localizations" class="text-blue-600 hover:underline">بومی‌سازی‌ها</a>
-                            section (EntityType Track, EntityId @Model.TrackId).
+                            section (EntityType Track, EntityId @Model.EntityId).
                         </p>
                     </div>
 
@@ -343,7 +343,7 @@
                             <i class="fas fa-link text-sky-400 me-1"></i>
                             Manage external پیوندی from the
                             <a href="/admin/links" class="text-blue-600 hover:underline">پیوندها</a>
-                            section (EntityType Track, EntityId @Model.TrackId).
+                            section (EntityType Track, EntityId @Model.EntityId).
                         </p>
                     </div>
 
@@ -363,13 +363,13 @@
                             <i class="fas fa-quote-right text-amber-400 me-1"></i>
                             افزودن ارجاعی from the
                             <a href="/admin/citations" class="text-blue-600 hover:underline">ارجاع‌ها</a>
-                            section (EntityType Track, EntityId @Model.TrackId).
+                            section (EntityType Track, EntityId @Model.EntityId).
                         </p>
                     </div>
 
                     <!-- Attributes -->
                     <div id="tab-attributes" class="tab-panel hidden">
-                        <div data-editor-url="/admin/attribute-values/@Model.EntityTypeId/@Model.TrackId"></div>
+                        <div data-editor-url="/admin/attribute-values/@Model.EntityTypeId/@Model.EntityId"></div>
                     </div>
                 </div>
             </div>

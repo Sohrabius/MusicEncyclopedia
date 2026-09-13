@@ -104,7 +104,7 @@ public sealed class TrackQueryService : ITrackQueryService
 
         if (!string.IsNullOrWhiteSpace(artist))
         {
-            whereClauses.Add("EXISTS (SELECT 1 FROM Credit c_inner INNER JOIN Entity e_inner ON e_inner.EntityId = c_inner.EntityId INNER JOIN Person p_inner ON p_inner.PersonId = c_inner.PersonId WHERE e_inner.EntityId = t.TrackId AND p_inner.Slug = @Artist)");
+            whereClauses.Add("EXISTS (SELECT 1 FROM Credit c_inner INNER JOIN Person p_inner ON p_inner.PersonId = c_inner.PersonId WHERE c_inner.EntityId = t.EntityId AND p_inner.Slug = @Artist)");
             parameters.Add("Artist", artist);
         }
 
@@ -158,7 +158,7 @@ public sealed class TrackQueryService : ITrackQueryService
                 t.Bpm,
                 mk.Name AS MusicalKeyName,
                 vs.Name AS VocalStyleName,
-                lat.Name AS LyricsAvailabilityName
+                lat.Code AS LyricsAvailabilityName
             FROM Track AS t
             LEFT JOIN MusicalKey AS mk ON mk.MusicalKeyId = t.MusicalKeyId
             LEFT JOIN VocalStyle AS vs ON vs.VocalStyleId = t.VocalStyleId
@@ -229,7 +229,7 @@ public sealed class TrackQueryService : ITrackQueryService
                 t.Bpm,
                 mk.Name AS MusicalKeyName,
                 vs.Name AS VocalStyleName,
-                lat.Name AS LyricsAvailabilityName
+                lat.Code AS LyricsAvailabilityName
             FROM Track AS t
             LEFT JOIN MusicalKey AS mk ON mk.MusicalKeyId = t.MusicalKeyId
             LEFT JOIN VocalStyle AS vs ON vs.VocalStyleId = t.VocalStyleId

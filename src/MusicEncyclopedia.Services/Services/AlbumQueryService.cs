@@ -45,6 +45,7 @@ public sealed class AlbumQueryService : IAlbumQueryService
         string? category = null,
         string? genre = null,
         string? mood = null,
+        int? year = null,
         string? q = null,
         CancellationToken cancellationToken = default)
     {
@@ -53,14 +54,14 @@ public sealed class AlbumQueryService : IAlbumQueryService
 
         try
         {
-            var cacheKey = CacheKeys.List("album", culture, page, pageSize, sort, category, genre, mood, q);
+            var cacheKey = CacheKeys.List("album", culture, page, pageSize, sort, category, genre, mood, year, q);
 
             var cached = await _cache.GetAsync<PagedResult<AlbumListItemDto>>(cacheKey, cancellationToken);
             if (cached is not null)
                 return cached;
 
             var result = await LoadAlbumsCoreAsync(
-                culture, page, pageSize, sort, category, genre, mood, q, cancellationToken);
+                culture, page, pageSize, sort, category, genre, mood, year, q, cancellationToken);
 
             await _cache.SetAsync(cacheKey, result, CacheKeys.ListDuration, cancellationToken);
             return result;
@@ -80,6 +81,7 @@ public sealed class AlbumQueryService : IAlbumQueryService
         string? category,
         string? genre,
         string? mood,
+        int? year,
         string? q,
         CancellationToken cancellationToken)
     {
@@ -104,6 +106,20 @@ public sealed class AlbumQueryService : IAlbumQueryService
             parameters.Add("Mood", mood);
         }
 
+        if (year.HasValue)
+        {
+            if (year.Value is < 1 or > 9999)
+            {
+                whereClauses.Add("1 = 0");
+            }
+            else
+            {
+                whereClauses.Add("a.ReleaseDate >= @YearStart AND a.ReleaseDate <= @YearEnd");
+                parameters.Add("YearStart", new DateOnly(year.Value, 1, 1));
+                parameters.Add("YearEnd", new DateOnly(year.Value, 12, 31));
+            }
+        }
+
         if (!string.IsNullOrWhiteSpace(q))
         {
             whereClauses.Add("(a.Title LIKE @Q OR a.OriginalTitle LIKE @Q OR a.EnglishTitle LIKE @Q)");
@@ -114,15 +130,15 @@ public sealed class AlbumQueryService : IAlbumQueryService
 
         var orderBy = sort?.ToLowerInvariant() switch
         {
-            "title" => "a.Title ASC",
-            "createdat" => "a.CreatedAt DESC",
-            "duration" => "a.DurationSeconds DESC",
-            _ => "a.ReleaseDate DESC"
+            "title" => "a.Title ASC, a.AlbumId ASC",
+            "createdat" => "a.CreatedAt DESC, a.AlbumId DESC",
+            "duration" => "a.DurationSeconds DESC, a.AlbumId DESC",
+            _ => "a.ReleaseDate DESC, a.AlbumId DESC"
         };
 
         if (string.IsNullOrWhiteSpace(sort) || sort.Equals("releaseDate", StringComparison.OrdinalIgnoreCase))
         {
-            orderBy = "CASE WHEN a.ReleaseDate IS NULL THEN 1 ELSE 0 END, a.ReleaseDate DESC";
+            orderBy = "CASE WHEN a.ReleaseDate IS NULL THEN 1 ELSE 0 END, a.ReleaseDate DESC, a.AlbumId DESC";
         }
 
         var countSql = $@"
@@ -140,6 +156,7 @@ public sealed class AlbumQueryService : IAlbumQueryService
                 a.Title,
                 a.OriginalTitle,
                 a.EnglishTitle,
+                ac.Code AS CategoryCode,
                 ac.Name AS CategoryName,
                 a.ReleaseDate,
                 a.DurationSeconds,

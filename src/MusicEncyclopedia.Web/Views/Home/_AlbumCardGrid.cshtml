@@ -1,5 +1,6 @@
 @using MusicEncyclopedia.Core.DTOs
 @model PagedResult<AlbumListItemDto>
+@inject Microsoft.Extensions.Localization.IStringLocalizer<MusicEncyclopedia.Web.SharedResources> L
 
 @{
     var culture = Context.Items["culture"] as string ?? "fa";
@@ -22,7 +23,8 @@
             }
             @if (!string.IsNullOrWhiteSpace(album.CategoryName))
             {
-                <span class="card__badge">@album.CategoryName</span>
+                var categoryLabel = L[$"AlbumCategory.{album.CategoryCode}"];
+                <span class="card__badge">@(categoryLabel.ResourceNotFound ? album.CategoryName : categoryLabel.Value)</span>
             }
         </div>
         <div class="card__body">

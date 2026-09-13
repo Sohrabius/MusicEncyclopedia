@@ -12,6 +12,14 @@ namespace MusicEncyclopedia.Web.Controllers.Api;
 /// </summary>
 public sealed class SearchApiController : BaseApiController
 {
+    private static readonly HashSet<string> SupportedEntityTypes = new(
+        [
+            "album", "track", "person", "company", "poem", "sungversion",
+            "genre", "mood", "instrument", "source", "location", "publication",
+            "recordingsession", "performanceevent"
+        ],
+        StringComparer.OrdinalIgnoreCase);
+
     private readonly ISearchService _searchService;
     private readonly ILogger<SearchApiController> _logger;
 
@@ -31,7 +39,6 @@ public sealed class SearchApiController : BaseApiController
     /// <param name="page">Page number (default 1).</param>
     /// <param name="pageSize">Results per page (default 20, max 100).</param>
     [HttpGet("search")]
-    [ResponseCache(Duration = 60, VaryByQueryKeys = ["q", "type", "page", "pageSize"])]
     public async Task<IActionResult> Search(
         [FromQuery] string? q,
         [FromQuery] string? type = null,
@@ -51,6 +58,9 @@ public sealed class SearchApiController : BaseApiController
 
         if (pageSize is < 1 or > 100)
             return BadRequestResult("pageSize", "OutOfRange", "PageSize must be between 1 and 100.");
+
+        if (!string.IsNullOrWhiteSpace(type) && !SupportedEntityTypes.Contains(type))
+            return BadRequestResult("type", "InvalidValue", $"Unsupported entity type '{type}'.");
 
         var query = new SearchQuery
         {

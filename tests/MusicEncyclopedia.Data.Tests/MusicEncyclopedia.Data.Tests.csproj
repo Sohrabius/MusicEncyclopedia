@@ -29,4 +29,8 @@
     <ProjectReference Include="..\..\src\MusicEncyclopedia.Core\MusicEncyclopedia.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Include="..\TestInfrastructure\SqlServerTestDatabase.cs" Link="Infrastructure\SqlServerTestDatabase.cs" />
+  </ItemGroup>
+
 </Project>

@@ -1,6 +1,8 @@
 # Album Creation Wizard — Implementation Plan
 
-**Status:** ✅ Implemented & verified end-to-end (all 7 phases complete)
+> Status reconciliation (2026-09-11): Fresh SQL-backed regression verification is complete under IMPLEMENTATION_PLAN.md task B07. The complete graph, two-disc ordering, global entity assignments, transaction rollback, concurrency, and shared-track editing now have current automated evidence; the old 13-test pass included two empty test methods and is only historical context.
+
+**Current status:** ✅ Implemented and verified under B07; browser layout coverage remains in B09/B10.
 **Branch:** redesign/ui-v2
 **Audience:** admins with `CanManageAlbums`
 

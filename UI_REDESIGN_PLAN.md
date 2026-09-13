@@ -1,6 +1,8 @@
 # Music Encyclopedia — UI Redesign Plan
 
-> Status: Proposed · Prepared with **ui-ux-pro-max** design intelligence
+> Status reconciliation (2026-09-11): Partially implemented. Fonts, design tokens, admin.css and shared partials exist; raw palette utilities remain across public/auth/admin views. `IMPLEMENTATION_PLAN.md` tasks B09/B10 govern completion. The launch UI is Persian (`fa`) only and RTL; multilingual UI and LTR acceptance are deferred.
+
+> Original proposal status: Proposed · Prepared with **ui-ux-pro-max** design intelligence
 > Goal: A **clean, minimal, user-friendly** UI — one design language across all 132 views (public + admin), with **Vazirmatn (Vazir) font mandatory in `fa` RTL mode**.
 
 ---
@@ -14,7 +16,7 @@ The app currently has **two competing design languages**:
 | Public layout + home + albums + details | Token-based custom CSS (oklch palette, **coral** accent, Geist font) | Solid foundation, but coral accent and floating pill nav feel more "portfolio" than "encyclopedia" |
 | Search, Auth, error pages | Raw Tailwind utilities (`blue-600`, `gray-200`) | A completely different visual language |
 | Admin (≈100 views) | Dark `gray-900` sidebar, Font Awesome, Tailwind CDN | Third visual language; font config references Vazirmatn but the font is **never loaded** |
-| RTL (`fa` / `ar`) | Public layout loads only **Geist** — no Persian font | **Violates the requirement: Vazir font must be used in `fa` RTL mode** |
+| Persian RTL | Font and token foundations exist but need browser verification across all surfaces | B10 must prove Vazirmatn, logical layout, keyboard behavior and responsive rendering in `fa` |
 
 **The redesign unifies everything onto one token-driven system**, guided by ui-ux-pro-max's recommendation for the *Wiki / Encyclopedia* product type:
 
@@ -39,7 +41,7 @@ Derived design decisions:
 | Surfaces | White cards on `#F8FAFC` paper | Knowledge-base palette from ui-ux-pro-max |
 | Nav | Clean sticky top bar with hairline border (replaces floating pill) | Encyclopedia-appropriate; predictable; easy scan |
 | Search | **Search-first hero** — large search centered at top of home | ui-ux-pro-max: Search-First landing pattern |
-| Typography | **Vazirmatn (Vazir) for `fa`/`ar` RTL · Inter for `en`/`fr` LTR** | Vazirmatn is the maintained successor of the Vazir font (same designer, Google Fonts); designed to pair with Inter-like faces |
+| Typography | **Vazirmatn (Vazir) for Persian `fa` RTL** | It is designed for Persian text and is already self-hosted; Inter may remain as dormant future infrastructure |
 | Admin | Light sidebar (white, hairline border) instead of dark gray | Flat, minimal, consistent with public site |
 | Icons | Single inline SVG set (Lucide/Heroicons style) in public; Font Awesome retained in admin | No emoji-as-icon, consistent stroke weight |
 | Motion | 150–300ms, ease-out, `prefers-reduced-motion` respected | ui-ux-pro-max rule 7 |
@@ -92,7 +94,7 @@ All contrast pairs verified ≥ 4.5:1 (WCAG AA): ink on paper, ink on surface, i
 :root {
   --font-display-ltr: "Inter", system-ui, -apple-system, sans-serif;
   --font-body-ltr:    "Inter", system-ui, -apple-system, sans-serif;
-  --font-display-rtl: "Vazirmatn", "Vazir", Tahoma, sans-serif;   /* fa / ar */
+  --font-display-rtl: "Vazirmatn", "Vazir", Tahoma, sans-serif;   /* fa */
   --font-body-rtl:    "Vazirmatn", "Vazir", Tahoma, sans-serif;
   --font-mono:        "JetBrains Mono", ui-monospace, monospace;
 }
@@ -110,12 +112,12 @@ html[dir="rtl"] .font-display {
 
 **Type scale (major third 1.25, base 16px, line-height 1.6):** keep the existing `--text-*` scale. In RTL set `letter-spacing: 0` (negative tracking breaks Persian script).
 
-**Font loading strategy (Phase 1):**
+**Font loading state and remaining work:**
 
-1. **Self-host woff2** into `wwwroot/fonts/vazirmatn/` — weights 400/500/600/700 (download from `https://cdn.jsdelivr.net/npm/vazirmatn@33.0.3/fonts/webfonts/Vazirmatn-Regular.woff2` etc. or the `@fontsource-variable/vazirmatn` package), define `@font-face` in `site.css`.
-2. Same for **Inter** (weights 400/500/600/700) in `wwwroot/fonts/inter/`.
-3. Remove the Geist Google Fonts link; remove per-page font tags.
-4. Admin: replace the current `tailwind.config` `fontFamily.sans` with the same CSS variables so it inherits the RTL switch for free.
+1. Vazirmatn and Inter are already self-hosted under `wwwroot/fonts/` and declared in `wwwroot/css/fonts.css`.
+2. Verify that every Persian public, auth and admin control resolves to Vazirmatn; remove any remaining Geist or per-page font request.
+3. Make admin controls inherit the same CSS variables and RTL font selection.
+4. Keep Inter as dormant future infrastructure; it is not part of launch acceptance.
 
 > **Note on "Vazir" vs "Vazirmatn":** Vazirmatn is the official maintained successor of the original Vazir font (same author, Ali Tofighi; available on Google Fonts). The plan uses **Vazirmatn** and keeps the legacy `"Vazir"` family name in the fallback chain. If the exact legacy "Vazir" face is required instead, only the `@font-face` src lines change — no view markup changes.
 
@@ -130,8 +132,8 @@ html[dir="rtl"] .font-display {
 
 | Component | New spec |
 |-----------|----------|
-| **Nav** | Sticky top bar: white/95 blur, hairline bottom border. Start → brand + primary links; end → search icon, language switcher, menu button. Mobile: slide-in drawer (RTL: slides from inline-end). Replace N5 floating pill. |
-| **Language switcher** | Keep `select` in a compact pill; ensure native `fa`, `en`, `ar`, `fr` labels render in their own scripts. |
+| **Nav** | Sticky top bar: white/95 blur, hairline bottom border. Start → brand + primary links; end → search icon and menu button. Mobile: slide-in drawer from inline-end. Replace N5 floating pill. |
+| **Language switcher** | Omit for the Persian-only launch. Keep dormant culture resources and redirects for future work. |
 | **Hero (home)** | Search-first: brand statement (short), large centered search input, subtle hint chips (genres/moods/instruments). |
 | **Section header** | Title + muted subtitle + "View all" link (logical arrow: flips in RTL via `scaleX(-1)`). |
 | **Card** | White surface, 1px `--color-rule` border, radius-md, image 1:1; hover: border → accent, image scale 1.02. No heavy shadow. |
@@ -148,15 +150,15 @@ html[dir="rtl"] .font-display {
 | **Footer** | Single-line: brand + copyright + links; hairline top border. |
 | **JSON-LD** | Unchanged (SEO/structured data untouched). |
 
-### 3.5 RTL strategy (`fa`, `ar`)
+### 3.5 RTL strategy (`fa`)
 
 1. **Font:** Vazirmatn/Vazir automatically applied via the `html[dir="rtl"]` rules (Section 3.2).
 2. **Layout:** all spacing/positioning uses **logical properties** (`margin-inline-start`, `inset-inline-end`, `border-inline-start`, `text-align: start`). Sweep every view for physical `left/right/margin-left` etc.
 3. **Icons:** directional icons (chevrons, arrows) flip with `[dir="rtl"] .icon-directional { transform: scaleX(-1) }` — replaces the manual `if (isRtl)` SVG-switching in Search view.
 4. **Mixed content:** `dir="auto"` on user content (titles, aliases, original titles) — already partially used; standardize.
-5. **Numbers:** keep Western digits with `font-variant-numeric: tabular-nums` (standard for Persian web); keep `en`/`fa` digit handling unchanged.
+5. **Numbers:** keep the existing digit behavior and use `font-variant-numeric: tabular-nums` where aligned numeric columns need it.
 6. **Hero/text:** replace `.hero { text-align: left }` with `text-align: start`.
-7. **site.js:** stop hardcoding `fa` — read culture from `document.documentElement.lang`; back-to-top button uses `inset-inline-end`.
+7. **site.js:** use `document.documentElement.lang` where culture affects behavior; back-to-top uses `inset-inline-end`.
 
 ---
 
@@ -197,17 +199,17 @@ html[dir="rtl"] .font-display {
 
 ### Phase 1 — Design foundation
 - [ ] Rewrite `wwwroot/css/site.css` tokens (Section 3.1–3.3); keep existing class names where possible to minimize view churn.
-- [ ] Add self-hosted **Vazirmatn + Inter** `@font-face`; add `html[dir="rtl"]` font rules.
+- [x] Add self-hosted Vazirmatn and `html[dir="rtl"]` font rules. Inter may remain for future localization.
 - [ ] Create `wwwroot/css/admin.css` (admin tokens + component classes) so admin stops depending on inline Tailwind for structure.
 - [ ] Add shared partials: `_Alerts`, `_Pagination`, `_EmptyState`.
 - [ ] Update `design.md` to the new system (or link to this plan).
-- **Accept:** build passes; both `fa` and `en` render; Vazirmatn visible in `fa` in DevTools (Computed → font-family).
+- **Accept:** build passes; `/fa` renders RTL and Vazirmatn is visible in DevTools (Computed → font-family).
 
 ### Phase 2 — Public shell
-- [ ] `_Layout.cshtml`: new top-bar nav + mobile drawer + lang switcher; remove Geist link; keep hreflang/JSON-LD sections.
+- [ ] `_Layout.cshtml`: new top-bar nav + mobile drawer; omit the language switcher; keep canonical/JSON-LD sections.
 - [ ] `site.js`: culture from `<html lang>`; directional-icon handling; keep debounce/back-to-top with logical positions.
 - [ ] Home `Index`: search-first hero, sections with new cards.
-- **Accept:** nav works at 375/768/1024/1440; drawer opens/closes; lang switch round-trips; `fa` shows Vazirmatn.
+- **Accept:** nav works at 375/768/1024/1440; drawer opens/closes; `fa` shows Vazirmatn and no LTR assumptions leak into layout.
 
 ### Phase 3 — Public content pages
 - [ ] List pages: standardized header, card grid, pagination partial, filter panel.
@@ -223,7 +225,7 @@ html[dir="rtl"] .font-display {
 ### Phase 5 — Admin shell & dashboard
 - [ ] `_AdminLayout`: light sidebar (hairline border, token colors), topbar with breadcrumb, Vazirmatn loads in RTL, alerts via `_Alerts` partial, Font Awesome retained.
 - [ ] Dashboard: flat stat cards + tables.
-- **Accept:** admin usable in `fa` (Vazirmatn) and `en`; sidebar toggle works in both directions.
+- **Accept:** admin is usable in `fa` with Vazirmatn; the sidebar toggle and focus order work in RTL.
 
 ### Phase 6 — Admin CRUD
 - [ ] Table pages: shared `.data-table` styling, pagination partial, search bar, bulk actions bar.
@@ -232,12 +234,11 @@ html[dir="rtl"] .font-display {
 - **Accept:** every admin list/form view passes a token-consistency grep; CRUD round-trip works for Albums.
 
 ### Phase 7 — QA & hardening
-- [ ] **RTL pass:** verify every page in `fa` and `ar` — fonts, alignment, arrows, spacing, drawer.
-- [ ] **LTR pass:** `en` and `fr`.
+- [ ] **Persian RTL pass:** verify every launch page in `fa` — fonts, alignment, arrows, spacing, drawer and mixed-content direction.
 - [ ] **Accessibility:** WCAG AA contrast, keyboard navigation, focus states, `prefers-reduced-motion`, aria-labels (ui-ux-pro-max checklist).
 - [ ] **Responsive:** 375 / 768 / 1024 / 1440; no horizontal scroll; CLS < 0.1.
 - [ ] **Performance:** lazy-load images (already present), preload fonts, remove Geist request.
-- [ ] (Optional, follow-up) Move Tailwind CDN → built `tailwind.css` via npm/Tailwind CLI for production.
+- [ ] Record Tailwind CDN as B15. Promote local generated CSS into release scope only if B12 performance or CSP evidence requires it.
 - [ ] Update `design.md`; capture after-screenshots.
 
 ---
@@ -256,14 +257,12 @@ dotnet test tests/MusicEncyclopedia.Web.Tests
 # Run locally (verify visually)
 dotnet run --project src/MusicEncyclopedia.Web
 # → http://localhost:5000/fa  (default RTL — expect Vazirmatn)
-# → http://localhost:5000/en  (LTR — expect Inter)
 ```
 
-Consistency greps (run at end of Phases 3 & 6):
+Consistency searches (run at end of Phases 3 and 6):
 ```bash
-grep -rn "blue-600\|gray-200\|text-gray" src/MusicEncyclopedia.Web/Views --include=*.cshtml | grep -v Areas/Admin
-# Admin area may keep neutral grays only via tokens; no hard-coded palette hexes.
-grep -rn "font-family:.*Geist" src/MusicEncyclopedia.Web/Views
+rg -n "blue-600|gray-200|text-gray" src/MusicEncyclopedia.Web/Views -g "*.cshtml"
+rg -n "font-family:.*Geist" src/MusicEncyclopedia.Web/Views
 ```
 
 ---
@@ -271,12 +270,12 @@ grep -rn "font-family:.*Geist" src/MusicEncyclopedia.Web/Views
 ## 7. Acceptance Criteria (Definition of Done)
 
 - [ ] One token system drives **all 132 views**; no raw Tailwind color utilities remain in public views.
-- [ ] **`fa` and `ar` render in Vazirmatn (Vazir)** — verified in DevTools and visually; `en`/`fr` render in Inter.
+- [ ] **`fa` renders in Vazirmatn (Vazir) with RTL layout** — verified in DevTools and visually across public, auth and admin surfaces.
 - [ ] Search-first home; hierarchical nav; predictable pagination.
 - [ ] WCAG AA contrast, keyboard navigable, focus rings, reduced-motion respected.
 - [ ] Responsive at 375–1440px with no horizontal scroll.
 - [ ] Admin redesigned to the same flat/minimal language; all CRUD flows functional.
-- [ ] All tests green; `dotnet build` clean; SEO tags (hreflang, canonical, JSON-LD) untouched.
+- [ ] All tests green; `dotnet build` clean; canonical, `fa`/`x-default` alternate links and JSON-LD remain valid.
 
 ---
 
@@ -286,5 +285,6 @@ grep -rn "font-family:.*Geist" src/MusicEncyclopedia.Web/Views
 |------|------------|
 | 100 admin views = large surface | Token classes + shared partials; sweep in batches; CSS-first so most changes are class swaps |
 | Persian font affects layout height | Vazirmatn metrics are Inter-compatible; test line clamps (`-webkit-line-clamp`) in `fa` |
-| Keeping Tailwind CDN | Retained initially for speed; optional Phase 7.7 moves to a built CSS file |
+| Keeping Tailwind CDN | B15 remains deferred unless B12 produces a concrete performance or CSP reason to replace it |
 | Design-system drift | `design.md` updated in Phases 1 and 7; greps as regression checks |
+| Dormant multilingual assets confuse scope | Do not expose a switcher or claim multilingual delivery; retain resources and redirects for a future milestone |

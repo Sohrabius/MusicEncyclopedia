@@ -29,8 +29,11 @@ public static class DataServiceRegistration
                     errorNumbersToAdd: null);
             });
 
-            // Disable lazy loading; use explicit Include/ThenInclude
-            options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTrackingWithIdentityResolution);
+            // Admin controllers use EF Core for writes and mutate entities returned
+            // by queries. Keep EF's normal tracking contract globally; public
+            // high-volume reads use Dapper, and read-only EF queries can opt into
+            // AsNoTracking locally when profiling justifies it.
+            options.UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll);
         });
 
         // Register any data-level services here as scoped/transient

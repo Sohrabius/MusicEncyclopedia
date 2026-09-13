@@ -102,9 +102,6 @@
   <data name="Home.AboutArtists" xml:space="preserve">
     <value>Artistes</value>
   </data>
-  <data name="Home.AboutCta" xml:space="preserve">
-    <value>En savoir plus</value>
-  </data>
   <data name="Home.MetaDescription" xml:space="preserve">
     <value>Explorez l&#x27;encyclopédie complète de la musique — albums, morceaux, artistes, paroles et plus encore.</value>
   </data>

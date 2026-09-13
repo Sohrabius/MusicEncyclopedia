@@ -32,7 +32,6 @@ public sealed class AdvancedApiController : BaseApiController
     /// GET /api/v1/sessions — paginated session listing.
     /// </summary>
     [HttpGet("sessions")]
-    [ResponseCache(Duration = 300, VaryByQueryKeys = ["page", "pageSize"])]
     public async Task<IActionResult> GetSessions(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 24,
@@ -53,7 +52,7 @@ public sealed class AdvancedApiController : BaseApiController
             SELECT
                 rs.RecordingSessionId,
                 rs.Slug,
-                rs.Title,
+                COALESCE(st.Name, 'Recording Session') AS Title,
                 rs.StartDate,
                 rs.EndDate,
                 rs.Notes,
@@ -77,7 +76,6 @@ public sealed class AdvancedApiController : BaseApiController
     /// GET /api/v1/sessions/{slug} — session detail.
     /// </summary>
     [HttpGet("sessions/{slug}")]
-    [ResponseCache(Duration = 600)]
     public async Task<IActionResult> GetSessionBySlug(
         string slug,
         CancellationToken cancellationToken = default)
@@ -89,7 +87,7 @@ public sealed class AdvancedApiController : BaseApiController
                 rs.RecordingSessionId,
                 rs.EntityId,
                 rs.Slug,
-                rs.Title,
+                COALESCE(st.Name, 'Recording Session') AS Title,
                 rs.StartDate,
                 rs.EndDate,
                 rs.Notes,
@@ -116,7 +114,6 @@ public sealed class AdvancedApiController : BaseApiController
     /// GET /api/v1/events — paginated event listing.
     /// </summary>
     [HttpGet("events")]
-    [ResponseCache(Duration = 300, VaryByQueryKeys = ["page", "pageSize"])]
     public async Task<IActionResult> GetEvents(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 24,
@@ -137,11 +134,11 @@ public sealed class AdvancedApiController : BaseApiController
             SELECT
                 pe.PerformanceEventId,
                 pe.Slug,
-                pe.Title,
-                pe.EventDate,
-                pe.StartTime,
-                pe.EndTime,
-                pe.AudienceInformation,
+                COALESCE(et.Name, 'Performance Event') AS Title,
+                pe.Date AS EventDate,
+                CAST(NULL AS time) AS StartTime,
+                CAST(NULL AS time) AS EndTime,
+                pe.AudienceInfo AS AudienceInformation,
                 pe.PerformanceNotes,
                 pe.ImprovisationNotes,
                 et.Name AS EventTypeName,
@@ -151,7 +148,7 @@ public sealed class AdvancedApiController : BaseApiController
             LEFT JOIN EventType et ON et.EventTypeId = pe.EventTypeId
             LEFT JOIN Location l ON l.LocationId = pe.LocationId
             WHERE pe.IsDeleted = 0
-            ORDER BY pe.EventDate DESC
+            ORDER BY pe.Date DESC
             OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
 
         var items = (await connection.QueryAsync(dataSql, new { Offset = offset, PageSize = pageSize })).AsList();
@@ -164,7 +161,6 @@ public sealed class AdvancedApiController : BaseApiController
     /// GET /api/v1/events/{slug} — event detail.
     /// </summary>
     [HttpGet("events/{slug}")]
-    [ResponseCache(Duration = 600)]
     public async Task<IActionResult> GetEventBySlug(
         string slug,
         CancellationToken cancellationToken = default)
@@ -176,11 +172,11 @@ public sealed class AdvancedApiController : BaseApiController
                 pe.PerformanceEventId,
                 pe.EntityId,
                 pe.Slug,
-                pe.Title,
-                pe.EventDate,
-                pe.StartTime,
-                pe.EndTime,
-                pe.AudienceInformation,
+                COALESCE(et.Name, 'Performance Event') AS Title,
+                pe.Date AS EventDate,
+                CAST(NULL AS time) AS StartTime,
+                CAST(NULL AS time) AS EndTime,
+                pe.AudienceInfo AS AudienceInformation,
                 pe.PerformanceNotes,
                 pe.ImprovisationNotes,
                 et.Name AS EventTypeName,
@@ -206,7 +202,6 @@ public sealed class AdvancedApiController : BaseApiController
     /// GET /api/v1/locations — paginated location listing.
     /// </summary>
     [HttpGet("locations")]
-    [ResponseCache(Duration = 300, VaryByQueryKeys = ["page", "pageSize"])]
     public async Task<IActionResult> GetLocations(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 24,
@@ -228,7 +223,7 @@ public sealed class AdvancedApiController : BaseApiController
                 l.LocationId,
                 l.Slug,
                 l.Name,
-                l.Description,
+                CAST(NULL AS nvarchar(max)) AS Description,
                 lt.Name AS LocationTypeName,
                 pl.Name AS ParentLocationName,
                 pl.Slug AS ParentLocationSlug,
@@ -251,7 +246,6 @@ public sealed class AdvancedApiController : BaseApiController
     /// GET /api/v1/locations/{slug} — location detail.
     /// </summary>
     [HttpGet("locations/{slug}")]
-    [ResponseCache(Duration = 600)]
     public async Task<IActionResult> GetLocationBySlug(
         string slug,
         CancellationToken cancellationToken = default)
@@ -264,7 +258,7 @@ public sealed class AdvancedApiController : BaseApiController
                 l.EntityId,
                 l.Slug,
                 l.Name,
-                l.Description,
+                CAST(NULL AS nvarchar(max)) AS Description,
                 lt.Name AS LocationTypeName,
                 pl.Name AS ParentLocationName,
                 pl.Slug AS ParentLocationSlug,
@@ -290,7 +284,6 @@ public sealed class AdvancedApiController : BaseApiController
     /// GET /api/v1/awards — paginated award listing.
     /// </summary>
     [HttpGet("awards")]
-    [ResponseCache(Duration = 300, VaryByQueryKeys = ["page", "pageSize"])]
     public async Task<IActionResult> GetAwards(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 24,
@@ -331,7 +324,6 @@ public sealed class AdvancedApiController : BaseApiController
     /// GET /api/v1/awards/{slug} — award detail.
     /// </summary>
     [HttpGet("awards/{slug}")]
-    [ResponseCache(Duration = 600)]
     public async Task<IActionResult> GetAwardBySlug(
         string slug,
         CancellationToken cancellationToken = default)
@@ -366,7 +358,6 @@ public sealed class AdvancedApiController : BaseApiController
     /// GET /api/v1/certifications — paginated certification listing.
     /// </summary>
     [HttpGet("certifications")]
-    [ResponseCache(Duration = 300, VaryByQueryKeys = ["page", "pageSize"])]
     public async Task<IActionResult> GetCertifications(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 24,
@@ -411,7 +402,6 @@ public sealed class AdvancedApiController : BaseApiController
     /// GET /api/v1/charts — paginated chart listing.
     /// </summary>
     [HttpGet("charts")]
-    [ResponseCache(Duration = 300, VaryByQueryKeys = ["page", "pageSize"])]
     public async Task<IActionResult> GetCharts(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 24,
@@ -433,7 +423,7 @@ public sealed class AdvancedApiController : BaseApiController
                 c.ChartId,
                 c.Slug,
                 c.Name,
-                c.Description,
+                CAST(NULL AS nvarchar(max)) AS Description,
                 c.Publisher AS PublisherName,
                 c.Frequency AS FrequencyName,
                 co.Name AS CountryName
@@ -453,7 +443,6 @@ public sealed class AdvancedApiController : BaseApiController
     /// GET /api/v1/charts/{slug} — chart detail.
     /// </summary>
     [HttpGet("charts/{slug}")]
-    [ResponseCache(Duration = 600)]
     public async Task<IActionResult> GetChartBySlug(
         string slug,
         CancellationToken cancellationToken = default)
@@ -466,7 +455,7 @@ public sealed class AdvancedApiController : BaseApiController
                 c.EntityId,
                 c.Slug,
                 c.Name,
-                c.Description,
+                CAST(NULL AS nvarchar(max)) AS Description,
                 c.Publisher AS PublisherName,
                 c.Frequency AS FrequencyName,
                 co.Name AS CountryName
@@ -485,7 +474,6 @@ public sealed class AdvancedApiController : BaseApiController
     /// GET /api/v1/charts/{slug}/entries — chart entries for a specific chart.
     /// </summary>
     [HttpGet("charts/{slug}/entries")]
-    [ResponseCache(Duration = 300, VaryByQueryKeys = ["slug", "page", "pageSize"])]
     public async Task<IActionResult> GetChartEntries(
         string slug,
         [FromQuery] int page = 1,

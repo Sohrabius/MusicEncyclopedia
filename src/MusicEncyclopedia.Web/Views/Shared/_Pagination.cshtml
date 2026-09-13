@@ -1,3 +1,4 @@
+@inject Microsoft.Extensions.Localization.IStringLocalizer<MusicEncyclopedia.Web.SharedResources> L
 @{
     // Shared pagination control.
     // Usage:
@@ -14,11 +15,11 @@
 
 @if (totalPages > 1)
 {
-    <nav class="pagination" aria-label="Pagination">
+    <nav class="pagination" aria-label="@L["Pagination"]">
         @if (page > 1)
         {
-            <a href="@pageUrl(page - 1)" rel="prev" aria-label="Previous page">
-                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <a href="@pageUrl(page - 1)" rel="prev" aria-label="@L["Pagination.Previous"]">
+                <svg class="icon-directional" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                 </svg>
             </a>
@@ -66,8 +67,8 @@
 
         @if (page < totalPages)
         {
-            <a href="@pageUrl(page + 1)" rel="next" aria-label="Next page">
-                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <a href="@pageUrl(page + 1)" rel="next" aria-label="@L["Pagination.Next"]">
+                <svg class="icon-directional" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                 </svg>
             </a>

@@ -1421,6 +1421,7 @@ html[dir="rtl"] {
     border-radius: var(--radius-pill);
     text-decoration: none;
     white-space: nowrap;
+    min-height: 44px;
     transition: border-color var(--dur-micro) var(--ease-out),
                 background var(--dur-micro) var(--ease-out),
                 color var(--dur-micro) var(--ease-out);
@@ -1490,6 +1491,21 @@ html[dir="rtl"] {
     margin: 0;
   }
 
+  .home-loadmore__error,
+  .home-interaction-status {
+    font-size: var(--text-xs);
+    margin: 0;
+  }
+
+  .home-loadmore__error,
+  .home-interaction-status.is-error {
+    color: var(--color-error);
+  }
+
+  .home-interaction-status:empty {
+    display: none;
+  }
+
   /* --- Sidebar: random poem --- */
   .home-sidebar {
     display: flex;
@@ -1530,8 +1546,8 @@ html[dir="rtl"] {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 28px;
-    height: 28px;
+    width: 44px;
+    height: 44px;
     border: 1px solid var(--color-rule);
     background: var(--color-surface);
     color: var(--color-ink-2);
@@ -1650,17 +1666,6 @@ html[dir="rtl"] {
     margin: 0;
   }
 
-  .home-about__link {
-    font-size: var(--text-xs);
-    font-weight: 600;
-    color: var(--color-accent);
-    text-decoration: none;
-  }
-
-  .home-about__link:hover {
-    text-decoration: underline;
-  }
-
   /* --- Home responsive --- */
   @media (max-width: 960px) {
     .home-layout {
@@ -1671,6 +1676,24 @@ html[dir="rtl"] {
       position: static;
     }
   }
+
+/* These controls sit outside the legacy Tailwind component layer so the
+   runtime preflight cannot collapse their padding and touch targets. */
+.home-banner .search__input {
+  min-height: 48px;
+  padding: var(--space-sm) var(--space-lg);
+  padding-inline-start: 2.75rem;
+}
+
+@media (max-width: 768px) {
+  .nav__toggle {
+    width: 44px;
+    height: 44px;
+    padding: var(--space-xs);
+    align-items: center;
+    justify-content: center;
+  }
+}
 
 /* ============================================================
    Reduced Motion

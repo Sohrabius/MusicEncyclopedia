@@ -234,6 +234,7 @@ public sealed class AlbumsController : AdminBaseController
         var viewModel = new AlbumEditViewModel
         {
             AlbumId = album.AlbumId,
+            EntityId = album.EntityId,
             Title = album.Title,
             TitleSort = album.TitleSort,
             OriginalTitle = album.OriginalTitle,
@@ -305,6 +306,7 @@ public sealed class AlbumsController : AdminBaseController
 
         // Load the album with concurrency token
         var album = await _db.Albums
+            .AsTracking()
             .FirstOrDefaultAsync(a => a.AlbumId == id, cancellationToken);
 
         if (album is null)
@@ -313,6 +315,10 @@ public sealed class AlbumsController : AdminBaseController
             SetErrorMessage("آلبوم یافت نشد. احتمالاً حذف شده است.");
             return RedirectToAction(nameof(Index));
         }
+
+        // The global entity ID is derived from the loaded album and is needed
+        // when the edit view is rendered again after a concurrency conflict.
+        viewModel.EntityId = album.EntityId;
 
         // Concurrency check
         if (viewModel.RowVersion is not null)
@@ -342,6 +348,7 @@ public sealed class AlbumsController : AdminBaseController
 
         // Also update the Entity slug
         var entity = await _db.Set<Entity>()
+            .AsTracking()
             .FirstOrDefaultAsync(e => e.EntityId == album.EntityId, cancellationToken);
         if (entity is not null)
         {
@@ -389,6 +396,7 @@ public sealed class AlbumsController : AdminBaseController
         CancellationToken cancellationToken = default)
     {
         var album = await _db.Albums
+            .AsTracking()
             .FirstOrDefaultAsync(a => a.AlbumId == id, cancellationToken);
 
         if (album is null)
@@ -403,6 +411,7 @@ public sealed class AlbumsController : AdminBaseController
 
         // Also soft-delete the base entity
         var entity = await _db.Set<Entity>()
+            .AsTracking()
             .FirstOrDefaultAsync(e => e.EntityId == album.EntityId, cancellationToken);
         if (entity is not null)
         {
@@ -436,6 +445,7 @@ public sealed class AlbumsController : AdminBaseController
         // Need to ignore the global query filter to find soft-deleted items
         var album = await _db.Albums
             .IgnoreQueryFilters()
+            .AsTracking()
             .FirstOrDefaultAsync(a => a.AlbumId == id, cancellationToken);
 
         if (album is null)
@@ -451,6 +461,7 @@ public sealed class AlbumsController : AdminBaseController
         // Also restore the base entity
         var entity = await _db.Set<Entity>()
             .IgnoreQueryFilters()
+            .AsTracking()
             .FirstOrDefaultAsync(e => e.EntityId == album.EntityId, cancellationToken);
         if (entity is not null)
         {
@@ -489,6 +500,7 @@ public sealed class AlbumsController : AdminBaseController
 
         ids = ids.Distinct().ToArray();
         var albums = await _db.Albums
+            .AsTracking()
             .Where(a => ids.Contains(a.AlbumId))
             .ToListAsync(cancellationToken);
 
@@ -502,6 +514,7 @@ public sealed class AlbumsController : AdminBaseController
         // Soft-delete the backing Entity rows too so public pages keep consistent state.
         var entityIds = albums.Select(a => a.EntityId).ToArray();
         var entities = await _db.Set<Entity>()
+            .AsTracking()
             .Where(e => entityIds.Contains(e.EntityId))
             .ToListAsync(cancellationToken);
         foreach (var entity in entities)
@@ -542,6 +555,7 @@ public sealed class AlbumsController : AdminBaseController
         ids = ids.Distinct().ToArray();
         var albums = await _db.Albums
             .IgnoreQueryFilters()
+            .AsTracking()
             .Where(a => ids.Contains(a.AlbumId))
             .ToListAsync(cancellationToken);
 
@@ -555,6 +569,7 @@ public sealed class AlbumsController : AdminBaseController
         var entityIds = albums.Select(a => a.EntityId).ToArray();
         var entities = await _db.Set<Entity>()
             .IgnoreQueryFilters()
+            .AsTracking()
             .Where(e => entityIds.Contains(e.EntityId))
             .ToListAsync(cancellationToken);
         foreach (var entity in entities)

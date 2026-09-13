@@ -106,6 +106,21 @@ public sealed class CreditsController : AdminBaseController
             return Json(new { success = false, errors = validationResult.Errors.Select(e => e.ErrorMessage) });
         }
 
+        var role = await _db.CreditRoles
+            .Include(x => x.RoleScopeType)
+            .FirstOrDefaultAsync(x => x.CreditRoleId == model.CreditRoleId, cancellationToken);
+        if (role is null || role.RoleScopeTypeId != model.RoleScopeTypeId)
+        {
+            return Json(new { success = false, errors = new[] { "The selected role and contributor scope do not match." } });
+        }
+
+        var scopeCode = role.RoleScopeType?.Code;
+        if ((scopeCode == "Person" && model.PersonId is null)
+            || (scopeCode == "Company" && model.CompanyId is null))
+        {
+            return Json(new { success = false, errors = new[] { "The contributor does not match the selected role." } });
+        }
+
         if (model.CreditId > 0)
         {
             // Update existing credit
@@ -115,6 +130,12 @@ public sealed class CreditsController : AdminBaseController
             if (credit is null)
             {
                 return Json(new { success = false, errors = new[] { "اعتبار یافت نشد." } });
+            }
+
+
+            if (await IsDuplicateAsync(credit.EntityTypeId, credit.EntityId, model, credit.CreditId, cancellationToken))
+            {
+                return Json(new { success = false, errors = new[] { "This exact credit already exists." } });
             }
 
             credit.CreditRoleId = model.CreditRoleId;
@@ -148,6 +169,20 @@ public sealed class CreditsController : AdminBaseController
                 return Json(new { success = false, errors = new[] { "موجودیت type and entity ID are required." } });
             }
 
+
+            var validEntity = await _db.Entities.AnyAsync(
+                x => x.EntityId == entityId && x.EntityTypeId == entityTypeId,
+                cancellationToken);
+            if (!validEntity)
+            {
+                return Json(new { success = false, errors = new[] { "The selected entity does not exist or has a different type." } });
+            }
+
+            if (await IsDuplicateAsync(entityTypeId, entityId, model, null, cancellationToken))
+            {
+                return Json(new { success = false, errors = new[] { "This exact credit already exists." } });
+            }
+
             var credit = new Credit
             {
                 EntityTypeId = entityTypeId,
@@ -174,6 +209,23 @@ public sealed class CreditsController : AdminBaseController
             return Json(new { success = true, creditId = credit.CreditId });
         }
     }
+
+    private Task<bool> IsDuplicateAsync(
+        int entityTypeId,
+        int entityId,
+        CreditRowViewModel model,
+        int? excludingCreditId,
+        CancellationToken cancellationToken) =>
+        _db.Credits.AnyAsync(x =>
+            x.EntityTypeId == entityTypeId
+            && x.EntityId == entityId
+            && x.CreditId != excludingCreditId
+            && x.CreditRoleId == model.CreditRoleId
+            && x.RoleScopeTypeId == model.RoleScopeTypeId
+            && x.PersonId == model.PersonId
+            && x.CompanyId == model.CompanyId
+            && x.InstrumentId == model.InstrumentId,
+            cancellationToken);
 
     /// <summary>
     /// POST: Deletes a credit row.

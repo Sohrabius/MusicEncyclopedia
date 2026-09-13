@@ -21,7 +21,6 @@ public sealed class RobotsController : Controller
     /// Route: GET /robots.txt
     /// </summary>
     [Route("/robots.txt")]
-    [ResponseCache(Duration = 86400)]
     public IActionResult Index()
     {
         var robots = $@"User-agent: *

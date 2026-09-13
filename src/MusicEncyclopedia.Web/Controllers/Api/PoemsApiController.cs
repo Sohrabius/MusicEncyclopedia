@@ -31,7 +31,6 @@ public sealed class PoemsApiController : BaseApiController
     /// GET /api/v1/poems — paginated poem listing.
     /// </summary>
     [HttpGet("poems")]
-    [ResponseCache(Duration = 300, VaryByQueryKeys = ["page", "pageSize"])]
     public async Task<IActionResult> GetPoems(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 24,
@@ -76,7 +75,6 @@ public sealed class PoemsApiController : BaseApiController
     /// GET /api/v1/poems/{slug} — poem detail.
     /// </summary>
     [HttpGet("poems/{slug}")]
-    [ResponseCache(Duration = 600)]
     public async Task<IActionResult> GetPoemBySlug(
         string slug,
         CancellationToken cancellationToken = default)
@@ -118,7 +116,6 @@ public sealed class PoemsApiController : BaseApiController
     /// GET /api/v1/poems/{slug}/sung-versions — sung versions of a poem.
     /// </summary>
     [HttpGet("poems/{slug}/sung-versions")]
-    [ResponseCache(Duration = 600)]
     public async Task<IActionResult> GetPoemSungVersions(
         string slug,
         CancellationToken cancellationToken = default)
@@ -153,7 +150,6 @@ public sealed class PoemsApiController : BaseApiController
     /// GET /api/v1/poems/{slug}/tracks — tracks using a poem (via sung versions).
     /// </summary>
     [HttpGet("poems/{slug}/tracks")]
-    [ResponseCache(Duration = 600)]
     public async Task<IActionResult> GetPoemTracks(
         string slug,
         CancellationToken cancellationToken = default)
@@ -194,7 +190,6 @@ public sealed class PoemsApiController : BaseApiController
     /// GET /api/v1/sung-versions/{slug} — sung version detail.
     /// </summary>
     [HttpGet("sung-versions/{slug}")]
-    [ResponseCache(Duration = 600)]
     public async Task<IActionResult> GetSungVersionBySlug(
         string slug,
         CancellationToken cancellationToken = default)
@@ -234,7 +229,6 @@ public sealed class PoemsApiController : BaseApiController
     /// GET /api/v1/sung-versions/{slug}/tracks — tracks using this sung version.
     /// </summary>
     [HttpGet("sung-versions/{slug}/tracks")]
-    [ResponseCache(Duration = 600)]
     public async Task<IActionResult> GetSungVersionTracks(
         string slug,
         CancellationToken cancellationToken = default)

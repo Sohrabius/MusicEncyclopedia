@@ -75,6 +75,7 @@ public sealed class HomeController : Controller
         string? category = null,
         CancellationToken cancellationToken = default)
     {
+        page = Math.Clamp(page, 1, 1_000_000);
         _logger.LogDebug("Home page requested for culture={Culture}, page={Page}, category={Category}",
             culture, page, category);
 
@@ -89,14 +90,16 @@ public sealed class HomeController : Controller
     /// </summary>
     [HttpGet]
     [Route("home/albums")]
-    [ResponseCache(Duration = 300, VaryByQueryKeys = ["page", "category"])]
     public async Task<IActionResult> AlbumGrid(
         string culture,
         int page = 1,
         string? category = null,
         CancellationToken cancellationToken = default)
     {
-        page = Math.Max(1, page);
+        if (page < 1 || page > HomeConstants.LazyLoadCapPages)
+        {
+            return BadRequest();
+        }
 
         var result = await _albums.GetAlbumsAsync(
             culture,
@@ -120,6 +123,11 @@ public sealed class HomeController : Controller
         CancellationToken cancellationToken = default)
     {
         var poem = await LoadRandomPoemAsync(cancellationToken);
+        if (poem is null)
+        {
+            return NoContent();
+        }
+
         return PartialView("_RandomPoemCard", poem);
     }
 
@@ -143,7 +151,7 @@ public sealed class HomeController : Controller
             var top8 = SqlDialect.Pagination("0", "8");
 
             // ── Banner hint chips: genres / moods / instruments (cached 1h).
-            var browse = await GetCachedAsync("home:browse", cancellationToken, async () =>
+            var browse = await GetCachedAsync("browse", cancellationToken, async () =>
             {
                 var genreRows = await _db.QueryAsync<(string Slug, string Name)>(
                     $"SELECT Slug, Name FROM Genre WHERE IsDeleted = 0 ORDER BY Name {top8}");
@@ -165,7 +173,7 @@ public sealed class HomeController : Controller
             viewModel.Instruments = browse.Instruments;
 
             // ── Category filter chips with album counts (cached 1h).
-            viewModel.Categories = await GetCachedAsync("home:categories", cancellationToken, async () =>
+            viewModel.Categories = await GetCachedAsync("categories", cancellationToken, async () =>
             {
                 const string sql = """
                     SELECT ac.Code, ac.Name, COUNT(a.AlbumId) AS AlbumCount
@@ -179,7 +187,7 @@ public sealed class HomeController : Controller
             });
 
             // ── About card stats (cached 1h).
-            viewModel.About = await GetCachedAsync("home:about", cancellationToken, async () =>
+            viewModel.About = await GetCachedAsync("about", cancellationToken, async () =>
             {
                 const string sql = """
                     SELECT
@@ -200,7 +208,7 @@ public sealed class HomeController : Controller
                 cancellationToken: cancellationToken);
 
             viewModel.Albums = result;
-            viewModel.LoadedCount = Math.Min(page * HomeConstants.InitialPageSize, result.TotalItems);
+            viewModel.LoadedCount = result.Items.Count;
 
             // ── Random poem: resolved per request, NEVER cached.
             viewModel.RandomPoem = await LoadRandomPoemAsync(cancellationToken);
@@ -276,21 +284,22 @@ public sealed class HomeController : Controller
     }
 
     /// <summary>
-    /// Reads a deterministic home fragment from cache or loads + caches it
-    /// (lookup duration — 1h — so it stays fresh enough after admin edits).
+    /// Reads a deterministic home fragment from cache or loads + caches it.
+    /// The home namespace is intentional: album, track and person writes already
+    /// evict home keys through CacheInvalidationService.
     /// </summary>
     private async Task<T> GetCachedAsync<T>(
         string name,
         CancellationToken cancellationToken,
         Func<Task<T>> loader) where T : class
     {
-        var key = CacheKeys.Lookup(name);
+        var key = CacheKeys.Home(name);
         var cached = await _cache.GetAsync<T>(key, cancellationToken);
         if (cached is not null)
             return cached;
 
         var value = await loader();
-        await _cache.SetAsync(key, value, CacheKeys.LookupDuration, cancellationToken);
+        await _cache.SetAsync(key, value, CacheKeys.HomeDuration, cancellationToken);
         return value;
     }
 

@@ -96,6 +96,13 @@ public sealed class AttributeValuesController : AdminBaseController
                 return Json(new { success = false, errors = new[] { "مقدار ویژگی یافت نشد." } });
             }
 
+            if (!await _db.AttributeDefinitions.AnyAsync(x =>
+                x.AttributeDefinitionId == model.AttributeDefinitionId
+                && x.EntityTypeId == attributeValue.EntityTypeId, cancellationToken))
+            {
+                return Json(new { success = false, errors = new[] { "تعریف ویژگی برای این نوع موجودیت معتبر نیست." } });
+            }
+
             attributeValue.AttributeDefinitionId = model.AttributeDefinitionId;
             attributeValue.LanguageId = model.LanguageId;
             attributeValue.ValueString = model.ValueString;
@@ -110,10 +117,7 @@ public sealed class AttributeValuesController : AdminBaseController
             _logger.LogInformation("AttributeValue updated: AttributeValueId={AttributeValueId}", attributeValue.AttributeValueId);
 
             // Invalidate the parent entity's cache
-            if (attributeValue is not null)
-            {
-                await InvalidateEntityCacheAsync(attributeValue.EntityTypeId, attributeValue.EntityId, "Updated");
-            }
+            await InvalidateEntityCacheAsync(attributeValue.EntityTypeId, attributeValue.EntityId, "Updated");
             await InvalidateBroadCacheAsync();
 
             return Json(new { success = true, attributeValueId = attributeValue.AttributeValueId });
@@ -126,6 +130,16 @@ public sealed class AttributeValuesController : AdminBaseController
             if (entityTypeId == 0 || entityId == 0)
             {
                 return Json(new { success = false, errors = new[] { "موجودیت type and entity ID are required." } });
+            }
+
+            var validTarget = await _db.Entities.AnyAsync(x =>
+                    x.EntityId == entityId && x.EntityTypeId == entityTypeId, cancellationToken)
+                && await _db.AttributeDefinitions.AnyAsync(x =>
+                    x.AttributeDefinitionId == model.AttributeDefinitionId
+                    && x.EntityTypeId == entityTypeId, cancellationToken);
+            if (!validTarget)
+            {
+                return Json(new { success = false, errors = new[] { "موجودیت یا تعریف ویژگی با نوع انتخاب‌شده سازگار نیست." } });
             }
 
             var attributeValue = new AttributeValue
@@ -178,10 +192,7 @@ public sealed class AttributeValuesController : AdminBaseController
 
         _logger.LogInformation("AttributeValue deleted: AttributeValueId={AttributeValueId}", attributeValueId);
 
-        if (attributeValue is not null)
-        {
-            await InvalidateEntityCacheAsync(attributeValue.EntityTypeId, attributeValue.EntityId, "Updated");
-        }
+        await InvalidateEntityCacheAsync(attributeValue.EntityTypeId, attributeValue.EntityId, "Updated");
         await InvalidateBroadCacheAsync();
 
         return Json(new { success = true });

@@ -18,6 +18,7 @@ public interface IAlbumQueryService
         string? category = null,
         string? genre = null,
         string? mood = null,
+        int? year = null,
         string? q = null,
         CancellationToken cancellationToken = default);
 

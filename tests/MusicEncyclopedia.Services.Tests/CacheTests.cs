@@ -92,6 +92,62 @@ public class CacheTests
         (await cache.GetAsync<string>(personDetail)).Should().BeNull();
     }
 
+    [Theory]
+    [InlineData("Localization")]
+    [InlineData("Media")]
+    [InlineData("Credit")]
+    public async Task InvalidateEntityAsync_RemovesDependentPublicDetails(string entityType)
+    {
+        var (cache, invalidation) = CreateServices();
+        var dependentKeys = new[]
+        {
+            CacheKeys.Detail("album", "fa", "album-one"),
+            CacheKeys.Detail("track", "en", "track-one"),
+            CacheKeys.Detail("person", "ar", "person-one"),
+            CacheKeys.Detail("company", "fr", "company-one"),
+            CacheKeys.Detail("poem", "fa", "poem-one")
+        };
+
+        foreach (var key in dependentKeys)
+        {
+            await cache.SetAsync(key, "stale");
+        }
+
+        await invalidation.InvalidateEntityAsync(entityType, 1, "Updated");
+
+        foreach (var key in dependentKeys)
+        {
+            (await cache.GetAsync<string>(key)).Should().BeNull();
+        }
+    }
+
+    [Fact]
+    public async Task AlbumInvalidation_RemovesEveryCultureAndQueryShape()
+    {
+        var (cache, invalidation) = CreateServices();
+        var affectedKeys = new[]
+        {
+            CacheKeys.Detail("album", "fa", "album-one"),
+            CacheKeys.Detail("album", "en", "album-one"),
+            CacheKeys.List("album", "fa", 1, 20, null, null),
+            CacheKeys.List("album", "fa", 2, 20, "title", "classical"),
+            CacheKeys.List("album", "en", 1, 24, null, "jazz")
+        };
+        affectedKeys.Distinct().Should().HaveCount(affectedKeys.Length);
+
+        foreach (var key in affectedKeys)
+        {
+            await cache.SetAsync(key, "stale");
+        }
+
+        await invalidation.InvalidateEntityAsync("Album", 1, "Updated");
+
+        foreach (var key in affectedKeys)
+        {
+            (await cache.GetAsync<string>(key)).Should().BeNull();
+        }
+    }
+
     [Fact]
     public async Task InvalidateBroadAsync_RemovesHomeSearchAndLookupKeys()
     {

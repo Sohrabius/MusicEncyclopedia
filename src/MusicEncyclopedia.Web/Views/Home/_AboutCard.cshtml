@@ -1,10 +1,6 @@
 @inject Microsoft.Extensions.Localization.IStringLocalizer<MusicEncyclopedia.Web.SharedResources> L
 @model MusicEncyclopedia.Web.ViewModels.AboutStats
 
-@{
-    var culture = Context.Items["culture"] as string ?? "fa";
-}
-
 <div class="home-about">
     <h3 class="home-about__title">@L["Home.AboutTitle"]</h3>
     <p class="home-about__text">@L["Home.AboutText"]</p>
@@ -23,6 +19,4 @@
             <dd class="home-about__stat-value">@Model.People</dd>
         </div>
     </dl>
-
-    <a href="/@culture" class="home-about__link">@L["Home.AboutCta"]</a>
 </div>

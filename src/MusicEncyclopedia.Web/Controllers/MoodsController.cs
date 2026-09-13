@@ -33,7 +33,6 @@ public sealed class MoodsController : Controller
     [HttpGet]
     [Route("")]
     [Route("Index")]
-    [ResponseCache(Duration = 60, VaryByQueryKeys = new[] { "*" }, VaryByHeader = "Accept-Language")]
     public async Task<IActionResult> Index(
         string culture,
         int page = 1,
@@ -81,7 +80,6 @@ public sealed class MoodsController : Controller
     /// </summary>
     [HttpGet]
     [Route("{slug}")]
-    [ResponseCache(Duration = 60)]
     public async Task<IActionResult> Detail(
         string culture,
         string slug,

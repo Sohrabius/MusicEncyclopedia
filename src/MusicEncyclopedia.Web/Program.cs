@@ -206,9 +206,6 @@ try
         failureStatus: Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Unhealthy,
         tags: ["db", "sql", "ready"]);
 
-    // ---- Response Caching ----
-    builder.Services.AddResponseCaching();
-
     // ---- Rate Limiting (Section 17.5) ----
     builder.Services.AddMemoryCache();
     builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimiting"));
@@ -218,25 +215,31 @@ try
     builder.Services.AddSingleton<IProcessingStrategy, AsyncKeyLockProcessingStrategy>();
 
     // ---- Hangfire Background Jobs (Section 20) ----
-    builder.Services.AddHangfire(config =>
+    // Tests and maintenance tools can disable workers without changing the
+    // production default. This keeps disposable database hosts deterministic.
+    var backgroundJobsEnabled = builder.Configuration.GetValue("BackgroundJobs:Enabled", true);
+    if (backgroundJobsEnabled)
     {
-        config.UseSqlServerStorage(connectionString, new SqlServerStorageOptions
+        builder.Services.AddHangfire(config =>
         {
-            CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
-            SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
-            QueuePollInterval = TimeSpan.FromSeconds(15),
-            UseRecommendedIsolationLevel = true,
-            DisableGlobalLocks = true,
+            config.UseSqlServerStorage(connectionString, new SqlServerStorageOptions
+            {
+                CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+                SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+                QueuePollInterval = TimeSpan.FromSeconds(15),
+                UseRecommendedIsolationLevel = true,
+                DisableGlobalLocks = true,
+            });
         });
-    });
-    builder.Services.AddHangfireServer(options =>
-    {
-        options.WorkerCount = Environment.ProcessorCount * 2;
-        options.Queues = ["default", "media", "search"];
-    });
+        builder.Services.AddHangfireServer(options =>
+        {
+            options.WorkerCount = Environment.ProcessorCount * 2;
+            options.Queues = ["default", "media", "search"];
+        });
 
-    // Recurring jobs (spec §20) are resolved from DI by Hangfire.
-    builder.Services.AddScoped<CacheWarmJob>();
+        // Recurring jobs (spec §20) are resolved from DI by Hangfire.
+        builder.Services.AddScoped<CacheWarmJob>();
+    }
 
     // ---- Anti-Forgery Tokens (Section 17.3) ----
     builder.Services.AddAntiforgery(options =>
@@ -293,14 +296,18 @@ try
     // default (admin@example.com) on the dev path. Seed:AdminUser defaults to
     // true for dev (convenience) and false in production (which must supply
     // Admin:Email/Admin:Password). Fully idempotent.
+    var adminBootstrapEnabled = builder.Configuration.GetValue("Admin:BootstrapEnabled", true);
     try
     {
-        var seedDefaultAdmin = builder.Configuration.GetValue("Seed:AdminUser", isDevelopment);
-        var bootstrapLogger = app.Services
-            .GetRequiredService<ILoggerFactory>()
-            .CreateLogger("AdminBootstrap");
-        await AdminBootstrap.SeedRolesAndAdminAsync(
-            app.Services, builder.Configuration, bootstrapLogger, seedDefaultAdmin);
+        if (adminBootstrapEnabled)
+        {
+            var seedDefaultAdmin = builder.Configuration.GetValue("Seed:AdminUser", isDevelopment);
+            var bootstrapLogger = app.Services
+                .GetRequiredService<ILoggerFactory>()
+                .CreateLogger("AdminBootstrap");
+            await AdminBootstrap.SeedRolesAndAdminAsync(
+                app.Services, builder.Configuration, bootstrapLogger, seedDefaultAdmin);
+        }
     }
     catch (Exception ex)
     {
@@ -374,9 +381,6 @@ try
     // ---- CORS ----
     app.UseCors("ApiCors");
 
-    // ---- Response Caching ----
-    app.UseResponseCaching();
-
     // ---- Routing ----
     app.UseRouting();
 
@@ -402,24 +406,27 @@ try
     app.UseAuthorization();
 
     // ---- Hangfire Dashboard & Recurring Jobs ----
-    app.UseHangfireDashboard("/hangfire", new DashboardOptions
+    if (backgroundJobsEnabled)
     {
-        Authorization = [new HangfireDashboardAuthorizationFilter()]
-    });
+        app.UseHangfireDashboard("/hangfire", new DashboardOptions
+        {
+            Authorization = [new HangfireDashboardAuthorizationFilter()]
+        });
 
-    // Nightly cache warm-up (spec §20 / §15) so the public site starts the
-    // day with warm list caches. Registration is best-effort: on first deploy
-    // the database may not exist yet and the job is registered on next start.
-    try
-    {
-        RecurringJob.AddOrUpdate<CacheWarmJob>(
-            "cache-warm",
-            job => job.WarmAsync(),
-            Cron.Daily(3, 0));
-    }
-    catch (Exception ex)
-    {
-        Log.Warning(ex, "Failed to register Hangfire recurring jobs");
+        // Nightly cache warm-up (spec §20 / §15) so the public site starts the
+        // day with warm list caches. Registration is best-effort: on first deploy
+        // the database may not exist yet and the job is registered on next start.
+        try
+        {
+            RecurringJob.AddOrUpdate<CacheWarmJob>(
+                "cache-warm",
+                job => job.WarmAsync(),
+                Cron.Daily(3, 0));
+        }
+        catch (Exception ex)
+        {
+            Log.Warning(ex, "Failed to register Hangfire recurring jobs");
+        }
     }
 
     // ---- Conventional Routes (Section 28) ----
@@ -527,6 +534,11 @@ internal static class HealthCheckResponseWriter
                 PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
             });
     }
+}
+
+// Exposes the top-level entry point to WebApplicationFactory integration tests.
+public partial class Program
+{
 }
 
 

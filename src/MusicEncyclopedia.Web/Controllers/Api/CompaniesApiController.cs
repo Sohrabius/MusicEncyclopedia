@@ -31,7 +31,6 @@ public sealed class CompaniesApiController : BaseApiController
     /// Supports ?page, ?pageSize, ?q.
     /// </summary>
     [HttpGet("companies")]
-    [ResponseCache(Duration = 300, VaryByQueryKeys = ["page", "pageSize", "q"])]
     public async Task<IActionResult> GetCompanies(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 24,
@@ -57,7 +56,6 @@ public sealed class CompaniesApiController : BaseApiController
     /// GET /api/v1/companies/{slug} — company detail.
     /// </summary>
     [HttpGet("companies/{slug}")]
-    [ResponseCache(Duration = 600, VaryByQueryKeys = ["slug"])]
     public async Task<IActionResult> GetCompanyBySlug(
         string slug,
         CancellationToken cancellationToken = default)
@@ -73,7 +71,6 @@ public sealed class CompaniesApiController : BaseApiController
     /// GET /api/v1/companies/{slug}/albums — albums associated with a company.
     /// </summary>
     [HttpGet("companies/{slug}/albums")]
-    [ResponseCache(Duration = 600, VaryByQueryKeys = ["slug"])]
     public async Task<IActionResult> GetCompanyAlbums(
         string slug,
         CancellationToken cancellationToken = default)
@@ -117,7 +114,6 @@ public sealed class CompaniesApiController : BaseApiController
     /// GET /api/v1/companies/{slug}/credits — credits for a company.
     /// </summary>
     [HttpGet("companies/{slug}/credits")]
-    [ResponseCache(Duration = 600, VaryByQueryKeys = ["slug"])]
     public async Task<IActionResult> GetCompanyCredits(
         string slug,
         CancellationToken cancellationToken = default)

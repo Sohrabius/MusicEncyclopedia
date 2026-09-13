@@ -130,6 +130,15 @@ public sealed class SearchService : ISearchService
         var fragments = BuildSearchFragments(
             query.EntityType, query.Genre, query.Mood, query.Instrument, useFullText);
 
+        // An unsupported entity-type filter produces no SQL fragments. Return a
+        // valid empty page instead of generating an invalid FROM () query. API
+        // callers reject this input earlier; this guard also protects MVC and
+        // direct service callers.
+        if (fragments.Count == 0)
+        {
+            return PagedResult<SearchResultDto>.Create([], page, pageSize, 0);
+        }
+
         // Count query
         var countSql = $@"
 SELECT COUNT(*)

@@ -1,0 +1,68 @@
+@using MusicEncyclopedia.Web.Constants
+@inject Microsoft.Extensions.Localization.IStringLocalizer<MusicEncyclopedia.Web.SharedResources> L
+@{
+    var items = Model.Items;
+    var pageUrl = (Func<int, string>)Model.PageUrl;
+    var currentPage = items.Page;
+    var firstTailPage = HomeConstants.LazyLoadCapPages + 1;
+    var totalPages = items.TotalPages;
+}
+
+@if (totalPages >= firstTailPage)
+{
+    <nav class="pagination" aria-label="@L["Pagination"]">
+        @if (currentPage > firstTailPage)
+        {
+            <a href="@pageUrl(currentPage - 1)" rel="prev" data-home-tail-page="@(currentPage - 1)" aria-label="@L["Pagination.Previous"]">
+                <svg class="icon-directional" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+            </a>
+        }
+
+        @{
+            var displayPage = Math.Max(firstTailPage, currentPage);
+            var startPage = Math.Max(firstTailPage, displayPage - 2);
+            var endPage = Math.Min(totalPages, displayPage + 2);
+
+            if (startPage > firstTailPage)
+            {
+                <a href="@pageUrl(firstTailPage)" data-home-tail-page="@firstTailPage">@firstTailPage</a>
+                if (startPage > firstTailPage + 1)
+                {
+                    <span aria-hidden="true">…</span>
+                }
+            }
+
+            for (var p = startPage; p <= endPage; p++)
+            {
+                if (currentPage >= firstTailPage && p == currentPage)
+                {
+                    <span class="active" aria-current="page">@p</span>
+                }
+                else
+                {
+                    <a href="@pageUrl(p)" data-home-tail-page="@p">@p</a>
+                }
+            }
+
+            if (endPage < totalPages)
+            {
+                if (endPage < totalPages - 1)
+                {
+                    <span aria-hidden="true">…</span>
+                }
+                <a href="@pageUrl(totalPages)" data-home-tail-page="@totalPages">@totalPages</a>
+            }
+        }
+
+        @if (currentPage >= firstTailPage && currentPage < totalPages)
+        {
+            <a href="@pageUrl(currentPage + 1)" rel="next" data-home-tail-page="@(currentPage + 1)" aria-label="@L["Pagination.Next"]">
+                <svg class="icon-directional" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </a>
+        }
+    </nav>
+}

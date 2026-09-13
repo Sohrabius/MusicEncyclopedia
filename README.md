@@ -1,9 +1,10 @@
 # MusicEncyclopedia
 
-A multilingual encyclopedia of Persian and world music: artists, albums, tracks,
+A Persian-language encyclopedia of Persian and world music: artists, albums, tracks,
 poems, sung versions, recording sessions, live events, awards, charts,
 publications, certifications and more — with a full admin area, full-text
-search, and per-culture localization (fa / en / ar / fr, RTL-aware).
+search and an RTL interface. Localization infrastructure for additional cultures
+is retained for a future milestone, but the current launch serves `fa` only.
 
 ## Stack
 
@@ -52,5 +53,7 @@ docker compose up -d --build
 ## Documentation
 
 - `music-encyclopedia-q.md` — product spec (requirements, §24 milestones, §36 acceptance criteria)
-- `IMPLEMENTATION_PLAN.md` — phased implementation plan and completion records
+- `IMPLEMENTATION_PLAN.md` — authoritative prioritized backlog, dependencies, and completion criteria
 - `design.md` — design notes
+- `docs/ACCEPTANCE_CHECKLIST.md` — evidence matrix for all 20 release criteria
+- `docs/archive/IMPLEMENTATION_PLAN_2026-09-11.md` — historical plan (superseded)

@@ -44,9 +44,6 @@ public sealed class AlbumsController : Controller
             "Album list requested: culture={Culture}, page={Page}, genre={Genre}, mood={Mood}, year={Year}, q={Q}, sort={Sort}",
             culture, page, genre, mood, year, q, sort);
 
-        // Flatten year into a search term if provided
-        var searchQuery = !string.IsNullOrWhiteSpace(q) ? q : year?.ToString();
-
         var result = await _albumQueryService.GetAlbumsAsync(
             culture,
             page,
@@ -54,7 +51,8 @@ public sealed class AlbumsController : Controller
             sort: sort,
             genre: genre,
             mood: mood,
-            q: searchQuery,
+            year: year,
+            q: q,
             cancellationToken: cancellationToken);
 
         var viewModel = new AlbumListViewModel

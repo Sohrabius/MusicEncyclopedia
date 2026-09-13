@@ -34,7 +34,6 @@ public sealed class SitemapController : Controller
     /// Route: GET /sitemap.xml
     /// </summary>
     [Route("/sitemap.xml")]
-    [ResponseCache(Duration = 86400)]
     public async Task<IActionResult> Index()
     {
         var urls = new List<SitemapUrl>();

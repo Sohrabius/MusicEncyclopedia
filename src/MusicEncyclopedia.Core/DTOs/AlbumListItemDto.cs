@@ -16,6 +16,7 @@ public sealed class AlbumListItemDto
     public string Title { get; set; } = "";
     public string? OriginalTitle { get; init; }
     public string? EnglishTitle { get; init; }
+    public string? CategoryCode { get; init; }
     public string? CategoryName { get; init; }
     public DateOnly? ReleaseDate { get; init; }
     public int? DurationSeconds { get; init; }

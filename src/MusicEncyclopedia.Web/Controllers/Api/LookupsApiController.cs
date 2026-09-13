@@ -32,7 +32,6 @@ public sealed class LookupsApiController : BaseApiController
     /// GET /api/v1/genres — list all genres.
     /// </summary>
     [HttpGet("genres")]
-    [ResponseCache(Duration = 300)]
     public async Task<IActionResult> GetGenres(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 50,
@@ -66,7 +65,6 @@ public sealed class LookupsApiController : BaseApiController
     /// GET /api/v1/genres/{slug} — genre detail.
     /// </summary>
     [HttpGet("genres/{slug}")]
-    [ResponseCache(Duration = 600)]
     public async Task<IActionResult> GetGenreBySlug(
         string slug,
         CancellationToken cancellationToken = default)
@@ -105,7 +103,6 @@ public sealed class LookupsApiController : BaseApiController
     /// GET /api/v1/genres/{slug}/albums — albums in this genre.
     /// </summary>
     [HttpGet("genres/{slug}/albums")]
-    [ResponseCache(Duration = 600)]
     public async Task<IActionResult> GetGenreAlbums(
         string slug,
         [FromQuery] int page = 1,
@@ -145,7 +142,6 @@ public sealed class LookupsApiController : BaseApiController
     /// GET /api/v1/genres/{slug}/tracks — tracks in this genre.
     /// </summary>
     [HttpGet("genres/{slug}/tracks")]
-    [ResponseCache(Duration = 600)]
     public async Task<IActionResult> GetGenreTracks(
         string slug,
         [FromQuery] int page = 1,
@@ -187,7 +183,6 @@ public sealed class LookupsApiController : BaseApiController
     /// GET /api/v1/moods — list all moods.
     /// </summary>
     [HttpGet("moods")]
-    [ResponseCache(Duration = 300)]
     public async Task<IActionResult> GetMoods(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 50,
@@ -221,7 +216,6 @@ public sealed class LookupsApiController : BaseApiController
     /// GET /api/v1/moods/{slug} — mood detail.
     /// </summary>
     [HttpGet("moods/{slug}")]
-    [ResponseCache(Duration = 600)]
     public async Task<IActionResult> GetMoodBySlug(
         string slug,
         CancellationToken cancellationToken = default)
@@ -244,7 +238,6 @@ public sealed class LookupsApiController : BaseApiController
     /// GET /api/v1/moods/{slug}/albums — albums with this mood.
     /// </summary>
     [HttpGet("moods/{slug}/albums")]
-    [ResponseCache(Duration = 600)]
     public async Task<IActionResult> GetMoodAlbums(
         string slug,
         [FromQuery] int page = 1,
@@ -284,7 +277,6 @@ public sealed class LookupsApiController : BaseApiController
     /// GET /api/v1/moods/{slug}/tracks — tracks with this mood.
     /// </summary>
     [HttpGet("moods/{slug}/tracks")]
-    [ResponseCache(Duration = 600)]
     public async Task<IActionResult> GetMoodTracks(
         string slug,
         [FromQuery] int page = 1,
@@ -326,7 +318,6 @@ public sealed class LookupsApiController : BaseApiController
     /// GET /api/v1/instruments — list all instruments.
     /// </summary>
     [HttpGet("instruments")]
-    [ResponseCache(Duration = 300)]
     public async Task<IActionResult> GetInstruments(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 50,
@@ -363,7 +354,6 @@ public sealed class LookupsApiController : BaseApiController
     /// GET /api/v1/instruments/{slug} — instrument detail.
     /// </summary>
     [HttpGet("instruments/{slug}")]
-    [ResponseCache(Duration = 600)]
     public async Task<IActionResult> GetInstrumentBySlug(
         string slug,
         CancellationToken cancellationToken = default)
@@ -389,7 +379,6 @@ public sealed class LookupsApiController : BaseApiController
     /// GET /api/v1/instruments/{slug}/musicians — musicians who play this instrument.
     /// </summary>
     [HttpGet("instruments/{slug}/musicians")]
-    [ResponseCache(Duration = 600)]
     public async Task<IActionResult> GetInstrumentMusicians(
         string slug,
         CancellationToken cancellationToken = default)
@@ -421,7 +410,6 @@ public sealed class LookupsApiController : BaseApiController
     /// GET /api/v1/instruments/{slug}/tracks — tracks featuring this instrument.
     /// </summary>
     [HttpGet("instruments/{slug}/tracks")]
-    [ResponseCache(Duration = 600)]
     public async Task<IActionResult> GetInstrumentTracks(
         string slug,
         [FromQuery] int page = 1,

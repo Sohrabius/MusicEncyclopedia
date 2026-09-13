@@ -9,11 +9,11 @@ public sealed class CreditValidator : AbstractValidator<CreditFormModel>
 {
     public CreditValidator()
     {
-        // Must have either PersonId or CompanyId; role scope validation is handled by the UI,
-        // but we enforce that at least one is provided.
+        // A credit belongs to exactly one contributor. Accepting both creates an
+        // ambiguous row that public queries cannot display consistently.
         RuleFor(x => x)
-            .Must(x => x.PersonId.HasValue || x.CompanyId.HasValue)
-            .WithMessage("Credit must have either a Person or a Company.");
+            .Must(x => x.PersonId.HasValue ^ x.CompanyId.HasValue)
+            .WithMessage("Credit must have either a Person or a Company, but not both.");
 
         // If InstrumentId is present, PersonId must be present
         RuleFor(x => x.PersonId)

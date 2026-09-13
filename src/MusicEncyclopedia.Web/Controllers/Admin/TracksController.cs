@@ -228,6 +228,7 @@ public sealed class TracksController : AdminBaseController
         var viewModel = new TrackEditViewModel
         {
             TrackId = track.TrackId,
+            EntityId = track.EntityId,
             Title = track.Title,
             TitleSort = track.TitleSort,
             OriginalTitle = track.OriginalTitle,
@@ -316,6 +317,10 @@ public sealed class TracksController : AdminBaseController
             SetErrorMessage("ترک یافت نشد. احتمالاً حذف شده است.");
             return RedirectToAction(nameof(Index));
         }
+
+        // The global entity ID is derived from the loaded track and is needed
+        // when the edit view is rendered again after a concurrency conflict.
+        viewModel.EntityId = track.EntityId;
 
         // Concurrency check
         if (viewModel.RowVersion is not null)

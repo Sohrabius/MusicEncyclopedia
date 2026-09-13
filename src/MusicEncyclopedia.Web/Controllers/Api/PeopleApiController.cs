@@ -31,7 +31,6 @@ public sealed class PeopleApiController : BaseApiController
     /// Supports ?page, ?pageSize, ?q.
     /// </summary>
     [HttpGet("people")]
-    [ResponseCache(Duration = 300, VaryByQueryKeys = ["page", "pageSize", "q"])]
     public async Task<IActionResult> GetPeople(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 24,
@@ -57,7 +56,6 @@ public sealed class PeopleApiController : BaseApiController
     /// GET /api/v1/people/{slug} — person detail.
     /// </summary>
     [HttpGet("people/{slug}")]
-    [ResponseCache(Duration = 600, VaryByQueryKeys = ["slug"])]
     public async Task<IActionResult> GetPersonBySlug(
         string slug,
         CancellationToken cancellationToken = default)
@@ -73,7 +71,6 @@ public sealed class PeopleApiController : BaseApiController
     /// GET /api/v1/people/{slug}/albums — albums associated with a person.
     /// </summary>
     [HttpGet("people/{slug}/albums")]
-    [ResponseCache(Duration = 600, VaryByQueryKeys = ["slug"])]
     public async Task<IActionResult> GetPersonAlbums(
         string slug,
         CancellationToken cancellationToken = default)
@@ -118,7 +115,6 @@ public sealed class PeopleApiController : BaseApiController
     /// GET /api/v1/people/{slug}/tracks — tracks associated with a person.
     /// </summary>
     [HttpGet("people/{slug}/tracks")]
-    [ResponseCache(Duration = 600, VaryByQueryKeys = ["slug"])]
     public async Task<IActionResult> GetPersonTracks(
         string slug,
         CancellationToken cancellationToken = default)
@@ -159,7 +155,6 @@ public sealed class PeopleApiController : BaseApiController
     /// GET /api/v1/people/{slug}/credits — credits for a person.
     /// </summary>
     [HttpGet("people/{slug}/credits")]
-    [ResponseCache(Duration = 600, VaryByQueryKeys = ["slug"])]
     public async Task<IActionResult> GetPersonCredits(
         string slug,
         CancellationToken cancellationToken = default)
@@ -200,7 +195,6 @@ public sealed class PeopleApiController : BaseApiController
     /// GET /api/v1/people/{slug}/instruments — instruments played by a person.
     /// </summary>
     [HttpGet("people/{slug}/instruments")]
-    [ResponseCache(Duration = 600, VaryByQueryKeys = ["slug"])]
     public async Task<IActionResult> GetPersonInstruments(
         string slug,
         CancellationToken cancellationToken = default)
@@ -245,7 +239,6 @@ public sealed class PeopleApiController : BaseApiController
     /// GET /api/v1/people/{slug}/poems — poems written by a person (if poet).
     /// </summary>
     [HttpGet("people/{slug}/poems")]
-    [ResponseCache(Duration = 600, VaryByQueryKeys = ["slug"])]
     public async Task<IActionResult> GetPersonPoems(
         string slug,
         CancellationToken cancellationToken = default)
@@ -280,7 +273,6 @@ public sealed class PeopleApiController : BaseApiController
     /// GET /api/v1/people/{slug}/media — media for a person.
     /// </summary>
     [HttpGet("people/{slug}/media")]
-    [ResponseCache(Duration = 600, VaryByQueryKeys = ["slug"])]
     public async Task<IActionResult> GetPersonMedia(
         string slug,
         CancellationToken cancellationToken = default)

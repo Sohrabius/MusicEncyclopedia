@@ -31,19 +31,21 @@ public sealed class AlbumsApiController : BaseApiController
     /// Supports ?page, ?pageSize, ?q, ?genre, ?mood.
     /// </summary>
     [HttpGet("albums")]
-    [ResponseCache(Duration = 300, VaryByQueryKeys = ["page", "pageSize", "q", "genre", "mood"])]
     public async Task<IActionResult> GetAlbums(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 24,
         [FromQuery] string? q = null,
         [FromQuery] string? genre = null,
         [FromQuery] string? mood = null,
+        [FromQuery] int? year = null,
         CancellationToken cancellationToken = default)
     {
         if (page < 1)
             return BadRequestResult("page", "MinValue", "Page must be 1 or greater.");
         if (pageSize is < 1 or > 100)
             return BadRequestResult("pageSize", "OutOfRange", "PageSize must be between 1 and 100.");
+        if (year is < 1 or > 9999)
+            return BadRequestResult("year", "OutOfRange", "Year must be between 1 and 9999.");
 
         var result = await _albumQueryService.GetAlbumsAsync(
             culture: "en",
@@ -51,6 +53,7 @@ public sealed class AlbumsApiController : BaseApiController
             pageSize: pageSize,
             genre: genre,
             mood: mood,
+            year: year,
             q: q,
             cancellationToken: cancellationToken);
 
@@ -61,7 +64,6 @@ public sealed class AlbumsApiController : BaseApiController
     /// GET /api/v1/albums/{slug} — album detail.
     /// </summary>
     [HttpGet("albums/{slug}")]
-    [ResponseCache(Duration = 600, VaryByQueryKeys = ["slug"])]
     public async Task<IActionResult> GetAlbumBySlug(
         string slug,
         CancellationToken cancellationToken = default)
@@ -79,7 +81,6 @@ public sealed class AlbumsApiController : BaseApiController
     /// GET /api/v1/albums/{slug}/tracks — track list for an album.
     /// </summary>
     [HttpGet("albums/{slug}/tracks")]
-    [ResponseCache(Duration = 600, VaryByQueryKeys = ["slug"])]
     public async Task<IActionResult> GetAlbumTracks(
         string slug,
         CancellationToken cancellationToken = default)
@@ -96,7 +97,6 @@ public sealed class AlbumsApiController : BaseApiController
     /// GET /api/v1/albums/{slug}/credits — credits for an album.
     /// </summary>
     [HttpGet("albums/{slug}/credits")]
-    [ResponseCache(Duration = 600, VaryByQueryKeys = ["slug"])]
     public async Task<IActionResult> GetAlbumCredits(
         string slug,
         CancellationToken cancellationToken = default)
@@ -112,7 +112,6 @@ public sealed class AlbumsApiController : BaseApiController
     /// GET /api/v1/albums/{slug}/media — media attached to an album.
     /// </summary>
     [HttpGet("albums/{slug}/media")]
-    [ResponseCache(Duration = 600, VaryByQueryKeys = ["slug"])]
     public async Task<IActionResult> GetAlbumMedia(
         string slug,
         CancellationToken cancellationToken = default)
@@ -128,7 +127,6 @@ public sealed class AlbumsApiController : BaseApiController
     /// GET /api/v1/albums/{slug}/links — external links for an album.
     /// </summary>
     [HttpGet("albums/{slug}/links")]
-    [ResponseCache(Duration = 600, VaryByQueryKeys = ["slug"])]
     public async Task<IActionResult> GetAlbumLinks(
         string slug,
         CancellationToken cancellationToken = default)
@@ -144,7 +142,6 @@ public sealed class AlbumsApiController : BaseApiController
     /// GET /api/v1/albums/{slug}/awards — awards for an album.
     /// </summary>
     [HttpGet("albums/{slug}/awards")]
-    [ResponseCache(Duration = 600, VaryByQueryKeys = ["slug"])]
     public async Task<IActionResult> GetAlbumAwards(
         string slug,
         CancellationToken cancellationToken = default)
@@ -160,7 +157,6 @@ public sealed class AlbumsApiController : BaseApiController
     /// GET /api/v1/albums/{slug}/certifications — certifications for an album.
     /// </summary>
     [HttpGet("albums/{slug}/certifications")]
-    [ResponseCache(Duration = 600, VaryByQueryKeys = ["slug"])]
     public async Task<IActionResult> GetAlbumCertifications(
         string slug,
         CancellationToken cancellationToken = default)
@@ -176,7 +172,6 @@ public sealed class AlbumsApiController : BaseApiController
     /// GET /api/v1/albums/{slug}/charts — chart entries for an album.
     /// </summary>
     [HttpGet("albums/{slug}/charts")]
-    [ResponseCache(Duration = 600, VaryByQueryKeys = ["slug"])]
     public async Task<IActionResult> GetAlbumCharts(
         string slug,
         CancellationToken cancellationToken = default)
@@ -193,7 +188,6 @@ public sealed class AlbumsApiController : BaseApiController
     /// Uses Dapper to query album relations since the service does not expose this directly.
     /// </summary>
     [HttpGet("albums/{slug}/related")]
-    [ResponseCache(Duration = 600, VaryByQueryKeys = ["slug"])]
     public async Task<IActionResult> GetAlbumRelated(
         string slug,
         CancellationToken cancellationToken = default)

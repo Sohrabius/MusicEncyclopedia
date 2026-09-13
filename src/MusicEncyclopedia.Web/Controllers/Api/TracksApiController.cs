@@ -31,7 +31,6 @@ public sealed class TracksApiController : BaseApiController
     /// Supports ?page, ?pageSize, ?q, ?genre, ?mood.
     /// </summary>
     [HttpGet("tracks")]
-    [ResponseCache(Duration = 300, VaryByQueryKeys = ["page", "pageSize", "q", "genre", "mood"])]
     public async Task<IActionResult> GetTracks(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 24,
@@ -61,7 +60,6 @@ public sealed class TracksApiController : BaseApiController
     /// GET /api/v1/tracks/{slug} — track detail.
     /// </summary>
     [HttpGet("tracks/{slug}")]
-    [ResponseCache(Duration = 600, VaryByQueryKeys = ["slug"])]
     public async Task<IActionResult> GetTrackBySlug(
         string slug,
         CancellationToken cancellationToken = default)
@@ -78,7 +76,6 @@ public sealed class TracksApiController : BaseApiController
     /// Uses Dapper since TrackDetailDto already contains albums in its Albums property.
     /// </summary>
     [HttpGet("tracks/{slug}/albums")]
-    [ResponseCache(Duration = 600, VaryByQueryKeys = ["slug"])]
     public async Task<IActionResult> GetTrackAlbums(
         string slug,
         CancellationToken cancellationToken = default)
@@ -94,7 +91,6 @@ public sealed class TracksApiController : BaseApiController
     /// GET /api/v1/tracks/{slug}/credits — credits for a track.
     /// </summary>
     [HttpGet("tracks/{slug}/credits")]
-    [ResponseCache(Duration = 600, VaryByQueryKeys = ["slug"])]
     public async Task<IActionResult> GetTrackCredits(
         string slug,
         CancellationToken cancellationToken = default)
@@ -110,7 +106,6 @@ public sealed class TracksApiController : BaseApiController
     /// GET /api/v1/tracks/{slug}/musicians — musician credits for a track.
     /// </summary>
     [HttpGet("tracks/{slug}/musicians")]
-    [ResponseCache(Duration = 600, VaryByQueryKeys = ["slug"])]
     public async Task<IActionResult> GetTrackMusicians(
         string slug,
         CancellationToken cancellationToken = default)
@@ -127,7 +122,7 @@ public sealed class TracksApiController : BaseApiController
     /// Respects lyrics availability. Returns 404 if no lyrics or restricted.
     /// </summary>
     [HttpGet("tracks/{slug}/lyrics")]
-    [ResponseCache(Duration = 600, VaryByQueryKeys = ["slug"])]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     public async Task<IActionResult> GetTrackLyrics(
         string slug,
         CancellationToken cancellationToken = default)
@@ -140,13 +135,24 @@ public sealed class TracksApiController : BaseApiController
         if (track.IsInstrumental)
             return NotFoundResult("This track is instrumental and has no lyrics.");
 
-        if (string.IsNullOrWhiteSpace(track.LyricsAvailabilityName) ||
-            track.LyricsAvailabilityName.Equals("None", StringComparison.OrdinalIgnoreCase))
-            return NotFoundResult("No lyrics available for this track.");
-
-        if (track.LyricsAvailabilityName.Equals("Restricted", StringComparison.OrdinalIgnoreCase) ||
-            track.LyricsAvailabilityName.Equals("Request", StringComparison.OrdinalIgnoreCase))
-            return NotFoundResult("Lyrics for this track are restricted.");
+        var availability = track.LyricsAvailabilityName?.ToUpperInvariant() ?? "NONE";
+        switch (availability)
+        {
+            case "PUBLIC":
+                break;
+            case "REGISTERED" when User.Identity?.IsAuthenticated == true:
+                break;
+            case "RESTRICTED" when User.HasClaim("Permission", "CanViewRestrictedLyrics"):
+                break;
+            case "NONE":
+                return NotFoundResult("No lyrics available for this track.");
+            case "REGISTERED":
+                return NotFoundResult("Lyrics are available to registered users.");
+            case "REQUEST":
+            case "RESTRICTED":
+            default:
+                return NotFoundResult("Lyrics for this track are restricted.");
+        }
 
         // Fetch lyrics via Dapper (SungVersion text associated with this track)
         const string sql = @"
@@ -181,7 +187,6 @@ public sealed class TracksApiController : BaseApiController
     /// GET /api/v1/tracks/{slug}/poems — poems associated with a track.
     /// </summary>
     [HttpGet("tracks/{slug}/poems")]
-    [ResponseCache(Duration = 600, VaryByQueryKeys = ["slug"])]
     public async Task<IActionResult> GetTrackPoems(
         string slug,
         CancellationToken cancellationToken = default)
@@ -215,7 +220,6 @@ public sealed class TracksApiController : BaseApiController
     /// GET /api/v1/tracks/{slug}/related — related tracks.
     /// </summary>
     [HttpGet("tracks/{slug}/related")]
-    [ResponseCache(Duration = 600, VaryByQueryKeys = ["slug"])]
     public async Task<IActionResult> GetTrackRelated(
         string slug,
         CancellationToken cancellationToken = default)
@@ -257,7 +261,6 @@ public sealed class TracksApiController : BaseApiController
     /// GET /api/v1/tracks/{slug}/media — media for a track.
     /// </summary>
     [HttpGet("tracks/{slug}/media")]
-    [ResponseCache(Duration = 600, VaryByQueryKeys = ["slug"])]
     public async Task<IActionResult> GetTrackMedia(
         string slug,
         CancellationToken cancellationToken = default)
@@ -273,7 +276,6 @@ public sealed class TracksApiController : BaseApiController
     /// GET /api/v1/tracks/{slug}/links — external links for a track.
     /// </summary>
     [HttpGet("tracks/{slug}/links")]
-    [ResponseCache(Duration = 600, VaryByQueryKeys = ["slug"])]
     public async Task<IActionResult> GetTrackLinks(
         string slug,
         CancellationToken cancellationToken = default)

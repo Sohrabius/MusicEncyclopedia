@@ -507,6 +507,17 @@ public sealed class MediaController : AdminBaseController
             return RedirectToAction(nameof(Edit), new { id = viewModel.MediaId });
         }
 
+
+        var mediaExists = await _db.Media.AnyAsync(x => x.MediaId == viewModel.MediaId, cancellationToken);
+        var entityExists = await _db.Entities.AnyAsync(
+            x => x.EntityId == viewModel.EntityId && x.EntityTypeId == viewModel.EntityTypeId,
+            cancellationToken);
+        if (!mediaExists || !entityExists)
+        {
+            SetErrorMessage("رسانه یا موجودیت انتخاب‌شده معتبر نیست.");
+            return RedirectToAction(nameof(Edit), new { id = viewModel.MediaId });
+        }
+
         // Check if assignment already exists
         var existingAssignment = await _db.MediaAssignments
             .FirstOrDefaultAsync(ma =>
@@ -589,10 +600,7 @@ public sealed class MediaController : AdminBaseController
         _db.MediaAssignments.Remove(assignment);
         await _db.SaveChangesAsync(cancellationToken);
 
-        if (assignment is not null)
-        {
-            await InvalidateEntityCacheAsync(assignment.EntityTypeId, assignment.EntityId, "Updated");
-        }
+        await InvalidateEntityCacheAsync(assignment.EntityTypeId, assignment.EntityId, "Updated");
         await InvalidateEntityCacheAsync("Media", mediaId, "Updated");
         await InvalidateBroadCacheAsync();
 

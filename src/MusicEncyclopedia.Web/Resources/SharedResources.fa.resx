@@ -192,13 +192,73 @@
   <data name="Home.AboutArtists" xml:space="preserve">
     <value>هنرمندان</value>
   </data>
-  <data name="Home.AboutCta" xml:space="preserve">
-    <value>بیشتر بدانید</value>
-  </data>
   <data name="Home.MetaDescription" xml:space="preserve">
     <value>دایرةالمعارف کامل موسیقی را کاوش کنید — آلبوم‌ها، ترانه‌ها، هنرمندان، متن ترانه‌ها و بیشتر.</value>
   </data>
   <data name="Track" xml:space="preserve">
     <value>ترانه</value>
+  </data>
+  <data name="Pagination" xml:space="preserve">
+    <value>صفحه‌بندی</value>
+  </data>
+  <data name="Pagination.Previous" xml:space="preserve">
+    <value>صفحهٔ قبلی</value>
+  </data>
+  <data name="Pagination.Next" xml:space="preserve">
+    <value>صفحهٔ بعدی</value>
+  </data>
+  <data name="Home.Loading" xml:space="preserve">
+    <value>در حال بارگذاری…</value>
+  </data>
+  <data name="Home.LoadedMore" xml:space="preserve">
+    <value>{0} آلبوم افزوده شد. نمایش {1} از {2}.</value>
+  </data>
+  <data name="Home.LoadFailed" xml:space="preserve">
+    <value>بارگذاری آلبوم‌ها انجام نشد. دوباره تلاش کنید.</value>
+  </data>
+  <data name="Home.PoemUpdated" xml:space="preserve">
+    <value>شعر دیگری نمایش داده شد.</value>
+  </data>
+  <data name="Home.PoemUnavailable" xml:space="preserve">
+    <value>در حال حاضر شعری برای نمایش وجود ندارد.</value>
+  </data>
+  <data name="Home.PoemLoadFailed" xml:space="preserve">
+    <value>بارگذاری شعر انجام نشد. دوباره تلاش کنید.</value>
+  </data>
+  <data name="All" xml:space="preserve">
+    <value>همه</value>
+  </data>
+  <data name="Album" xml:space="preserve">
+    <value>آلبوم</value>
+  </data>
+  <data name="AlbumCategory.Studio" xml:space="preserve">
+    <value>استودیویی</value>
+  </data>
+  <data name="AlbumCategory.Live" xml:space="preserve">
+    <value>اجرای زنده</value>
+  </data>
+  <data name="AlbumCategory.Compilation" xml:space="preserve">
+    <value>گزیده</value>
+  </data>
+  <data name="AlbumCategory.EP" xml:space="preserve">
+    <value>چندآهنگه</value>
+  </data>
+  <data name="AlbumCategory.Single" xml:space="preserve">
+    <value>تک‌آهنگ</value>
+  </data>
+  <data name="AlbumCategory.BoxSet" xml:space="preserve">
+    <value>مجموعه جعبه‌ای</value>
+  </data>
+  <data name="AlbumCategory.Soundtrack" xml:space="preserve">
+    <value>موسیقی متن</value>
+  </data>
+  <data name="AlbumCategory.Demo" xml:space="preserve">
+    <value>نسخهٔ آزمایشی</value>
+  </data>
+  <data name="AlbumCategory.Mixtape" xml:space="preserve">
+    <value>میکس‌تیپ</value>
+  </data>
+  <data name="AlbumCategory.Remix" xml:space="preserve">
+    <value>ریمیکس</value>
   </data>
 </root>
