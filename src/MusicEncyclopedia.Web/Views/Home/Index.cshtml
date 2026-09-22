@@ -26,49 +26,34 @@
 <meta property="og:url" content="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.PathBase}{Context.Request.Path}")" />
 <meta property="og:type" content="website" />
 
-<!-- Banner · search-first -->
-<section class="home-banner">
-    <div class="home-banner__inner">
-        <p class="home-banner__eyebrow">@L["Home.Eyebrow"]</p>
-        <h1 class="home-banner__title">@ViewData["Title"]</h1>
-        <p class="home-banner__subtitle">@L["Home.Tagline"]</p>
+<!-- Banner · fixed image, then minimal title and search -->
+<section class="home-hero" aria-labelledby="home-title">
+    <div class="home-hero__media" aria-hidden="true">
+        <img src="~/images/home/music-archive-banner.svg" alt="" width="1920" height="520" fetchpriority="high" />
+    </div>
+    <div class="home-hero__content">
+        <h1 id="home-title" class="home-hero__title">@ViewData["Title"]</h1>
 
-        <form action="/@culture/search" method="get" class="search" role="search">
+        <form action="/@culture/search" method="get" class="search home-hero__search" role="search">
             <div class="relative">
-                <svg class="search__icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="search__icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
-                <input type="search"
+                <label class="sr-only" for="home-search">@L["Nav.Search"]</label>
+                <input id="home-search"
+                       type="search"
                        name="q"
                        class="search__input"
                        placeholder="@L["Home.SearchPlaceholder"]"
                        aria-label="@L["Nav.Search"]" />
             </div>
         </form>
-
-        @if (Model.Genres.Count > 0 || Model.Moods.Count > 0 || Model.Instruments.Count > 0)
-        {
-            <div class="hero__hints">
-                @foreach (var genre in Model.Genres.Take(4))
-                {
-                    <a href="/@culture/genres/@genre.Slug" class="tag">@genre.Name</a>
-                }
-                @foreach (var mood in Model.Moods.Take(3))
-                {
-                    <a href="/@culture/moods/@mood.Slug" class="tag">@mood.Name</a>
-                }
-                @foreach (var instrument in Model.Instruments.Take(3))
-                {
-                    <a href="/@culture/instruments/@instrument.Slug" class="tag">@instrument.Name</a>
-                }
-            </div>
-        }
     </div>
 </section>
 
 <!-- Catalog + Sidebar -->
-<section class="section" style="padding-top: 0;">
+<section class="section home-catalog">
     <div class="section__inner">
         <div class="home-layout">
 

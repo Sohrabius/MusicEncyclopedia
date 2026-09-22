@@ -1,7 +1,7 @@
 /* ============================================================
    Music Encyclopedia · site.css
-   Hallmark: minimal-flat · Encyclopedia · link-blue theme
-   Design plan: UI_REDESIGN_PLAN.md (v2)
+   Hallmark: Lapis Archive · paper, ink, and cover-led discovery
+   Design plan: LAPIS_ARCHIVE_REDESIGN_PLAN.md
    Fonts live in fonts.css (Vazirmatn for fa/ar RTL, Inter for en/fr).
    ============================================================ */
 
@@ -10,34 +10,48 @@
    ============================================================ */
 :root {
   /* Surfaces */
-  --color-paper:         #F8FAFC;   /* page background */
-  --color-paper-2:       #F1F5F9;   /* subtle background */
+  --color-paper:         #F4F6F5;   /* page background */
+  --color-paper-2:       #E9EDF0;   /* subtle background */
   --color-surface:       #FFFFFF;   /* cards, panels */
   --color-surface-raised: #FFFFFF;  /* elevated surface */
 
   /* Ink & text */
-  --color-ink:           #1E293B;   /* primary text */
-  --color-ink-2:         #475569;   /* secondary text */
-  --color-ink-3:         #64748B;   /* tertiary / citation text */
+  --color-ink:           #17212F;   /* primary text */
+  --color-ink-2:         #3E5065;   /* secondary text */
+  --color-ink-3:         #5B6A7D;   /* tertiary / citation text */
+  --color-ink-disabled:  #8996A5;   /* decorative icons and disabled labels */
 
   /* Rules & borders */
-  --color-rule:          #E2E8F0;   /* borders */
-  --color-rule-light:    #EDF1F5;   /* subtle borders */
+  --color-rule:          #D5DCE3;   /* borders */
+  --color-rule-light:    #E3E8EC;   /* subtle borders */
+  --color-rule-strong:   #B9C4CE;   /* inputs and emphasized dividers */
 
   /* Accent — link blue */
-  --color-accent:        #2563EB;
-  --color-accent-hover:  #1D4ED8;
+  --color-accent:        #174A85;
+  --color-accent-hover:  #12345F;
   --color-accent-ink:    #FFFFFF;
-  --color-accent-soft:   #EFF6FF;   /* tinted backgrounds (badges, icons) */
+  --color-accent-soft:   #E8F0F7;   /* tinted backgrounds (badges, icons) */
+  --color-accent-border: #B9CDE1;
+
+  /* Lapis Archive accents */
+  --color-lapis-deep:     #12345F;
+  --color-teal:           #176B70;
+  --color-teal-soft:      #E7F1F2;
+  --color-amber:          #C77718;
+  --color-amber-soft:     #FFF2DE;
 
   /* Semantic */
-  --color-success:       #16A34A;  --color-success-soft: #F0FDF4;
-  --color-warning:       #D97706;  --color-warning-soft: #FFFBEB;
-  --color-error:         #DC2626;  --color-error-soft:   #FEF2F2;
-  --color-info:          #2563EB;  --color-info-soft:    #EFF6FF;
+  --color-success:       #15803D;  --color-success-hover: #166534;
+  --color-success-soft:  #F0FDF4;  --color-success-border: #BBF7D0;
+  --color-warning:       #B45309;  --color-warning-hover: #92400E;
+  --color-warning-soft:  #FFFBEB;  --color-warning-border: #FDE68A;
+  --color-error:         #DC2626;  --color-error-hover: #B91C1C;
+  --color-error-soft:    #FEF2F2;  --color-error-border: #FECACA;
+  --color-info:          #176B70;  --color-info-hover: #105256;
+  --color-info-soft:     #E7F1F2;  --color-info-border: #B9D9DB;
 
   /* Focus */
-  --color-focus:         #2563EB;
+  --color-focus:         #C77718;
 
   /* Fonts — set per direction in fonts.css */
   --font-display: var(--font-body-ltr);
@@ -81,8 +95,8 @@
   --radius-pill: 9999px;
 
   /* Shadows */
-  --shadow-card: 0 1px 2px rgb(15 23 42 / 0.04);
-  --shadow-pop:  0 8px 24px rgb(15 23 42 / 0.08);
+  --shadow-card: 0 1px 2px rgb(23 33 47 / 0.05);
+  --shadow-pop:  0 8px 24px rgb(23 33 47 / 0.1);
 
   /* Z-index */
   --z-base:     1;
@@ -133,6 +147,85 @@ html[dir="rtl"] {
    Components
    ============================================================ */
 @layer components {
+  /* --- Keyboard navigation --- */
+  .skip-link {
+    position: fixed;
+    inset-block-start: var(--space-xs);
+    inset-inline-start: var(--space-xs);
+    z-index: calc(var(--z-sticky) + 10);
+    padding: var(--space-xs) var(--space-md);
+    color: var(--color-accent-ink);
+    background: var(--color-accent);
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    text-decoration: none;
+    transform: translateY(-150%);
+    transition: transform var(--dur-micro) var(--ease-out);
+  }
+
+  .skip-link:focus-visible {
+    transform: translateY(0);
+  }
+
+  :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+    outline: 3px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+
+  /* --- Forms and validation --- */
+  .form-label {
+    display: block;
+    margin-bottom: var(--space-2xs);
+    color: var(--color-ink-2);
+    font-size: var(--text-sm);
+    font-weight: 500;
+  }
+
+  .form-control {
+    width: 100%;
+    min-height: 44px;
+    padding: var(--space-xs) var(--space-sm);
+    color: var(--color-ink);
+    background: var(--color-surface);
+    border: 1px solid var(--color-rule-strong);
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: var(--text-sm);
+    transition: border-color var(--dur-micro) var(--ease-out),
+                box-shadow var(--dur-micro) var(--ease-out);
+  }
+
+  textarea.form-control { min-height: 7rem; }
+
+  .form-control:focus {
+    border-color: var(--color-focus);
+    box-shadow: 0 0 0 3px rgb(37 99 235 / 0.15);
+    outline: none;
+  }
+
+  .form-control:disabled,
+  .form-control[readonly] {
+    color: var(--color-ink-3);
+    background: var(--color-paper-2);
+    cursor: not-allowed;
+  }
+
+  .field-error {
+    display: block;
+    margin-top: var(--space-2xs);
+    color: var(--color-error);
+    font-size: var(--text-xs);
+  }
+
+  .ui-state {
+    padding: var(--space-xl) var(--space-md);
+    text-align: center;
+    color: var(--color-ink-3);
+  }
+
+  .ui-state--error { color: var(--color-error); }
+  .ui-state--loading { cursor: progress; }
+
   /* --- Nav: sticky top bar (replaces N5 floating pill) --- */
   .nav {
     position: sticky;
@@ -315,15 +408,6 @@ html[dir="rtl"] {
     max-width: 52ch;
     margin: 0 0 var(--space-xl);
     line-height: 1.6;
-  }
-
-  /* --- Hero hint chips --- */
-  .hero__hints {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-xs);
-    margin-top: var(--space-md);
-    max-width: 560px;
   }
 
   /* --- Search --- */
@@ -1125,10 +1209,10 @@ html[dir="rtl"] {
     margin: 0;
   }
 
-  .alert--success { background: var(--color-success-soft); border-color: #BBF7D0; color: #166534; }
-  .alert--error   { background: var(--color-error-soft);   border-color: #FECACA; color: #991B1B; }
-  .alert--warning { background: var(--color-warning-soft); border-color: #FDE68A; color: #92400E; }
-  .alert--info    { background: var(--color-info-soft);    border-color: #BFDBFE; color: #1E40AF; }
+  .alert--success { background: var(--color-success-soft); border-color: var(--color-success-border); color: var(--color-success-hover); }
+  .alert--error   { background: var(--color-error-soft);   border-color: var(--color-error-border); color: var(--color-error-hover); }
+  .alert--warning { background: var(--color-warning-soft); border-color: var(--color-warning-border); color: var(--color-warning-hover); }
+  .alert--info    { background: var(--color-info-soft);    border-color: var(--color-info-border); color: var(--color-info-hover); }
 
   /* --- Empty State --- */
   .empty {
@@ -1328,7 +1412,7 @@ html[dir="rtl"] {
 }
 
 /* ============================================================
-   Home page (HOME_REDESIGN_PLAN.md) — album-first landing
+   Home page — album-first landing
    ============================================================ */
 
   /* --- Utilities used by home views --- */
@@ -1338,48 +1422,6 @@ html[dir="rtl"] {
 
   .mt-2 {
     margin-top: var(--space-sm);
-  }
-
-  /* --- Banner (search-first) --- */
-  .home-banner {
-    padding: var(--space-3xl) var(--space-lg) var(--space-2xl);
-    background:
-      radial-gradient(900px 380px at 85% -20%, rgb(37 99 235 / 0.09), transparent 60%),
-      var(--color-paper);
-    border-bottom: 1px solid var(--color-rule-light);
-  }
-
-  .home-banner__inner {
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-
-  .home-banner__eyebrow {
-    font-size: var(--text-xs);
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--color-accent);
-    margin: 0 0 var(--space-sm);
-  }
-
-  .home-banner__title {
-    font-family: var(--font-display);
-    font-size: var(--text-display);
-    font-weight: 700;
-    line-height: 1.12;
-    letter-spacing: -0.02em;
-    color: var(--color-ink);
-    margin: 0 0 var(--space-md);
-    max-width: 18ch;
-  }
-
-  .home-banner__subtitle {
-    font-size: var(--text-md);
-    color: var(--color-ink-2);
-    max-width: 52ch;
-    margin: 0 0 var(--space-xl);
-    line-height: 1.6;
   }
 
   /* --- Catalog + sidebar layout --- */
@@ -1677,14 +1719,6 @@ html[dir="rtl"] {
     }
   }
 
-/* These controls sit outside the legacy Tailwind component layer so the
-   runtime preflight cannot collapse their padding and touch targets. */
-.home-banner .search__input {
-  min-height: 48px;
-  padding: var(--space-sm) var(--space-lg);
-  padding-inline-start: 2.75rem;
-}
-
 @media (max-width: 768px) {
   .nav__toggle {
     width: 44px;
@@ -1696,13 +1730,173 @@ html[dir="rtl"] {
 }
 
 /* ============================================================
+   Lapis Archive reference treatment
+   ============================================================ */
+.nav {
+  background: rgb(244 246 245 / 0.94);
+  border-bottom-color: var(--color-rule);
+}
+
+.nav__brand svg,
+.nav__link:hover,
+.nav__search:hover,
+.section__more,
+.breadcrumb a:hover,
+.footer__links a:hover {
+  color: var(--color-accent);
+}
+
+.nav__link.active {
+  color: var(--color-lapis-deep);
+  background: var(--color-accent-soft);
+}
+
+.nav__search,
+.nav__lang-select {
+  background: var(--color-surface);
+}
+
+.home-hero {
+  background: var(--color-paper);
+  border-bottom: 1px solid var(--color-rule);
+}
+
+.home-hero__media {
+  height: clamp(220px, 34vw, 520px);
+  overflow: hidden;
+  background: var(--color-lapis-deep);
+}
+
+.home-hero__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.home-hero__content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-2xl) var(--space-lg) var(--space-3xl);
+}
+
+.home-hero__title {
+  max-width: none;
+  margin: 0 0 var(--space-lg);
+  color: var(--color-ink);
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.home-hero__search {
+  max-width: 680px;
+}
+
+.home-hero__search .search__input {
+  min-height: 52px;
+  border-color: var(--color-rule-strong);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 4px 16px rgb(23 33 47 / 0.06);
+}
+
+.home-hero__search .search__input:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgb(23 74 133 / 0.16), 0 4px 16px rgb(23 33 47 / 0.06);
+}
+
+.home-catalog {
+  padding-top: var(--space-2xl);
+}
+
+.home-catalog .section__title,
+.section__title,
+.detail-section__title {
+  color: var(--color-ink);
+}
+
+.card--album {
+  padding: var(--space-xs);
+  background: var(--color-surface);
+  border: 1px solid var(--color-rule-light);
+  border-radius: var(--radius-sm);
+}
+
+.card--album:hover {
+  border-color: var(--color-accent-border);
+  box-shadow: var(--shadow-card);
+}
+
+.card--album .card__image {
+  border: 0;
+  border-radius: 3px;
+}
+
+.card--album .card__body {
+  padding: var(--space-sm) var(--space-2xs) var(--space-xs);
+}
+
+.card--album .card__badge {
+  top: var(--space-sm);
+  inset-inline-start: var(--space-sm);
+  background: var(--color-amber);
+}
+
+.chip--active,
+.btn--accent,
+.pagination .active {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.home-poem {
+  background: var(--color-surface);
+  border-color: var(--color-rule);
+  border-inline-start: 3px solid var(--color-teal);
+  border-radius: var(--radius-sm);
+}
+
+.home-poem__icon,
+.home-poem__links a,
+.home-poem__verse:hover {
+  color: var(--color-teal);
+}
+
+.home-about {
+  border-color: var(--color-rule);
+  border-radius: var(--radius-sm);
+}
+
+.home-about__stat-value {
+  color: var(--color-accent);
+}
+
+@media (max-width: 768px) {
+  .home-hero__content {
+    padding: var(--space-xl) var(--space-md) var(--space-2xl);
+  }
+
+  .home-hero__title {
+    margin-bottom: var(--space-md);
+    font-size: clamp(1.75rem, 8vw, 2.5rem);
+  }
+}
+
+/* ============================================================
    Reduced Motion
    ============================================================ */
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+
   *, *::before, *::after {
-    animation-duration: 150ms !important;
+    animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 150ms !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
   }
 }
 

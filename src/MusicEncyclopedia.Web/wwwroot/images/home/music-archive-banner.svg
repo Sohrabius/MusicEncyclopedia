@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 520" role="img" aria-labelledby="title desc">
+  <title id="title">Music archive banner</title>
+  <desc id="desc">A deep lapis archival composition with a record and fine sound-wave lines.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#12345f"/>
+      <stop offset="0.62" stop-color="#174a85"/>
+      <stop offset="1" stop-color="#176b70"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.78" cy="0.35" r="0.7">
+      <stop offset="0" stop-color="#c77718" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#c77718" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grain" width="34" height="34" patternUnits="userSpaceOnUse">
+      <circle cx="5" cy="8" r="1" fill="#fff" opacity="0.08"/>
+      <circle cx="23" cy="26" r="1" fill="#fff" opacity="0.06"/>
+    </pattern>
+  </defs>
+  <rect width="1920" height="520" fill="url(#bg)"/>
+  <rect width="1920" height="520" fill="url(#glow)"/>
+  <rect width="1920" height="520" fill="url(#grain)"/>
+  <g fill="none" stroke="#fff" opacity="0.18">
+    <circle cx="1510" cy="244" r="230" stroke-width="2"/>
+    <circle cx="1510" cy="244" r="188" stroke-width="1"/>
+    <circle cx="1510" cy="244" r="142" stroke-width="1"/>
+  </g>
+  <g fill="none" stroke="#e9edf0" stroke-linecap="round" opacity="0.3">
+    <path d="M90 356c90-78 130 78 220 0s130 78 220 0 130 78 220 0 130 78 220 0" stroke-width="4"/>
+    <path d="M90 390c90-78 130 78 220 0s130 78 220 0 130 78 220 0 130 78 220 0" stroke-width="2"/>
+  </g>
+  <g transform="translate(1510 244)">
+    <circle r="98" fill="#17212f" opacity="0.88"/>
+    <circle r="72" fill="none" stroke="#c77718" stroke-width="11"/>
+    <circle r="24" fill="#c77718"/>
+    <circle r="8" fill="#17212f"/>
+  </g>
+</svg>
