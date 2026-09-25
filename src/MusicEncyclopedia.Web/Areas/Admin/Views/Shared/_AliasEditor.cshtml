@@ -5,27 +5,27 @@
 
 <div class="alias-editor" data-entity-type-id="@Model.EntityTypeId" data-entity-id="@Model.EntityId">
     <div class="flex items-center justify-between mb-3">
-        <h3 class="text-sm font-semibold text-gray-700">نام‌های مستعار</h3>
-        <button type="button" class="btn-add-alias px-3 py-1.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-            <i class="fas fa-plus"></i> افزودن Alias
+        <h3 class="text-sm font-semibold text-ink-secondary">نام‌های مستعار</h3>
+        <button type="button" class="btn-add-alias px-3 py-1.5 text-xs bg-accent text-on-accent rounded-md hover:bg-accent-hover transition-colors">
+            <i aria-hidden="true" class="fas fa-plus"></i> افزودن Alias
         </button>
     </div>
 
     <div class="overflow-x-auto">
         <table class="w-full text-sm">
-            <thead class="bg-gray-50 border-b border-gray-200">
+            <thead class="bg-paper border-b border-rule">
                 <tr>
-                    <th class="text-start px-3 py-2 font-medium text-gray-600">نام مستعار</th>
-                    <th class="text-start px-3 py-2 font-medium text-gray-600">نوع</th>
-                    <th class="text-start px-3 py-2 font-medium text-gray-600">زبان</th>
-                    <th class="text-center px-3 py-2 font-medium text-gray-600">اصلی</th>
-                    <th class="text-end px-3 py-2 font-medium text-gray-600">عملیات</th>
+                    <th class="text-start px-3 py-2 font-medium text-ink-secondary">نام مستعار</th>
+                    <th class="text-start px-3 py-2 font-medium text-ink-secondary">نوع</th>
+                    <th class="text-start px-3 py-2 font-medium text-ink-secondary">زبان</th>
+                    <th class="text-center px-3 py-2 font-medium text-ink-secondary">اصلی</th>
+                    <th class="text-end px-3 py-2 font-medium text-ink-secondary">عملیات</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100">
+            <tbody class="divide-y divide-rule-light">
                 @if (Model.Aliases.Count == 0)
                 {
-                    <tr class="empty-row"><td colspan="5" class="px-3 py-6 text-center text-gray-500 text-xs">هنوز نام مستعاری وجود ندارد.</td></tr>
+                    <tr class="empty-row"><td colspan="5" class="ui-state ui-state--empty text-xs">هنوز نام مستعاری وجود ندارد.</td></tr>
                 }
                 else
                 {
@@ -35,9 +35,9 @@
                             <td class="px-3 py-2">@alias.AliasName</td>
                             <td class="px-3 py-2">@alias.AliasTypeId</td>
                             <td class="px-3 py-2">@alias.LanguageId</td>
-                            <td class="px-3 py-2 text-center">@if(alias.IsPrimary){<i class="fas fa-check text-green-500"></i>}</td>
+                            <td class="px-3 py-2 text-center">@if(alias.IsPrimary){<i aria-hidden="true" class="fas fa-check text-success"></i>}</td>
                             <td class="px-3 py-2 text-end">
-                                <button type="button" class="btn-delete-alias text-red-600 hover:text-red-800 text-xs"><i class="fas fa-trash-alt"></i></button>
+                                <button type="button" class="btn-delete-alias text-error hover:text-error-hover text-xs min-w-11 min-h-11 inline-flex items-center justify-center" aria-label="حذف"><i aria-hidden="true" class="fas fa-trash-alt"></i></button>
                             </td>
                         </tr>
                     }
@@ -46,23 +46,23 @@
         </table>
     </div>
 
-    <div class="alias-form hidden mt-3 p-3 bg-gray-50 rounded-md border border-gray-200">
+    <div class="alias-form hidden mt-3 p-3 bg-paper rounded-md border border-rule">
         <input type="hidden" class="alias-id" value="0" />
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
             <div class="md:col-span-2">
-                <label class="block text-xs font-medium text-gray-600 mb-1">نام مستعار</label>
-                <input type="text" class="alias-name w-full text-xs px-2 py-1.5 border border-gray-300 rounded" />
+                <label class="block text-xs font-medium text-ink-secondary mb-1">نام مستعار</label>
+                <input type="text" class="alias-name w-full text-xs px-2 py-1.5 border border-rule-strong rounded" />
             </div>
             <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">نوع</label>
-                <select class="alias-type-id w-full text-xs px-2 py-1.5 border border-gray-300 rounded">
+                <label class="block text-xs font-medium text-ink-secondary mb-1">نوع</label>
+                <select class="alias-type-id w-full text-xs px-2 py-1.5 border border-rule-strong rounded">
                     <option value="">-- انتخاب --</option>
                     @foreach (var at in Model.AliasTypes) { <option value="@at.AliasTypeId">@at.Name</option> }
                 </select>
             </div>
             <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">زبان</label>
-                <select class="language-id w-full text-xs px-2 py-1.5 border border-gray-300 rounded">
+                <label class="block text-xs font-medium text-ink-secondary mb-1">زبان</label>
+                <select class="language-id w-full text-xs px-2 py-1.5 border border-rule-strong rounded">
                     <option value="">-- انتخاب --</option>
                     @foreach (var lang in Model.Languages) { <option value="@lang.LanguageId">@lang.Name</option> }
                 </select>
@@ -70,13 +70,13 @@
         </div>
         <div class="flex items-center gap-4 mt-3">
             <label class="inline-flex items-center gap-1 cursor-pointer">
-                <input type="checkbox" class="is-primary-alias rounded border-gray-300 text-blue-600" />
-                <span class="text-xs text-gray-600">اصلی</span>
+                <input type="checkbox" class="is-primary-alias rounded border-rule-strong text-accent" />
+                <span class="text-xs text-ink-secondary">اصلی</span>
             </label>
         </div>
         <div class="flex items-center gap-2 mt-3">
-            <button type="button" class="btn-save-alias px-3 py-1.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700">ذخیره</button>
-            <button type="button" class="btn-cancel-alias px-3 py-1.5 text-xs text-gray-600 bg-gray-200 rounded-md hover:bg-gray-300">انصراف</button>
+            <button type="button" class="btn-save-alias px-3 py-1.5 text-xs bg-accent text-on-accent rounded-md hover:bg-accent-hover">ذخیره</button>
+            <button type="button" class="btn-cancel-alias px-3 py-1.5 text-xs text-ink-secondary bg-rule rounded-md hover:bg-rule-strong">انصراف</button>
         </div>
     </div>
 </div>

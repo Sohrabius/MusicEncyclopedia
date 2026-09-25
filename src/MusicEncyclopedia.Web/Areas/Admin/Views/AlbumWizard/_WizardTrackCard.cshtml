@@ -3,76 +3,76 @@
     var trackIndex = (int)ViewData["TrackIndex"]!;
     var shared = (AlbumWizardViewModel)ViewData["Shared"]!;
     string P(string field) => $"Tracks[{trackIndex}].{field}";
-    string rowClasses = "w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500";
+    string rowClasses = "form-control";
 }
 
-<div class="track-card bg-white rounded-lg shadow-sm border border-gray-200 p-5" data-idx="@trackIndex">
+<div class="track-card bg-surface rounded-lg shadow-sm border border-rule p-5" data-idx="@trackIndex">
     <div class="flex items-center justify-between mb-4">
-        <h3 class="text-base font-semibold text-gray-900">
-            <i class="fas fa-music text-blue-500 me-2"></i>ترک <span class="track-no-label">@(trackIndex + 1)</span>
+        <h3 class="text-base font-semibold text-ink">
+            <i aria-hidden="true" class="fas fa-music text-accent me-2"></i>ترک <span class="track-no-label">@(trackIndex + 1)</span>
         </h3>
-        <button type="button" class="remove-track px-3 py-1.5 text-xs text-red-600 border border-red-200 rounded-md hover:bg-red-50 transition-colors">
-            <i class="fas fa-trash-alt me-1"></i>حذف ترک
+        <button type="button" class="remove-track px-3 py-1.5 text-xs text-error border border-error-border rounded-md hover:bg-error-soft transition-colors">
+            <i aria-hidden="true" class="fas fa-trash-alt me-1"></i>حذف ترک
         </button>
     </div>
 
     <!-- Track basics -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="md:col-span-2">
-            <label class="block text-sm font-medium text-gray-700 mb-1">عنوان *</label>
+            <label class="form-label">عنوان *</label>
             <input type="text" name="@P("Title")" value="@Model.Title"
                    data-val="true" data-val-required="عنوان ترک الزامی است."
                    data-track-title class="@rowClasses" />
-            <span class="text-xs text-red-600" data-valmsg-for="@P("Title")" data-valmsg-replace="true"></span>
+            <span class="text-xs text-error" data-valmsg-for="@P("Title")" data-valmsg-replace="true"></span>
         </div>
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Slug</label>
+            <label class="form-label">Slug</label>
             <input type="text" name="@P("Slug")" value="@Model.Slug" data-track-slug class="@rowClasses" />
         </div>
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">عنوان مرتب‌سازی</label>
+            <label class="form-label">عنوان مرتب‌سازی</label>
             <input type="text" name="@P("TitleSort")" value="@Model.TitleSort" class="@rowClasses" />
         </div>
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">عنوان اصلی</label>
+            <label class="form-label">عنوان اصلی</label>
             <input type="text" name="@P("OriginalTitle")" value="@Model.OriginalTitle" class="@rowClasses" />
         </div>
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">عنوان انگلیسی</label>
+            <label class="form-label">عنوان انگلیسی</label>
             <input type="text" name="@P("EnglishTitle")" value="@Model.EnglishTitle" class="@rowClasses" />
         </div>
     </div>
 
     <!-- Album-track row -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 border-t border-gray-100 pt-4">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 border-t border-rule-light pt-4">
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">دیسک</label>
+            <label class="form-label">دیسک</label>
             <input type="number" name="@P("DiscNumber")" value="@(Model.DiscNumber > 0 ? Model.DiscNumber : 1)" data-track-disc class="@rowClasses" />
         </div>
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">شماره</label>
+            <label class="form-label">شماره</label>
             <input type="number" name="@P("TrackNumber")" value="@Model.TrackNumber" data-track-no class="@rowClasses" />
         </div>
         <div class="flex items-end gap-4 pb-1">
             <label class="inline-flex items-center gap-1 cursor-pointer">
-                <input type="checkbox" name="@P("IsBonus")" value="true" @(Model.IsBonus ? "checked" : "") class="rounded border-gray-300 text-blue-600" />
-                <span class="text-xs text-gray-700">آهنگ جایزه</span>
+                <input type="checkbox" name="@P("IsBonus")" value="true" @(Model.IsBonus ? "checked" : "") class="rounded border-rule-strong text-accent" />
+                <span class="text-xs text-ink-secondary">آهنگ جایزه</span>
             </label>
             <label class="inline-flex items-center gap-1 cursor-pointer">
-                <input type="checkbox" name="@P("IsHidden")" value="true" @(Model.IsHidden ? "checked" : "") class="rounded border-gray-300 text-blue-600" />
-                <span class="text-xs text-gray-700">مخفی</span>
+                <input type="checkbox" name="@P("IsHidden")" value="true" @(Model.IsHidden ? "checked" : "") class="rounded border-rule-strong text-accent" />
+                <span class="text-xs text-ink-secondary">مخفی</span>
             </label>
         </div>
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">مدت (ثانیه)</label>
+            <label class="form-label">مدت (ثانیه)</label>
             <input type="number" name="@P("DurationSeconds")" value="@Model.DurationSeconds" class="@rowClasses" />
         </div>
     </div>
 
     <!-- Music details -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 border-t border-gray-100 pt-4">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 border-t border-rule-light pt-4">
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">در دسترس بودن متن</label>
+            <label class="form-label">در دسترس بودن متن</label>
             <select name="@P("LyricsAvailabilityTypeId")" class="@rowClasses">
                 <option value="">-- انتخاب --</option>
                 @foreach (var item in shared.LyricsAvailabilityTypeOptions)
@@ -82,7 +82,7 @@
             </select>
         </div>
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">سبک آواز</label>
+            <label class="form-label">سبک آواز</label>
             <select name="@P("VocalStyleId")" class="@rowClasses">
                 <option value="">-- انتخاب --</option>
                 @foreach (var item in shared.VocalStyleOptions)
@@ -92,7 +92,7 @@
             </select>
         </div>
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">گام موسیقی</label>
+            <label class="form-label">گام موسیقی</label>
             <select name="@P("MusicalKeyId")" class="@rowClasses">
                 <option value="">-- انتخاب --</option>
                 @foreach (var item in shared.MusicalKeyOptions)
@@ -102,19 +102,19 @@
             </select>
         </div>
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">BPM</label>
+            <label class="form-label">BPM</label>
             <input type="number" name="@P("BPM")" value="@Model.BPM" class="@rowClasses" />
         </div>
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">ISRC</label>
+            <label class="form-label">ISRC</label>
             <input type="text" name="@P("ISRC")" value="@Model.ISRC" class="@rowClasses" />
         </div>
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">تاریخ انتشار</label>
+            <label class="form-label">تاریخ انتشار</label>
             <input type="date" name="@P("ReleaseDate")" value="@Model.ReleaseDate?.ToString("yyyy-MM-dd")" class="@rowClasses" />
         </div>
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">دقت تاریخ انتشار</label>
+            <label class="form-label">دقت تاریخ انتشار</label>
             <select name="@P("ReleaseDatePrecision")" class="@rowClasses">
                 <option value="">-- دقت --</option>
                 <option value="day" selected="@(Model.ReleaseDatePrecision == "day")">روز</option>
@@ -123,15 +123,15 @@
             </select>
         </div>
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">تاریخ شروع ضبط</label>
+            <label class="form-label">تاریخ شروع ضبط</label>
             <input type="date" name="@P("RecordingStartDate")" value="@Model.RecordingStartDate?.ToString("yyyy-MM-dd")" class="@rowClasses" />
         </div>
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">تاریخ پایان ضبط</label>
+            <label class="form-label">تاریخ پایان ضبط</label>
             <input type="date" name="@P("RecordingEndDate")" value="@Model.RecordingEndDate?.ToString("yyyy-MM-dd")" class="@rowClasses" />
         </div>
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">دقت تاریخ ضبط</label>
+            <label class="form-label">دقت تاریخ ضبط</label>
             <select name="@P("RecordingDatePrecision")" class="@rowClasses">
                 <option value="">-- دقت --</option>
                 <option value="day" selected="@(Model.RecordingDatePrecision == "day")">روز</option>
@@ -141,40 +141,40 @@
         </div>
         <div class="flex items-end gap-4 pb-1">
             <label class="inline-flex items-center gap-1 cursor-pointer">
-                <input type="checkbox" name="@P("IsInstrumental")" value="true" @(Model.IsInstrumental ? "checked" : "") class="rounded border-gray-300 text-blue-600" />
-                <span class="text-xs text-gray-700">بی‌کلام است</span>
+                <input type="checkbox" name="@P("IsInstrumental")" value="true" @(Model.IsInstrumental ? "checked" : "") class="rounded border-rule-strong text-accent" />
+                <span class="text-xs text-ink-secondary">بی‌کلام است</span>
             </label>
             <label class="inline-flex items-center gap-1 cursor-pointer">
-                <input type="checkbox" name="@P("IsExplicit")" value="true" @(Model.IsExplicit ? "checked" : "") class="rounded border-gray-300 text-blue-600" />
-                <span class="text-xs text-gray-700">صریح است</span>
+                <input type="checkbox" name="@P("IsExplicit")" value="true" @(Model.IsExplicit ? "checked" : "") class="rounded border-rule-strong text-accent" />
+                <span class="text-xs text-ink-secondary">صریح است</span>
             </label>
         </div>
     </div>
 
     <!-- Description / copyright -->
-    <div class="mt-4 border-t border-gray-100 pt-4 space-y-4">
+    <div class="mt-4 border-t border-rule-light pt-4 space-y-4">
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">توضیحات</label>
+            <label class="form-label">توضیحات</label>
             <textarea name="@P("Description")" rows="2" class="@rowClasses">@Model.Description</textarea>
         </div>
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">اعلامیه حق نشر</label>
+            <label class="form-label">اعلامیه حق نشر</label>
             <input type="text" name="@P("CopyrightNotice")" value="@Model.CopyrightNotice" class="@rowClasses" />
         </div>
     </div>
 
     <!-- Assigns (multi-select checkboxes) -->
-    <div class="mt-4 border-t border-gray-100 pt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="mt-4 border-t border-rule-light pt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
             <div class="flex items-center justify-between mb-2">
-                <label class="block text-sm font-medium text-gray-700">سبک‌ها</label>
-                <button type="button" class="btn-quick-add text-blue-600 hover:text-blue-800 text-xs" data-qa-target="genre" title="افزودن سبک جدید"><i class="fas fa-plus me-1"></i>جدید</button>
+                <label class="block text-sm font-medium text-ink-secondary">سبک‌ها</label>
+                <button type="button" class="btn-quick-add text-accent hover:text-accent-hover text-xs" data-qa-target="genre" title="افزودن سبک جدید"><i aria-hidden="true" class="fas fa-plus me-1"></i>جدید</button>
             </div>
-            <div class="space-y-1 max-h-40 overflow-y-auto border border-gray-200 rounded-md p-2" data-qa-options="genre">
+            <div class="space-y-1 max-h-40 overflow-y-auto border border-rule rounded-md p-2" data-qa-options="genre">
                 @foreach (var item in shared.GenreOptions)
                 {
-                    <label class="flex items-center gap-2 text-xs text-gray-700 cursor-pointer">
-                        <input type="checkbox" name="@P("GenreIds")" value="@item.GenreId" @(Model.GenreIds.Contains(item.GenreId) ? "checked" : "") class="rounded border-gray-300 text-blue-600" />
+                    <label class="flex items-center gap-2 text-xs text-ink-secondary cursor-pointer">
+                        <input type="checkbox" name="@P("GenreIds")" value="@item.GenreId" @(Model.GenreIds.Contains(item.GenreId) ? "checked" : "") class="rounded border-rule-strong text-accent" />
                         @item.Name
                     </label>
                 }
@@ -182,14 +182,14 @@
         </div>
         <div>
             <div class="flex items-center justify-between mb-2">
-                <label class="block text-sm font-medium text-gray-700">حالت‌ها</label>
-                <button type="button" class="btn-quick-add text-blue-600 hover:text-blue-800 text-xs" data-qa-target="mood" title="افزودن حالت جدید"><i class="fas fa-plus me-1"></i>جدید</button>
+                <label class="block text-sm font-medium text-ink-secondary">حالت‌ها</label>
+                <button type="button" class="btn-quick-add text-accent hover:text-accent-hover text-xs" data-qa-target="mood" title="افزودن حالت جدید"><i aria-hidden="true" class="fas fa-plus me-1"></i>جدید</button>
             </div>
-            <div class="space-y-1 max-h-40 overflow-y-auto border border-gray-200 rounded-md p-2" data-qa-options="mood">
+            <div class="space-y-1 max-h-40 overflow-y-auto border border-rule rounded-md p-2" data-qa-options="mood">
                 @foreach (var item in shared.MoodOptions)
                 {
-                    <label class="flex items-center gap-2 text-xs text-gray-700 cursor-pointer">
-                        <input type="checkbox" name="@P("MoodIds")" value="@item.MoodId" @(Model.MoodIds.Contains(item.MoodId) ? "checked" : "") class="rounded border-gray-300 text-blue-600" />
+                    <label class="flex items-center gap-2 text-xs text-ink-secondary cursor-pointer">
+                        <input type="checkbox" name="@P("MoodIds")" value="@item.MoodId" @(Model.MoodIds.Contains(item.MoodId) ? "checked" : "") class="rounded border-rule-strong text-accent" />
                         @item.Name
                     </label>
                 }
@@ -197,14 +197,14 @@
         </div>
         <div>
             <div class="flex items-center justify-between mb-2">
-                <label class="block text-sm font-medium text-gray-700">سازها</label>
-                <button type="button" class="btn-quick-add text-blue-600 hover:text-blue-800 text-xs" data-qa-target="instrument" title="افزودن ساز جدید"><i class="fas fa-plus me-1"></i>جدید</button>
+                <label class="block text-sm font-medium text-ink-secondary">سازها</label>
+                <button type="button" class="btn-quick-add text-accent hover:text-accent-hover text-xs" data-qa-target="instrument" title="افزودن ساز جدید"><i aria-hidden="true" class="fas fa-plus me-1"></i>جدید</button>
             </div>
-            <div class="space-y-1 max-h-40 overflow-y-auto border border-gray-200 rounded-md p-2" data-qa-options="instrument">
+            <div class="space-y-1 max-h-40 overflow-y-auto border border-rule rounded-md p-2" data-qa-options="instrument">
                 @foreach (var item in shared.InstrumentOptions)
                 {
-                    <label class="flex items-center gap-2 text-xs text-gray-700 cursor-pointer">
-                        <input type="checkbox" name="@P("InstrumentIds")" value="@item.InstrumentId" @(Model.InstrumentIds.Contains(item.InstrumentId) ? "checked" : "") class="rounded border-gray-300 text-blue-600" />
+                    <label class="flex items-center gap-2 text-xs text-ink-secondary cursor-pointer">
+                        <input type="checkbox" name="@P("InstrumentIds")" value="@item.InstrumentId" @(Model.InstrumentIds.Contains(item.InstrumentId) ? "checked" : "") class="rounded border-rule-strong text-accent" />
                         @item.Name
                     </label>
                 }
@@ -212,14 +212,14 @@
         </div>
         <div>
             <div class="flex items-center justify-between mb-2">
-                <label class="block text-sm font-medium text-gray-700">نوع نسخه</label>
-                <button type="button" class="btn-quick-add text-blue-600 hover:text-blue-800 text-xs" data-qa-target="trackversiontype" title="افزودن نوع نسخه جدید"><i class="fas fa-plus me-1"></i>جدید</button>
+                <label class="block text-sm font-medium text-ink-secondary">نوع نسخه</label>
+                <button type="button" class="btn-quick-add text-accent hover:text-accent-hover text-xs" data-qa-target="trackversiontype" title="افزودن نوع نسخه جدید"><i aria-hidden="true" class="fas fa-plus me-1"></i>جدید</button>
             </div>
-            <div class="space-y-1 max-h-40 overflow-y-auto border border-gray-200 rounded-md p-2" data-qa-options="trackversiontype">
+            <div class="space-y-1 max-h-40 overflow-y-auto border border-rule rounded-md p-2" data-qa-options="trackversiontype">
                 @foreach (var item in shared.TrackVersionTypeOptions)
                 {
-                    <label class="flex items-center gap-2 text-xs text-gray-700 cursor-pointer">
-                        <input type="checkbox" name="@P("VersionTypeIds")" value="@item.TrackVersionTypeId" @(Model.VersionTypeIds.Contains(item.TrackVersionTypeId) ? "checked" : "") class="rounded border-gray-300 text-blue-600" />
+                    <label class="flex items-center gap-2 text-xs text-ink-secondary cursor-pointer">
+                        <input type="checkbox" name="@P("VersionTypeIds")" value="@item.TrackVersionTypeId" @(Model.VersionTypeIds.Contains(item.TrackVersionTypeId) ? "checked" : "") class="rounded border-rule-strong text-accent" />
                         @item.Name
                     </label>
                 }
@@ -228,11 +228,11 @@
     </div>
 
     <!-- Sung versions -->
-    <div class="mt-4 border-t border-gray-100 pt-4">
+    <div class="mt-4 border-t border-rule-light pt-4">
         <div class="flex items-center justify-between mb-2">
-            <label class="text-sm font-medium text-gray-700">نسخه‌های خوانده‌شده</label>
-            <button type="button" class="btn-add-sv px-3 py-1.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-                <i class="fas fa-plus me-1"></i>افزودن نسخه
+            <label class="text-sm font-medium text-ink-secondary">نسخه‌های خوانده‌شده</label>
+            <button type="button" class="btn-add-sv px-3 py-1.5 text-xs bg-accent text-on-accent rounded-md hover:bg-accent-hover transition-colors">
+                <i aria-hidden="true" class="fas fa-plus me-1"></i>افزودن نسخه
             </button>
         </div>
         <div class="sv-rows space-y-2">
@@ -240,9 +240,9 @@
             {
                 var sv = Model.SungVersions[j];
                 string SP(string field) => $"Tracks[{trackIndex}].SungVersions[{j}].{field}";
-                <div class="sv-row grid grid-cols-1 md:grid-cols-4 gap-3 p-3 bg-gray-50 rounded-md border border-gray-200">
+                <div class="sv-row grid grid-cols-1 md:grid-cols-4 gap-3 p-3 bg-paper rounded-md border border-rule">
                     <div>
-                        <label class="block text-xs font-medium text-gray-600 mb-1">نسخه موجود</label>
+                        <label class="block text-xs font-medium text-ink-secondary mb-1">نسخه موجود</label>
                         <select name="@SP("SungVersionId")" class="@rowClasses">
                             <option value="">-- ایجاد جدید --</option>
                             @foreach (var item in shared.SungVersionOptions)
@@ -252,13 +252,13 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-gray-600 mb-1">عنوان (جدید)</label>
+                        <label class="block text-xs font-medium text-ink-secondary mb-1">عنوان (جدید)</label>
                         <input type="text" name="@SP("Title")" value="@sv.Title" class="@rowClasses" />
                     </div>
                     <div>
                         <div class="flex items-center justify-between mb-1">
-                            <label class="block text-xs font-medium text-gray-600">شعر</label>
-                            <button type="button" class="btn-quick-add text-blue-600 hover:text-blue-800 text-xs" data-qa-target="poem" title="افزودن شعر جدید"><i class="fas fa-plus"></i></button>
+                            <label class="block text-xs font-medium text-ink-secondary">شعر</label>
+                            <button type="button" class="btn-quick-add text-accent hover:text-accent-hover text-xs min-w-11 min-h-11 inline-flex items-center justify-center" data-qa-target="poem" title="افزودن شعر جدید"><i aria-hidden="true" class="fas fa-plus"></i></button>
                         </div>
                         <select name="@SP("PoemId")" data-qa-options="poem" class="@rowClasses">
                             <option value="">-- انتخاب شعر --</option>
@@ -269,7 +269,7 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-gray-600 mb-1">سبک آواز</label>
+                        <label class="block text-xs font-medium text-ink-secondary mb-1">سبک آواز</label>
                         <select name="@SP("VocalStyleId")" class="@rowClasses">
                             <option value="">-- انتخاب --</option>
                             @foreach (var item in shared.VocalStyleOptions)
@@ -279,27 +279,27 @@
                         </select>
                     </div>
                     <div class="md:col-span-2">
-                        <label class="block text-xs font-medium text-gray-600 mb-1">متن</label>
+                        <label class="block text-xs font-medium text-ink-secondary mb-1">متن</label>
                         <textarea name="@SP("Text")" rows="2" class="@rowClasses">@sv.Text</textarea>
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-gray-600 mb-1">یادداشت‌ها</label>
+                        <label class="block text-xs font-medium text-ink-secondary mb-1">یادداشت‌ها</label>
                         <input type="text" name="@SP("Notes")" value="@sv.Notes" class="@rowClasses" />
                     </div>
                     <div class="flex items-end gap-3 pb-1">
                         <label class="inline-flex items-center gap-1 cursor-pointer">
-                            <input type="checkbox" name="@SP("IsCanonical")" value="true" @(sv.IsCanonical ? "checked" : "") class="rounded border-gray-300 text-blue-600" />
-                            <span class="text-xs text-gray-600">نسخه اصلی</span>
+                            <input type="checkbox" name="@SP("IsCanonical")" value="true" @(sv.IsCanonical ? "checked" : "") class="rounded border-rule-strong text-accent" />
+                            <span class="text-xs text-ink-secondary">نسخه اصلی</span>
                         </label>
-                        <button type="button" class="remove-sv text-red-600 hover:text-red-800 text-xs"><i class="fas fa-times me-1"></i>حذف</button>
+                        <button type="button" class="remove-sv text-error hover:text-error-hover text-xs"><i aria-hidden="true" class="fas fa-times me-1"></i>حذف</button>
                     </div>
                 </div>
             }
         </div>
         <template class="tpl-sv">
-            <div class="sv-row grid grid-cols-1 md:grid-cols-4 gap-3 p-3 bg-gray-50 rounded-md border border-gray-200">
+            <div class="sv-row grid grid-cols-1 md:grid-cols-4 gap-3 p-3 bg-paper rounded-md border border-rule">
                 <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">نسخه موجود</label>
+                    <label class="block text-xs font-medium text-ink-secondary mb-1">نسخه موجود</label>
                     <select name="__P__[0].SungVersionId" class="@rowClasses">
                         <option value="">-- ایجاد جدید --</option>
                         @foreach (var item in shared.SungVersionOptions)
@@ -309,13 +309,13 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">عنوان (جدید)</label>
+                    <label class="block text-xs font-medium text-ink-secondary mb-1">عنوان (جدید)</label>
                     <input type="text" name="__P__[0].Title" class="@rowClasses" />
                 </div>
                 <div>
                     <div class="flex items-center justify-between mb-1">
-                        <label class="block text-xs font-medium text-gray-600">شعر</label>
-                        <button type="button" class="btn-quick-add text-blue-600 hover:text-blue-800 text-xs" data-qa-target="poem" title="افزودن شعر جدید"><i class="fas fa-plus"></i></button>
+                        <label class="block text-xs font-medium text-ink-secondary">شعر</label>
+                        <button type="button" class="btn-quick-add text-accent hover:text-accent-hover text-xs min-w-11 min-h-11 inline-flex items-center justify-center" data-qa-target="poem" title="افزودن شعر جدید"><i aria-hidden="true" class="fas fa-plus"></i></button>
                     </div>
                     <select name="__P__[0].PoemId" data-qa-options="poem" class="@rowClasses">
                         <option value="">-- انتخاب شعر --</option>
@@ -326,7 +326,7 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">سبک آواز</label>
+                    <label class="block text-xs font-medium text-ink-secondary mb-1">سبک آواز</label>
                     <select name="__P__[0].VocalStyleId" class="@rowClasses">
                         <option value="">-- انتخاب --</option>
                         @foreach (var item in shared.VocalStyleOptions)
@@ -336,30 +336,30 @@
                     </select>
                 </div>
                 <div class="md:col-span-2">
-                    <label class="block text-xs font-medium text-gray-600 mb-1">متن</label>
+                    <label class="block text-xs font-medium text-ink-secondary mb-1">متن</label>
                     <textarea name="__P__[0].Text" rows="2" class="@rowClasses"></textarea>
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">یادداشت‌ها</label>
+                    <label class="block text-xs font-medium text-ink-secondary mb-1">یادداشت‌ها</label>
                     <input type="text" name="__P__[0].Notes" class="@rowClasses" />
                 </div>
                 <div class="flex items-end gap-3 pb-1">
                     <label class="inline-flex items-center gap-1 cursor-pointer">
-                        <input type="checkbox" name="__P__[0].IsCanonical" value="true" class="rounded border-gray-300 text-blue-600" />
-                        <span class="text-xs text-gray-600">نسخه اصلی</span>
+                        <input type="checkbox" name="__P__[0].IsCanonical" value="true" class="rounded border-rule-strong text-accent" />
+                        <span class="text-xs text-ink-secondary">نسخه اصلی</span>
                     </label>
-                    <button type="button" class="remove-sv text-red-600 hover:text-red-800 text-xs"><i class="fas fa-times me-1"></i>حذف</button>
+                    <button type="button" class="remove-sv text-error hover:text-error-hover text-xs"><i aria-hidden="true" class="fas fa-times me-1"></i>حذف</button>
                 </div>
             </div>
         </template>
     </div>
 
     <!-- Per-track credits -->
-    <div class="mt-4 border-t border-gray-100 pt-4">
+    <div class="mt-4 border-t border-rule-light pt-4">
         <div class="flex items-center justify-between mb-2">
-            <label class="text-sm font-medium text-gray-700">عوامل ترک</label>
-            <button type="button" class="btn-add-track-credit px-3 py-1.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-                <i class="fas fa-plus me-1"></i>افزودن عامل
+            <label class="text-sm font-medium text-ink-secondary">عوامل ترک</label>
+            <button type="button" class="btn-add-track-credit px-3 py-1.5 text-xs bg-accent text-on-accent rounded-md hover:bg-accent-hover transition-colors">
+                <i aria-hidden="true" class="fas fa-plus me-1"></i>افزودن عامل
             </button>
         </div>
         <div class="track-credit-rows space-y-2">
@@ -367,9 +367,9 @@
             {
                 var credit = Model.Credits[j];
                 string CP(string field) => $"Tracks[{trackIndex}].Credits[{j}].{field}";
-                <div class="credit-row grid grid-cols-2 md:grid-cols-4 gap-3 p-3 bg-gray-50 rounded-md border border-gray-200">
+                <div class="credit-row grid grid-cols-2 md:grid-cols-4 gap-3 p-3 bg-paper rounded-md border border-rule">
                     <div>
-                        <label class="block text-xs font-medium text-gray-600 mb-1">نقش</label>
+                        <label class="block text-xs font-medium text-ink-secondary mb-1">نقش</label>
                         <select name="@CP("CreditRoleId")" class="@rowClasses">
                             <option value="">-- انتخاب --</option>
                             @foreach (var item in shared.CreditRoleOptions)
@@ -379,7 +379,7 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-gray-600 mb-1">حوزه</label>
+                        <label class="block text-xs font-medium text-ink-secondary mb-1">حوزه</label>
                         <select name="@CP("RoleScopeTypeId")" class="@rowClasses">
                             <option value="">-- انتخاب --</option>
                             @foreach (var item in shared.RoleScopeTypeOptions)
@@ -390,8 +390,8 @@
                     </div>
                     <div>
                         <div class="flex items-center justify-between mb-1">
-                            <label class="block text-xs font-medium text-gray-600">شخص</label>
-                            <button type="button" class="btn-quick-add text-blue-600 hover:text-blue-800 text-xs" data-qa-target="person" title="افزودن شخص جدید"><i class="fas fa-plus"></i></button>
+                            <label class="block text-xs font-medium text-ink-secondary">شخص</label>
+                            <button type="button" class="btn-quick-add text-accent hover:text-accent-hover text-xs min-w-11 min-h-11 inline-flex items-center justify-center" data-qa-target="person" title="افزودن شخص جدید"><i aria-hidden="true" class="fas fa-plus"></i></button>
                         </div>
                         <select name="@CP("PersonId")" data-qa-options="person" class="@rowClasses">
                             <option value="">-- انتخاب --</option>
@@ -403,8 +403,8 @@
                     </div>
                     <div>
                         <div class="flex items-center justify-between mb-1">
-                            <label class="block text-xs font-medium text-gray-600">شرکت</label>
-                            <button type="button" class="btn-quick-add text-blue-600 hover:text-blue-800 text-xs" data-qa-target="company" title="افزودن شرکت جدید"><i class="fas fa-plus"></i></button>
+                            <label class="block text-xs font-medium text-ink-secondary">شرکت</label>
+                            <button type="button" class="btn-quick-add text-accent hover:text-accent-hover text-xs min-w-11 min-h-11 inline-flex items-center justify-center" data-qa-target="company" title="افزودن شرکت جدید"><i aria-hidden="true" class="fas fa-plus"></i></button>
                         </div>
                         <select name="@CP("CompanyId")" data-qa-options="company" class="@rowClasses">
                             <option value="">-- انتخاب --</option>
@@ -416,8 +416,8 @@
                     </div>
                     <div>
                         <div class="flex items-center justify-between mb-1">
-                            <label class="block text-xs font-medium text-gray-600">ساز</label>
-                            <button type="button" class="btn-quick-add text-blue-600 hover:text-blue-800 text-xs" data-qa-target="instrument" title="افزودن ساز جدید"><i class="fas fa-plus"></i></button>
+                            <label class="block text-xs font-medium text-ink-secondary">ساز</label>
+                            <button type="button" class="btn-quick-add text-accent hover:text-accent-hover text-xs min-w-11 min-h-11 inline-flex items-center justify-center" data-qa-target="instrument" title="افزودن ساز جدید"><i aria-hidden="true" class="fas fa-plus"></i></button>
                         </div>
                         <select name="@CP("InstrumentId")" data-qa-options="instrument" class="@rowClasses">
                             <option value="">-- انتخاب --</option>
@@ -428,29 +428,29 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-gray-600 mb-1">ترتیب نمایش</label>
+                        <label class="block text-xs font-medium text-ink-secondary mb-1">ترتیب نمایش</label>
                         <input type="number" name="@CP("DisplayOrder")" value="@credit.DisplayOrder" class="@rowClasses" />
                     </div>
                     <div class="flex items-end gap-3 pb-1">
                         <label class="inline-flex items-center gap-1 cursor-pointer">
-                            <input type="checkbox" name="@CP("IsPrimary")" value="true" @(credit.IsPrimary ? "checked" : "") class="rounded border-gray-300 text-blue-600" />
-                            <span class="text-xs text-gray-600">اصلی</span>
+                            <input type="checkbox" name="@CP("IsPrimary")" value="true" @(credit.IsPrimary ? "checked" : "") class="rounded border-rule-strong text-accent" />
+                            <span class="text-xs text-ink-secondary">اصلی</span>
                         </label>
                     </div>
                     <div class="flex items-end pb-1">
-                        <button type="button" class="remove-credit text-red-600 hover:text-red-800 text-xs"><i class="fas fa-times me-1"></i>حذف</button>
+                        <button type="button" class="remove-credit text-error hover:text-error-hover text-xs"><i aria-hidden="true" class="fas fa-times me-1"></i>حذف</button>
                     </div>
                     <div class="md:col-span-4">
-                        <label class="block text-xs font-medium text-gray-600 mb-1">یادداشت‌ها</label>
+                        <label class="block text-xs font-medium text-ink-secondary mb-1">یادداشت‌ها</label>
                         <input type="text" name="@CP("Notes")" value="@credit.Notes" class="@rowClasses" />
                     </div>
                 </div>
             }
         </div>
         <template class="tpl-track-credit">
-            <div class="credit-row grid grid-cols-2 md:grid-cols-4 gap-3 p-3 bg-gray-50 rounded-md border border-gray-200">
+            <div class="credit-row grid grid-cols-2 md:grid-cols-4 gap-3 p-3 bg-paper rounded-md border border-rule">
                 <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">نقش</label>
+                    <label class="block text-xs font-medium text-ink-secondary mb-1">نقش</label>
                     <select name="__P__[0].CreditRoleId" class="@rowClasses">
                         <option value="">-- انتخاب --</option>
                         @foreach (var item in shared.CreditRoleOptions)
@@ -460,7 +460,7 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">حوزه</label>
+                    <label class="block text-xs font-medium text-ink-secondary mb-1">حوزه</label>
                     <select name="__P__[0].RoleScopeTypeId" class="@rowClasses">
                         <option value="">-- انتخاب --</option>
                         @foreach (var item in shared.RoleScopeTypeOptions)
@@ -471,8 +471,8 @@
                 </div>
                 <div>
                     <div class="flex items-center justify-between mb-1">
-                        <label class="block text-xs font-medium text-gray-600">شخص</label>
-                        <button type="button" class="btn-quick-add text-blue-600 hover:text-blue-800 text-xs" data-qa-target="person" title="افزودن شخص جدید"><i class="fas fa-plus"></i></button>
+                        <label class="block text-xs font-medium text-ink-secondary">شخص</label>
+                        <button type="button" class="btn-quick-add text-accent hover:text-accent-hover text-xs min-w-11 min-h-11 inline-flex items-center justify-center" data-qa-target="person" title="افزودن شخص جدید"><i aria-hidden="true" class="fas fa-plus"></i></button>
                     </div>
                     <select name="__P__[0].PersonId" data-qa-options="person" class="@rowClasses">
                         <option value="">-- انتخاب --</option>
@@ -484,8 +484,8 @@
                 </div>
                 <div>
                     <div class="flex items-center justify-between mb-1">
-                        <label class="block text-xs font-medium text-gray-600">شرکت</label>
-                        <button type="button" class="btn-quick-add text-blue-600 hover:text-blue-800 text-xs" data-qa-target="company" title="افزودن شرکت جدید"><i class="fas fa-plus"></i></button>
+                        <label class="block text-xs font-medium text-ink-secondary">شرکت</label>
+                        <button type="button" class="btn-quick-add text-accent hover:text-accent-hover text-xs min-w-11 min-h-11 inline-flex items-center justify-center" data-qa-target="company" title="افزودن شرکت جدید"><i aria-hidden="true" class="fas fa-plus"></i></button>
                     </div>
                     <select name="__P__[0].CompanyId" data-qa-options="company" class="@rowClasses">
                         <option value="">-- انتخاب --</option>
@@ -497,8 +497,8 @@
                 </div>
                 <div>
                     <div class="flex items-center justify-between mb-1">
-                        <label class="block text-xs font-medium text-gray-600">ساز</label>
-                        <button type="button" class="btn-quick-add text-blue-600 hover:text-blue-800 text-xs" data-qa-target="instrument" title="افزودن ساز جدید"><i class="fas fa-plus"></i></button>
+                        <label class="block text-xs font-medium text-ink-secondary">ساز</label>
+                        <button type="button" class="btn-quick-add text-accent hover:text-accent-hover text-xs min-w-11 min-h-11 inline-flex items-center justify-center" data-qa-target="instrument" title="افزودن ساز جدید"><i aria-hidden="true" class="fas fa-plus"></i></button>
                     </div>
                     <select name="__P__[0].InstrumentId" data-qa-options="instrument" class="@rowClasses">
                         <option value="">-- انتخاب --</option>
@@ -509,20 +509,20 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">ترتیب نمایش</label>
+                    <label class="block text-xs font-medium text-ink-secondary mb-1">ترتیب نمایش</label>
                     <input type="number" name="__P__[0].DisplayOrder" value="0" class="@rowClasses" />
                 </div>
                 <div class="flex items-end gap-3 pb-1">
                     <label class="inline-flex items-center gap-1 cursor-pointer">
-                        <input type="checkbox" name="__P__[0].IsPrimary" value="true" class="rounded border-gray-300 text-blue-600" />
-                        <span class="text-xs text-gray-600">اصلی</span>
+                        <input type="checkbox" name="__P__[0].IsPrimary" value="true" class="rounded border-rule-strong text-accent" />
+                        <span class="text-xs text-ink-secondary">اصلی</span>
                     </label>
                 </div>
                 <div class="flex items-end pb-1">
-                    <button type="button" class="remove-credit text-red-600 hover:text-red-800 text-xs"><i class="fas fa-times me-1"></i>حذف</button>
+                    <button type="button" class="remove-credit text-error hover:text-error-hover text-xs"><i aria-hidden="true" class="fas fa-times me-1"></i>حذف</button>
                 </div>
                 <div class="md:col-span-4">
-                    <label class="block text-xs font-medium text-gray-600 mb-1">یادداشت‌ها</label>
+                    <label class="block text-xs font-medium text-ink-secondary mb-1">یادداشت‌ها</label>
                     <input type="text" name="__P__[0].Notes" class="@rowClasses" />
                 </div>
             </div>

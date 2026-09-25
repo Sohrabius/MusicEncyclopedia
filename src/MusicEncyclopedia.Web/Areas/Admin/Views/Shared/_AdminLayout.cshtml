@@ -20,62 +20,38 @@
     <!-- Fonts (self-hosted: Vazirmatn for fa/ar RTL, Inter for en/fr LTR) -->
     <link rel="stylesheet" href="~/css/fonts.css" />
 
-    <!-- Admin component styles (alerts etc.) -->
-    <link rel="stylesheet" href="~/css/admin.css" />
-
     <!-- Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            future: { hoverOnlyWhenSupported: true },
-            theme: {
-                extend: {
-                    fontFamily: {
-                        // Vazirmatn is loaded via fonts.css; Tailwind uses it for both
-                        // directions here and the [dir=rtl] rules in fonts.css take over.
-                        sans: ['Vazirmatn', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
-                    },
-                },
-            },
-        };
-    </script>
+    <script src="~/js/tailwind-theme.js"></script>
+
+    <!-- Shared design tokens and admin components -->
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/css/admin.css" />
 
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
           integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
           crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-    <style>
-        /* Sidebar scrollbar styling */
-        .sidebar-scroll::-webkit-scrollbar { width: 4px; }
-        .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
-        .sidebar-scroll::-webkit-scrollbar-thumb { background: #4a5568; border-radius: 2px; }
-        .sidebar-scroll { scrollbar-width: thin; scrollbar-color: #4a5568 transparent; }
-
-        /* Active nav link */
-        .nav-active { background-color: rgba(59, 130, 246, 0.15); color: #3b82f6; border-inline-start: 3px solid #3b82f6; }
-        .nav-link-admin { transition: all 0.15s ease; }
-        .nav-link-admin:hover { background-color: rgba(255,255,255,0.05); }
-    </style>
-
     @await RenderSectionAsync("Styles", required: false)
 </head>
-<body class="bg-gray-100 text-gray-900 @(isRtl ? "rtl" : "")">
+<body class="admin-shell bg-paper-muted text-ink @(isRtl ? "rtl" : "")">
+    <a href="#main-content" class="skip-link">پرش به محتوای اصلی</a>
 
     <!-- ============================================================
          Top Navigation Bar
          ============================================================ -->
-    <header class="fixed top-0 start-0 end-0 z-30 h-16 bg-white border-b border-gray-200 shadow-sm">
-        <div class="flex items-center justify-between h-full px-4 lg:px-6">
+    <header class="admin-topbar fixed top-0 start-0 end-0 z-30 h-16">
+        <div class="admin-topbar__inner flex items-center justify-between h-full px-4 lg:px-6">
             <!-- Left: Brand & Mobile Menu Toggle -->
             <div class="flex items-center gap-3">
                 <button id="sidebar-toggle"
-                        class="lg:hidden p-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        aria-label="باز/بستن منوی کناری">
-                    <i class="fas fa-bars text-xl"></i>
-                </button>
-                <a href="/admin" class="flex items-center gap-2 text-lg font-bold text-gray-800 hover:text-blue-600 transition-colors">
-                    <i class="fas fa-music text-blue-600"></i>
+                        class="lg:hidden min-w-11 min-h-11 p-2 rounded-md text-ink-muted hover:text-ink-secondary hover:bg-paper-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                        aria-label="باز/بستن منوی کناری"
+                        aria-controls="sidebar"
+                        aria-expanded="false"><i aria-hidden="true" class="fas fa-bars text-xl"></i></button>
+                <a href="/admin" class="admin-brand flex items-center gap-2 text-lg font-bold transition-colors">
+                    <i aria-hidden="true" class="admin-brand__icon fas fa-music"></i>
                     <span class="hidden sm:inline">مدیریت دایرة‌المعارف موسیقی</span>
                     <span class="sm:hidden">مدیریت</span>
                 </a>
@@ -83,14 +59,15 @@
 
             <!-- Right: User Info & Logout -->
             <div class="flex items-center gap-4">
-                <span class="text-sm text-gray-500 hidden md:inline">
-                    <i class="fas fa-user-circle text-gray-400 me-1"></i>
+                <span class="admin-user text-sm hidden md:inline">
+                    <i aria-hidden="true" class="fas fa-user-circle text-ink-muted me-1"></i>
                     @displayName
                 </span>
                 <a href="/auth/logout"
-                   class="inline-flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                   class="admin-logout inline-flex items-center gap-1 px-3 py-1.5 text-sm rounded-md transition-colors"
+                   aria-label="خروج"
                    title="خروج">
-                    <i class="fas fa-sign-out-alt"></i>
+                    <i aria-hidden="true" class="fas fa-sign-out-alt"></i>
                     <span class="hidden sm:inline">خروج</span>
                 </a>
             </div>
@@ -104,19 +81,20 @@
 
         <!-- Sidebar (spec 10.3) -->
         <aside id="sidebar"
-               class="fixed lg:static inset-y-0 start-0 z-20 w-64 bg-gray-900 text-gray-300 transform -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out overflow-y-auto sidebar-scroll pt-16 lg:pt-0">
+               class="admin-sidebar fixed lg:static inset-y-0 start-0 z-20 text-ink-secondary transform translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out overflow-y-auto sidebar-scroll pt-16 lg:pt-0"
+               aria-hidden="true">
 
-            <nav class="py-4 px-3 space-y-1 text-sm" aria-label="ناوبری مدیریت">
+            <nav class="admin-sidebar__nav px-3 space-y-1 text-sm" aria-label="ناوبری مدیریت">
 
                 <!-- Dashboard -->
                 <a href="/admin"
                    class="nav-link-admin flex items-center gap-3 px-3 py-2.5 rounded-md @(ViewData["ActiveMenu"]?.ToString() == "Dashboard" ? "nav-active" : "")">
-                    <i class="fas fa-tachometer-alt w-5 text-center"></i>
+                    <i aria-hidden="true" class="fas fa-tachometer-alt w-5 text-center"></i>
                     <span>داشبورد</span>
                 </a>
 
                 <!-- Content Management -->
-                <div class="pt-4 pb-1 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">محتوا</div>
+                <div class="admin-sidebar__section pt-4 pb-1 px-3 text-xs font-semibold uppercase tracking-wider">محتوا</div>
 
                 @RenderNavItem("Albums", "آلبوم‌ها", "/admin/albums", "fa fa-compact-disc")
                 @RenderNavItem("Tracks", "ترک‌ها", "/admin/tracks", "fa fa-music")
@@ -130,21 +108,21 @@
                 @RenderNavItem("Instruments", "سازها", "/admin/instruments", "fa fa-guitar")
 
                 <!-- Sessions & Events -->
-                <div class="pt-4 pb-1 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">جلسات و رویدادها</div>
+                <div class="admin-sidebar__section pt-4 pb-1 px-3 text-xs font-semibold uppercase tracking-wider">جلسات و رویدادها</div>
 
                 @RenderNavItem("Recording Sessions", "جلسات ضبط", "/admin/sessions", "fa fa-circle")
                 @RenderNavItem("Performance Events", "رویدادهای اجرا", "/admin/events", "fa fa-calendar-alt")
                 @RenderNavItem("Locations", "مکان‌ها", "/admin/locations", "fa fa-map-marker-alt")
 
                 <!-- Awards & Charts -->
-                <div class="pt-4 pb-1 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">جوایز و جدول‌ها</div>
+                <div class="admin-sidebar__section pt-4 pb-1 px-3 text-xs font-semibold uppercase tracking-wider">جوایز و جدول‌ها</div>
 
                 @RenderNavItem("Awards", "جوایز", "/admin/awards", "fa fa-trophy")
                 @RenderNavItem("Certifications", "گواهینامه‌ها", "/admin/certifications", "fa fa-certificate")
                 @RenderNavItem("Charts", "جدول‌ها", "/admin/charts", "fa fa-chart-line")
 
                 <!-- Media & References -->
-                <div class="pt-4 pb-1 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">رسانه و مراجع</div>
+                <div class="admin-sidebar__section pt-4 pb-1 px-3 text-xs font-semibold uppercase tracking-wider">رسانه و مراجع</div>
 
                 @RenderNavItem("Media", "رسانه", "/admin/media", "fa fa-photo-video")
                 @RenderNavItem("Sources", "منابع", "/admin/sources", "fa fa-database")
@@ -154,7 +132,7 @@
                 @RenderNavItem("Localizations", "بومی‌سازی‌ها", "/admin/localizations", "fa fa-language")
 
                 <!-- Settings -->
-                <div class="pt-4 pb-1 px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">تنظیمات</div>
+                <div class="admin-sidebar__section pt-4 pb-1 px-3 text-xs font-semibold uppercase tracking-wider">تنظیمات</div>
 
                 @RenderNavItem("Lookup Tables", "جدول‌های مرجع", "/admin/lookup-tables", "fa fa-cog")
                 @RenderNavItem("Users", "کاربران", "/admin/users", "fa fa-user-shield")
@@ -166,17 +144,17 @@
 
         <!-- Overlay for mobile sidebar -->
         <div id="sidebar-overlay"
-             class="fixed inset-0 bg-black bg-opacity-50 z-10 hidden lg:hidden"
+             class="fixed inset-0 bg-overlay bg-opacity-50 z-10 hidden lg:hidden"
              aria-hidden="true"></div>
 
         <!-- ============================================================
              Main Content Area
              ============================================================ -->
-        <main class="flex-1 p-4 lg:p-6 overflow-x-hidden" role="main">
+        <main id="main-content" class="admin-main flex-1 overflow-x-hidden" role="main" tabindex="-1">
 
             <!-- Page Header -->
-            <div class="mb-6">
-                <h1 class="text-2xl font-bold text-gray-900">@ViewData["Title"]</h1>
+            <div class="admin-page-header">
+                <h1 class="admin-page-title">@ViewData["Title"]</h1>
             </div>
 
             <!-- ============================================================
@@ -191,7 +169,7 @@
     <!-- ============================================================
          Footer
          ============================================================ -->
-    <footer class="bg-white border-t border-gray-200 py-4 px-6 text-center text-xs text-gray-500">
+    <footer class="admin-footer py-4 px-6 text-center text-xs">
         <p>&copy; @DateTime.Now.Year مدیریت دایرة‌المعارف موسیقی. کلیه حقوق محفوظ است.</p>
     </footer>
 
@@ -206,25 +184,69 @@
             var overlay = document.getElementById('sidebar-overlay');
 
             function openSidebar() {
-                sidebar.classList.remove('-translate-x-full');
+                sidebar.classList.remove('translate-x-full');
                 overlay.classList.remove('hidden');
+                toggle.setAttribute('aria-expanded', 'true');
+                sidebar.setAttribute('aria-hidden', 'false');
+                sidebar.inert = false;
                 document.body.style.overflow = 'hidden';
+                var firstLink = sidebar.querySelector('a');
+                if (firstLink) firstLink.focus();
             }
-            function closeSidebar() {
-                sidebar.classList.add('-translate-x-full');
+            function closeSidebar(returnFocus) {
+                sidebar.classList.add('translate-x-full');
                 overlay.classList.add('hidden');
+                toggle.setAttribute('aria-expanded', 'false');
+                sidebar.setAttribute('aria-hidden', 'true');
+                sidebar.inert = true;
                 document.body.style.overflow = '';
+                if (returnFocus) toggle.focus();
             }
 
             if (toggle && sidebar && overlay) {
+                var desktop = window.matchMedia('(min-width: 1024px)');
+                function syncSidebarAccessibility() {
+                    if (desktop.matches) {
+                        sidebar.setAttribute('aria-hidden', 'false');
+                        sidebar.inert = false;
+                        toggle.setAttribute('aria-expanded', 'false');
+                        document.body.style.overflow = '';
+                    } else if (toggle.getAttribute('aria-expanded') !== 'true') {
+                        sidebar.setAttribute('aria-hidden', 'true');
+                        sidebar.inert = true;
+                    }
+                }
+
                 toggle.addEventListener('click', function () {
-                    if (sidebar.classList.contains('-translate-x-full')) {
+                    if (sidebar.classList.contains('translate-x-full')) {
                         openSidebar();
                     } else {
-                        closeSidebar();
+                        closeSidebar(true);
                     }
                 });
-                overlay.addEventListener('click', closeSidebar);
+                overlay.addEventListener('click', function () { closeSidebar(true); });
+                document.addEventListener('keydown', function (event) {
+                    if (event.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') {
+                        closeSidebar(true);
+                    }
+                    if (event.key === 'Tab' && toggle.getAttribute('aria-expanded') === 'true') {
+                        var focusable = Array.from(sidebar.querySelectorAll('a, button, input, select, textarea'));
+                        var first = focusable[0];
+                        var last = focusable[focusable.length - 1];
+                        if (event.shiftKey && document.activeElement === first) {
+                            event.preventDefault();
+                            last.focus();
+                        } else if (!event.shiftKey && document.activeElement === last) {
+                            event.preventDefault();
+                            first.focus();
+                        }
+                    }
+                });
+                sidebar.querySelectorAll('a').forEach(function (link) {
+                    link.addEventListener('click', function () { closeSidebar(false); });
+                });
+                desktop.addEventListener('change', syncSidebarAccessibility);
+                syncSidebarAccessibility();
             }
         });
     </script>
@@ -244,7 +266,7 @@
         var isActive = string.Equals(ViewData["ActiveMenu"]?.ToString(), key, StringComparison.OrdinalIgnoreCase);
         var activeClass = isActive ? "nav-active" : "";
         var html = $"<a href=\"{url}\" class=\"nav-link-admin flex items-center gap-3 px-3 py-2.5 rounded-md {activeClass}\">" +
-                   $"<i class=\"{iconClass} w-5 text-center\"></i>" +
+                   $"<i aria-hidden='true' class='{iconClass} w-5 text-center'></i>" +
                    $"<span>{label}</span>" +
                    $"</a>";
         return new Microsoft.AspNetCore.Html.HtmlString(html);

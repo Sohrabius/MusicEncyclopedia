@@ -142,12 +142,14 @@ docker compose exec -T mssql /opt/mssql-tools18/bin/sqlcmd \
 
 The script creates the catalog + indexes, and can be re-run after schema changes
 (EF `MigrateAsync` on startup keeps the schema current; re-run FTS script after
-any change to the indexed tables).
+any change to an indexed table or column). It uses `CHANGE_TRACKING AUTO`, so
+there is no scheduled catalog rebuild job. Run the verifier in
+[`docs/B11_SEARCH_OPERATIONS_PLAN.md`](docs/B11_SEARCH_OPERATIONS_PLAN.md)
+after setup and after any indexed-schema change.
 
 ### 5.1 Hangfire jobs (automatic, SQL Server only)
 
 - `cache-warm` — nightly 03:00, warms public list caches per culture.
-- Search FTS re-indexing, if enabled, is exposed the same way.
 
 Dashboard: `/hangfire` (requires an admin login).
 

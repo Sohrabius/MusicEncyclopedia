@@ -16,14 +16,16 @@
 | `--color-ink` | `#1E293B` | Primary text |
 | `--color-ink-2` | `#475569` | Secondary text |
 | `--color-ink-3` | `#64748B` | Tertiary/muted text (citations) |
+| `--color-ink-disabled` | `#94A3B8` | Decorative and disabled content |
 | `--color-rule` | `#E2E8F0` | Borders |
 | `--color-rule-light` | `#EDF1F5` | Subtle borders |
+| `--color-rule-strong` | `#CBD5E1` | Inputs and emphasized dividers |
 | `--color-accent` | `#2563EB` | Link blue accent |
 | `--color-accent-hover` | `#1D4ED8` | Accent hover |
 | `--color-accent-ink` | `#FFFFFF` | Text on accent |
 | `--color-accent-soft` | `#EFF6FF` | Accent tint (badges, icons) |
-| `--color-success` | `#16A34A` | Success |
-| `--color-warning` | `#D97706` | Warning |
+| `--color-success` | `#15803D` | Success |
+| `--color-warning` | `#B45309` | Warning |
 | `--color-error` | `#DC2626` | Error |
 | `--color-info` | `#2563EB` | Info |
 

@@ -37,8 +37,8 @@
 }
 
 <!-- Breadcrumb -->
-<nav class="section" style="padding-bottom: 0;">
-    <div class="section__inner">
+<nav class="page-breadcrumb">
+    <div class="page-frame">
         <ol class="breadcrumb">
             <li><a href="/@culture">Home</a></li>
             <li class="breadcrumb__sep">/</li>
@@ -50,8 +50,8 @@
 </nav>
 
 <!-- Header -->
-<section class="section" style="padding-top: 0; padding-bottom: var(--space-xl);">
-    <div class="section__inner">
+<section class="detail-intro">
+    <div class="page-frame">
         <div class="detail-header">
             <div class="detail-header__cover">
                 @if (!string.IsNullOrWhiteSpace(album.CoverUrl))
@@ -71,11 +71,11 @@
 
                 @if (!string.IsNullOrWhiteSpace(album.OriginalTitle) && album.OriginalTitle != album.Title)
                 {
-                    <p class="text-base mt-1" style="color: var(--color-ink-2);" dir="auto">@album.OriginalTitle</p>
+                    <p class="detail-header__original-title" dir="auto">@album.OriginalTitle</p>
                 }
                 @if (!string.IsNullOrWhiteSpace(album.EnglishTitle) && album.EnglishTitle != album.Title && album.EnglishTitle != album.OriginalTitle)
                 {
-                    <p class="text-sm mt-0.5" style="color: var(--color-ink-3);" dir="ltr">@album.EnglishTitle</p>
+                    <p class="detail-header__english-title" dir="ltr">@album.EnglishTitle</p>
                 }
 
                 <div class="detail-header__meta">
@@ -97,7 +97,7 @@
                 {
                     <div class="detail-header__artists">
                         <h2>@Localizer["Artists"]</h2>
-                        <div style="display: flex; flex-wrap: wrap; gap: var(--space-xs);">
+                        <div class="detail-header__artist-list">
                             @foreach (var artist in primaryArtists)
                             {
                                 <a href="/@culture/people/@(artist.PersonSlug ?? artist.CompanySlug)" class="tag">
@@ -153,14 +153,14 @@
 
                 @if (!string.IsNullOrWhiteSpace(album.Description))
                 {
-                    <p style="color: var(--color-ink-2); line-height: 1.7; margin-bottom: var(--space-lg);">@album.Description</p>
+                    <p class="detail-description">@album.Description</p>
                 }
 
                 @if (album.Tags.Count > 0)
                 {
-                    <div style="margin-bottom: var(--space-md);">
-                        <h3 style="font-size: var(--text-xs); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-ink-3); margin-bottom: var(--space-xs);">@Localizer["Tags"]</h3>
-                        <div style="display: flex; flex-wrap: wrap; gap: var(--space-2xs);">
+                    <div class="detail-subsection">
+                        <h3 class="detail-subsection__title">@Localizer["Tags"]</h3>
+                        <div class="tag-list">
                             @foreach (var tag in album.Tags)
                             {
                                 <a href="/@culture/tags/@tag.Slug" class="tag">#@tag.Name</a>
@@ -171,9 +171,9 @@
 
                 @if (album.Genres.Count > 0)
                 {
-                    <div style="margin-bottom: var(--space-md);">
-                        <h3 style="font-size: var(--text-xs); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-ink-3); margin-bottom: var(--space-xs);">@Localizer["Genres"]</h3>
-                        <div style="display: flex; flex-wrap: wrap; gap: var(--space-2xs);">
+                    <div class="detail-subsection">
+                        <h3 class="detail-subsection__title">@Localizer["Genres"]</h3>
+                        <div class="tag-list">
                             @foreach (var genre in album.Genres)
                             {
                                 <a href="/@culture/genres/@genre.Slug" class="tag tag--accent">@genre.Name</a>
@@ -184,9 +184,9 @@
 
                 @if (album.Moods.Count > 0)
                 {
-                    <div>
-                        <h3 style="font-size: var(--text-xs); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-ink-3); margin-bottom: var(--space-xs);">@Localizer["Moods"]</h3>
-                        <div style="display: flex; flex-wrap: wrap; gap: var(--space-2xs);">
+                    <div class="detail-subsection">
+                        <h3 class="detail-subsection__title">@Localizer["Moods"]</h3>
+                        <div class="tag-list">
                             @foreach (var mood in album.Moods)
                             {
                                 <a href="/@culture/moods/@mood.Slug" class="tag">@mood.Name</a>
@@ -207,7 +207,7 @@
                 {
                     @if (tracksByDisc.Count > 1)
                     {
-                        <h3 style="font-size: var(--text-sm); font-weight: 600; color: var(--color-ink-3); margin-bottom: var(--space-sm); padding-bottom: var(--space-xs); border-bottom: 1px solid var(--color-rule);">
+                        <h3 class="track-disc-heading">
                             @(discGroup.Key == 0 ? Localizer["Tracks"] : Localizer["Disc {0}", discGroup.Key])
                         </h3>
                     }
@@ -220,15 +220,15 @@
                         var trackDurationSeconds = track.DurationSecondsOverride ?? track.DurationSeconds;
 
                         <div class="track-row">
-                            <div class="track-row__num" style="min-width: 32px;">
+                            <div class="track-row__num">
                                 @track.TrackNumber
                                 @if (track.IsBonus)
                                 {
-                                    <span class="text-[10px]" title="@Localizer["Bonus track"]">*</span>
+                                    <span title="@Localizer["Bonus track"]">*</span>
                                 }
                             </div>
                             <div class="track-row__info">
-                                <a href="/@culture/tracks/@track.Slug" class="track-row__title" style="text-decoration: none; color: var(--color-accent);">
+                                <a href="/@culture/tracks/@track.Slug" class="track-row__title">
                                     @displayTitle
                                 </a>
                                 @if (track.PrimaryArtists.Count > 0)
@@ -243,7 +243,7 @@
                                 }
                                 else
                                 {
-                                    <span style="color: var(--color-rule);">—</span>
+                                    <span class="track-row__missing">—</span>
                                 }
                             </div>
                         </div>
@@ -259,23 +259,23 @@
                 <h2 class="detail-section__title">@Localizer["Credits"]</h2>
                 @foreach (var roleGroup in creditsByRole)
                 {
-                    <div style="margin-bottom: var(--space-lg);">
-                        <h3 style="font-size: var(--text-xs); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-ink-3); margin-bottom: var(--space-xs);">@roleGroup.Key</h3>
-                        <ul style="list-style: none; padding: 0; margin: 0;">
+                    <div class="credit-group">
+                        <h3 class="credit-role">@roleGroup.Key</h3>
+                        <ul class="credit-list">
                             @foreach (var credit in roleGroup)
                             {
-                                <li style="font-size: var(--text-sm); color: var(--color-ink-2); padding: var(--space-2xs) 0;">
+                                <li>
                                     @if (credit.PersonId.HasValue)
                                     {
-                                        <a href="/@culture/people/@credit.PersonSlug" style="color: var(--color-accent); text-decoration: none; font-weight: 500;">@credit.PersonFullName</a>
+                                        <a href="/@culture/people/@credit.PersonSlug" class="detail-link">@credit.PersonFullName</a>
                                         @if (!string.IsNullOrWhiteSpace(credit.InstrumentName))
                                         {
-                                            <span style="color: var(--color-ink-3);"> — @credit.InstrumentName</span>
+                                            <span class="credit-list__secondary"> — @credit.InstrumentName</span>
                                         }
                                     }
                                     else if (credit.CompanyId.HasValue)
                                     {
-                                        <a href="/@culture/companies/@credit.CompanySlug" style="color: var(--color-accent); text-decoration: none; font-weight: 500;">@credit.CompanyName</a>
+                                        <a href="/@culture/companies/@credit.CompanySlug" class="detail-link">@credit.CompanyName</a>
                                     }
                                 </li>
                             }
@@ -290,7 +290,7 @@
         {
             <section class="detail-section">
                 <h2 class="detail-section__title">@Localizer["Companies"]</h2>
-                <div style="overflow-x: auto;">
+                <div class="detail-table-wrap">
                     <table class="data-table">
                         <thead>
                             <tr>
@@ -305,9 +305,9 @@
                             {
                                 <tr>
                                     <td>@company.CompanyRole</td>
-                                    <td><a href="/@culture/companies/@company.CompanySlug" style="color: var(--color-accent); text-decoration: none;">@company.CompanyName</a></td>
-                                    <td style="font-family: var(--font-mono); font-size: var(--text-xs);">@(company.CatalogNumber ?? "—")</td>
-                                    <td style="font-family: var(--font-mono); font-size: var(--text-xs);">@(company.Barcode ?? "—")</td>
+                                    <td><a href="/@culture/companies/@company.CompanySlug" class="detail-link">@company.CompanyName</a></td>
+                                    <td class="detail-table__code">@(company.CatalogNumber ?? "—")</td>
+                                    <td class="detail-table__code">@(company.Barcode ?? "—")</td>
                                 </tr>
                             }
                         </tbody>
@@ -324,24 +324,24 @@
                 @foreach (var award in album.Awards.OrderByDescending(a => a.Year))
                 {
                     <div class="track-row">
-                        <div class="track-row__num" style="background: var(--color-accent); color: var(--color-accent-ink);">
+                        <div class="track-row__num track-row__num--award">
                             <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
                             </svg>
                         </div>
                         <div class="track-row__info">
                             <div class="track-row__title">
-                                <a href="/@culture/awards/@award.AwardSlug" style="color: var(--color-accent); text-decoration: none;">@award.AwardName</a>
+                                <a href="/@culture/awards/@award.AwardSlug" class="detail-link">@award.AwardName</a>
                                 @if (!string.IsNullOrWhiteSpace(award.Category))
                                 {
-                                    <span style="color: var(--color-ink-3);"> — @award.Category</span>
+                                    <span class="credit-list__secondary"> — @award.Category</span>
                                 }
                             </div>
                             <div class="track-row__artist">
                                 @if (award.Year.HasValue) { <span>@award.Year</span> }
                                 @if (!string.IsNullOrWhiteSpace(award.Result))
                                 {
-                                    <span style="color: @(award.Result == "Winner" ? "var(--color-success)" : "var(--color-ink-3)");"> · @award.Result</span>
+                                    <span class="@(award.Result == "Winner" ? "text-success" : "credit-list__secondary")"> · @award.Result</span>
                                 }
                             </div>
                         </div>
@@ -358,7 +358,7 @@
                 @foreach (var cert in album.Certifications.OrderByDescending(c => c.CertificationDate))
                 {
                     <div class="track-row">
-                        <div class="track-row__num" style="background: oklch(75% 0.15 90); color: var(--color-ink);">
+                        <div class="track-row__num track-row__num--certification">
                             <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
@@ -380,26 +380,26 @@
         {
             <section class="detail-section">
                 <h2 class="detail-section__title">@Localizer["Chart History"]</h2>
-                <div style="overflow-x: auto;">
+                <div class="detail-table-wrap">
                     <table class="data-table">
                         <thead>
                             <tr>
                                 <th>@Localizer["Chart"]</th>
                                 <th>@Localizer["Date"]</th>
-                                <th style="text-align: center;">@Localizer["Position"]</th>
-                                <th style="text-align: center;">@Localizer["Previous"]</th>
-                                <th style="text-align: center;">@Localizer["Weeks"]</th>
+                                <th class="detail-table__center">@Localizer["Position"]</th>
+                                <th class="detail-table__center">@Localizer["Previous"]</th>
+                                <th class="detail-table__center">@Localizer["Weeks"]</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var entry in album.ChartEntries.OrderByDescending(e => e.Date))
                             {
                                 <tr>
-                                    <td><a href="/@culture/charts/@entry.ChartSlug" style="color: var(--color-accent); text-decoration: none;">@entry.ChartName</a></td>
+                                    <td><a href="/@culture/charts/@entry.ChartSlug" class="detail-link">@entry.ChartName</a></td>
                                     <td>@entry.Date.ToString("yyyy-MM-dd")</td>
-                                    <td style="text-align: center; font-weight: 600;">@entry.Position</td>
-                                    <td style="text-align: center;">@(entry.PreviousPosition?.ToString() ?? "—")</td>
-                                    <td style="text-align: center;">@(entry.WeeksOnChart?.ToString() ?? "—")</td>
+                                    <td class="detail-table__center"><strong>@entry.Position</strong></td>
+                                    <td class="detail-table__center">@(entry.PreviousPosition?.ToString() ?? "—")</td>
+                                    <td class="detail-table__center">@(entry.WeeksOnChart?.ToString() ?? "—")</td>
                                 </tr>
                             }
                         </tbody>
@@ -413,7 +413,7 @@
         {
             <section class="detail-section">
                 <h2 class="detail-section__title">@Localizer["Related Albums"]</h2>
-                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: var(--space-md);">
+                <div class="card-grid related-albums-grid">
                     @foreach (var related in album.RelatedAlbums)
                     {
                         <a href="/@culture/albums/@related.Slug" class="card">
@@ -424,7 +424,7 @@
                                 }
                                 else
                                 {
-                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 40px; height: 40px; color: var(--color-ink-3);">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z" />
                                     </svg>
                                 }
@@ -453,17 +453,17 @@
         {
             <section class="detail-section">
                 <h2 class="detail-section__title">@Localizer["Recording Sessions"]</h2>
-                <div class="space-y-3" style="display: flex; flex-direction: column; gap: var(--space-sm);">
+                <div class="detail-stack">
                     @foreach (var session in album.RecordingSessions.OrderByDescending(s => s.StartDate))
                     {
                         <div class="track-row">
-                            <div class="track-row__num" style="background: var(--color-paper-2); color: var(--color-ink-2);">
+                            <div class="track-row__num track-row__num--session">
                                 <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                                 </svg>
                             </div>
                             <div class="track-row__info">
-                                <a href="/@culture/sessions/@session.Slug" class="track-row__title" style="text-decoration: none; color: var(--color-accent);">
+                                <a href="/@culture/sessions/@session.Slug" class="track-row__title">
                                     @(session.SessionTypeName ?? Localizer["Recording Session"].ToString())
                                 </a>
                                 <div class="track-row__artist">
@@ -482,17 +482,17 @@
         {
             <section class="detail-section">
                 <h2 class="detail-section__title">@Localizer["Live Performances"]</h2>
-                <div class="space-y-3" style="display: flex; flex-direction: column; gap: var(--space-sm);">
+                <div class="detail-stack">
                     @foreach (var evt in album.PerformanceEvents.OrderByDescending(e => e.Date))
                     {
                         <div class="track-row">
-                            <div class="track-row__num" style="background: var(--color-accent); color: var(--color-accent-ink);">
+                            <div class="track-row__num track-row__num--event">
                                 <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V7a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                 </svg>
                             </div>
                             <div class="track-row__info">
-                                <a href="/@culture/events/@evt.Slug" class="track-row__title" style="text-decoration: none; color: var(--color-accent);">
+                                <a href="/@culture/events/@evt.Slug" class="track-row__title">
                                     @(evt.EventTypeName ?? Localizer["Live Performance"].ToString())
                                 </a>
                                 <div class="track-row__artist">
@@ -517,7 +517,7 @@
                 <h2 class="detail-section__title">@Localizer["Media"]</h2>
                 @if (images.Count > 0)
                 {
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: var(--space-md); margin-bottom: var(--space-lg);">
+                    <div class="media-grid">
                         @foreach (var media in images)
                         {
                             <a href="@media.Url" target="_blank" rel="noopener noreferrer" class="card">
@@ -532,14 +532,14 @@
                 {
                     @foreach (var media in videos)
                     {
-                        <div style="aspect-ratio: 16/9; background: var(--color-paper-2); border-radius: var(--radius-md); overflow: hidden; margin-bottom: var(--space-md);">
+                        <div class="media-video">
                             @if (media.Url.Contains("youtube") || media.Url.Contains("youtu.be"))
                             {
-                                <iframe src="@media.Url" style="width: 100%; height: 100%; border: none;" allowfullscreen loading="lazy" title="@(media.Description ?? "")"></iframe>
+                                <iframe src="@media.Url" allowfullscreen loading="lazy" title="@(media.Description ?? "")"></iframe>
                             }
                             else
                             {
-                                <video src="@media.Url" style="width: 100%; height: 100%; object-fit: cover;" controls preload="none"></video>
+                                <video src="@media.Url" controls preload="none"></video>
                             }
                         </div>
                     }
@@ -573,21 +573,21 @@
         {
             <section class="detail-section">
                 <h2 class="detail-section__title">@Localizer["References"]</h2>
-                <ol style="list-style: decimal; padding-inline-start: var(--space-lg); margin: 0;">
+                <ol class="detail-list">
                     @foreach (var citation in album.Citations)
                     {
-                        <li style="font-size: var(--text-sm); color: var(--color-ink-2); padding: var(--space-2xs) 0;">
+                        <li>
                             @if (!string.IsNullOrWhiteSpace(citation.Quote))
                             {
-                                <span style="font-weight: 500;">"@citation.Quote"</span>
+                                <strong>"@citation.Quote"</strong>
                             }
                             @if (!string.IsNullOrWhiteSpace(citation.SourceName))
                             {
-                                <a href="/@culture/sources/@citation.SourceSlug" style="color: var(--color-accent); text-decoration: none;">@citation.SourceName</a>
+                                <a href="/@culture/sources/@citation.SourceSlug" class="detail-link">@citation.SourceName</a>
                             }
                             @if (!string.IsNullOrWhiteSpace(citation.Url))
                             {
-                                <a href="@citation.Url" target="_blank" rel="noopener noreferrer" style="color: var(--color-accent); text-decoration: none; font-size: var(--text-xs);">[@Localizer["Source"]]</a>
+                                <a href="@citation.Url" target="_blank" rel="noopener noreferrer" class="detail-link citation-source">[@Localizer["Source"]]</a>
                             }
                         </li>
                     }
@@ -609,12 +609,12 @@
                 {
                     <div class="track-row">
                         <div class="track-row__info">
-                            <a href="@link.Url" target="_blank" rel="noopener noreferrer" style="color: var(--color-accent); text-decoration: none; font-weight: 500;">
+                            <a href="@link.Url" target="_blank" rel="noopener noreferrer" class="detail-link">
                                 @(!string.IsNullOrWhiteSpace(link.Title) ? link.Title : link.Url)
                             </a>
                             @if (!string.IsNullOrWhiteSpace(link.LinkType))
                             {
-                                <span style="font-size: var(--text-xs); color: var(--color-ink-3);"> [@link.LinkType]</span>
+                                <span class="credit-list__secondary"> [@link.LinkType]</span>
                             }
                         </div>
                     </div>
@@ -632,7 +632,7 @@
             {
                 <div class="detail-sidebar__item">
                     <div class="detail-sidebar__label">@Localizer["Languages"]</div>
-                    <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                    <div class="detail-sidebar__tags">
                         @foreach (var lang in album.Languages)
                         {
                             <span class="tag">@lang.Name</span>
@@ -645,7 +645,7 @@
             {
                 <div class="detail-sidebar__item">
                     <div class="detail-sidebar__label">@Localizer["Countries"]</div>
-                    <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                    <div class="detail-sidebar__tags">
                         @foreach (var country in album.Countries)
                         {
                             <span class="tag">@country.Name</span>
@@ -668,9 +668,9 @@
                     <div class="detail-sidebar__label">@Localizer["Identifiers"]</div>
                     @foreach (var id in album.Identifiers)
                     {
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--space-2xs) 0; font-size: var(--text-xs);">
-                            <span style="color: var(--color-ink-3);">@id.IdentifierType</span>
-                            <span style="font-family: var(--font-mono); color: var(--color-ink); background: var(--color-paper-2); padding: 2px 6px; border-radius: var(--radius-sm);">@id.IdentifierValue</span>
+                        <div class="detail-sidebar__identifier">
+                            <span class="detail-sidebar__identifier-type">@id.IdentifierType</span>
+                            <span class="detail-sidebar__identifier-value">@id.IdentifierValue</span>
                         </div>
                     }
                 </div>

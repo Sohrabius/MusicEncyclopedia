@@ -10,14 +10,14 @@
      data-uses-dropdown="@(Model.UsesDropdown ? "1" : "0")">
 
     <div class="flex items-center justify-between mb-3">
-        <h3 class="text-sm font-semibold text-gray-700">@Model.Title</h3>
-        <span class="ri-count text-xs text-gray-500">@Model.Items.Count assigned</span>
+        <h3 class="text-sm font-semibold text-ink-secondary">@Model.Title</h3>
+        <span class="ri-count text-xs text-ink-muted">@Model.Items.Count assigned</span>
     </div>
 
     @if (Model.Items.Count == 0)
     {
-        <p class="ri-empty text-xs text-gray-500 mb-3">
-            <i class="fas fa-info-circle text-blue-400 me-1"></i>
+        <p class="ri-empty text-xs text-ink-muted mb-3">
+            <i aria-hidden="true" class="fas fa-info-circle text-accent me-1"></i>
             No @Model.Title.ToLower() assigned yet.
         </p>
     }
@@ -25,25 +25,23 @@
     <ul class="ri-list space-y-1.5 mb-3">
         @foreach (var item in Model.Items)
         {
-            <li class="flex items-center justify-between gap-2 px-3 py-2 bg-gray-50 rounded-md border border-gray-200 text-sm"
+            <li class="flex items-center justify-between gap-2 px-3 py-2 bg-paper rounded-md border border-rule text-sm"
                 data-id="@item.Id">
-                <span class="text-gray-800 truncate">
+                <span class="text-ink truncate">
                     @item.Label
                     @if (!string.IsNullOrWhiteSpace(item.Extra))
                     {
-                        <span class="text-gray-500 text-xs">(@item.Extra)</span>
+                        <span class="text-ink-muted text-xs">(@item.Extra)</span>
                     }
                     @if (!string.IsNullOrWhiteSpace(item.RoleLabel))
                     {
-                        <span class="inline-block ms-1 px-1.5 py-0.5 bg-blue-50 text-blue-700 text-xs rounded">@item.RoleLabel</span>
+                        <span class="inline-block ms-1 px-1.5 py-0.5 bg-accent-soft text-accent-hover text-xs rounded">@item.RoleLabel</span>
                     }
                 </span>
                 <button type="button"
-                        class="ri-remove text-red-600 hover:text-red-800 text-xs shrink-0"
+                        class="ri-remove text-error hover:text-error-hover text-xs shrink-0 min-w-11 min-h-11 inline-flex items-center justify-center"
                         title="حذف"
-                        data-id="@item.Id">
-                    <i class="fas fa-times"></i>
-                </button>
+                        data-id="@item.Id"><i aria-hidden="true" class="fas fa-times"></i></button>
             </li>
         }
     </ul>
@@ -53,8 +51,8 @@
         @if (Model.UsesDropdown)
         {
             <div class="flex-1 min-w-[180px]">
-                <label class="block text-xs font-medium text-gray-600 mb-1">افزودن</label>
-                <select class="ri-option w-full text-xs px-2 py-1.5 border border-gray-300 rounded">
+                <label class="block text-xs font-medium text-ink-secondary mb-1">افزودن</label>
+                <select class="ri-option w-full text-xs px-2 py-1.5 border border-rule-strong rounded">
                     <option value="">-- انتخاب --</option>
                     @foreach (var option in Model.Options)
                     {
@@ -66,8 +64,8 @@
         else
         {
             <div class="flex-1 min-w-[180px]">
-                <label class="block text-xs font-medium text-gray-600 mb-1">@Model.ExtraFieldLabel</label>
-                <input type="text" class="ri-extra w-full text-xs px-2 py-1.5 border border-gray-300 rounded"
+                <label class="block text-xs font-medium text-ink-secondary mb-1">@Model.ExtraFieldLabel</label>
+                <input type="text" class="ri-extra w-full text-xs px-2 py-1.5 border border-rule-strong rounded"
                        placeholder="@Model.ExtraFieldPlaceholder" />
             </div>
         }
@@ -75,8 +73,8 @@
         @if (Model.HasRoleField)
         {
             <div class="min-w-[140px]">
-                <label class="block text-xs font-medium text-gray-600 mb-1">@Model.RoleFieldLabel</label>
-                <select class="ri-role w-full text-xs px-2 py-1.5 border border-gray-300 rounded">
+                <label class="block text-xs font-medium text-ink-secondary mb-1">@Model.RoleFieldLabel</label>
+                <select class="ri-role w-full text-xs px-2 py-1.5 border border-rule-strong rounded">
                     <option value="">-- انتخاب --</option>
                     @foreach (var role in Model.RoleOptions)
                     {
@@ -89,20 +87,20 @@
         @if (Model.UsesDropdown && Model.HasExtraField)
         {
             <div class="min-w-[140px]">
-                <label class="block text-xs font-medium text-gray-600 mb-1">@Model.ExtraFieldLabel</label>
-                <input type="text" class="ri-extra w-full text-xs px-2 py-1.5 border border-gray-300 rounded"
+                <label class="block text-xs font-medium text-ink-secondary mb-1">@Model.ExtraFieldLabel</label>
+                <input type="text" class="ri-extra w-full text-xs px-2 py-1.5 border border-rule-strong rounded"
                        placeholder="@Model.ExtraFieldPlaceholder" />
             </div>
         }
 
         <button type="button"
-                class="ri-add px-3 py-1.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-            <i class="fas fa-plus"></i> افزودن
+                class="ri-add px-3 py-1.5 text-xs bg-accent text-on-accent rounded-md hover:bg-accent-hover transition-colors">
+            <i aria-hidden="true" class="fas fa-plus"></i> افزودن
         </button>
     </div>
 
-    <div class="ri-error mt-2 hidden">
-        <p class="text-xs text-red-600 bg-red-50 border border-red-200 rounded px-2 py-1.5"></p>
+    <div class="ri-error ui-state--error mt-2 hidden">
+        <p class="text-xs text-error bg-error-soft border border-error-border rounded px-2 py-1.5"></p>
     </div>
 </div>
 

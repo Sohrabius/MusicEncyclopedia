@@ -9,38 +9,38 @@
 
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" dir="@dir">
     <nav aria-label="@Localizer["Breadcrumb"]" class="mb-6">
-        <ol class="flex items-center gap-2 text-sm text-gray-500">
-            <li><a href="/@culture" class="hover:text-blue-600">@Localizer["Home"]</a></li>
-            <li><a href="/@culture/locations" class="hover:text-blue-600 ms-1">@Localizer["Locations"]</a></li>
+        <ol class="flex items-center gap-2 text-sm text-ink-muted">
+            <li><a href="/@culture" class="hover:text-accent">@Localizer["Home"]</a></li>
+            <li><a href="/@culture/locations" class="hover:text-accent ms-1">@Localizer["Locations"]</a></li>
             <li><span class="mx-1">/</span></li>
-            <li class="text-gray-900 font-medium truncate max-w-[200px]" aria-current="page">@location.Name</li>
+            <li class="text-ink font-medium truncate max-w-[200px]" aria-current="page">@location.Name</li>
         </ol>
     </nav>
 
     <div class="flex flex-col lg:flex-row gap-8">
         <div class="flex-1 min-w-0 space-y-8">
             <section>
-                <h1 class="text-3xl font-bold text-gray-900">@location.Name</h1>
+                <h1 class="text-3xl font-bold text-ink">@location.Name</h1>
                 <div class="flex flex-wrap gap-2 mt-3">
                     @if (!string.IsNullOrWhiteSpace(location.LocationTypeName))
                     {
-                        <span class="inline-block bg-green-100 text-green-800 text-sm font-medium px-3 py-1 rounded-full">@location.LocationTypeName</span>
+                        <span class="inline-block bg-success-soft text-success-hover text-sm font-medium px-3 py-1 rounded-full">@location.LocationTypeName</span>
                     }
                     @if (!string.IsNullOrWhiteSpace(location.CountryName))
                     {
-                        <span class="text-sm text-gray-600"><i class="fas fa-globe text-gray-400 me-1"></i> @location.CountryName</span>
+                        <span class="text-sm text-ink-secondary"><i aria-hidden="true" class="fas fa-globe text-ink-muted me-1"></i> @location.CountryName</span>
                     }
                 </div>
                 @if (!string.IsNullOrWhiteSpace(location.ParentLocationName))
                 {
-                    <p class="text-sm text-gray-500 mt-1">
-                        @Localizer["Part of"]: <a href="/@culture/locations/@location.ParentLocationSlug" class="text-blue-600 hover:text-blue-800">@location.ParentLocationName</a>
+                    <p class="text-sm text-ink-muted mt-1">
+                        @Localizer["Part of"]: <a href="/@culture/locations/@location.ParentLocationSlug" class="text-accent hover:text-accent-hover">@location.ParentLocationName</a>
                     </p>
                 }
                 @if (location.Latitude.HasValue && location.Longitude.HasValue)
                 {
-                    <p class="text-sm text-gray-500 mt-1">
-                        <i class="fas fa-map-pin text-gray-400 me-1"></i> @location.Latitude.Value, @location.Longitude.Value
+                    <p class="text-sm text-ink-muted mt-1">
+                        <i aria-hidden="true" class="fas fa-map-pin text-ink-muted me-1"></i> @location.Latitude.Value, @location.Longitude.Value
                     </p>
                 }
             </section>
@@ -48,15 +48,15 @@
             @if (location.Children.Count > 0)
             {
                 <section>
-                    <h2 class="text-lg font-semibold text-gray-900 mb-3">@Localizer["Sub-Locations"]</h2>
+                    <h2 class="text-lg font-semibold text-ink mb-3">@Localizer["Sub-Locations"]</h2>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         @foreach (var child in location.Children)
                         {
-                            <a href="/@culture/locations/@child.Slug" class="bg-white rounded-lg border border-gray-200 p-3 hover:shadow-sm">
-                                <p class="font-medium text-gray-900">@child.Name</p>
+                            <a href="/@culture/locations/@child.Slug" class="bg-surface rounded-lg border border-rule p-3 hover:shadow-sm">
+                                <p class="font-medium text-ink">@child.Name</p>
                                 @if (!string.IsNullOrWhiteSpace(child.LocationTypeName))
                                 {
-                                    <span class="text-xs text-gray-500">@child.LocationTypeName</span>
+                                    <span class="text-xs text-ink-muted">@child.LocationTypeName</span>
                                 }
                             </a>
                         }
@@ -67,21 +67,21 @@
             @if (location.Sessions.Count > 0)
             {
                 <section>
-                    <h2 class="text-lg font-semibold text-gray-900 mb-3">@Localizer["Recording Sessions"]</h2>
-                    <div class="bg-white divide-y border border-gray-200 rounded-lg">
+                    <h2 class="text-lg font-semibold text-ink mb-3">@Localizer["Recording Sessions"]</h2>
+                    <div class="bg-surface divide-y border border-rule rounded-lg">
                         @foreach (var session in location.Sessions)
                         {
-                            <a href="/@culture/sessions/@session.Slug" class="flex items-center justify-between p-3 hover:bg-gray-50">
+                            <a href="/@culture/sessions/@session.Slug" class="flex items-center justify-between p-3 hover:bg-paper">
                                 <div>
-                                    <p class="font-medium text-gray-900">@session.Slug</p>
+                                    <p class="font-medium text-ink">@session.Slug</p>
                                     @if (!string.IsNullOrWhiteSpace(session.SessionTypeName))
                                     {
-                                        <span class="text-xs text-gray-500">@session.SessionTypeName</span>
+                                        <span class="text-xs text-ink-muted">@session.SessionTypeName</span>
                                     }
                                 </div>
                                 @if (session.StartDate.HasValue)
                                 {
-                                    <span class="text-sm text-gray-500">@session.StartDate.Value.ToString("yyyy-MM-dd")</span>
+                                    <span class="text-sm text-ink-muted">@session.StartDate.Value.ToString("yyyy-MM-dd")</span>
                                 }
                             </a>
                         }
@@ -92,21 +92,21 @@
             @if (location.Events.Count > 0)
             {
                 <section>
-                    <h2 class="text-lg font-semibold text-gray-900 mb-3">@Localizer["Performance Events"]</h2>
-                    <div class="bg-white divide-y border border-gray-200 rounded-lg">
+                    <h2 class="text-lg font-semibold text-ink mb-3">@Localizer["Performance Events"]</h2>
+                    <div class="bg-surface divide-y border border-rule rounded-lg">
                         @foreach (var evt in location.Events)
                         {
-                            <a href="/@culture/events/@evt.Slug" class="flex items-center justify-between p-3 hover:bg-gray-50">
+                            <a href="/@culture/events/@evt.Slug" class="flex items-center justify-between p-3 hover:bg-paper">
                                 <div>
-                                    <p class="font-medium text-gray-900">@evt.Slug</p>
+                                    <p class="font-medium text-ink">@evt.Slug</p>
                                     @if (!string.IsNullOrWhiteSpace(evt.EventTypeName))
                                     {
-                                        <span class="text-xs text-gray-500">@evt.EventTypeName</span>
+                                        <span class="text-xs text-ink-muted">@evt.EventTypeName</span>
                                     }
                                 </div>
                                 @if (evt.Date.HasValue)
                                 {
-                                    <span class="text-sm text-gray-500">@evt.Date.Value.ToString("yyyy-MM-dd")</span>
+                                    <span class="text-sm text-ink-muted">@evt.Date.Value.ToString("yyyy-MM-dd")</span>
                                 }
                             </a>
                         }
@@ -117,13 +117,13 @@
             @if (location.PeopleBornHere.Count > 0)
             {
                 <section>
-                    <h2 class="text-lg font-semibold text-gray-900 mb-3">@Localizer["People Born Here"]</h2>
+                    <h2 class="text-lg font-semibold text-ink mb-3">@Localizer["People Born Here"]</h2>
                     <div class="flex flex-wrap gap-3">
                         @foreach (var person in location.PeopleBornHere)
                         {
-                            <a href="/@culture/people/@person.Slug" class="inline-flex items-center gap-2 bg-white rounded-lg border border-gray-200 px-3 py-2 hover:shadow-sm">
-                                <i class="fas fa-user text-gray-400"></i>
-                                <span class="text-blue-600 hover:text-blue-800 font-medium">@person.FullName</span>
+                            <a href="/@culture/people/@person.Slug" class="inline-flex items-center gap-2 bg-surface rounded-lg border border-rule px-3 py-2 hover:shadow-sm">
+                                <i aria-hidden="true" class="fas fa-user text-ink-muted"></i>
+                                <span class="text-accent hover:text-accent-hover font-medium">@person.FullName</span>
                             </a>
                         }
                     </div>
@@ -133,13 +133,13 @@
             @if (location.PeopleDiedHere.Count > 0)
             {
                 <section>
-                    <h2 class="text-lg font-semibold text-gray-900 mb-3">@Localizer["People Died Here"]</h2>
+                    <h2 class="text-lg font-semibold text-ink mb-3">@Localizer["People Died Here"]</h2>
                     <div class="flex flex-wrap gap-3">
                         @foreach (var person in location.PeopleDiedHere)
                         {
-                            <a href="/@culture/people/@person.Slug" class="inline-flex items-center gap-2 bg-white rounded-lg border border-gray-200 px-3 py-2 hover:shadow-sm">
-                                <i class="fas fa-user text-gray-400"></i>
-                                <span class="text-blue-600 hover:text-blue-800 font-medium">@person.FullName</span>
+                            <a href="/@culture/people/@person.Slug" class="inline-flex items-center gap-2 bg-surface rounded-lg border border-rule px-3 py-2 hover:shadow-sm">
+                                <i aria-hidden="true" class="fas fa-user text-ink-muted"></i>
+                                <span class="text-accent hover:text-accent-hover font-medium">@person.FullName</span>
                             </a>
                         }
                     </div>
@@ -149,11 +149,11 @@
             @if (location.Media.Count > 0)
             {
                 <section>
-                    <h2 class="text-lg font-semibold text-gray-900 mb-3">@Localizer["Media"]</h2>
+                    <h2 class="text-lg font-semibold text-ink mb-3">@Localizer["Media"]</h2>
                     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                         @foreach (var media in location.Media)
                         {
-                            <div class="bg-gray-100 rounded-lg aspect-square overflow-hidden">
+                            <div class="bg-paper-muted rounded-lg aspect-square overflow-hidden">
                                 @if (!string.IsNullOrWhiteSpace(media.Url))
                                 {
                                     <img src="@media.Url" alt="@media.FileName" class="w-full h-full object-cover" loading="lazy" />
@@ -166,13 +166,13 @@
         </div>
 
         <aside class="w-full lg:w-72 space-y-4">
-            <div class="bg-white rounded-lg border border-gray-200 p-4">
-                <h3 class="text-sm font-semibold text-gray-700 mb-2">@Localizer["Location Info"]</h3>
+            <div class="bg-surface rounded-lg border border-rule p-4">
+                <h3 class="text-sm font-semibold text-ink-secondary mb-2">@Localizer["Location Info"]</h3>
                 <dl class="space-y-1 text-sm">
-                    <div class="flex justify-between"><dt class="text-gray-500">@Localizer["Type"]</dt><dd class="text-gray-900">@(location.LocationTypeName ?? "—")</dd></div>
-                    <div class="flex justify-between"><dt class="text-gray-500">@Localizer["Country"]</dt><dd class="text-gray-900">@(location.CountryName ?? "—")</dd></div>
-                    <div class="flex justify-between"><dt class="text-gray-500">@Localizer["Sessions"]</dt><dd class="text-gray-900">@location.Sessions.Count</dd></div>
-                    <div class="flex justify-between"><dt class="text-gray-500">@Localizer["Events"]</dt><dd class="text-gray-900">@location.Events.Count</dd></div>
+                    <div class="flex justify-between"><dt class="text-ink-muted">@Localizer["Type"]</dt><dd class="text-ink">@(location.LocationTypeName ?? "—")</dd></div>
+                    <div class="flex justify-between"><dt class="text-ink-muted">@Localizer["Country"]</dt><dd class="text-ink">@(location.CountryName ?? "—")</dd></div>
+                    <div class="flex justify-between"><dt class="text-ink-muted">@Localizer["Sessions"]</dt><dd class="text-ink">@location.Sessions.Count</dd></div>
+                    <div class="flex justify-between"><dt class="text-ink-muted">@Localizer["Events"]</dt><dd class="text-ink">@location.Events.Count</dd></div>
                 </dl>
             </div>
         </aside>

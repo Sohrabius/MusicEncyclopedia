@@ -1,8 +1,8 @@
 # Music Encyclopedia — UI Redesign Plan
 
-> Status reconciliation (2026-09-11): Partially implemented. Fonts, design tokens, admin.css and shared partials exist; raw palette utilities remain across public/auth/admin views. `IMPLEMENTATION_PLAN.md` tasks B09/B10 govern completion. The launch UI is Persian (`fa`) only and RTL; multilingual UI and LTR acceptance are deferred.
+> Status reconciliation (2026-09-13): B09 and B10 are implemented. Public, authentication, and admin Razor views use the shared semantic palette; common forms and feedback states are standardized; and the Persian RTL accessibility and responsive matrix has passed. The launch UI is Persian (`fa`) only and RTL; multilingual UI and LTR acceptance are deferred.
 
-> Original proposal status: Proposed · Prepared with **ui-ux-pro-max** design intelligence
+> Original proposal status: Implemented through B09 · Prepared with **ui-ux-pro-max** design intelligence
 > Goal: A **clean, minimal, user-friendly** UI — one design language across all 132 views (public + admin), with **Vazirmatn (Vazir) font mandatory in `fa` RTL mode**.
 
 ---
@@ -16,7 +16,7 @@ The app currently has **two competing design languages**:
 | Public layout + home + albums + details | Token-based custom CSS (oklch palette, **coral** accent, Geist font) | Solid foundation, but coral accent and floating pill nav feel more "portfolio" than "encyclopedia" |
 | Search, Auth, error pages | Raw Tailwind utilities (`blue-600`, `gray-200`) | A completely different visual language |
 | Admin (≈100 views) | Dark `gray-900` sidebar, Font Awesome, Tailwind CDN | Third visual language; font config references Vazirmatn but the font is **never loaded** |
-| Persian RTL | Font and token foundations exist but need browser verification across all surfaces | B10 must prove Vazirmatn, logical layout, keyboard behavior and responsive rendering in `fa` |
+| Persian RTL | Verified across public, auth, admin, and wizard surfaces | B10 proved Vazirmatn, logical layout, keyboard behavior and responsive rendering in `fa` |
 
 **The redesign unifies everything onto one token-driven system**, guided by ui-ux-pro-max's recommendation for the *Wiki / Encyclopedia* product type:
 
@@ -223,7 +223,7 @@ html[dir="rtl"] .font-display {
 - **Accept:** keyboard-only login flow; focus rings visible.
 
 ### Phase 5 — Admin shell & dashboard
-- [ ] `_AdminLayout`: light sidebar (hairline border, token colors), topbar with breadcrumb, Vazirmatn loads in RTL, alerts via `_Alerts` partial, Font Awesome retained.
+- [x] `_AdminLayout`: light sidebar (hairline border, token colors), topbar, Vazirmatn loads in RTL, alerts via `_Alerts` partial, Font Awesome retained.
 - [ ] Dashboard: flat stat cards + tables.
 - **Accept:** admin is usable in `fa` with Vazirmatn; the sidebar toggle and focus order work in RTL.
 
@@ -234,9 +234,9 @@ html[dir="rtl"] .font-display {
 - **Accept:** every admin list/form view passes a token-consistency grep; CRUD round-trip works for Albums.
 
 ### Phase 7 — QA & hardening
-- [ ] **Persian RTL pass:** verify every launch page in `fa` — fonts, alignment, arrows, spacing, drawer and mixed-content direction.
-- [ ] **Accessibility:** WCAG AA contrast, keyboard navigation, focus states, `prefers-reduced-motion`, aria-labels (ui-ux-pro-max checklist).
-- [ ] **Responsive:** 375 / 768 / 1024 / 1440; no horizontal scroll; CLS < 0.1.
+- [x] **Persian RTL pass:** representative launch routes verified in `fa` across home, public catalog, auth, admin and wizard.
+- [x] **Accessibility:** WCAG AA token contrast, keyboard navigation, focus states, `prefers-reduced-motion`, validation announcements and aria labels pass B10 checks.
+- [x] **Responsive:** 375 / 768 / 1024 / 1440 with no horizontal scroll. CLS measurement remains B12.
 - [ ] **Performance:** lazy-load images (already present), preload fonts, remove Geist request.
 - [ ] Record Tailwind CDN as B15. Promote local generated CSS into release scope only if B12 performance or CSP evidence requires it.
 - [ ] Update `design.md`; capture after-screenshots.
@@ -269,13 +269,13 @@ rg -n "font-family:.*Geist" src/MusicEncyclopedia.Web/Views
 
 ## 7. Acceptance Criteria (Definition of Done)
 
-- [ ] One token system drives **all 132 views**; no raw Tailwind color utilities remain in public views.
-- [ ] **`fa` renders in Vazirmatn (Vazir) with RTL layout** — verified in DevTools and visually across public, auth and admin surfaces.
-- [ ] Search-first home; hierarchical nav; predictable pagination.
-- [ ] WCAG AA contrast, keyboard navigable, focus rings, reduced-motion respected.
-- [ ] Responsive at 375–1440px with no horizontal scroll.
-- [ ] Admin redesigned to the same flat/minimal language; all CRUD flows functional.
-- [ ] All tests green; `dotnet build` clean; canonical, `fa`/`x-default` alternate links and JSON-LD remain valid.
+- [x] One token system drives all Razor views; no raw named Tailwind color utilities remain.
+- [x] **`fa` renders in Vazirmatn (Vazir) with RTL layout** across public, auth, admin and wizard surfaces.
+- [x] Search-first home; hierarchical nav; predictable hybrid pagination.
+- [x] WCAG AA token contrast, keyboard navigation, focus rings and reduced-motion behavior.
+- [x] Responsive at 375–1440px with no horizontal scroll.
+- [x] Admin uses the same flat/minimal language; CRUD and wizard flows have B07 regression coverage.
+- [ ] Canonical, `fa`/`x-default` alternate links, JSON-LD, CLS and other performance evidence remain B12.
 
 ---
 

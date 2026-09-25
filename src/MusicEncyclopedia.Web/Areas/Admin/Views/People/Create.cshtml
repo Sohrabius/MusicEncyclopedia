@@ -6,46 +6,46 @@
 
 <form method="post" action="/admin/people/Create">
     @Html.AntiForgeryToken()
-    <div asp-validation-summary="ModelOnly" class="mb-4 px-4 py-3 rounded-md bg-red-50 border border-red-200 text-red-800 text-sm" role="alert"></div>
+    <div asp-validation-summary="ModelOnly" class="mb-4 px-4 py-3 rounded-md bg-error-soft border border-error-border text-error-hover text-sm" role="alert"></div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="lg:col-span-2 space-y-6">
             <!-- Basic Information -->
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">اطلاعات پایه</h2>
+            <div class="bg-surface rounded-lg shadow-sm border border-rule p-5">
+                <h2 class="text-lg font-semibold text-ink mb-4">اطلاعات پایه</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="md:col-span-2">
-                        <label asp-for="FullName" class="block text-sm font-medium text-gray-700 mb-1"></label>
-                        <input asp-for="FullName" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                        <span asp-validation-for="FullName" class="text-xs text-red-600"></span>
+                        <label asp-for="FullName" class="form-label"></label>
+                        <input asp-for="FullName" class="form-control" />
+                        <span asp-validation-for="FullName" aria-live="polite" class="field-error"></span>
                     </div>
                     <div>
-                        <label asp-for="FullNameSort" class="block text-sm font-medium text-gray-700 mb-1"></label>
-                        <input asp-for="FullNameSort" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                        <label asp-for="FullNameSort" class="form-label"></label>
+                        <input asp-for="FullNameSort" class="form-control" />
                     </div>
                     <div>
-                        <label asp-for="Slug" class="block text-sm font-medium text-gray-700 mb-1"></label>
-                        <input asp-for="Slug" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                        <span asp-validation-for="Slug" class="text-xs text-red-600"></span>
+                        <label asp-for="Slug" class="form-label"></label>
+                        <input asp-for="Slug" class="form-control" />
+                        <span asp-validation-for="Slug" aria-live="polite" class="field-error"></span>
                     </div>
                     <div>
-                        <label asp-for="OriginalName" class="block text-sm font-medium text-gray-700 mb-1"></label>
-                        <input asp-for="OriginalName" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                        <label asp-for="OriginalName" class="form-label"></label>
+                        <input asp-for="OriginalName" class="form-control" />
                     </div>
                     <div>
-                        <label asp-for="EnglishName" class="block text-sm font-medium text-gray-700 mb-1"></label>
-                        <input asp-for="EnglishName" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                        <label asp-for="EnglishName" class="form-label"></label>
+                        <input asp-for="EnglishName" class="form-control" />
                     </div>
                 </div>
             </div>
 
             <!-- Classification -->
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">دسته‌بندی</h2>
+            <div class="bg-surface rounded-lg shadow-sm border border-rule p-5">
+                <h2 class="text-lg font-semibold text-ink mb-4">دسته‌بندی</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label asp-for="PersonKindId" class="block text-sm font-medium text-gray-700 mb-1"></label>
-                        <select asp-for="PersonKindId" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <label asp-for="PersonKindId" class="form-label"></label>
+                        <select asp-for="PersonKindId" class="form-control">
                             <option value="">-- انتخاب نوع --</option>
                             @foreach (var item in Model.PersonKinds)
                             {
@@ -54,8 +54,8 @@
                         </select>
                     </div>
                     <div>
-                        <label asp-for="NationalityCountryId" class="block text-sm font-medium text-gray-700 mb-1"></label>
-                        <select asp-for="NationalityCountryId" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <label asp-for="NationalityCountryId" class="form-label"></label>
+                        <select asp-for="NationalityCountryId" class="form-control">
                             <option value="">-- انتخاب کشور --</option>
                             @foreach (var item in Model.Countries)
                             {
@@ -67,27 +67,27 @@
             </div>
 
             <!-- Dates -->
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">تاریخ‌ها</h2>
+            <div class="bg-surface rounded-lg shadow-sm border border-rule p-5">
+                <h2 class="text-lg font-semibold text-ink mb-4">تاریخ‌ها</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label asp-for="BirthDate" class="block text-sm font-medium text-gray-700 mb-1"></label>
-                        <input asp-for="BirthDate" type="date" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                        <label asp-for="BirthDate" class="form-label"></label>
+                        <input asp-for="BirthDate" type="date" class="form-control" />
                     </div>
                     <div>
-                        <label asp-for="BirthDatePrecision" class="block text-sm font-medium text-gray-700 mb-1"></label>
-                        <select asp-for="BirthDatePrecision" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <label asp-for="BirthDatePrecision" class="form-label"></label>
+                        <select asp-for="BirthDatePrecision" class="form-control">
                             <option value="">-- دقت --</option>
                             <option value="day">روز</option><option value="month">ماه</option><option value="year">سال</option>
                         </select>
                     </div>
                     <div>
-                        <label asp-for="DeathDate" class="block text-sm font-medium text-gray-700 mb-1"></label>
-                        <input asp-for="DeathDate" type="date" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                        <label asp-for="DeathDate" class="form-label"></label>
+                        <input asp-for="DeathDate" type="date" class="form-control" />
                     </div>
                     <div>
-                        <label asp-for="DeathDatePrecision" class="block text-sm font-medium text-gray-700 mb-1"></label>
-                        <select asp-for="DeathDatePrecision" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <label asp-for="DeathDatePrecision" class="form-label"></label>
+                        <select asp-for="DeathDatePrecision" class="form-control">
                             <option value="">-- دقت --</option>
                             <option value="day">روز</option><option value="month">ماه</option><option value="year">سال</option>
                         </select>
@@ -96,27 +96,27 @@
             </div>
 
             <!-- Biography -->
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">زندگی‌نامه</h2>
+            <div class="bg-surface rounded-lg shadow-sm border border-rule p-5">
+                <h2 class="text-lg font-semibold text-ink mb-4">زندگی‌نامه</h2>
                 <div>
-                    <label asp-for="Biography" class="block text-sm font-medium text-gray-700 mb-1"></label>
-                    <textarea asp-for="Biography" rows="6" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                    <label asp-for="Biography" class="form-label"></label>
+                    <textarea asp-for="Biography" rows="6" class="form-control"></textarea>
                 </div>
                 <div class="mt-4">
-                    <label asp-for="ImageMediaId" class="block text-sm font-medium text-gray-700 mb-1"></label>
-                    <input asp-for="ImageMediaId" type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="شناسه رسانه" />
+                    <label asp-for="ImageMediaId" class="form-label"></label>
+                    <input asp-for="ImageMediaId" type="number" class="form-control" placeholder="شناسه رسانه" />
                 </div>
             </div>
         </div>
 
         <!-- Sidebar -->
         <div class="space-y-6">
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">انتشار</h2>
-                <button type="submit" class="w-full px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
-                    <i class="fas fa-save"></i> ایجاد شخص
+            <div class="bg-surface rounded-lg shadow-sm border border-rule p-5">
+                <h2 class="text-lg font-semibold text-ink mb-4">انتشار</h2>
+                <button type="submit" class="w-full px-4 py-2.5 bg-accent text-on-accent text-sm font-medium rounded-md hover:bg-accent-hover transition-colors flex items-center justify-center gap-2">
+                    <i aria-hidden="true" class="fas fa-save"></i> ایجاد شخص
                 </button>
-                <a href="/admin/people" class="w-full block text-center mt-3 px-4 py-2.5 text-sm text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">انصراف</a>
+                <a href="/admin/people" class="w-full block text-center mt-3 px-4 py-2.5 text-sm text-ink-secondary bg-paper-muted rounded-md hover:bg-rule transition-colors">انصراف</a>
             </div>
         </div>
     </div>

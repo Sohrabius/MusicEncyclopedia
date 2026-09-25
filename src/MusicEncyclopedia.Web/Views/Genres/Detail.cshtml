@@ -13,12 +13,12 @@
          Breadcrumb
          ============================================================ -->
     <nav aria-label="@Localizer["Breadcrumb"]" class="mb-6">
-        <ol class="flex items-center gap-2 text-sm text-gray-500">
-            <li><a href="/@culture" class="hover:text-blue-600 transition-colors">@Localizer["Home"]</a></li>
+        <ol class="flex items-center gap-2 text-sm text-ink-muted">
+            <li><a href="/@culture" class="hover:text-accent transition-colors">@Localizer["Home"]</a></li>
             <li><span class="mx-1">/</span></li>
-            <li><a href="/@culture/genres" class="hover:text-blue-600 transition-colors">@Localizer["Genres"]</a></li>
+            <li><a href="/@culture/genres" class="hover:text-accent transition-colors">@Localizer["Genres"]</a></li>
             <li><span class="mx-1">/</span></li>
-            <li class="text-gray-900 font-medium truncate max-w-[200px]" aria-current="page">@Model.Name</li>
+            <li class="text-ink font-medium truncate max-w-[200px]" aria-current="page">@Model.Name</li>
         </ol>
     </nav>
 
@@ -26,15 +26,15 @@
          1. Header
          ============================================================ -->
     <div class="mb-10">
-        <h1 class="text-3xl md:text-4xl font-bold text-gray-900">@Model.Name</h1>
+        <h1 class="text-3xl md:text-4xl font-bold text-ink">@Model.Name</h1>
 
         <!-- Parent genre -->
         @if (Model.ParentGenre is not null)
         {
-            <p class="mt-2 text-gray-600">
+            <p class="mt-2 text-ink-secondary">
                 @Localizer["Parent genre"]:
                 <a href="/@culture/genres/@Model.ParentGenre.Slug"
-                   class="text-blue-600 hover:text-blue-800 font-medium">
+                   class="text-accent hover:text-accent-hover font-medium">
                     @Model.ParentGenre.Name
                 </a>
             </p>
@@ -44,11 +44,11 @@
         @if (Model.ChildGenres.Count > 0)
         {
             <div class="flex flex-wrap gap-2 mt-3">
-                <span class="text-sm text-gray-500 me-1">@Localizer["Sub-genres"]:</span>
+                <span class="text-sm text-ink-muted me-1">@Localizer["Sub-genres"]:</span>
                 @foreach (var child in Model.ChildGenres)
                 {
                     <a href="/@culture/genres/@child.Slug"
-                       class="inline-block bg-blue-50 text-blue-700 text-xs px-2.5 py-1 rounded-full hover:bg-blue-100 transition-colors">
+                       class="inline-block bg-accent-soft text-accent-hover text-xs px-2.5 py-1 rounded-full hover:bg-accent-soft transition-colors">
                         @child.Name
                     </a>
                 }
@@ -68,8 +68,8 @@
             @if (!string.IsNullOrWhiteSpace(Model.Description))
             {
                 <section>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["Description"]</h2>
-                    <div class="prose prose-gray max-w-none text-gray-700 leading-relaxed">
+                    <h2 class="text-2xl font-bold text-ink mb-4">@Localizer["Description"]</h2>
+                    <div class="prose prose-gray max-w-none text-ink-secondary leading-relaxed">
                         @Model.Description
                     </div>
                 </section>
@@ -81,18 +81,18 @@
             @if (Model.Albums.Count > 0)
             {
                 <section>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-4">
+                    <h2 class="text-2xl font-bold text-ink mb-4">
                         @Localizer["Albums"] (@Model.Albums.Count)
                     </h2>
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                         @foreach (var album in Model.Albums)
                         {
                             <a href="/@culture/albums/@album.Slug"
-                               class="block bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow">
-                                <h3 class="font-medium text-blue-600 hover:text-blue-800">@album.Title</h3>
+                               class="block bg-surface rounded-lg border border-rule p-4 hover:shadow-md transition-shadow">
+                                <h3 class="font-medium text-accent hover:text-accent-hover">@album.Title</h3>
                                 @if (album.ReleaseDate.HasValue)
                                 {
-                                    <span class="text-sm text-gray-500">@album.ReleaseDate.Value.Year</span>
+                                    <span class="text-sm text-ink-muted">@album.ReleaseDate.Value.Year</span>
                                 }
                             </a>
                         }
@@ -106,18 +106,18 @@
             @if (Model.Tracks.Count > 0)
             {
                 <section>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-4">
+                    <h2 class="text-2xl font-bold text-ink mb-4">
                         @Localizer["Tracks"] (@Model.Tracks.Count)
                     </h2>
                     <div class="space-y-2">
                         @foreach (var track in Model.Tracks)
                         {
                             <a href="/@culture/tracks/@track.Slug"
-                               class="flex items-center justify-between bg-white rounded-lg border border-gray-200 px-4 py-2 hover:bg-gray-50 transition-colors">
-                                <span class="text-sm font-medium text-blue-600 hover:text-blue-800">@track.Title</span>
+                               class="flex items-center justify-between bg-surface rounded-lg border border-rule px-4 py-2 hover:bg-paper transition-colors">
+                                <span class="text-sm font-medium text-accent hover:text-accent-hover">@track.Title</span>
                                 @if (track.DurationSeconds.HasValue)
                                 {
-                                    <span class="text-xs text-gray-500 tabular-nums">
+                                    <span class="text-xs text-ink-muted tabular-nums">
                                         @TimeSpan.FromSeconds(track.DurationSeconds.Value).ToString(@"m\:ss")
                                     </span>
                                 }
@@ -133,14 +133,14 @@
             @if (Model.Artists.Count > 0)
             {
                 <section>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-4">
+                    <h2 class="text-2xl font-bold text-ink mb-4">
                         @Localizer["Artists"] (@Model.Artists.Count)
                     </h2>
                     <div class="flex flex-wrap gap-2">
                         @foreach (var artist in Model.Artists)
                         {
                             <a href="/@culture/people/@artist.Slug"
-                               class="inline-block bg-purple-50 text-purple-700 text-sm px-3 py-1.5 rounded-full hover:bg-purple-100 transition-colors">
+                               class="inline-block bg-info-soft text-info-hover text-sm px-3 py-1.5 rounded-full hover:bg-info-soft transition-colors">
                                 @artist.Name
                             </a>
                         }
@@ -157,18 +157,18 @@
                 var videos = Model.Media.Where(m => m.MediaType == "VIDEO" || m.MediaType == "video").ToList();
 
                 <section>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["Media"]</h2>
+                    <h2 class="text-2xl font-bold text-ink mb-4">@Localizer["Media"]</h2>
 
                     @if (images.Count > 0)
                     {
-                        <h3 class="text-lg font-semibold text-gray-700 mb-2">@Localizer["Images"]</h3>
+                        <h3 class="text-lg font-semibold text-ink-secondary mb-2">@Localizer["Images"]</h3>
                         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-6">
                             @foreach (var media in images)
                             {
                                 <a href="@media.Url"
                                    target="_blank"
                                    rel="noopener noreferrer"
-                                   class="block aspect-square bg-gray-100 rounded-lg overflow-hidden hover:opacity-90 transition-opacity">
+                                   class="block aspect-square bg-paper-muted rounded-lg overflow-hidden hover:opacity-90 transition-opacity">
                                     <img src="@(media.ThumbnailUrl ?? media.Url)"
                                          alt="@(media.Description ?? "")"
                                          class="w-full h-full object-cover"
@@ -180,11 +180,11 @@
 
                     @if (videos.Count > 0)
                     {
-                        <h3 class="text-lg font-semibold text-gray-700 mb-2">@Localizer["Videos"]</h3>
+                        <h3 class="text-lg font-semibold text-ink-secondary mb-2">@Localizer["Videos"]</h3>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                             @foreach (var media in videos)
                             {
-                                <div class="aspect-video bg-gray-100 rounded-lg overflow-hidden">
+                                <div class="aspect-video bg-paper-muted rounded-lg overflow-hidden">
                                     @if (media.Url.Contains("youtube") || media.Url.Contains("youtu.be"))
                                     {
                                         <iframe src="@media.Url"
@@ -213,21 +213,21 @@
             @if (Model.Citations.Count > 0)
             {
                 <section>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["References"]</h2>
+                    <h2 class="text-2xl font-bold text-ink mb-4">@Localizer["References"]</h2>
                     <ol class="space-y-3 list-decimal list-inside">
                         @foreach (var citation in Model.Citations)
                         {
-                            <li class="text-sm text-gray-700">
+                            <li class="text-sm text-ink-secondary">
                                 @if (!string.IsNullOrWhiteSpace(citation.Quote))
                                 {
                                     <span class="font-medium">"@citation.Quote"</span>
                                     <br />
                                 }
-                                <span class="text-gray-500">
+                                <span class="text-ink-muted">
                                     @if (!string.IsNullOrWhiteSpace(citation.SourceSlug))
                                     {
                                         <a href="/@culture/sources/@citation.SourceSlug"
-                                           class="text-blue-600 hover:text-blue-800">
+                                           class="text-accent hover:text-accent-hover">
                                             @citation.SourceName
                                         </a>
                                     }
@@ -244,7 +244,7 @@
                                         <a href="@citation.Url"
                                            target="_blank"
                                            rel="noopener noreferrer"
-                                           class="text-blue-600 hover:text-blue-800 ms-1">
+                                           class="text-accent hover:text-accent-hover ms-1">
                                             @Localizer["Source"]
                                         </a>
                                     }
@@ -261,7 +261,7 @@
             @if (Model.Links.Count > 0)
             {
                 <section>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["External Links"]</h2>
+                    <h2 class="text-2xl font-bold text-ink mb-4">@Localizer["External Links"]</h2>
                     <ul class="space-y-1.5">
                         @foreach (var link in Model.Links)
                         {
@@ -269,12 +269,12 @@
                                 <a href="@link.Url"
                                    target="_blank"
                                    rel="noopener noreferrer"
-                                   class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                   class="text-accent hover:text-accent-hover text-sm font-medium">
                                     @(!string.IsNullOrWhiteSpace(link.Title) ? link.Title : link.Url)
                                 </a>
                                 @if (!string.IsNullOrWhiteSpace(link.LinkType))
                                 {
-                                    <span class="text-gray-400 text-xs ms-1">[@link.LinkType]</span>
+                                    <span class="text-ink-muted text-xs ms-1">[@link.LinkType]</span>
                                 }
                             </li>
                         }
@@ -287,45 +287,45 @@
              Sidebar
              ============================================================ -->
         <aside class="w-full lg:w-72 flex-shrink-0" role="complementary" aria-label="@Localizer["Genre metadata"]">
-            <div class="bg-gray-50 rounded-lg border border-gray-200 p-5 space-y-4 sticky top-4">
-                <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider">@Localizer["Details"]</h3>
+            <div class="bg-paper rounded-lg border border-rule p-5 space-y-4 sticky top-4">
+                <h3 class="text-sm font-semibold text-ink-muted uppercase tracking-wider">@Localizer["Details"]</h3>
 
                 <div>
-                    <h4 class="text-xs font-medium text-gray-500 uppercase">@Localizer["Name"]</h4>
-                    <p class="mt-1 text-sm text-gray-700">@Model.Name</p>
+                    <h4 class="text-xs font-medium text-ink-muted uppercase">@Localizer["Name"]</h4>
+                    <p class="mt-1 text-sm text-ink-secondary">@Model.Name</p>
                 </div>
 
                 @if (Model.ParentGenre is not null)
                 {
                     <div>
-                        <h4 class="text-xs font-medium text-gray-500 uppercase">@Localizer["Parent Genre"]</h4>
+                        <h4 class="text-xs font-medium text-ink-muted uppercase">@Localizer["Parent Genre"]</h4>
                         <a href="/@culture/genres/@Model.ParentGenre.Slug"
-                           class="mt-1 text-sm text-blue-600 hover:text-blue-800 block">
+                           class="mt-1 text-sm text-accent hover:text-accent-hover block">
                             @Model.ParentGenre.Name
                         </a>
                     </div>
                 }
 
                 <div>
-                    <h4 class="text-xs font-medium text-gray-500 uppercase">@Localizer["Sub-genres"]</h4>
-                    <p class="mt-1 text-sm text-gray-700">@Model.ChildGenres.Count</p>
+                    <h4 class="text-xs font-medium text-ink-muted uppercase">@Localizer["Sub-genres"]</h4>
+                    <p class="mt-1 text-sm text-ink-secondary">@Model.ChildGenres.Count</p>
                 </div>
 
                 <div>
-                    <h4 class="text-xs font-medium text-gray-500 uppercase">@Localizer["Albums"]</h4>
-                    <p class="mt-1 text-sm text-gray-700">@Model.Albums.Count</p>
+                    <h4 class="text-xs font-medium text-ink-muted uppercase">@Localizer["Albums"]</h4>
+                    <p class="mt-1 text-sm text-ink-secondary">@Model.Albums.Count</p>
                 </div>
 
                 <div>
-                    <h4 class="text-xs font-medium text-gray-500 uppercase">@Localizer["Tracks"]</h4>
-                    <p class="mt-1 text-sm text-gray-700">@Model.Tracks.Count</p>
+                    <h4 class="text-xs font-medium text-ink-muted uppercase">@Localizer["Tracks"]</h4>
+                    <p class="mt-1 text-sm text-ink-secondary">@Model.Tracks.Count</p>
                 </div>
 
                 @if (Model.Artists.Count > 0)
                 {
                     <div>
-                        <h4 class="text-xs font-medium text-gray-500 uppercase">@Localizer["Artists"]</h4>
-                        <p class="mt-1 text-sm text-gray-700">@Model.Artists.Count</p>
+                        <h4 class="text-xs font-medium text-ink-muted uppercase">@Localizer["Artists"]</h4>
+                        <p class="mt-1 text-sm text-ink-secondary">@Model.Artists.Count</p>
                     </div>
                 }
             </div>

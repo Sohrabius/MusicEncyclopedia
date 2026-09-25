@@ -46,8 +46,8 @@
 </script>
 
 <!-- Breadcrumb -->
-<nav class="section" style="padding-bottom: 0;">
-    <div class="section__inner">
+<nav class="page-breadcrumb">
+    <div class="page-frame">
         <ol class="breadcrumb">
             <li><a href="/@culture">Home</a></li>
             <li class="breadcrumb__sep">/</li>
@@ -57,20 +57,20 @@
 </nav>
 
 <!-- Header -->
-<section class="section" style="padding-top: 0; padding-bottom: var(--space-lg);">
-    <div class="section__inner">
-        <h1 class="section__title" style="font-size: var(--text-2xl);">@Localizer["Albums"]</h1>
-        <p class="mt-2" style="color: var(--color-ink-2); font-size: var(--text-sm);">@Localizer["Browse the complete album catalog"]</p>
+<section class="page-heading">
+    <div class="page-frame">
+        <h1 class="page-heading__title">@Localizer["Albums"]</h1>
+        <p class="page-heading__description">@Localizer["Browse the complete album catalog"]</p>
     </div>
 </section>
 
 <!-- Content -->
-<section class="section" style="padding-top: 0;">
-    <div class="section__inner">
-        <div style="display: flex; gap: var(--space-2xl);">
+<section class="section catalog-page catalog-page--flush">
+    <div class="page-frame">
+        <div class="catalog-layout">
 
             <!-- Filter Sidebar -->
-            <aside style="width: 240px; flex-shrink: 0;" role="complementary" aria-label="@Localizer["Filters"]">
+            <aside class="catalog-sidebar" role="complementary" aria-label="@Localizer["Filters"]">
                 <form method="get" action="/@culture/albums" class="filter">
 
                     <div class="filter__field">
@@ -125,7 +125,7 @@
             </aside>
 
             <!-- Album Grid -->
-            <div style="flex: 1; min-width: 0;">
+            <div class="catalog-results">
                 @if (items.Items.Count == 0)
                 {
                     <div class="empty">
@@ -140,18 +140,18 @@
                 }
                 else
                 {
-                    <p style="font-size: var(--text-xs); color: var(--color-ink-3); margin-bottom: var(--space-lg);">
+                    <p class="catalog-result-count">
                         @Localizer["Showing {0}–{1} of {2} albums",
                             ((items.Page - 1) * items.PageSize) + 1,
                             Math.Min(items.Page * items.PageSize, items.TotalItems),
                             items.TotalItems]
                     </p>
 
-                    <div class="card-grid">
+                    <div class="card-grid catalog-grid">
                         @foreach (var album in items.Items)
                         {
-                            <a href="/@culture/albums/@album.Slug" class="card">
-                                <div class="card__image relative">
+                            <a href="/@culture/albums/@album.Slug" class="card catalog-card">
+                                <div class="card__image">
                                     @if (!string.IsNullOrWhiteSpace(album.CoverUrl))
                                     {
                                         <img src="@album.CoverUrl" alt="@album.Title" loading="lazy" />
@@ -169,7 +169,7 @@
                                     }
                                 </div>
                                 <div class="card__body">
-                                    <h3 class="card__title">@album.Title</h3>
+                                    <h3 class="card__title" dir="auto">@album.Title</h3>
                                     @if (!string.IsNullOrWhiteSpace(album.OriginalTitle) && album.OriginalTitle != album.Title)
                                     {
                                         <p class="card__meta" dir="auto">@album.OriginalTitle</p>
@@ -184,7 +184,7 @@
                                     }
                                     @if (album.Genres.Count > 0)
                                     {
-                                        <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: var(--space-xs);">
+                                        <div class="tag-list catalog-card__tags">
                                             @foreach (var genreName in album.Genres.Take(3))
                                             {
                                                 <span class="tag">@genreName</span>

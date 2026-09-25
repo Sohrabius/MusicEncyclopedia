@@ -68,7 +68,7 @@ try
     // Development — and inject it into the connection string.
     // A fully-specified ConnectionStrings__DefaultConnection override that
     // already contains Password= wins untouched.
-    var dbPassword = builder.Configuration["DbPassword"];
+    var dbPassword = builder.Configuration["DbPassword"];// "Ms*6802951";
     if (!string.IsNullOrWhiteSpace(dbPassword) &&
         !connectionString.Contains("Password=", StringComparison.OrdinalIgnoreCase))
     {

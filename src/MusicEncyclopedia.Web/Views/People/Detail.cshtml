@@ -78,12 +78,12 @@
          Breadcrumb
          ============================================================ -->
     <nav aria-label="@Localizer["Breadcrumb"]" class="mb-6">
-        <ol class="flex items-center gap-2 text-sm text-gray-500">
-            <li><a href="/@culture" class="hover:text-blue-600 transition-colors">@Localizer["Home"]</a></li>
+        <ol class="flex items-center gap-2 text-sm text-ink-muted">
+            <li><a href="/@culture" class="hover:text-accent transition-colors">@Localizer["Home"]</a></li>
             <li><span class="mx-1">/</span></li>
-            <li><a href="/@culture/people" class="hover:text-blue-600 transition-colors">@Localizer["People"]</a></li>
+            <li><a href="/@culture/people" class="hover:text-accent transition-colors">@Localizer["People"]</a></li>
             <li><span class="mx-1">/</span></li>
-            <li class="text-gray-900 font-medium truncate max-w-[200px]" aria-current="page">@fullName</li>
+            <li class="text-ink font-medium truncate max-w-[200px]" aria-current="page">@fullName</li>
         </ol>
     </nav>
 
@@ -94,7 +94,7 @@
     <div class="flex flex-col md:flex-row gap-8 mb-10">
         <!-- Image -->
         <div class="w-full md:w-72 flex-shrink-0">
-            <div class="aspect-square bg-gray-100 rounded-lg overflow-hidden shadow-lg flex items-center justify-center">
+            <div class="aspect-square bg-paper-muted rounded-lg overflow-hidden shadow-lg flex items-center justify-center">
                 @if (!string.IsNullOrWhiteSpace(imageUrl))
                 {
                     <img src="@imageUrl"
@@ -105,7 +105,7 @@
                 }
                 else
                 {
-                    <svg class="w-24 h-24 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-24 h-24 text-ink-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                               d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
@@ -115,39 +115,39 @@
 
         <!-- Person Info -->
         <div class="flex-1 min-w-0">
-            <h1 class="text-3xl md:text-4xl font-bold text-gray-900">@fullName</h1>
+            <h1 class="text-3xl md:text-4xl font-bold text-ink">@fullName</h1>
 
             @if (!string.IsNullOrWhiteSpace(originalName) && originalName != fullName)
             {
-                <p class="text-xl text-gray-500 mt-1" dir="auto">@originalName</p>
+                <p class="text-xl text-ink-muted mt-1" dir="auto">@originalName</p>
             }
             @if (!string.IsNullOrWhiteSpace(englishName) && englishName != fullName && englishName != originalName)
             {
-                <p class="text-lg text-gray-400 mt-0.5" dir="ltr">@englishName</p>
+                <p class="text-lg text-ink-muted mt-0.5" dir="ltr">@englishName</p>
             }
 
             <!-- Kind & Nationality badges -->
             <div class="flex flex-wrap items-center gap-2 mt-3">
                 @if (!string.IsNullOrWhiteSpace(personKind))
                 {
-                    <span class="inline-block bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                    <span class="inline-block bg-accent-soft text-accent-hover text-xs font-medium px-2.5 py-0.5 rounded-full">
                         @personKind
                     </span>
                 }
                 @if (!string.IsNullOrWhiteSpace(nationality))
                 {
-                    <span class="inline-block bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                    <span class="inline-block bg-success-soft text-success-hover text-xs font-medium px-2.5 py-0.5 rounded-full">
                         @nationality
                     </span>
                 }
             </div>
 
             <!-- Birth / Death dates -->
-            <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 text-sm text-gray-600">
+            <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 text-sm text-ink-secondary">
                 @if (birthDate.HasValue)
                 {
                     <span>
-                        <span class="font-medium text-gray-700">@Localizer["Born"]:</span>
+                        <span class="font-medium text-ink-secondary">@Localizer["Born"]:</span>
                         @birthDate.Value.ToString("yyyy-MM-dd")
                         @if (!string.IsNullOrWhiteSpace(birthPlace))
                         {
@@ -158,7 +158,7 @@
                 else if (!string.IsNullOrWhiteSpace(birthPlace))
                 {
                     <span>
-                        <span class="font-medium text-gray-700">@Localizer["Born"]:</span>
+                        <span class="font-medium text-ink-secondary">@Localizer["Born"]:</span>
                         @birthPlace
                     </span>
                 }
@@ -166,7 +166,7 @@
                 @if (deathDate.HasValue)
                 {
                     <span>
-                        <span class="font-medium text-gray-700">@Localizer["Died"]:</span>
+                        <span class="font-medium text-ink-secondary">@Localizer["Died"]:</span>
                         @deathDate.Value.ToString("yyyy-MM-dd")
                         @if (!string.IsNullOrWhiteSpace(deathPlace))
                         {
@@ -177,7 +177,7 @@
                 else if (!string.IsNullOrWhiteSpace(deathPlace))
                 {
                     <span>
-                        <span class="font-medium text-gray-700">@Localizer["Died"]:</span>
+                        <span class="font-medium text-ink-secondary">@Localizer["Died"]:</span>
                         @deathPlace
                     </span>
                 }
@@ -197,8 +197,8 @@
             @if (!string.IsNullOrWhiteSpace(biography))
             {
                 <section>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["Biography"]</h2>
-                    <div class="prose prose-gray max-w-none text-gray-700 leading-relaxed">
+                    <h2 class="text-2xl font-bold text-ink mb-4">@Localizer["Biography"]</h2>
+                    <div class="prose prose-gray max-w-none text-ink-secondary leading-relaxed">
                         @biography
                     </div>
                 </section>
@@ -211,9 +211,9 @@
             @if (timeline.Count > 0)
             {
                 <section>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["Timeline"]</h2>
+                    <h2 class="text-2xl font-bold text-ink mb-4">@Localizer["Timeline"]</h2>
                     <div class="relative">
-                        <div class="absolute top-0 bottom-0 start-4 w-px bg-gray-200" aria-hidden="true"></div>
+                        <div class="absolute top-0 bottom-0 start-4 w-px bg-rule" aria-hidden="true"></div>
                         <ul class="space-y-4">
                             @foreach (var entry in timeline)
                             {
@@ -234,14 +234,14 @@
 
                                 var badgeClass = entryType switch
                                 {
-                                    "AlbumRelease" => "bg-emerald-50 text-emerald-700",
-                                    "TrackRelease" => "bg-teal-50 text-teal-700",
-                                    "RecordingSession" => "bg-indigo-50 text-indigo-700",
-                                    "PerformanceEvent" => "bg-rose-50 text-rose-700",
-                                    "Award" => "bg-amber-50 text-amber-700",
-                                    "ChartEntry" => "bg-sky-50 text-sky-700",
-                                    "Publication" => "bg-violet-50 text-violet-700",
-                                    _ => "bg-gray-100 text-gray-600"
+                                    "AlbumRelease" => "bg-success-soft text-success-hover",
+                                    "TrackRelease" => "bg-info-soft text-info-hover",
+                                    "RecordingSession" => "bg-info-soft text-info-hover",
+                                    "PerformanceEvent" => "bg-error-soft text-error-hover",
+                                    "Award" => "bg-warning-soft text-warning-hover",
+                                    "ChartEntry" => "bg-info-soft text-info-hover",
+                                    "Publication" => "bg-info-soft text-info-hover",
+                                    _ => "bg-paper-muted text-ink-secondary"
                                 };
                                 var typeLabel = entryType switch
                                 {
@@ -260,7 +260,7 @@
                                 var hasLink = !string.IsNullOrWhiteSpace(entryRoute) && !string.IsNullOrWhiteSpace(entrySlug);
 
                                 <li class="relative ps-10">
-                                    <span class="absolute start-0 top-1.5 flex h-8 w-8 items-center justify-center rounded-full bg-white border border-gray-200 shadow-sm" aria-hidden="true">
+                                    <span class="absolute start-0 top-1.5 flex h-8 w-8 items-center justify-center rounded-full bg-surface border border-rule shadow-sm" aria-hidden="true">
                                         @switch (entryType)
                                         {
                                             case "AlbumRelease":
@@ -292,24 +292,24 @@
                                     <div class="flex flex-wrap items-center gap-2">
                                         @if (!string.IsNullOrWhiteSpace(entryDateText))
                                         {
-                                            <span class="text-xs font-semibold text-gray-500 tabular-nums">@entryDateText</span>
+                                            <span class="text-xs font-semibold text-ink-muted tabular-nums">@entryDateText</span>
                                         }
                                         <span class="inline-block text-xs font-medium px-2 py-0.5 rounded-full @badgeClass">@typeLabel</span>
                                     </div>
                                     @if (hasLink)
                                     {
                                         <a href="/@culture/@entryRoute/@entrySlug"
-                                           class="mt-1 block text-sm font-medium text-gray-900 hover:text-blue-600 transition-colors">
+                                           class="mt-1 block text-sm font-medium text-ink hover:text-accent transition-colors">
                                             @entryTitle
                                         </a>
                                     }
                                     else
                                     {
-                                        <p class="mt-1 text-sm font-medium text-gray-900">@entryTitle</p>
+                                        <p class="mt-1 text-sm font-medium text-ink">@entryTitle</p>
                                     }
                                     @if (!string.IsNullOrWhiteSpace(entryDetail))
                                     {
-                                        <p class="text-xs text-gray-500 mt-0.5">@entryDetail</p>
+                                        <p class="text-xs text-ink-muted mt-0.5">@entryDetail</p>
                                     }
                                 </li>
                             }
@@ -328,18 +328,18 @@
 
                 <section>
                     <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-                        <h2 class="text-2xl font-bold text-gray-900">@Localizer["Discography"]</h2>
-                        <span class="text-sm text-gray-500">@Model.Person.Albums.Count @Localizer["albums"]</span>
+                        <h2 class="text-2xl font-bold text-ink">@Localizer["Discography"]</h2>
+                        <span class="text-sm text-ink-muted">@Model.Person.Albums.Count @Localizer["albums"]</span>
                     </div>
 
                     @if (hasAlbumFilters)
                     {
-                        <form method="get" class="flex flex-wrap items-end gap-3 mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <form method="get" class="flex flex-wrap items-end gap-3 mb-6 p-4 bg-paper rounded-lg border border-rule">
                             @if (Model.Person.AlbumCategories.Count > 0)
                             {
                                 <div>
-                                    <label for="albumCategory" class="block text-xs font-medium text-gray-500 mb-1">@Localizer["Category"]</label>
-                                    <select id="albumCategory" name="albumCategory" class="text-sm border border-gray-300 rounded-md px-2.5 py-1.5 bg-white">
+                                    <label for="albumCategory" class="block text-xs font-medium text-ink-muted mb-1">@Localizer["Category"]</label>
+                                    <select id="albumCategory" name="albumCategory" class="text-sm border border-rule-strong rounded-md px-2.5 py-1.5 bg-surface">
                                         <option value="">@Localizer["All"]</option>
                                         @foreach (var category in Model.Person.AlbumCategories)
                                         {
@@ -352,8 +352,8 @@
                             @if (Model.Person.AlbumYears.Count > 0)
                             {
                                 <div>
-                                    <label for="albumYear" class="block text-xs font-medium text-gray-500 mb-1">@Localizer["Year"]</label>
-                                    <select id="albumYear" name="albumYear" class="text-sm border border-gray-300 rounded-md px-2.5 py-1.5 bg-white">
+                                    <label for="albumYear" class="block text-xs font-medium text-ink-muted mb-1">@Localizer["Year"]</label>
+                                    <select id="albumYear" name="albumYear" class="text-sm border border-rule-strong rounded-md px-2.5 py-1.5 bg-surface">
                                         <option value="">@Localizer["All"]</option>
                                         @foreach (var year in Model.Person.AlbumYears)
                                         {
@@ -366,8 +366,8 @@
                             @if (Model.Person.AlbumRoles.Count > 0)
                             {
                                 <div>
-                                    <label for="albumRole" class="block text-xs font-medium text-gray-500 mb-1">@Localizer["Role"]</label>
-                                    <select id="albumRole" name="albumRole" class="text-sm border border-gray-300 rounded-md px-2.5 py-1.5 bg-white">
+                                    <label for="albumRole" class="block text-xs font-medium text-ink-muted mb-1">@Localizer["Role"]</label>
+                                    <select id="albumRole" name="albumRole" class="text-sm border border-rule-strong rounded-md px-2.5 py-1.5 bg-surface">
                                         <option value="">@Localizer["All"]</option>
                                         @foreach (var role in Model.Person.AlbumRoles)
                                         {
@@ -380,8 +380,8 @@
                             @if (Model.Person.AlbumInstruments.Count > 0)
                             {
                                 <div>
-                                    <label for="albumInstrument" class="block text-xs font-medium text-gray-500 mb-1">@Localizer["Instrument"]</label>
-                                    <select id="albumInstrument" name="albumInstrument" class="text-sm border border-gray-300 rounded-md px-2.5 py-1.5 bg-white">
+                                    <label for="albumInstrument" class="block text-xs font-medium text-ink-muted mb-1">@Localizer["Instrument"]</label>
+                                    <select id="albumInstrument" name="albumInstrument" class="text-sm border border-rule-strong rounded-md px-2.5 py-1.5 bg-surface">
                                         <option value="">@Localizer["All"]</option>
                                         @foreach (var instrument in Model.Person.AlbumInstruments)
                                         {
@@ -391,12 +391,12 @@
                                     </select>
                                 </div>
                             }
-                            <button type="submit" class="text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md px-4 py-1.5 transition-colors">
+                            <button type="submit" class="text-sm font-medium text-on-accent bg-accent hover:bg-accent-hover rounded-md px-4 py-1.5 transition-colors">
                                 @Localizer["Filter"]
                             </button>
                             @if (Model.AlbumCategory is not null || Model.AlbumYear is not null || Model.AlbumRole is not null || Model.AlbumInstrument is not null)
                             {
-                                <a href="/@culture/people/@Model.Person.Slug" class="text-sm text-gray-500 hover:text-gray-700 px-2 py-1.5">@Localizer["Clear"]</a>
+                                <a href="/@culture/people/@Model.Person.Slug" class="text-sm text-ink-muted hover:text-ink-secondary px-2 py-1.5">@Localizer["Clear"]</a>
                             }
                         </form>
                     }
@@ -412,7 +412,7 @@
 
                     @if (filteredAlbums.Count == 0)
                     {
-                        <p class="text-sm text-gray-500">@Localizer["No albums match the selected filters."]</p>
+                        <p class="text-sm text-ink-muted">@Localizer["No albums match the selected filters."]</p>
                     }
                     else
                     {
@@ -421,22 +421,22 @@
                             {
                                 <li>
                                     <a href="/@culture/albums/@album.Slug"
-                                       class="group flex gap-4 p-3 rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all bg-white">
-                                        <div class="w-16 h-16 flex-shrink-0 rounded-md bg-gray-100 overflow-hidden">
+                                       class="group flex gap-4 p-3 rounded-lg border border-rule hover:border-accent-border hover:shadow-md transition-all bg-surface">
+                                        <div class="w-16 h-16 flex-shrink-0 rounded-md bg-paper-muted overflow-hidden">
                                             @if (!string.IsNullOrWhiteSpace(album.CoverUrl))
                                             {
                                                 <img src="@album.CoverUrl" alt="@album.Title" class="w-full h-full object-cover" loading="lazy" />
                                             }
                                             else
                                             {
-                                                <svg class="w-full h-full p-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <svg class="w-full h-full p-3 text-ink-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 21a9 9 0 110-18 9 9 0 010 18zm0-11l5 3-5 3V10z" />
                                                 </svg>
                                             }
                                         </div>
                                         <div class="min-w-0">
-                                            <p class="text-sm font-semibold text-gray-900 group-hover:text-blue-600 transition-colors truncate">@album.Title</p>
-                                            <p class="text-xs text-gray-500 mt-0.5">
+                                            <p class="text-sm font-semibold text-ink group-hover:text-accent transition-colors truncate">@album.Title</p>
+                                            <p class="text-xs text-ink-muted mt-0.5">
                                                 @album.CategoryName
                                                 @if (album.ReleaseDate.HasValue)
                                                 {
@@ -445,7 +445,7 @@
                                             </p>
                                             @if (album.Roles.Count > 0)
                                             {
-                                                <p class="text-xs text-gray-400 mt-1 truncate">@string.Join(" · ", album.Roles)</p>
+                                                <p class="text-xs text-ink-muted mt-1 truncate">@string.Join(" · ", album.Roles)</p>
                                             }
                                         </div>
                                     </a>
@@ -466,18 +466,18 @@
 
                 <section>
                     <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-                        <h2 class="text-2xl font-bold text-gray-900">@Localizer["Track Contributions"]</h2>
-                        <span class="text-sm text-gray-500">@Model.Person.TrackContributions.Count @Localizer["tracks"]</span>
+                        <h2 class="text-2xl font-bold text-ink">@Localizer["Track Contributions"]</h2>
+                        <span class="text-sm text-ink-muted">@Model.Person.TrackContributions.Count @Localizer["tracks"]</span>
                     </div>
 
                     @if (hasContributionFilters)
                     {
-                        <form method="get" class="flex flex-wrap items-end gap-3 mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <form method="get" class="flex flex-wrap items-end gap-3 mb-6 p-4 bg-paper rounded-lg border border-rule">
                             @if (Model.Person.ContributionRoles.Count > 0)
                             {
                                 <div>
-                                    <label for="contributionRole" class="block text-xs font-medium text-gray-500 mb-1">@Localizer["Role"]</label>
-                                    <select id="contributionRole" name="contributionRole" class="text-sm border border-gray-300 rounded-md px-2.5 py-1.5 bg-white">
+                                    <label for="contributionRole" class="block text-xs font-medium text-ink-muted mb-1">@Localizer["Role"]</label>
+                                    <select id="contributionRole" name="contributionRole" class="text-sm border border-rule-strong rounded-md px-2.5 py-1.5 bg-surface">
                                         <option value="">@Localizer["All"]</option>
                                         @foreach (var role in Model.Person.ContributionRoles)
                                         {
@@ -490,8 +490,8 @@
                             @if (Model.Person.ContributionInstruments.Count > 0)
                             {
                                 <div>
-                                    <label for="contributionInstrument" class="block text-xs font-medium text-gray-500 mb-1">@Localizer["Instrument"]</label>
-                                    <select id="contributionInstrument" name="contributionInstrument" class="text-sm border border-gray-300 rounded-md px-2.5 py-1.5 bg-white">
+                                    <label for="contributionInstrument" class="block text-xs font-medium text-ink-muted mb-1">@Localizer["Instrument"]</label>
+                                    <select id="contributionInstrument" name="contributionInstrument" class="text-sm border border-rule-strong rounded-md px-2.5 py-1.5 bg-surface">
                                         <option value="">@Localizer["All"]</option>
                                         @foreach (var instrument in Model.Person.ContributionInstruments)
                                         {
@@ -504,8 +504,8 @@
                             @if (Model.Person.ContributionAlbums.Count > 0)
                             {
                                 <div>
-                                    <label for="contributionAlbum" class="block text-xs font-medium text-gray-500 mb-1">@Localizer["Album"]</label>
-                                    <select id="contributionAlbum" name="contributionAlbum" class="text-sm border border-gray-300 rounded-md px-2.5 py-1.5 bg-white">
+                                    <label for="contributionAlbum" class="block text-xs font-medium text-ink-muted mb-1">@Localizer["Album"]</label>
+                                    <select id="contributionAlbum" name="contributionAlbum" class="text-sm border border-rule-strong rounded-md px-2.5 py-1.5 bg-surface">
                                         <option value="">@Localizer["All"]</option>
                                         @foreach (var album in Model.Person.ContributionAlbums)
                                         {
@@ -518,8 +518,8 @@
                             @if (Model.Person.ContributionGenres.Count > 0)
                             {
                                 <div>
-                                    <label for="contributionGenre" class="block text-xs font-medium text-gray-500 mb-1">@Localizer["Genre"]</label>
-                                    <select id="contributionGenre" name="contributionGenre" class="text-sm border border-gray-300 rounded-md px-2.5 py-1.5 bg-white">
+                                    <label for="contributionGenre" class="block text-xs font-medium text-ink-muted mb-1">@Localizer["Genre"]</label>
+                                    <select id="contributionGenre" name="contributionGenre" class="text-sm border border-rule-strong rounded-md px-2.5 py-1.5 bg-surface">
                                         <option value="">@Localizer["All"]</option>
                                         @foreach (var genre in Model.Person.ContributionGenres)
                                         {
@@ -529,12 +529,12 @@
                                     </select>
                                 </div>
                             }
-                            <button type="submit" class="text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md px-4 py-1.5 transition-colors">
+                            <button type="submit" class="text-sm font-medium text-on-accent bg-accent hover:bg-accent-hover rounded-md px-4 py-1.5 transition-colors">
                                 @Localizer["Filter"]
                             </button>
                             @if (Model.ContributionRole is not null || Model.ContributionInstrument is not null || Model.ContributionAlbum is not null || Model.ContributionGenre is not null)
                             {
-                                <a href="/@culture/people/@Model.Person.Slug" class="text-sm text-gray-500 hover:text-gray-700 px-2 py-1.5">@Localizer["Clear"]</a>
+                                <a href="/@culture/people/@Model.Person.Slug" class="text-sm text-ink-muted hover:text-ink-secondary px-2 py-1.5">@Localizer["Clear"]</a>
                             }
                         </form>
                     }
@@ -550,40 +550,40 @@
 
                     @if (filteredContributions.Count == 0)
                     {
-                        <p class="text-sm text-gray-500">@Localizer["No tracks match the selected filters."]</p>
+                        <p class="text-sm text-ink-muted">@Localizer["No tracks match the selected filters."]</p>
                     }
                     else
                     {
-                        <ul class="divide-y divide-gray-100 border border-gray-200 rounded-lg overflow-hidden bg-white">
+                        <ul class="divide-y divide-rule-light border border-rule rounded-lg overflow-hidden bg-surface">
                             @foreach (var contribution in filteredContributions)
                             {
-                                <li class="p-3 hover:bg-gray-50 transition-colors">
+                                <li class="p-3 hover:bg-paper transition-colors">
                                     <div class="flex items-center justify-between gap-3">
                                         <a href="/@culture/tracks/@contribution.Slug"
-                                           class="text-sm font-medium text-gray-900 hover:text-blue-600 transition-colors">
+                                           class="text-sm font-medium text-ink hover:text-accent transition-colors">
                                             @contribution.Title
                                         </a>
                                         @if (contribution.ReleaseDate.HasValue)
                                         {
-                                            <span class="text-xs text-gray-400 tabular-nums">@contribution.ReleaseDate.Value.Year</span>
+                                            <span class="text-xs text-ink-muted tabular-nums">@contribution.ReleaseDate.Value.Year</span>
                                         }
                                     </div>
-                                    <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-xs text-gray-500">
+                                    <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-xs text-ink-muted">
                                         @if (!string.IsNullOrWhiteSpace(contribution.AlbumTitle))
                                         {
-                                            <a href="/@culture/albums/@contribution.AlbumSlug" class="hover:text-blue-600 transition-colors">@contribution.AlbumTitle</a>
+                                            <a href="/@culture/albums/@contribution.AlbumSlug" class="hover:text-accent transition-colors">@contribution.AlbumTitle</a>
                                         }
                                         @foreach (var role in contribution.Roles)
                                         {
-                                            <span class="inline-block bg-purple-50 text-purple-700 px-1.5 py-0.5 rounded">@role</span>
+                                            <span class="inline-block bg-info-soft text-info-hover px-1.5 py-0.5 rounded">@role</span>
                                         }
                                         @foreach (var instrument in contribution.Instruments)
                                         {
-                                            <span class="inline-block bg-amber-50 text-amber-700 px-1.5 py-0.5 rounded">@instrument</span>
+                                            <span class="inline-block bg-warning-soft text-warning-hover px-1.5 py-0.5 rounded">@instrument</span>
                                         }
                                         @foreach (var genre in contribution.Genres)
                                         {
-                                            <span class="inline-block bg-teal-50 text-teal-700 px-1.5 py-0.5 rounded">@genre</span>
+                                            <span class="inline-block bg-info-soft text-info-hover px-1.5 py-0.5 rounded">@genre</span>
                                         }
                                     </div>
                                 </li>
@@ -599,7 +599,7 @@
             @if (instruments.Count > 0)
             {
                 <section>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["Instruments"]</h2>
+                    <h2 class="text-2xl font-bold text-ink mb-4">@Localizer["Instruments"]</h2>
                     <div class="flex flex-wrap gap-2">
                         @foreach (var instrument in instruments)
                         {
@@ -611,13 +611,13 @@
                             if (!string.IsNullOrWhiteSpace(instrSlug))
                             {
                                 <a href="/@culture/instruments/@instrSlug"
-                                   class="inline-block bg-amber-50 text-amber-700 text-sm px-3 py-1 rounded-full hover:bg-amber-100 transition-colors">
+                                   class="inline-block bg-warning-soft text-warning-hover text-sm px-3 py-1 rounded-full hover:bg-warning-soft transition-colors">
                                     @instrName
                                 </a>
                             }
                             else
                             {
-                                <span class="inline-block bg-amber-50 text-amber-700 text-sm px-3 py-1 rounded-full">@instrName</span>
+                                <span class="inline-block bg-warning-soft text-warning-hover text-sm px-3 py-1 rounded-full">@instrName</span>
                             }
                         }
                     </div>
@@ -630,14 +630,14 @@
             @if (roles.Count > 0)
             {
                 <section>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["Roles"]</h2>
+                    <h2 class="text-2xl font-bold text-ink mb-4">@Localizer["Roles"]</h2>
                     <div class="flex flex-wrap gap-2">
                         @foreach (var role in roles)
                         {
                             string? roleName = null;
                             try { roleName = (string?)role.Name ?? (string?)role.RoleName; } catch { }
 
-                            <span class="inline-block bg-purple-50 text-purple-700 text-sm px-3 py-1 rounded-full">
+                            <span class="inline-block bg-info-soft text-info-hover text-sm px-3 py-1 rounded-full">
                                 @roleName
                             </span>
                         }
@@ -661,11 +661,11 @@
                 }
 
                 <section>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["Media"]</h2>
+                    <h2 class="text-2xl font-bold text-ink mb-4">@Localizer["Media"]</h2>
 
                     @if (images.Count > 0)
                     {
-                        <h3 class="text-lg font-semibold text-gray-700 mb-2">@Localizer["Images"]</h3>
+                        <h3 class="text-lg font-semibold text-ink-secondary mb-2">@Localizer["Images"]</h3>
                         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-6">
                             @foreach (var img in images)
                             {
@@ -679,7 +679,7 @@
                                 <a href="@imgUrl"
                                    target="_blank"
                                    rel="noopener noreferrer"
-                                   class="block aspect-square bg-gray-100 rounded-lg overflow-hidden hover:opacity-90 transition-opacity">
+                                   class="block aspect-square bg-paper-muted rounded-lg overflow-hidden hover:opacity-90 transition-opacity">
                                     <img src="@(thumbUrl ?? imgUrl)"
                                          alt="@(imgDesc ?? "")"
                                          class="w-full h-full object-cover"
@@ -691,7 +691,7 @@
 
                     @if (videos.Count > 0)
                     {
-                        <h3 class="text-lg font-semibold text-gray-700 mb-2">@Localizer["Videos"]</h3>
+                        <h3 class="text-lg font-semibold text-ink-secondary mb-2">@Localizer["Videos"]</h3>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                             @foreach (var vid in videos)
                             {
@@ -700,7 +700,7 @@
                                 try { vidUrl = (string?)vid.Url; } catch { }
                                 try { vidDesc = (string?)vid.Description; } catch { }
 
-                                <div class="aspect-video bg-gray-100 rounded-lg overflow-hidden">
+                                <div class="aspect-video bg-paper-muted rounded-lg overflow-hidden">
                                     @if (vidUrl is not null && (vidUrl.Contains("youtube") || vidUrl.Contains("youtu.be")))
                                     {
                                         <iframe src="@vidUrl"
@@ -729,7 +729,7 @@
             @if (citations.Count > 0)
             {
                 <section>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["References"]</h2>
+                    <h2 class="text-2xl font-bold text-ink mb-4">@Localizer["References"]</h2>
                     <ol class="space-y-3 list-decimal list-inside">
                         @foreach (var citation in citations)
                         {
@@ -744,17 +744,17 @@
                             try { pageNumber = (string?)citation.PageNumber; } catch { }
                             try { citationUrl = (string?)citation.Url; } catch { }
 
-                            <li class="text-sm text-gray-700">
+                            <li class="text-sm text-ink-secondary">
                                 @if (!string.IsNullOrWhiteSpace(quote))
                                 {
                                     <span class="font-medium">"@quote"</span>
                                     <br />
                                 }
-                                <span class="text-gray-500">
+                                <span class="text-ink-muted">
                                     @if (!string.IsNullOrWhiteSpace(sourceSlug))
                                     {
                                         <a href="/@culture/sources/@sourceSlug"
-                                           class="text-blue-600 hover:text-blue-800">
+                                           class="text-accent hover:text-accent-hover">
                                             @sourceName
                                         </a>
                                     }
@@ -771,7 +771,7 @@
                                         <a href="@citationUrl"
                                            target="_blank"
                                            rel="noopener noreferrer"
-                                           class="text-blue-600 hover:text-blue-800 ms-1">
+                                           class="text-accent hover:text-accent-hover ms-1">
                                             @Localizer["Source"]
                                         </a>
                                     }
@@ -788,7 +788,7 @@
             @if (links.Count > 0)
             {
                 <section>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["External Links"]</h2>
+                    <h2 class="text-2xl font-bold text-ink mb-4">@Localizer["External Links"]</h2>
                     <ul class="space-y-1.5">
                         @foreach (var link in links)
                         {
@@ -803,12 +803,12 @@
                                 <a href="@linkUrl"
                                    target="_blank"
                                    rel="noopener noreferrer"
-                                   class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                   class="text-accent hover:text-accent-hover text-sm font-medium">
                                     @(!string.IsNullOrWhiteSpace(linkTitle) ? linkTitle : linkUrl)
                                 </a>
                                 @if (!string.IsNullOrWhiteSpace(linkType))
                                 {
-                                    <span class="text-gray-400 text-xs ms-1">[@linkType]</span>
+                                    <span class="text-ink-muted text-xs ms-1">[@linkType]</span>
                                 }
                             </li>
                         }
@@ -822,7 +822,7 @@
             @if (tags.Count > 0)
             {
                 <section>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["Tags"]</h2>
+                    <h2 class="text-2xl font-bold text-ink mb-4">@Localizer["Tags"]</h2>
                     <div class="flex flex-wrap gap-2">
                         @foreach (var tag in tags)
                         {
@@ -832,7 +832,7 @@
                             try { tagSlug = (string?)tag.Slug ?? (string?)tag.TagSlug; } catch { }
 
                             <a href="/@culture/tags/@tagSlug"
-                               class="inline-block bg-gray-100 text-gray-700 text-xs px-2.5 py-1 rounded-full hover:bg-gray-200 transition-colors">
+                               class="inline-block bg-paper-muted text-ink-secondary text-xs px-2.5 py-1 rounded-full hover:bg-rule transition-colors">
                                 #@tagName
                             </a>
                         }
@@ -846,7 +846,7 @@
             @if (aliases.Count > 0)
             {
                 <section>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["Also Known As"]</h2>
+                    <h2 class="text-2xl font-bold text-ink mb-4">@Localizer["Also Known As"]</h2>
                     <ul class="space-y-1.5">
                         @foreach (var alias in aliases)
                         {
@@ -859,19 +859,19 @@
                             try { aliasType = (string?)alias.AliasType ?? (string?)alias.Type; } catch { }
                             try { isPrimary = (bool)alias.IsPrimary; } catch { }
 
-                            <li class="text-sm text-gray-700">
+                            <li class="text-sm text-ink-secondary">
                                 <span dir="auto">@aliasName</span>
                                 @if (!string.IsNullOrWhiteSpace(aliasLanguage))
                                 {
-                                    <span class="text-gray-400 text-xs ms-2">(@aliasLanguage)</span>
+                                    <span class="text-ink-muted text-xs ms-2">(@aliasLanguage)</span>
                                 }
                                 @if (!string.IsNullOrWhiteSpace(aliasType))
                                 {
-                                    <span class="text-gray-400 text-xs ms-1">[@aliasType]</span>
+                                    <span class="text-ink-muted text-xs ms-1">[@aliasType]</span>
                                 }
                                 @if (isPrimary)
                                 {
-                                    <span class="text-blue-500 text-xs ms-1">@Localizer["Primary"]</span>
+                                    <span class="text-accent text-xs ms-1">@Localizer["Primary"]</span>
                                 }
                             </li>
                         }
@@ -884,30 +884,30 @@
              Sidebar — Summary metadata
              ============================================================ -->
         <aside class="w-full lg:w-72 flex-shrink-0" role="complementary" aria-label="@Localizer["Person metadata"]">
-            <div class="bg-gray-50 rounded-lg border border-gray-200 p-5 space-y-4 sticky top-4">
-                <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider">@Localizer["Details"]</h3>
+            <div class="bg-paper rounded-lg border border-rule p-5 space-y-4 sticky top-4">
+                <h3 class="text-sm font-semibold text-ink-muted uppercase tracking-wider">@Localizer["Details"]</h3>
 
                 @if (!string.IsNullOrWhiteSpace(personKind))
                 {
                     <div>
-                        <h4 class="text-xs font-medium text-gray-500 uppercase">@Localizer["Kind"]</h4>
-                        <p class="mt-1 text-sm text-gray-700">@personKind</p>
+                        <h4 class="text-xs font-medium text-ink-muted uppercase">@Localizer["Kind"]</h4>
+                        <p class="mt-1 text-sm text-ink-secondary">@personKind</p>
                     </div>
                 }
 
                 @if (!string.IsNullOrWhiteSpace(nationality))
                 {
                     <div>
-                        <h4 class="text-xs font-medium text-gray-500 uppercase">@Localizer["Nationality"]</h4>
-                        <p class="mt-1 text-sm text-gray-700">@nationality</p>
+                        <h4 class="text-xs font-medium text-ink-muted uppercase">@Localizer["Nationality"]</h4>
+                        <p class="mt-1 text-sm text-ink-secondary">@nationality</p>
                     </div>
                 }
 
                 @if (birthDate.HasValue)
                 {
                     <div>
-                        <h4 class="text-xs font-medium text-gray-500 uppercase">@Localizer["Born"]</h4>
-                        <p class="mt-1 text-sm text-gray-700">
+                        <h4 class="text-xs font-medium text-ink-muted uppercase">@Localizer["Born"]</h4>
+                        <p class="mt-1 text-sm text-ink-secondary">
                             @birthDate.Value.ToString("yyyy-MM-dd")
                             @if (!string.IsNullOrWhiteSpace(birthPlace))
                             {
@@ -920,8 +920,8 @@
                 @if (deathDate.HasValue)
                 {
                     <div>
-                        <h4 class="text-xs font-medium text-gray-500 uppercase">@Localizer["Died"]</h4>
-                        <p class="mt-1 text-sm text-gray-700">
+                        <h4 class="text-xs font-medium text-ink-muted uppercase">@Localizer["Died"]</h4>
+                        <p class="mt-1 text-sm text-ink-secondary">
                             @deathDate.Value.ToString("yyyy-MM-dd")
                             @if (!string.IsNullOrWhiteSpace(deathPlace))
                             {

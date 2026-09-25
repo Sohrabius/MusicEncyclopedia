@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Music Encyclopedia | Theme Redesign Plan</title>
+  <style>
+    :root {
+      --paper: #f4f6f5;
+      --surface: #ffffff;
+      --ink: #17212f;
+      --muted: #5b6a7d;
+      --rule: #d5dce3;
+      --lapis: #174a85;
+      --lapis-deep: #12345f;
+      --teal: #176b70;
+      --saffron: #c77718;
+      --sand: #e9edf0;
+      --focus: #b75c08;
+      --font: "Vazirmatn", Tahoma, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.8 var(--font); }
+    button, input { font: inherit; }
+    a { color: inherit; }
+    .page { max-width: 1240px; margin: 0 auto; padding: 28px 22px 64px; }
+    .masthead { display: flex; justify-content: space-between; align-items: center; gap: 24px; border-bottom: 1px solid var(--rule); padding-bottom: 20px; }
+    .brand { display: flex; align-items: center; gap: 12px; font-weight: 700; }
+    .mark { display: grid; place-items: center; width: 38px; height: 38px; background: var(--lapis); color: white; border-radius: 50% 50% 50% 7px; font-size: 20px; }
+    .status { color: var(--teal); font-size: .84rem; font-weight: 700; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { max-width: 18ch; margin: 42px 0 12px; font-size: clamp(2.1rem, 6vw, 4.75rem); line-height: 1.12; letter-spacing: 0; }
+    h2 { font-size: clamp(1.35rem, 2.4vw, 2.05rem); line-height: 1.35; }
+    h3 { font-size: 1.03rem; }
+    .lede { max-width: 70ch; color: var(--muted); font-size: 1.1rem; }
+    .hero-grid { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(280px, .92fr); gap: 28px; align-items: end; }
+    .theme-preview { position: relative; min-height: 320px; overflow: hidden; padding: 26px; color: white; background: var(--lapis-deep); border-radius: 20px 4px 20px 4px; }
+    .theme-preview::before { content: ""; position: absolute; width: 390px; height: 390px; border: 1px solid rgb(255 255 255 / .32); border-radius: 50%; inset: -184px -108px auto auto; box-shadow: 0 0 0 27px rgb(255 255 255 / .06), 0 0 0 54px rgb(255 255 255 / .04); }
+    .theme-preview > * { position: relative; }
+    .preview-nav { display: flex; justify-content: space-between; font-size: .82rem; color: rgb(255 255 255 / .72); }
+    .preview-title { margin: 62px 0 12px; max-width: 12ch; font-size: clamp(2rem, 3.5vw, 3.35rem); font-weight: 700; line-height: 1.2; }
+    .preview-search { display: flex; gap: 10px; align-items: center; background: white; color: var(--muted); max-width: 420px; padding: 10px 14px; border-radius: 5px; font-size: .9rem; }
+    .disc { position: absolute; left: 28px; bottom: 28px; width: 84px; height: 84px; border: 13px solid var(--saffron); border-radius: 50%; box-shadow: inset 0 0 0 10px var(--lapis-deep); }
+    .section { padding-top: 62px; }
+    .section-label { color: var(--teal); font-size: .8rem; font-weight: 700; }
+    .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    .card { min-width: 0; background: var(--surface); border: 1px solid var(--rule); padding: 22px; border-radius: 12px; }
+    .card p { margin-bottom: 0; color: var(--muted); font-size: .92rem; }
+    .card--recommend { border: 2px solid var(--lapis); box-shadow: 8px 8px 0 #dce7ef; }
+    .pill { display: inline-block; padding: 3px 10px; margin-bottom: 10px; border-radius: 999px; background: #e7f1f3; color: var(--teal); font-size: .76rem; font-weight: 700; }
+    .tokens { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 24px; }
+    .swatches { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .swatch { display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--rule); padding: 8px 0; font-size: .86rem; }
+    .dot { width: 28px; height: 28px; flex: 0 0 auto; border-radius: 50%; border: 1px solid rgb(0 0 0 / .1); }
+    .type-sample { padding: 18px; border-right: 4px solid var(--saffron); background: var(--surface); }
+    .type-sample strong { display: block; font-size: 1.6rem; line-height: 1.45; }
+    .flow { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); align-items: stretch; gap: 8px; }
+    .phase { padding: 16px 12px; min-width: 0; background: var(--surface); border-top: 4px solid var(--lapis); font-size: .85rem; }
+    .phase b { display: block; margin-bottom: 8px; color: var(--lapis-deep); }
+    .phase span { color: var(--muted); }
+    .comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .comparison section { padding: 22px; border: 1px solid var(--rule); background: var(--surface); }
+    .comparison .target { border-top: 4px solid var(--lapis); }
+    ul { padding-right: 20px; color: var(--muted); }
+    li + li { margin-top: 6px; }
+    .risk { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .risk > div { padding: 18px; background: #eef3f5; border-right: 4px solid var(--teal); }
+    .risk h3 { margin-bottom: 4px; }
+    .risk p { margin: 0; color: var(--muted); font-size: .9rem; }
+    .decision { margin-top: 48px; padding: 26px; color: white; background: var(--lapis-deep); border-radius: 12px; }
+    .decision h2 { margin-bottom: 6px; }
+    .decision p { color: rgb(255 255 255 / .75); }
+    .choices { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 20px; }
+    .choice { display: block; min-width: 0; padding: 14px; background: rgb(255 255 255 / .1); border: 1px solid rgb(255 255 255 / .22); border-radius: 8px; cursor: pointer; }
+    .choice:has(input:checked) { background: white; color: var(--ink); }
+    .choice input { margin-left: 7px; accent-color: var(--saffron); }
+    .choice small { display: block; margin-top: 4px; opacity: .78; }
+    .submit { margin-top: 16px; padding: 10px 18px; border: 0; background: var(--saffron); color: #1d1b18; border-radius: 5px; font-weight: 700; cursor: pointer; }
+    .source { margin-top: 36px; color: var(--muted); font-size: .78rem; }
+    @media (max-width: 760px) { .page { padding: 18px 14px 44px; } .masthead { align-items: flex-start; } .hero-grid, .tokens, .comparison, .risk { grid-template-columns: 1fr; } .cards, .choices { grid-template-columns: 1fr; } .flow { grid-template-columns: 1fr 1fr; } .theme-preview { min-height: 295px; } }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="masthead">
+      <div class="brand"><span class="mark" aria-hidden="true">♪</span><span>موسیقی‌نامه</span></div>
+      <span class="status">پیشنهاد بازطراحی سراسری</span>
+    </header>
+
+    <div class="hero-grid">
+      <section>
+        <p class="section-label">هدف</p>
+        <h1>مرجع موسیقی، با حال‌وهوای یک آرشیو زنده</h1>
+        <p class="lede">پیشنهاد این است که سایت از یک «ویکی سفید و عمومی» به یک آرشیو ایرانی معاصر تبدیل شود: دقیق و قابل اعتماد برای پژوهش، اما دعوت‌کننده برای کشف آلبوم، هنرمند و شعر.</p>
+        <p class="lede">مخاطب اصلی در انتشار فعلی فارسی‌زبان و راست‌به‌چپ است. شغل اصلی تجربه: یافتن یک اثر مشخص و سپس حرکت طبیعی بین آثار، هنرمندان، دوره‌ها و منابع.</p>
+      </section>
+      <section class="theme-preview" aria-label="نمونه تصویری تم پیشنهادی">
+        <div class="preview-nav"><span>موسیقی‌نامه</span><span>جست‌وجو · آلبوم‌ها · هنرمندان</span></div>
+        <div class="preview-title">از یک قطعه، به تاریخ آن برسید.</div>
+        <div class="preview-search"><span aria-hidden="true">⌕</span><span>نام آلبوم، هنرمند یا شعر را جست‌وجو کنید</span></div>
+        <span class="disc" aria-hidden="true"></span>
+      </section>
+    </div>
+
+    <section class="section">
+      <p class="section-label">جهت پیشنهادی</p>
+      <h2>تم «آرشیو لاجوردی»</h2>
+      <div class="cards">
+        <article class="card card--recommend"><span class="pill">پیشنهاد اصلی</span><h3>آرشیو لاجوردی</h3><p>لاجورد برای هویت دانش‌محور و عمق فرهنگی، سبزآبی برای پیوندها و کاوش، و کهربا فقط برای لحظه‌های شنیدن یا اقدام. هدر خانه به یک صحنه جست‌وجوی عمیق تبدیل می‌شود؛ بقیه صفحات آرام و کاغذی می‌مانند.</p></article>
+        <article class="card"><h3>اتاق شنیدن شبانه</h3><p>رابط عمدتاً تیره با کاورهای بزرگ و ردیف‌های پخش‌محور. برای محصول استریم مناسب‌تر از یک دانشنامه است و خوانایی داده‌های بلند را پایین می‌آورد.</p></article>
+        <article class="card"><h3>فهرست‌نامه مینیمال</h3><p>نسخه‌ای پالوده از وضعیت فعلی: سفید، آبی پیوندی و مرزبندی کم‌رنگ. کم‌ریسک است، اما تغییر سبک «کامل» و تمایز برند ملموسی ایجاد نمی‌کند.</p></article>
+      </div>
+    </section>
+
+    <section class="section tokens">
+      <div>
+        <p class="section-label">توکن‌های تم</p>
+        <h2>رنگ از خود موسیقی نمی‌آید؛ از جایگاه آرشیوی آن می‌آید.</h2>
+        <p class="lede">پالت عمداً نه کرم-سفالیِ قالبی است و نه نئونی/فناورانه. رنگ تیره فقط یک نقطه خاطره‌ساز در صفحه خانه و هویت برند است، نه پس‌زمینه همه محتوا.</p>
+      </div>
+      <div class="card">
+        <div class="swatches">
+          <div class="swatch"><i class="dot" style="background:#F4F6F5"></i>کاغذ آرشیو <b>#F4F6F5</b></div>
+          <div class="swatch"><i class="dot" style="background:#17212F"></i>جوهر <b>#17212F</b></div>
+          <div class="swatch"><i class="dot" style="background:#174A85"></i>لاجورد <b>#174A85</b></div>
+          <div class="swatch"><i class="dot" style="background:#176B70"></i>سبزآبی <b>#176B70</b></div>
+          <div class="swatch"><i class="dot" style="background:#C77718"></i>کهربا <b>#C77718</b></div>
+          <div class="swatch"><i class="dot" style="background:#D5DCE3"></i>خط راهنما <b>#D5DCE3</b></div>
+        </div>
+        <div class="type-sample" style="margin-top:18px"><strong>وزیرمتن، منظم و بی‌زحمت</strong><span>همان Vazirmatn خودمیزبان حفظ می‌شود. وزن و اندازه، نه فونت نمایشی تازه، سلسله‌مراتب را می‌سازند.</span></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="section-label">تصمیم‌های تجربه</p>
+      <div class="comparison">
+        <section><h3>اکنون</h3><ul><li>خانه و شل مشترک، سیستم CSS اختصاصی جدیدتر دارند.</li><li>بسیاری از فهرست‌ها و جزئیات هنوز با کلاس‌های Tailwind و الگوهای کارت متفاوت ساخته شده‌اند.</li><li>جزئیات آلبوم چندین style درون‌خطی دارد؛ تغییر تم سراسری شکننده است.</li><li>خانه با رنگ‌مایه آبی و گرادیان ملایم شروع می‌شود، اما شخصیت بصری آن به محتوای موسیقی گره نمی‌خورد.</li></ul></section>
+        <section class="target"><h3>پس از بازطراحی</h3><ul><li>یک لایه توکن و کامپوننت برای عمومی، احراز هویت و ادمین؛ بدون بازنویسی منطق Razor.</li><li>قالب خانه: جست‌وجوی لاجوردی، نقوش دایره‌ای بسیار ظریف و مسیرهای کشف.</li><li>فهرست‌ها: پوستر/کاور در کنار داده مرجع، فیلترهای ثابت و پیوندهای آشکار.</li><li>جزئیات: صفحه «اثر» با هدر تصویری، نوار ابرداده، فهرست قطعه قابل اسکن، منابع و روابط در ستون فرعی.</li></ul></section>
+      </div>
+    </section>
+
+    <section class="section">
+      <p class="section-label">مراحل اجرا</p>
+      <h2>سیستم اول، صفحه‌های نمونه بعد، سپس مهاجرت گروهی</h2>
+      <div class="flow" aria-label="مراحل بازطراحی">
+        <div class="phase"><b>1. تثبیت</b><span>ثبت اسکرین‌شات، مسیرهای کلیدی و معیارهای RTL، موبایل و دسترس‌پذیری.</span></div>
+        <div class="phase"><b>2. هسته تم</b><span>توکن‌های رنگ/فاصله/تایپ، حالت فوکوس، رنگ‌های معنایی و حذف رنگ‌های پراکنده.</span></div>
+        <div class="phase"><b>3. سه قالب مرجع</b><span>خانه، یک فهرست و جزئیات آلبوم. این سه، الگوهای قابل تکرار را اثبات می‌کنند.</span></div>
+        <div class="phase"><b>4. مهاجرت محتوا</b><span>فهرست‌ها و جزئیات گروه‌به‌گروه؛ جایگزینی style درون‌خطی و ترکیب Tailwind پراکنده.</span></div>
+        <div class="phase"><b>5. پرداخت و سنجش</b><span>صفحه‌های ورود و ادمین، تست 375 تا 1440، کنتراست، کیبورد، reduced motion و کارایی.</span></div>
+      </div>
+    </section>
+
+    <section class="section risk">
+      <div><h3>محدوده</h3><p>بازطراحی با حفظ URLها، مدل‌ها، کنترلرها، SEO و JSON-LD انجام می‌شود. نخست CSS و کلاس‌های معنایی جایگزین می‌شوند؛ رفتار موجود نباید تغییر کند.</p></div>
+      <div><h3>ریسک اصلی</h3><p>وجود Tailwind CDN، کلاس‌های پراکنده و حداقل 79 style درون‌خطی در viewها می‌تواند تم را دوپاره کند. باید در قالب‌های مرجع، کلاس‌های قابل استفاده مجدد بسازیم، نه اینکه فقط رنگ‌ها را عوض کنیم.</p></div>
+    </section>
+
+    <section class="decision">
+      <h2>کدام مسیر را شروع کنیم؟</h2>
+      <p>انتخاب شما جهت طراحی سه صفحه مرجع و اولین تغییر کد را مشخص می‌کند.</p>
+      <form data-lavish-question="theme-direction" onsubmit="event.preventDefault(); const choice = new FormData(event.currentTarget).get('theme'); if (choice) window.lavish.queuePrompt('Use the selected Music Encyclopedia redesign direction and begin the implementation plan for the three reference pages.', { tag: 'theme-direction', text: 'Theme direction: ' + choice, element: event.currentTarget, data: { question: 'theme-direction', answer: choice } });">
+        <div class="choices">
+          <label class="choice"><input type="radio" name="theme" value="Lapis Archive" checked> آرشیو لاجوردی<small>پیشنهاد اصلی: معاصر، معتبر و مبتنی بر کشف</small></label>
+          <label class="choice"><input type="radio" name="theme" value="Night Listening Room"> اتاق شنیدن شبانه<small>تیره، جسور و تصویرمحور</small></label>
+          <label class="choice"><input type="radio" name="theme" value="Minimal Catalog"> فهرست‌نامه مینیمال<small>کم‌ریسک و نزدیک به وضعیت فعلی</small></label>
+        </div>
+        <button class="submit" type="submit">انتخاب را برای اجرا بفرست</button>
+      </form>
+    </section>
+
+    <p class="source">شواهد کد: <code>wwwroot/css/site.css</code>، <code>Views/Shared/_Layout.cshtml</code>، <code>Views/Home/Index.cshtml</code>، <code>Views/Artists/Index.cshtml</code> و <code>Views/Albums/Detail.cshtml</code>. این پیشنهاد هیچ کد محصولی را تغییر نمی‌دهد.</p>
+  </main>
+</body>
+</html>

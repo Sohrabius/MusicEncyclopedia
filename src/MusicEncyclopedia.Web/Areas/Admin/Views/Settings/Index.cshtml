@@ -5,54 +5,54 @@
 }
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <div class="px-5 py-4 border-b border-gray-200 flex items-center gap-2">
-            <i class="fas fa-server text-blue-600"></i>
-            <h2 class="font-semibold text-gray-900">زمان اجرا</h2>
+    <div class="bg-surface rounded-lg shadow-sm border border-rule overflow-hidden">
+        <div class="px-5 py-4 border-b border-rule flex items-center gap-2">
+            <i aria-hidden="true" class="fas fa-server text-accent"></i>
+            <h2 class="font-semibold text-ink">زمان اجرا</h2>
         </div>
-        <dl class="divide-y divide-gray-100 text-sm">
-            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-gray-500 font-medium">محیط اجرا</dt><dd class="col-span-2"><span class="inline-block px-2 py-0.5 text-xs rounded-full @(Model.Environment == "Development" ? "bg-yellow-50 text-yellow-700" : "bg-green-50 text-green-700")">@Model.Environment</span></dd></div>
-            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-gray-500 font-medium">.NET زمان اجرا</dt><dd class="col-span-2 font-mono text-xs">@Model.RuntimeVersion</dd></div>
-            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-gray-500 font-medium">پایگاه داده</dt><dd class="col-span-2">@Model.DatabaseProvider</dd></div>
-            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-gray-500 font-medium">ارائه‌دهنده جستجو</dt><dd class="col-span-2">@Model.SearchProvider</dd></div>
+        <dl class="divide-y divide-rule-light text-sm">
+            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-ink-muted font-medium">محیط اجرا</dt><dd class="col-span-2"><span class="inline-block px-2 py-0.5 text-xs rounded-full @(Model.Environment == "Development" ? "bg-warning-soft text-warning-hover" : "bg-success-soft text-success-hover")">@Model.Environment</span></dd></div>
+            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-ink-muted font-medium">.NET زمان اجرا</dt><dd class="col-span-2 font-mono text-xs">@Model.RuntimeVersion</dd></div>
+            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-ink-muted font-medium">پایگاه داده</dt><dd class="col-span-2">@Model.DatabaseProvider</dd></div>
+            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-ink-muted font-medium">ارائه‌دهنده جستجو</dt><dd class="col-span-2">@Model.SearchProvider</dd></div>
         </dl>
     </div>
 
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <div class="px-5 py-4 border-b border-gray-200 flex items-center gap-2">
-            <i class="fas fa-globe text-blue-600"></i>
-            <h2 class="font-semibold text-gray-900">بومی‌سازی</h2>
+    <div class="bg-surface rounded-lg shadow-sm border border-rule overflow-hidden">
+        <div class="px-5 py-4 border-b border-rule flex items-center gap-2">
+            <i aria-hidden="true" class="fas fa-globe text-accent"></i>
+            <h2 class="font-semibold text-ink">بومی‌سازی</h2>
         </div>
-        <dl class="divide-y divide-gray-100 text-sm">
-            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-gray-500 font-medium">فرهنگ پیش‌فرض</dt><dd class="col-span-2">@Model.DefaultCulture</dd></div>
-            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-gray-500 font-medium">فرهنگ پایه</dt><dd class="col-span-2">@Model.BaseCulture</dd></div>
-            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-gray-500 font-medium">فرهنگ جایگزین</dt><dd class="col-span-2">@Model.FallbackCulture</dd></div>
-            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-gray-500 font-medium">فرهنگ‌های پشتیبانی‌شده</dt><dd class="col-span-2">@string.Join(", ", Model.SupportedCultures)</dd></div>
+        <dl class="divide-y divide-rule-light text-sm">
+            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-ink-muted font-medium">فرهنگ پیش‌فرض</dt><dd class="col-span-2">@Model.DefaultCulture</dd></div>
+            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-ink-muted font-medium">فرهنگ پایه</dt><dd class="col-span-2">@Model.BaseCulture</dd></div>
+            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-ink-muted font-medium">فرهنگ جایگزین</dt><dd class="col-span-2">@Model.FallbackCulture</dd></div>
+            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-ink-muted font-medium">فرهنگ‌های پشتیبانی‌شده</dt><dd class="col-span-2">@string.Join(", ", Model.SupportedCultures)</dd></div>
         </dl>
     </div>
 
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <div class="px-5 py-4 border-b border-gray-200 flex items-center gap-2">
-            <i class="fas fa-cogs text-blue-600"></i>
-            <h2 class="font-semibold text-gray-900">برنامه</h2>
+    <div class="bg-surface rounded-lg shadow-sm border border-rule overflow-hidden">
+        <div class="px-5 py-4 border-b border-rule flex items-center gap-2">
+            <i aria-hidden="true" class="fas fa-cogs text-accent"></i>
+            <h2 class="font-semibold text-ink">برنامه</h2>
         </div>
-        <dl class="divide-y divide-gray-100 text-sm">
-            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-gray-500 font-medium">آدرس پایه سایت</dt><dd class="col-span-2 font-mono text-xs">@(Model.SiteBaseUrl ?? "—")</dd></div>
-            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-gray-500 font-medium">کش صفحه عمومی</dt><dd class="col-span-2">@Model.DefaultPublicPageCacheMinutes minutes</dd></div>
-            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-gray-500 font-medium">اندازه صفحه پیش‌فرض</dt><dd class="col-span-2">@Model.DefaultPageSize items</dd></div>
-            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-gray-500 font-medium">حد تلاش ورود</dt><dd class="col-span-2">@Model.MaxLoginAttempts attempts</dd></div>
+        <dl class="divide-y divide-rule-light text-sm">
+            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-ink-muted font-medium">آدرس پایه سایت</dt><dd class="col-span-2 font-mono text-xs">@(Model.SiteBaseUrl ?? "—")</dd></div>
+            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-ink-muted font-medium">کش صفحه عمومی</dt><dd class="col-span-2">@Model.DefaultPublicPageCacheMinutes minutes</dd></div>
+            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-ink-muted font-medium">اندازه صفحه پیش‌فرض</dt><dd class="col-span-2">@Model.DefaultPageSize items</dd></div>
+            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-ink-muted font-medium">حد تلاش ورود</dt><dd class="col-span-2">@Model.MaxLoginAttempts attempts</dd></div>
         </dl>
     </div>
 
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <div class="px-5 py-4 border-b border-gray-200 flex items-center gap-2">
-            <i class="fas fa-database text-blue-600"></i>
-            <h2 class="font-semibold text-gray-900">رسانه</h2>
+    <div class="bg-surface rounded-lg shadow-sm border border-rule overflow-hidden">
+        <div class="px-5 py-4 border-b border-rule flex items-center gap-2">
+            <i aria-hidden="true" class="fas fa-database text-accent"></i>
+            <h2 class="font-semibold text-ink">رسانه</h2>
         </div>
-        <dl class="divide-y divide-gray-100 text-sm">
-            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-gray-500 font-medium">مسیر ذخیره‌سازی</dt><dd class="col-span-2 font-mono text-xs">@Model.MediaStoragePath</dd></div>
+        <dl class="divide-y divide-rule-light text-sm">
+            <div class="px-5 py-3 grid grid-cols-3 gap-4"><dt class="text-ink-muted font-medium">مسیر ذخیره‌سازی</dt><dd class="col-span-2 font-mono text-xs">@Model.MediaStoragePath</dd></div>
         </dl>
     </div>
 </div>
 
-<p class="mt-6 text-sm text-gray-500"><i class="fas fa-info-circle me-1"></i> این مقادیر از <code class="font-mono text-xs bg-gray-100 px-1 py-0.5 rounded">appsettings.json</code> و محیط زمان اجرا خوانده می‌شوند. تنظیمات برنامه در حال حاضر از طریق فایل‌های پیکربندی مدیریت می‌شوند.</p>
+<p class="mt-6 text-sm text-ink-muted"><i aria-hidden="true" class="fas fa-info-circle me-1"></i> این مقادیر از <code class="font-mono text-xs bg-paper-muted px-1 py-0.5 rounded">appsettings.json</code> و محیط زمان اجرا خوانده می‌شوند. تنظیمات برنامه در حال حاضر از طریق فایل‌های پیکربندی مدیریت می‌شوند.</p>

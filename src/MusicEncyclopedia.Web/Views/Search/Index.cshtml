@@ -22,14 +22,14 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" dir="@dir">
     <!-- Page Header -->
     <div class="mb-8">
-        <h1 class="text-3xl md:text-4xl font-bold text-gray-900">@Localizer["Search"]</h1>
-        <p class="mt-2 text-gray-600">@Localizer["Search the Music Encyclopedia"]</p>
+        <h1 class="text-3xl md:text-4xl font-bold text-ink">@Localizer["Search"]</h1>
+        <p class="mt-2 text-ink-secondary">@Localizer["Search the Music Encyclopedia"]</p>
     </div>
 
     <!-- ============================================================
          Search Box & Filters
          ============================================================ -->
-    <div class="bg-white rounded-lg border border-gray-200 p-6 mb-8">
+    <div class="bg-surface rounded-lg border border-rule p-6 mb-8">
         <form method="get" action="/@culture/search" class="space-y-4">
             <!-- Search input row -->
             <div class="flex flex-col sm:flex-row gap-3">
@@ -40,37 +40,37 @@
                            name="q"
                            value="@Model.Query"
                            placeholder="@Localizer["Search albums, tracks, people, poems..."]"
-                           class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base px-4 py-3 border"
+                           class="w-full rounded-md border-rule-strong shadow-sm focus-visible:border-accent focus-visible:ring-accent text-base px-4 py-3 border"
                            autofocus="@(hasQuery ? null : "autofocus")" />
                 </div>
                 <button type="submit"
-                        class="bg-blue-600 text-white px-6 py-3 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        class="bg-accent text-on-accent px-6 py-3 rounded-md text-sm font-medium hover:bg-accent-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2">
                     @Localizer["Search"]
                 </button>
             </div>
 
             <!-- Entity type filter pills -->
             <div class="flex flex-wrap items-center gap-2">
-                <span class="text-sm text-gray-500 mr-1">@Localizer["Type:"]</span>
+                <span class="text-sm text-ink-muted me-1">@Localizer["Type:"]</span>
                 <a href="/@culture/search?q=@(Uri.EscapeDataString(Model.Query ?? ""))"
-                   class="inline-block px-3 py-1.5 text-sm rounded-full border transition-colors @(string.IsNullOrWhiteSpace(Model.EntityType) ? "bg-blue-600 text-white border-blue-600" : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50")">
+                   class="inline-block px-3 py-1.5 text-sm rounded-full border transition-colors @(string.IsNullOrWhiteSpace(Model.EntityType) ? "bg-accent text-on-accent border-accent" : "bg-surface text-ink-secondary border-rule-strong hover:bg-paper")">
                     @Localizer["All"]
                 </a>
                 @foreach (var et in knownEntityTypes)
                 {
                     var isActive = string.Equals(Model.EntityType, et, StringComparison.OrdinalIgnoreCase);
                     <a href="/@culture/search?q=@(Uri.EscapeDataString(Model.Query ?? ""))&type=@et"
-                       class="inline-block px-3 py-1.5 text-sm rounded-full border transition-colors @(isActive ? "bg-blue-600 text-white border-blue-600" : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50")">
+                       class="inline-block px-3 py-1.5 text-sm rounded-full border transition-colors @(isActive ? "bg-accent text-on-accent border-accent" : "bg-surface text-ink-secondary border-rule-strong hover:bg-paper")">
                         @GetEntityTypeLabel(et)
                     </a>
                 }
             </div>
 
             <!-- Faceted filters: Genre, Mood, Instrument -->
-            <div class="flex flex-wrap items-center gap-3 pt-3 border-t border-gray-100">
-                <span class="text-sm text-gray-500">@Localizer["More filters:"]</span>
+            <div class="flex flex-wrap items-center gap-3 pt-3 border-t border-rule-light">
+                <span class="text-sm text-ink-muted">@Localizer["More filters:"]</span>
 
-                <select name="genre" id="filter-genre" class="px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-white" onchange="this.form.submit()">
+                <select name="genre" id="filter-genre" class="px-3 py-1.5 text-sm border border-rule-strong rounded-md bg-surface" onchange="this.form.submit()">
                     <option value="">@Localizer["Genre"]</option>
                     @foreach (var g in Model.Genres)
                     {
@@ -78,7 +78,7 @@
                     }
                 </select>
 
-                <select name="mood" id="filter-mood" class="px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-white" onchange="this.form.submit()">
+                <select name="mood" id="filter-mood" class="px-3 py-1.5 text-sm border border-rule-strong rounded-md bg-surface" onchange="this.form.submit()">
                     <option value="">@Localizer["Mood"]</option>
                     @foreach (var m in Model.Moods)
                     {
@@ -86,7 +86,7 @@
                     }
                 </select>
 
-                <select name="instrument" id="filter-instrument" class="px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-white" onchange="this.form.submit()">
+                <select name="instrument" id="filter-instrument" class="px-3 py-1.5 text-sm border border-rule-strong rounded-md bg-surface" onchange="this.form.submit()">
                     <option value="">@Localizer["Instrument"]</option>
                     @foreach (var inst in Model.Instruments)
                     {
@@ -103,12 +103,12 @@
         {
             <!-- Empty results -->
             <div class="text-center py-16">
-                <svg class="mx-auto h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="mx-auto h-16 w-16 text-ink-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                           d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
-                <h3 class="mt-4 text-lg font-medium text-gray-900">@Localizer["No results found"]</h3>
-                <p class="mt-2 text-gray-500">
+                <h3 class="mt-4 text-lg font-medium text-ink">@Localizer["No results found"]</h3>
+                <p class="mt-2 text-ink-muted">
                     @Localizer["No results for \"{0}\". Try adjusting your search terms.", Model.Query ?? ""]
                 </p>
             </div>
@@ -116,7 +116,7 @@
         else
         {
             <!-- Results count -->
-            <p class="text-sm text-gray-500 mb-4">
+            <p class="text-sm text-ink-muted mb-4">
                 @Localizer["Showing {0}–{1} of {2} results for \"{3}\"",
                     ((results.Page - 1) * results.PageSize) + 1,
                     Math.Min(results.Page * results.PageSize, results.TotalItems),
@@ -128,10 +128,10 @@
             <div class="space-y-4">
                 @foreach (var item in results.Items)
                 {
-                    <article class="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                    <article class="bg-surface rounded-lg border border-rule overflow-hidden shadow-sm hover:shadow-md transition-shadow">
                         <a href="/@culture/@item.Url.TrimStart('/')" class="flex items-start gap-4 p-4">
                             <!-- Image -->
-                            <div class="w-20 h-20 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
+                            <div class="w-20 h-20 flex-shrink-0 bg-paper-muted rounded-lg overflow-hidden flex items-center justify-center">
                                 @if (!string.IsNullOrWhiteSpace(item.ImageUrl))
                                 {
                                     <img src="@item.ImageUrl"
@@ -141,7 +141,7 @@
                                 }
                                 else
                                 {
-                                    <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-8 h-8 text-ink-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                                               d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                                     </svg>
@@ -158,27 +158,27 @@
                                 </div>
 
                                 <!-- Title -->
-                                <h3 class="font-semibold text-gray-900 text-base leading-tight line-clamp-1">
+                                <h3 class="font-semibold text-ink text-base leading-tight line-clamp-1">
                                     @item.Title
                                 </h3>
 
                                 <!-- Subtitle -->
                                 @if (!string.IsNullOrWhiteSpace(item.Subtitle))
                                 {
-                                    <p class="text-sm text-gray-500 mt-0.5 line-clamp-1">@item.Subtitle</p>
+                                    <p class="text-sm text-ink-muted mt-0.5 line-clamp-1">@item.Subtitle</p>
                                 }
 
                                 <!-- Description -->
                                 @if (!string.IsNullOrWhiteSpace(item.Description))
                                 {
-                                    <p class="text-sm text-gray-600 mt-1 line-clamp-2">
+                                    <p class="text-sm text-ink-secondary mt-1 line-clamp-2">
                                         @TrimDescription(item.Description, 200)
                                     </p>
                                 }
                             </div>
 
                             <!-- Arrow -->
-                            <svg class="w-5 h-5 text-gray-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 text-ink-muted flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 @if (isRtl)
                                 {
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
@@ -203,14 +203,14 @@
                     @if (results.Page > 1)
                     {
                         <a href="@GetPageUrl(results.Page - 1)"
-                           class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                           class="px-3 py-2 text-sm font-medium text-ink-secondary bg-surface border border-rule-strong rounded-md hover:bg-paper transition-colors"
                            rel="prev">
                             @Localizer["Previous"]
                         </a>
                     }
                     else
                     {
-                        <span class="px-3 py-2 text-sm font-medium text-gray-400 bg-gray-50 border border-gray-200 rounded-md cursor-not-allowed">
+                        <span class="px-3 py-2 text-sm font-medium text-ink-muted bg-paper border border-rule rounded-md cursor-not-allowed">
                             @Localizer["Previous"]
                         </span>
                     }
@@ -221,22 +221,22 @@
                         var endPage = Math.Min(results.TotalPages, results.Page + 2);
                         if (startPage > 1)
                         {
-                            <a href="@GetPageUrl(1)" class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">1</a>
+                            <a href="@GetPageUrl(1)" class="px-3 py-2 text-sm font-medium text-ink-secondary bg-surface border border-rule-strong rounded-md hover:bg-paper">1</a>
                             if (startPage > 2)
                             {
-                                <span class="px-2 py-2 text-sm text-gray-400">...</span>
+                                <span class="px-2 py-2 text-sm text-ink-muted">...</span>
                             }
                         }
                         for (var p = startPage; p <= endPage; p++)
                         {
                             if (p == results.Page)
                             {
-                                <span class="px-3 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-md">@p</span>
+                                <span class="px-3 py-2 text-sm font-medium text-on-accent bg-accent border border-accent rounded-md">@p</span>
                             }
                             else
                             {
                                 <a href="@GetPageUrl(p)"
-                                   class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                                   class="px-3 py-2 text-sm font-medium text-ink-secondary bg-surface border border-rule-strong rounded-md hover:bg-paper">
                                     @p
                                 </a>
                             }
@@ -245,10 +245,10 @@
                         {
                             if (endPage < results.TotalPages - 1)
                             {
-                                <span class="px-2 py-2 text-sm text-gray-400">...</span>
+                                <span class="px-2 py-2 text-sm text-ink-muted">...</span>
                             }
                             <a href="@GetPageUrl(results.TotalPages)"
-                               class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                               class="px-3 py-2 text-sm font-medium text-ink-secondary bg-surface border border-rule-strong rounded-md hover:bg-paper">
                                 @results.TotalPages
                             </a>
                         }
@@ -258,14 +258,14 @@
                     @if (results.Page < results.TotalPages)
                     {
                         <a href="@GetPageUrl(results.Page + 1)"
-                           class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                           class="px-3 py-2 text-sm font-medium text-ink-secondary bg-surface border border-rule-strong rounded-md hover:bg-paper transition-colors"
                            rel="next">
                             @Localizer["Next"]
                         </a>
                     }
                     else
                     {
-                        <span class="px-3 py-2 text-sm font-medium text-gray-400 bg-gray-50 border border-gray-200 rounded-md cursor-not-allowed">
+                        <span class="px-3 py-2 text-sm font-medium text-ink-muted bg-paper border border-rule rounded-md cursor-not-allowed">
                             @Localizer["Next"]
                         </span>
                     }
@@ -277,12 +277,12 @@
     {
         <!-- Initial state (no query yet) -->
         <div class="text-center py-16">
-            <svg class="mx-auto h-20 w-20 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="mx-auto h-20 w-20 text-ink-disabled" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
                       d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
-            <h3 class="mt-4 text-lg font-medium text-gray-500">@Localizer["Search across the encyclopedia"]</h3>
-            <p class="mt-2 text-gray-400">@Localizer["Enter a search term above to find albums, tracks, people, poems, and more."]</p>
+            <h3 class="mt-4 text-lg font-medium text-ink-muted">@Localizer["Search across the encyclopedia"]</h3>
+            <p class="mt-2 text-ink-muted">@Localizer["Enter a search term above to find albums, tracks, people, poems, and more."]</p>
         </div>
     }
 </div>
@@ -295,21 +295,21 @@
     {
         return entityType?.ToLowerInvariant() switch
         {
-            "album" => "bg-blue-100 text-blue-800",
-            "track" => "bg-green-100 text-green-800",
-            "person" => "bg-purple-100 text-purple-800",
-            "poem" => "bg-amber-100 text-amber-800",
-            "sungversion" => "bg-indigo-100 text-indigo-800",
-            "company" => "bg-gray-100 text-gray-800",
-            "genre" => "bg-pink-100 text-pink-800",
-            "mood" => "bg-teal-100 text-teal-800",
-            "instrument" => "bg-orange-100 text-orange-800",
-            "publication" => "bg-violet-100 text-violet-800",
-            "recordingsession" => "bg-cyan-100 text-cyan-800",
-            "performanceevent" => "bg-rose-100 text-rose-800",
-            "location" => "bg-emerald-100 text-emerald-800",
-            "source" => "bg-slate-100 text-slate-800",
-            _ => "bg-gray-100 text-gray-800"
+            "album" => "bg-accent-soft text-accent-hover",
+            "track" => "bg-success-soft text-success-hover",
+            "person" => "bg-info-soft text-info-hover",
+            "poem" => "bg-warning-soft text-warning-hover",
+            "sungversion" => "bg-info-soft text-info-hover",
+            "company" => "bg-paper-muted text-ink",
+            "genre" => "bg-info-soft text-info-hover",
+            "mood" => "bg-info-soft text-info-hover",
+            "instrument" => "bg-warning-soft text-warning-hover",
+            "publication" => "bg-info-soft text-info-hover",
+            "recordingsession" => "bg-info-soft text-info-hover",
+            "performanceevent" => "bg-error-soft text-error-hover",
+            "location" => "bg-success-soft text-success-hover",
+            "source" => "bg-paper-muted text-ink",
+            _ => "bg-paper-muted text-ink"
         };
     }
 

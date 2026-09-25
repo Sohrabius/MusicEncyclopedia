@@ -9,12 +9,12 @@
 
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" dir="@dir">
     <nav aria-label="@Localizer["Breadcrumb"]" class="mb-6">
-        <ol class="flex items-center gap-2 text-sm text-gray-500">
-            <li><a href="/@culture" class="hover:text-blue-600">@Localizer["Home"]</a></li>
+        <ol class="flex items-center gap-2 text-sm text-ink-muted">
+            <li><a href="/@culture" class="hover:text-accent">@Localizer["Home"]</a></li>
             <li><span class="mx-1">/</span></li>
-            <li><a href="/@culture/sessions" class="hover:text-blue-600">@Localizer["Sessions"]</a></li>
+            <li><a href="/@culture/sessions" class="hover:text-accent">@Localizer["Sessions"]</a></li>
             <li><span class="mx-1">/</span></li>
-            <li class="text-gray-900 font-medium truncate max-w-[200px]" aria-current="page">@session.Slug</li>
+            <li class="text-ink font-medium truncate max-w-[200px]" aria-current="page">@session.Slug</li>
         </ol>
     </nav>
 
@@ -22,16 +22,16 @@
         <div class="flex-1 min-w-0 space-y-8">
             <!-- Header -->
             <section>
-                <h1 class="text-3xl font-bold text-gray-900">@Localizer["Recording Session"]: @session.Slug</h1>
+                <h1 class="text-3xl font-bold text-ink">@Localizer["Recording Session"]: @session.Slug</h1>
                 <div class="flex flex-wrap gap-3 mt-3">
                     @if (!string.IsNullOrWhiteSpace(session.SessionTypeName))
                     {
-                        <span class="inline-block bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full">@session.SessionTypeName</span>
+                        <span class="inline-block bg-accent-soft text-accent-hover text-sm font-medium px-3 py-1 rounded-full">@session.SessionTypeName</span>
                     }
                     @if (session.StartDate.HasValue)
                     {
-                        <span class="text-sm text-gray-600">
-                            <i class="fas fa-calendar text-gray-400 me-1"></i>
+                        <span class="text-sm text-ink-secondary">
+                            <i aria-hidden="true" class="fas fa-calendar text-ink-muted me-1"></i>
                             @session.StartDate.Value.ToString("yyyy-MM-dd")
                             @if (session.EndDate.HasValue && session.EndDate != session.StartDate)
                             {
@@ -45,10 +45,10 @@
             <!-- Location -->
             @if (session.LocationId.HasValue)
             {
-                <section class="bg-gray-50 rounded-lg p-5 border border-gray-200">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-2">@Localizer["Location"]</h2>
-                    <a href="/@culture/locations/@session.LocationSlug" class="text-blue-600 hover:text-blue-800">
-                        <i class="fas fa-map-marker-alt me-1"></i> @session.LocationName
+                <section class="bg-paper rounded-lg p-5 border border-rule">
+                    <h2 class="text-lg font-semibold text-ink mb-2">@Localizer["Location"]</h2>
+                    <a href="/@culture/locations/@session.LocationSlug" class="text-accent hover:text-accent-hover">
+                        <i aria-hidden="true" class="fas fa-map-marker-alt me-1"></i> @session.LocationName
                     </a>
                 </section>
             }
@@ -56,9 +56,9 @@
             <!-- Notes -->
             @if (!string.IsNullOrWhiteSpace(session.Notes))
             {
-                <section class="bg-white rounded-lg p-5 border border-gray-200">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-2">@Localizer["Notes"]</h2>
-                    <div class="text-gray-700 whitespace-pre-line">@session.Notes</div>
+                <section class="bg-surface rounded-lg p-5 border border-rule">
+                    <h2 class="text-lg font-semibold text-ink mb-2">@Localizer["Notes"]</h2>
+                    <div class="text-ink-secondary whitespace-pre-line">@session.Notes</div>
                 </section>
             }
 
@@ -66,16 +66,16 @@
             @if (session.Albums.Count > 0)
             {
                 <section>
-                    <h2 class="text-lg font-semibold text-gray-900 mb-3">@Localizer["Albums Recorded"]</h2>
+                    <h2 class="text-lg font-semibold text-ink mb-3">@Localizer["Albums Recorded"]</h2>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         @foreach (var album in session.Albums)
                         {
-                            <a href="/@culture/albums/@album.Slug" class="flex items-center gap-3 bg-white rounded-lg border border-gray-200 p-3 hover:shadow-sm transition-shadow">
-                                <div class="w-12 h-12 bg-gray-100 rounded flex-shrink-0 flex items-center justify-center text-gray-400">
-                                    <i class="fas fa-compact-disc"></i>
+                            <a href="/@culture/albums/@album.Slug" class="flex items-center gap-3 bg-surface rounded-lg border border-rule p-3 hover:shadow-sm transition-shadow">
+                                <div class="w-12 h-12 bg-paper-muted rounded flex-shrink-0 flex items-center justify-center text-ink-muted">
+                                    <i aria-hidden="true" class="fas fa-compact-disc"></i>
                                 </div>
                                 <div>
-                                    <p class="font-medium text-gray-900">@album.Title</p>
+                                    <p class="font-medium text-ink">@album.Title</p>
                                 </div>
                             </a>
                         }
@@ -87,15 +87,15 @@
             @if (session.Tracks.Count > 0)
             {
                 <section>
-                    <h2 class="text-lg font-semibold text-gray-900 mb-3">@Localizer["Tracks Recorded"]</h2>
-                    <div class="bg-white rounded-lg border border-gray-200 divide-y">
+                    <h2 class="text-lg font-semibold text-ink mb-3">@Localizer["Tracks Recorded"]</h2>
+                    <div class="bg-surface rounded-lg border border-rule divide-y">
                         @foreach (var track in session.Tracks)
                         {
-                            <a href="/@culture/tracks/@track.Slug" class="flex items-center justify-between p-3 hover:bg-gray-50 transition-colors">
-                                <span class="text-gray-900 font-medium">@track.Title</span>
+                            <a href="/@culture/tracks/@track.Slug" class="flex items-center justify-between p-3 hover:bg-paper transition-colors">
+                                <span class="text-ink font-medium">@track.Title</span>
                                 @if (track.DurationSeconds.HasValue)
                                 {
-                                    <span class="text-sm text-gray-500">@TimeSpan.FromSeconds(track.DurationSeconds.Value).ToString(@"m\:ss")</span>
+                                    <span class="text-sm text-ink-muted">@TimeSpan.FromSeconds(track.DurationSeconds.Value).ToString(@"m\:ss")</span>
                                 }
                             </a>
                         }
@@ -107,11 +107,11 @@
             @if (session.Media.Count > 0)
             {
                 <section>
-                    <h2 class="text-lg font-semibold text-gray-900 mb-3">@Localizer["Media"]</h2>
+                    <h2 class="text-lg font-semibold text-ink mb-3">@Localizer["Media"]</h2>
                     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                         @foreach (var media in session.Media)
                         {
-                            <div class="bg-gray-100 rounded-lg aspect-square overflow-hidden">
+                            <div class="bg-paper-muted rounded-lg aspect-square overflow-hidden">
                                 @if (!string.IsNullOrWhiteSpace(media.Url))
                                 {
                                     <img src="@media.Url" alt="@media.FileName" class="w-full h-full object-cover" loading="lazy" />
@@ -126,18 +126,18 @@
             @if (session.Citations.Count > 0)
             {
                 <section>
-                    <h2 class="text-lg font-semibold text-gray-900 mb-3">@Localizer["References"]</h2>
+                    <h2 class="text-lg font-semibold text-ink mb-3">@Localizer["References"]</h2>
                     <ul class="space-y-2">
                         @foreach (var citation in session.Citations)
                         {
-                            <li class="bg-white rounded-lg border border-gray-200 p-3 text-sm text-gray-700">
+                            <li class="bg-surface rounded-lg border border-rule p-3 text-sm text-ink-secondary">
                                 @if (!string.IsNullOrWhiteSpace(citation.Quote))
                                 {
-                                    <blockquote class="italic border-s-4 border-gray-300 ps-3 mb-1">@citation.Quote</blockquote>
+                                    <blockquote class="italic border-s-4 border-rule-strong ps-3 mb-1">@citation.Quote</blockquote>
                                 }
                                 @if (!string.IsNullOrWhiteSpace(citation.SourceName))
                                 {
-                                    <p class="text-xs text-gray-500">— @citation.SourceName</p>
+                                    <p class="text-xs text-ink-muted">— @citation.SourceName</p>
                                 }
                             </li>
                         }
@@ -148,20 +148,20 @@
 
         <!-- Sidebar -->
         <aside class="w-full lg:w-72 space-y-4">
-            <div class="bg-white rounded-lg border border-gray-200 p-4">
-                <h3 class="text-sm font-semibold text-gray-700 mb-2">@Localizer["Session Info"]</h3>
+            <div class="bg-surface rounded-lg border border-rule p-4">
+                <h3 class="text-sm font-semibold text-ink-secondary mb-2">@Localizer["Session Info"]</h3>
                 <dl class="space-y-1 text-sm">
                     <div class="flex justify-between">
-                        <dt class="text-gray-500">@Localizer["Type"]</dt>
-                        <dd class="text-gray-900">@(session.SessionTypeName ?? "—")</dd>
+                        <dt class="text-ink-muted">@Localizer["Type"]</dt>
+                        <dd class="text-ink">@(session.SessionTypeName ?? "—")</dd>
                     </div>
                     <div class="flex justify-between">
-                        <dt class="text-gray-500">@Localizer["Start Date"]</dt>
-                        <dd class="text-gray-900">@(session.StartDate?.ToString("yyyy-MM-dd") ?? "—")</dd>
+                        <dt class="text-ink-muted">@Localizer["Start Date"]</dt>
+                        <dd class="text-ink">@(session.StartDate?.ToString("yyyy-MM-dd") ?? "—")</dd>
                     </div>
                     <div class="flex justify-between">
-                        <dt class="text-gray-500">@Localizer["End Date"]</dt>
-                        <dd class="text-gray-900">@(session.EndDate?.ToString("yyyy-MM-dd") ?? "—")</dd>
+                        <dt class="text-ink-muted">@Localizer["End Date"]</dt>
+                        <dd class="text-ink">@(session.EndDate?.ToString("yyyy-MM-dd") ?? "—")</dd>
                     </div>
                 </dl>
             </div>

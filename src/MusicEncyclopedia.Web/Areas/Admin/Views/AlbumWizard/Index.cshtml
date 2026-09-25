@@ -2,7 +2,7 @@
 @{
     ViewData["Title"] = "ایجاد آلبوم (گام‌به‌گام)";
     ViewData["ActiveMenu"] = "Albums";
-    string fieldClasses = "w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500";
+    string fieldClasses = "form-control";
     var stepMeta = new[]
     {
         (Label: "اطلاعات پایه", Icon: "fa-info-circle"),
@@ -21,30 +21,30 @@
     @Html.AntiForgeryToken()
     <input type="hidden" asp-for="ActiveStep" id="activeStep" />
 
-    <div asp-validation-summary="ModelOnly" class="mb-4 px-4 py-3 rounded-md bg-red-50 border border-red-200 text-red-800 text-sm" role="alert"></div>
+    <div asp-validation-summary="ModelOnly" class="mb-4 px-4 py-3 rounded-md bg-error-soft border border-error-border text-error-hover text-sm" role="alert"></div>
 
     <!-- ============================================================
          Stepper header
          ============================================================ -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
+    <div class="bg-surface rounded-lg shadow-sm border border-rule p-4 mb-6">
         <ol class="flex items-center justify-between overflow-x-auto gap-2" id="wizardStepper">
             @for (var s = 1; s <= stepMeta.Length; s++)
             {
                 <li class="wizard-step-badge flex flex-col items-center gap-1.5 flex-1 min-w-[90px] cursor-pointer"
                     data-step="@s" title="@stepMeta[s - 1].Label">
                     <span class="wizard-step-dot w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold
-                         border-2 transition-colors @(s == Model.ActiveStep ? "border-blue-600 bg-blue-600 text-white" : "border-gray-300 bg-white text-gray-500")">
+                         border-2 transition-colors @(s == Model.ActiveStep ? "border-accent bg-accent text-on-accent" : "border-rule-strong bg-surface text-ink-muted")">
                         @if (s < Model.ActiveStep)
                         {
-                            <i class="fas fa-check"></i>
+                            <i aria-hidden="true" class="fas fa-check"></i>
                         }
                         else
                         {
                             @s
                         }
                     </span>
-                    <span class="text-[11px] text-gray-600 whitespace-nowrap">
-                        <i class="fas @stepMeta[s - 1].Icon me-1 text-gray-400"></i>@stepMeta[s - 1].Label
+                    <span class="text-[11px] text-ink-secondary whitespace-nowrap">
+                        <i aria-hidden="true" class="fas @stepMeta[s - 1].Icon me-1 text-ink-muted"></i>@stepMeta[s - 1].Label
                     </span>
                 </li>
             }
@@ -54,47 +54,47 @@
     <!-- ============================================================
          Step 1 — Album basics
          ============================================================ -->
-    <section class="wizard-step bg-white rounded-lg shadow-sm border border-gray-200 p-5 mb-6" data-step="1">
-        <h2 class="text-lg font-semibold text-gray-900 mb-4"><i class="fas fa-info-circle text-blue-500 me-2"></i>اطلاعات پایه</h2>
+    <section class="wizard-step bg-surface rounded-lg shadow-sm border border-rule p-5 mb-6" data-step="1">
+        <h2 class="text-lg font-semibold text-ink mb-4"><i aria-hidden="true" class="fas fa-info-circle text-accent me-2"></i>اطلاعات پایه</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="md:col-span-2">
-                <label asp-for="Title" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                <label asp-for="Title" class="form-label"></label>
                 <input asp-for="Title" data-album-title class="@fieldClasses" />
-                <span asp-validation-for="Title" class="text-xs text-red-600"></span>
+                <span asp-validation-for="Title" aria-live="polite" class="field-error"></span>
             </div>
             <div>
-                <label asp-for="Slug" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                <label asp-for="Slug" class="form-label"></label>
                 <div class="flex gap-2">
                     <input asp-for="Slug" id="AlbumSlug" class="@fieldClasses" dir="ltr" />
                     <label class="inline-flex items-center gap-1 shrink-0 cursor-pointer" title="قفل کردن slug (در صورت ویرایش دستی)">
-                        <input type="checkbox" id="AlbumSlugLocked" class="rounded border-gray-300 text-blue-600" />
-                        <span class="text-xs text-gray-500">قفل</span>
+                        <input type="checkbox" id="AlbumSlugLocked" class="rounded border-rule-strong text-accent" />
+                        <span class="text-xs text-ink-muted">قفل</span>
                     </label>
                 </div>
-                <span asp-validation-for="Slug" class="text-xs text-red-600"></span>
+                <span asp-validation-for="Slug" aria-live="polite" class="field-error"></span>
             </div>
             <div>
-                <label asp-for="TitleSort" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                <label asp-for="TitleSort" class="form-label"></label>
                 <input asp-for="TitleSort" class="@fieldClasses" />
-                <span asp-validation-for="TitleSort" class="text-xs text-red-600"></span>
+                <span asp-validation-for="TitleSort" aria-live="polite" class="field-error"></span>
             </div>
             <div>
-                <label asp-for="OriginalTitle" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                <label asp-for="OriginalTitle" class="form-label"></label>
                 <input asp-for="OriginalTitle" class="@fieldClasses" />
-                <span asp-validation-for="OriginalTitle" class="text-xs text-red-600"></span>
+                <span asp-validation-for="OriginalTitle" aria-live="polite" class="field-error"></span>
             </div>
             <div>
-                <label asp-for="EnglishTitle" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                <label asp-for="EnglishTitle" class="form-label"></label>
                 <input asp-for="EnglishTitle" class="@fieldClasses" />
-                <span asp-validation-for="EnglishTitle" class="text-xs text-red-600"></span>
+                <span asp-validation-for="EnglishTitle" aria-live="polite" class="field-error"></span>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 border-t border-gray-100 pt-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 border-t border-rule-light pt-4">
             <div>
                 <div class="flex items-center justify-between mb-1">
-                    <label asp-for="AlbumCategoryId" class="block text-sm font-medium text-gray-700"></label>
-                    <button type="button" class="btn-quick-add text-blue-600 hover:text-blue-800 text-xs" data-qa-target="albumcategory" title="افزودن دسته‌بندی جدید"><i class="fas fa-plus me-1"></i>جدید</button>
+                    <label asp-for="AlbumCategoryId" class="block text-sm font-medium text-ink-secondary"></label>
+                    <button type="button" class="btn-quick-add text-accent hover:text-accent-hover text-xs" data-qa-target="albumcategory" title="افزودن دسته‌بندی جدید"><i aria-hidden="true" class="fas fa-plus me-1"></i>جدید</button>
                 </div>
                 <select asp-for="AlbumCategoryId"
                         data-val="true" data-val-required="دسته‌بندی آلبوم الزامی است." data-qa-options="albumcategory" class="@fieldClasses">
@@ -104,59 +104,59 @@
                         <option value="@cat.AlbumCategoryId">@cat.Name</option>
                     }
                 </select>
-                <span asp-validation-for="AlbumCategoryId" class="text-xs text-red-600"></span>
+                <span asp-validation-for="AlbumCategoryId" aria-live="polite" class="field-error"></span>
             </div>
             <div class="flex items-end pb-2">
                 <label class="inline-flex items-center gap-2 cursor-pointer">
-                    <input asp-for="IsOfficial" type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
-                    <span class="text-sm text-gray-700">@Html.DisplayNameFor(m => m.IsOfficial)</span>
+                    <input asp-for="IsOfficial" type="checkbox" class="rounded border-rule-strong text-accent focus-visible:ring-accent" />
+                    <span class="text-sm text-ink-secondary">@Html.DisplayNameFor(m => m.IsOfficial)</span>
                 </label>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 border-t border-gray-100 pt-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 border-t border-rule-light pt-4">
             <div>
-                <label asp-for="ReleaseDate" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                <label asp-for="ReleaseDate" class="form-label"></label>
                 <input asp-for="ReleaseDate" type="date" class="@fieldClasses" />
-                <span asp-validation-for="ReleaseDate" class="text-xs text-red-600"></span>
+                <span asp-validation-for="ReleaseDate" aria-live="polite" class="field-error"></span>
             </div>
             <div>
-                <label asp-for="ReleaseDatePrecision" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                <label asp-for="ReleaseDatePrecision" class="form-label"></label>
                 <select asp-for="ReleaseDatePrecision" class="@fieldClasses">
                     <option value="">-- دقت --</option>
                     <option value="day">روز</option>
                     <option value="month">ماه</option>
                     <option value="year">سال</option>
                 </select>
-                <span asp-validation-for="ReleaseDatePrecision" class="text-xs text-red-600"></span>
+                <span asp-validation-for="ReleaseDatePrecision" aria-live="polite" class="field-error"></span>
             </div>
             <div>
-                <label asp-for="RecordingStartDate" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                <label asp-for="RecordingStartDate" class="form-label"></label>
                 <input asp-for="RecordingStartDate" type="date" class="@fieldClasses" />
-                <span asp-validation-for="RecordingStartDate" class="text-xs text-red-600"></span>
+                <span asp-validation-for="RecordingStartDate" aria-live="polite" class="field-error"></span>
             </div>
             <div>
-                <label asp-for="RecordingEndDate" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                <label asp-for="RecordingEndDate" class="form-label"></label>
                 <input asp-for="RecordingEndDate" type="date" class="@fieldClasses" />
-                <span asp-validation-for="RecordingEndDate" class="text-xs text-red-600"></span>
+                <span asp-validation-for="RecordingEndDate" aria-live="polite" class="field-error"></span>
             </div>
             <div>
-                <label asp-for="RecordingDatePrecision" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                <label asp-for="RecordingDatePrecision" class="form-label"></label>
                 <select asp-for="RecordingDatePrecision" class="@fieldClasses">
                     <option value="">-- دقت --</option>
                     <option value="day">روز</option>
                     <option value="month">ماه</option>
                     <option value="year">سال</option>
                 </select>
-                <span asp-validation-for="RecordingDatePrecision" class="text-xs text-red-600"></span>
+                <span asp-validation-for="RecordingDatePrecision" aria-live="polite" class="field-error"></span>
             </div>
             <div>
-                <label asp-for="DurationSeconds" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                <label asp-for="DurationSeconds" class="form-label"></label>
                 <input asp-for="DurationSeconds" type="number" class="@fieldClasses" />
-                <span asp-validation-for="DurationSeconds" class="text-xs text-red-600"></span>
+                <span asp-validation-for="DurationSeconds" aria-live="polite" class="field-error"></span>
             </div>
             <div>
-                <label asp-for="CoverMediaId" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                <label asp-for="CoverMediaId" class="form-label"></label>
                 <select asp-for="CoverMediaId" class="@fieldClasses">
                     <option value="">-- انتخاب رسانه --</option>
                     @foreach (var media in Model.MediaOptions)
@@ -164,17 +164,17 @@
                         <option value="@media.MediaId">@media.FileName</option>
                     }
                 </select>
-                <span asp-validation-for="CoverMediaId" class="text-xs text-red-600"></span>
+                <span asp-validation-for="CoverMediaId" aria-live="polite" class="field-error"></span>
             </div>
             <div>
-                <label asp-for="CopyrightNotice" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                <label asp-for="CopyrightNotice" class="form-label"></label>
                 <input asp-for="CopyrightNotice" class="@fieldClasses" />
-                <span asp-validation-for="CopyrightNotice" class="text-xs text-red-600"></span>
+                <span asp-validation-for="CopyrightNotice" aria-live="polite" class="field-error"></span>
             </div>
             <div class="md:col-span-2">
-                <label asp-for="Description" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                <label asp-for="Description" class="form-label"></label>
                 <textarea asp-for="Description" rows="4" class="@fieldClasses"></textarea>
-                <span asp-validation-for="Description" class="text-xs text-red-600"></span>
+                <span asp-validation-for="Description" aria-live="polite" class="field-error"></span>
             </div>
         </div>
     </section>
@@ -182,20 +182,20 @@
     <!-- ============================================================
          Step 2 — Classification & distribution
          ============================================================ -->
-    <section class="wizard-step bg-white rounded-lg shadow-sm border border-gray-200 p-5 mb-6 hidden" data-step="2">
-        <h2 class="text-lg font-semibold text-gray-900 mb-4"><i class="fas fa-tags text-blue-500 me-2"></i>طبقه‌بندی و نشر</h2>
+    <section class="wizard-step bg-surface rounded-lg shadow-sm border border-rule p-5 mb-6 hidden" data-step="2">
+        <h2 class="text-lg font-semibold text-ink mb-4"><i aria-hidden="true" class="fas fa-tags text-accent me-2"></i>طبقه‌بندی و نشر</h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
                 <div class="flex items-center justify-between mb-2">
-                    <label class="block text-sm font-medium text-gray-700">سبک‌ها</label>
-                    <button type="button" class="btn-quick-add text-blue-600 hover:text-blue-800 text-xs" data-qa-target="genre" title="افزودن سبک جدید"><i class="fas fa-plus me-1"></i>جدید</button>
+                    <label class="block text-sm font-medium text-ink-secondary">سبک‌ها</label>
+                    <button type="button" class="btn-quick-add text-accent hover:text-accent-hover text-xs" data-qa-target="genre" title="افزودن سبک جدید"><i aria-hidden="true" class="fas fa-plus me-1"></i>جدید</button>
                 </div>
-                <div class="space-y-1 max-h-48 overflow-y-auto border border-gray-200 rounded-md p-2" data-qa-options="genre">
+                <div class="space-y-1 max-h-48 overflow-y-auto border border-rule rounded-md p-2" data-qa-options="genre">
                     @foreach (var item in Model.GenreOptions)
                     {
-                        <label class="flex items-center gap-2 text-xs text-gray-700 cursor-pointer">
-                            <input type="checkbox" name="GenreIds" value="@item.GenreId" @(Model.GenreIds.Contains(item.GenreId) ? "checked" : "") class="rounded border-gray-300 text-blue-600" />
+                        <label class="flex items-center gap-2 text-xs text-ink-secondary cursor-pointer">
+                            <input type="checkbox" name="GenreIds" value="@item.GenreId" @(Model.GenreIds.Contains(item.GenreId) ? "checked" : "") class="rounded border-rule-strong text-accent" />
                             @item.Name
                         </label>
                     }
@@ -203,14 +203,14 @@
             </div>
             <div>
                 <div class="flex items-center justify-between mb-2">
-                    <label class="block text-sm font-medium text-gray-700">حالت‌ها</label>
-                    <button type="button" class="btn-quick-add text-blue-600 hover:text-blue-800 text-xs" data-qa-target="mood" title="افزودن حالت جدید"><i class="fas fa-plus me-1"></i>جدید</button>
+                    <label class="block text-sm font-medium text-ink-secondary">حالت‌ها</label>
+                    <button type="button" class="btn-quick-add text-accent hover:text-accent-hover text-xs" data-qa-target="mood" title="افزودن حالت جدید"><i aria-hidden="true" class="fas fa-plus me-1"></i>جدید</button>
                 </div>
-                <div class="space-y-1 max-h-48 overflow-y-auto border border-gray-200 rounded-md p-2" data-qa-options="mood">
+                <div class="space-y-1 max-h-48 overflow-y-auto border border-rule rounded-md p-2" data-qa-options="mood">
                     @foreach (var item in Model.MoodOptions)
                     {
-                        <label class="flex items-center gap-2 text-xs text-gray-700 cursor-pointer">
-                            <input type="checkbox" name="MoodIds" value="@item.MoodId" @(Model.MoodIds.Contains(item.MoodId) ? "checked" : "") class="rounded border-gray-300 text-blue-600" />
+                        <label class="flex items-center gap-2 text-xs text-ink-secondary cursor-pointer">
+                            <input type="checkbox" name="MoodIds" value="@item.MoodId" @(Model.MoodIds.Contains(item.MoodId) ? "checked" : "") class="rounded border-rule-strong text-accent" />
                             @item.Name
                         </label>
                     }
@@ -218,14 +218,14 @@
             </div>
             <div>
                 <div class="flex items-center justify-between mb-2">
-                    <label class="block text-sm font-medium text-gray-700">زبان‌ها</label>
-                    <button type="button" class="btn-quick-add text-blue-600 hover:text-blue-800 text-xs" data-qa-target="language" title="افزودن زبان جدید"><i class="fas fa-plus me-1"></i>جدید</button>
+                    <label class="block text-sm font-medium text-ink-secondary">زبان‌ها</label>
+                    <button type="button" class="btn-quick-add text-accent hover:text-accent-hover text-xs" data-qa-target="language" title="افزودن زبان جدید"><i aria-hidden="true" class="fas fa-plus me-1"></i>جدید</button>
                 </div>
-                <div class="space-y-1 max-h-48 overflow-y-auto border border-gray-200 rounded-md p-2" data-qa-options="language">
+                <div class="space-y-1 max-h-48 overflow-y-auto border border-rule rounded-md p-2" data-qa-options="language">
                     @foreach (var item in Model.LanguageOptions)
                     {
-                        <label class="flex items-center gap-2 text-xs text-gray-700 cursor-pointer">
-                            <input type="checkbox" name="LanguageIds" value="@item.LanguageId" @(Model.LanguageIds.Contains(item.LanguageId) ? "checked" : "") class="rounded border-gray-300 text-blue-600" />
+                        <label class="flex items-center gap-2 text-xs text-ink-secondary cursor-pointer">
+                            <input type="checkbox" name="LanguageIds" value="@item.LanguageId" @(Model.LanguageIds.Contains(item.LanguageId) ? "checked" : "") class="rounded border-rule-strong text-accent" />
                             @item.Name
                         </label>
                     }
@@ -233,14 +233,14 @@
             </div>
             <div>
                 <div class="flex items-center justify-between mb-2">
-                    <label class="block text-sm font-medium text-gray-700">کشورها</label>
-                    <button type="button" class="btn-quick-add text-blue-600 hover:text-blue-800 text-xs" data-qa-target="country" title="افزودن کشور جدید"><i class="fas fa-plus me-1"></i>جدید</button>
+                    <label class="block text-sm font-medium text-ink-secondary">کشورها</label>
+                    <button type="button" class="btn-quick-add text-accent hover:text-accent-hover text-xs" data-qa-target="country" title="افزودن کشور جدید"><i aria-hidden="true" class="fas fa-plus me-1"></i>جدید</button>
                 </div>
-                <div class="space-y-1 max-h-48 overflow-y-auto border border-gray-200 rounded-md p-2" data-qa-options="country">
+                <div class="space-y-1 max-h-48 overflow-y-auto border border-rule rounded-md p-2" data-qa-options="country">
                     @foreach (var item in Model.CountryOptions)
                     {
-                        <label class="flex items-center gap-2 text-xs text-gray-700 cursor-pointer">
-                            <input type="checkbox" name="CountryIds" value="@item.CountryId" @(Model.CountryIds.Contains(item.CountryId) ? "checked" : "") class="rounded border-gray-300 text-blue-600" />
+                        <label class="flex items-center gap-2 text-xs text-ink-secondary cursor-pointer">
+                            <input type="checkbox" name="CountryIds" value="@item.CountryId" @(Model.CountryIds.Contains(item.CountryId) ? "checked" : "") class="rounded border-rule-strong text-accent" />
                             @item.Name
                         </label>
                     }
@@ -249,22 +249,22 @@
         </div>
 
         <!-- Companies -->
-        <div class="mt-6 border-t border-gray-100 pt-4">
+        <div class="mt-6 border-t border-rule-light pt-4">
             <div class="flex items-center justify-between mb-3">
-                <label class="text-sm font-medium text-gray-700">شرکت‌های ناشر / توزیع</label>
-                <button type="button" id="btnAddCompany" class="px-3 py-1.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-                    <i class="fas fa-plus me-1"></i>افزودن شرکت
+                <label class="text-sm font-medium text-ink-secondary">شرکت‌های ناشر / توزیع</label>
+                <button type="button" id="btnAddCompany" class="px-3 py-1.5 text-xs bg-accent text-on-accent rounded-md hover:bg-accent-hover transition-colors">
+                    <i aria-hidden="true" class="fas fa-plus me-1"></i>افزودن شرکت
                 </button>
             </div>
             <div class="company-rows space-y-2">
                 @for (var j = 0; j < Model.Companies.Count; j++)
                 {
                     var company = Model.Companies[j];
-                    <div class="company-row grid grid-cols-2 md:grid-cols-4 gap-3 p-3 bg-gray-50 rounded-md border border-gray-200">
+                    <div class="company-row grid grid-cols-2 md:grid-cols-4 gap-3 p-3 bg-paper rounded-md border border-rule">
                         <div>
                             <div class="flex items-center justify-between mb-1">
-                                <label class="block text-xs font-medium text-gray-600">شرکت</label>
-                                <button type="button" class="btn-quick-add text-blue-600 hover:text-blue-800 text-xs" data-qa-target="company" title="افزودن شرکت جدید"><i class="fas fa-plus"></i></button>
+                                <label class="block text-xs font-medium text-ink-secondary">شرکت</label>
+                                <button type="button" class="btn-quick-add text-accent hover:text-accent-hover text-xs min-w-11 min-h-11 inline-flex items-center justify-center" data-qa-target="company" title="افزودن شرکت جدید"><i aria-hidden="true" class="fas fa-plus"></i></button>
                             </div>
                             <select name="Companies[@j].CompanyId" data-qa-options="company" class="@fieldClasses">
                                 <option value="">-- انتخاب --</option>
@@ -275,7 +275,7 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-gray-600 mb-1">نقش شرکت</label>
+                            <label class="block text-xs font-medium text-ink-secondary mb-1">نقش شرکت</label>
                             <select name="Companies[@j].CompanyRoleTypeId" class="@fieldClasses">
                                 <option value="">-- انتخاب --</option>
                                 @foreach (var item in Model.CompanyRoleTypeOptions)
@@ -285,24 +285,24 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-gray-600 mb-1">شماره کاتالوگ</label>
+                            <label class="block text-xs font-medium text-ink-secondary mb-1">شماره کاتالوگ</label>
                             <input type="text" name="Companies[@j].CatalogNumber" value="@company.CatalogNumber" class="@fieldClasses" />
                         </div>
                         <div class="flex items-end gap-3">
                             <div class="flex-1">
-                                <label class="block text-xs font-medium text-gray-600 mb-1">بارکد</label>
+                                <label class="block text-xs font-medium text-ink-secondary mb-1">بارکد</label>
                                 <input type="text" name="Companies[@j].Barcode" value="@company.Barcode" class="@fieldClasses" />
                             </div>
-                            <button type="button" class="remove-company text-red-600 hover:text-red-800 text-xs"><i class="fas fa-times"></i></button>
+                            <button type="button" class="remove-company text-error hover:text-error-hover text-xs min-w-11 min-h-11 inline-flex items-center justify-center" aria-label="حذف"><i aria-hidden="true" class="fas fa-times"></i></button>
                         </div>
                     </div>
                 }
             </div>
             <template id="tpl-company">
-                <div class="company-row grid grid-cols-2 md:grid-cols-4 gap-3 p-3 bg-gray-50 rounded-md border border-gray-200">                        <div>
+                <div class="company-row grid grid-cols-2 md:grid-cols-4 gap-3 p-3 bg-paper rounded-md border border-rule">                        <div>
                             <div class="flex items-center justify-between mb-1">
-                                <label class="block text-xs font-medium text-gray-600">شرکت</label>
-                                <button type="button" class="btn-quick-add text-blue-600 hover:text-blue-800 text-xs" data-qa-target="company" title="افزودن شرکت جدید"><i class="fas fa-plus"></i></button>
+                                <label class="block text-xs font-medium text-ink-secondary">شرکت</label>
+                                <button type="button" class="btn-quick-add text-accent hover:text-accent-hover text-xs min-w-11 min-h-11 inline-flex items-center justify-center" data-qa-target="company" title="افزودن شرکت جدید"><i aria-hidden="true" class="fas fa-plus"></i></button>
                             </div>
                             <select name="__P__[0].CompanyId" data-qa-options="company" class="@fieldClasses">
                             <option value="">-- انتخاب --</option>
@@ -313,7 +313,7 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-gray-600 mb-1">نقش شرکت</label>
+                        <label class="block text-xs font-medium text-ink-secondary mb-1">نقش شرکت</label>
                         <select name="__P__[0].CompanyRoleTypeId" class="@fieldClasses">
                             <option value="">-- انتخاب --</option>
                             @foreach (var item in Model.CompanyRoleTypeOptions)
@@ -323,35 +323,35 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-gray-600 mb-1">شماره کاتالوگ</label>
+                        <label class="block text-xs font-medium text-ink-secondary mb-1">شماره کاتالوگ</label>
                         <input type="text" name="__P__[0].CatalogNumber" class="@fieldClasses" />
                     </div>
                     <div class="flex items-end gap-3">
                         <div class="flex-1">
-                            <label class="block text-xs font-medium text-gray-600 mb-1">بارکد</label>
+                            <label class="block text-xs font-medium text-ink-secondary mb-1">بارکد</label>
                             <input type="text" name="__P__[0].Barcode" class="@fieldClasses" />
                         </div>
-                        <button type="button" class="remove-company text-red-600 hover:text-red-800 text-xs"><i class="fas fa-times"></i></button>
+                        <button type="button" class="remove-company text-error hover:text-error-hover text-xs min-w-11 min-h-11 inline-flex items-center justify-center" aria-label="حذف"><i aria-hidden="true" class="fas fa-times"></i></button>
                     </div>
                 </div>
             </template>
         </div>
 
         <!-- Identifiers -->
-        <div class="mt-6 border-t border-gray-100 pt-4">
+        <div class="mt-6 border-t border-rule-light pt-4">
             <div class="flex items-center justify-between mb-3">
-                <label class="text-sm font-medium text-gray-700">شناسه‌ها (بارکد، ISRC و…)</label>
-                <button type="button" id="btnAddIdentifier" class="px-3 py-1.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-                    <i class="fas fa-plus me-1"></i>افزودن شناسه
+                <label class="text-sm font-medium text-ink-secondary">شناسه‌ها (بارکد، ISRC و…)</label>
+                <button type="button" id="btnAddIdentifier" class="px-3 py-1.5 text-xs bg-accent text-on-accent rounded-md hover:bg-accent-hover transition-colors">
+                    <i aria-hidden="true" class="fas fa-plus me-1"></i>افزودن شناسه
                 </button>
             </div>
             <div class="identifier-rows space-y-2">
                 @for (var j = 0; j < Model.Identifiers.Count; j++)
                 {
                     var identifier = Model.Identifiers[j];
-                    <div class="identifier-row grid grid-cols-2 md:grid-cols-3 gap-3 p-3 bg-gray-50 rounded-md border border-gray-200">
+                    <div class="identifier-row grid grid-cols-2 md:grid-cols-3 gap-3 p-3 bg-paper rounded-md border border-rule">
                         <div>
-                            <label class="block text-xs font-medium text-gray-600 mb-1">نوع شناسه</label>
+                            <label class="block text-xs font-medium text-ink-secondary mb-1">نوع شناسه</label>
                             <select name="Identifiers[@j].IdentifierTypeId" class="@fieldClasses">
                                 <option value="">-- انتخاب --</option>
                                 @foreach (var item in Model.IdentifierTypeOptions)
@@ -361,19 +361,19 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-gray-600 mb-1">مقدار</label>
+                            <label class="block text-xs font-medium text-ink-secondary mb-1">مقدار</label>
                             <input type="text" name="Identifiers[@j].Value" value="@identifier.Value" class="@fieldClasses" />
                         </div>
                         <div class="flex items-end pb-1">
-                            <button type="button" class="remove-identifier text-red-600 hover:text-red-800 text-xs"><i class="fas fa-times me-1"></i>حذف</button>
+                            <button type="button" class="remove-identifier text-error hover:text-error-hover text-xs"><i aria-hidden="true" class="fas fa-times me-1"></i>حذف</button>
                         </div>
                     </div>
                 }
             </div>
             <template id="tpl-identifier">
-                <div class="identifier-row grid grid-cols-2 md:grid-cols-3 gap-3 p-3 bg-gray-50 rounded-md border border-gray-200">
+                <div class="identifier-row grid grid-cols-2 md:grid-cols-3 gap-3 p-3 bg-paper rounded-md border border-rule">
                     <div>
-                        <label class="block text-xs font-medium text-gray-600 mb-1">نوع شناسه</label>
+                        <label class="block text-xs font-medium text-ink-secondary mb-1">نوع شناسه</label>
                         <select name="__P__[0].IdentifierTypeId" class="@fieldClasses">
                             <option value="">-- انتخاب --</option>
                             @foreach (var item in Model.IdentifierTypeOptions)
@@ -383,11 +383,11 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-gray-600 mb-1">مقدار</label>
+                        <label class="block text-xs font-medium text-ink-secondary mb-1">مقدار</label>
                         <input type="text" name="__P__[0].Value" class="@fieldClasses" />
                     </div>
                     <div class="flex items-end pb-1">
-                        <button type="button" class="remove-identifier text-red-600 hover:text-red-800 text-xs"><i class="fas fa-times me-1"></i>حذف</button>
+                        <button type="button" class="remove-identifier text-error hover:text-error-hover text-xs"><i aria-hidden="true" class="fas fa-times me-1"></i>حذف</button>
                     </div>
                 </div>
             </template>
@@ -398,14 +398,14 @@
          Step 3 — Tracks
          ============================================================ -->
     <section class="wizard-step mb-6 hidden" data-step="3">
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5 mb-4">
+        <div class="bg-surface rounded-lg shadow-sm border border-rule p-5 mb-4">
             <div class="flex items-center justify-between">
-                <h2 class="text-lg font-semibold text-gray-900"><i class="fas fa-music text-blue-500 me-2"></i>ترک‌ها</h2>
-                <button type="button" id="btnAddTrack" class="px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-                    <i class="fas fa-plus me-1"></i>افزودن ترک
+                <h2 class="text-lg font-semibold text-ink"><i aria-hidden="true" class="fas fa-music text-accent me-2"></i>ترک‌ها</h2>
+                <button type="button" id="btnAddTrack" class="px-4 py-2 text-sm bg-accent text-on-accent rounded-md hover:bg-accent-hover transition-colors">
+                    <i aria-hidden="true" class="fas fa-plus me-1"></i>افزودن ترک
                 </button>
             </div>
-            <p class="text-xs text-gray-500 mt-1">برای هر ترک می‌توانید سبک‌ها، سازها، نسخه‌های خوانده‌شده (با انتخاب شعر) و عوامل را در همین‌جا ثبت کنید.</p>
+            <p class="text-xs text-ink-muted mt-1">برای هر ترک می‌توانید سبک‌ها، سازها، نسخه‌های خوانده‌شده (با انتخاب شعر) و عوامل را در همین‌جا ثبت کنید.</p>
         </div>
         <div id="trackList" class="space-y-4">
             @for (var i = 0; i < Model.Tracks.Count; i++)
@@ -416,9 +416,9 @@
         </div>
         @if (Model.Tracks.Count == 0)
         {
-            <div id="trackEmptyHint" class="bg-white rounded-lg shadow-sm border border-dashed border-gray-300 p-8 text-center">
-                <i class="fas fa-music text-3xl text-gray-300 mb-2"></i>
-                <p class="text-sm text-gray-500">هنوز ترکی اضافه نشده است. با دکمه «افزودن ترک» شروع کنید — ترک‌ها اختیاری‌اند و می‌توانید آلبوم را بدون ترک بسازید.</p>
+            <div id="trackEmptyHint" class="bg-surface rounded-lg shadow-sm border border-dashed border-rule-strong p-8 text-center">
+                <i aria-hidden="true" class="fas fa-music text-3xl text-ink-disabled mb-2"></i>
+                <p class="text-sm text-ink-muted">هنوز ترکی اضافه نشده است. با دکمه «افزودن ترک» شروع کنید — ترک‌ها اختیاری‌اند و می‌توانید آلبوم را بدون ترک بسازید.</p>
             </div>
         }
     </section>
@@ -426,22 +426,22 @@
     <!-- ============================================================
          Step 4 — Album credits
          ============================================================ -->
-    <section class="wizard-step bg-white rounded-lg shadow-sm border border-gray-200 p-5 mb-6 hidden" data-step="4">
-        <h2 class="text-lg font-semibold text-gray-900 mb-1"><i class="fas fa-users text-blue-500 me-2"></i>عوامل آلبوم</h2>
-        <p class="text-xs text-gray-500 mb-4">عوامل کلی آلبوم (خواننده، تهیه‌کننده، آهنگساز و…). عوامل هر ترک در گام قبلی ثبت می‌شوند.</p>
+    <section class="wizard-step bg-surface rounded-lg shadow-sm border border-rule p-5 mb-6 hidden" data-step="4">
+        <h2 class="text-lg font-semibold text-ink mb-1"><i aria-hidden="true" class="fas fa-users text-accent me-2"></i>عوامل آلبوم</h2>
+        <p class="text-xs text-ink-muted mb-4">عوامل کلی آلبوم (خواننده، تهیه‌کننده، آهنگساز و…). عوامل هر ترک در گام قبلی ثبت می‌شوند.</p>
         <div class="flex items-center justify-between mb-3">
-            <label class="text-sm font-medium text-gray-700">عوامل</label>
-            <button type="button" id="btnAddAlbumCredit" class="px-3 py-1.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-                <i class="fas fa-plus me-1"></i>افزودن عامل
+            <label class="text-sm font-medium text-ink-secondary">عوامل</label>
+            <button type="button" id="btnAddAlbumCredit" class="px-3 py-1.5 text-xs bg-accent text-on-accent rounded-md hover:bg-accent-hover transition-colors">
+                <i aria-hidden="true" class="fas fa-plus me-1"></i>افزودن عامل
             </button>
         </div>
         <div class="album-credit-rows space-y-2">
             @for (var j = 0; j < Model.AlbumCredits.Count; j++)
             {
                 var credit = Model.AlbumCredits[j];
-                <div class="credit-row grid grid-cols-2 md:grid-cols-4 gap-3 p-3 bg-gray-50 rounded-md border border-gray-200">
+                <div class="credit-row grid grid-cols-2 md:grid-cols-4 gap-3 p-3 bg-paper rounded-md border border-rule">
                     <div>
-                        <label class="block text-xs font-medium text-gray-600 mb-1">نقش</label>
+                        <label class="block text-xs font-medium text-ink-secondary mb-1">نقش</label>
                         <select name="AlbumCredits[@j].CreditRoleId" class="@fieldClasses">
                             <option value="">-- انتخاب --</option>
                             @foreach (var item in Model.CreditRoleOptions)
@@ -451,7 +451,7 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-gray-600 mb-1">حوزه</label>
+                        <label class="block text-xs font-medium text-ink-secondary mb-1">حوزه</label>
                         <select name="AlbumCredits[@j].RoleScopeTypeId" class="@fieldClasses">
                             <option value="">-- انتخاب --</option>
                             @foreach (var item in Model.RoleScopeTypeOptions)
@@ -462,8 +462,8 @@
                     </div>
                     <div>
                         <div class="flex items-center justify-between mb-1">
-                            <label class="block text-xs font-medium text-gray-600">شخص</label>
-                            <button type="button" class="btn-quick-add text-blue-600 hover:text-blue-800 text-xs" data-qa-target="person" title="افزودن شخص جدید"><i class="fas fa-plus"></i></button>
+                            <label class="block text-xs font-medium text-ink-secondary">شخص</label>
+                            <button type="button" class="btn-quick-add text-accent hover:text-accent-hover text-xs min-w-11 min-h-11 inline-flex items-center justify-center" data-qa-target="person" title="افزودن شخص جدید"><i aria-hidden="true" class="fas fa-plus"></i></button>
                         </div>
                         <select name="AlbumCredits[@j].PersonId" data-qa-options="person" class="@fieldClasses">
                             <option value="">-- انتخاب --</option>
@@ -475,8 +475,8 @@
                     </div>
                     <div>
                         <div class="flex items-center justify-between mb-1">
-                            <label class="block text-xs font-medium text-gray-600">شرکت</label>
-                            <button type="button" class="btn-quick-add text-blue-600 hover:text-blue-800 text-xs" data-qa-target="company" title="افزودن شرکت جدید"><i class="fas fa-plus"></i></button>
+                            <label class="block text-xs font-medium text-ink-secondary">شرکت</label>
+                            <button type="button" class="btn-quick-add text-accent hover:text-accent-hover text-xs min-w-11 min-h-11 inline-flex items-center justify-center" data-qa-target="company" title="افزودن شرکت جدید"><i aria-hidden="true" class="fas fa-plus"></i></button>
                         </div>
                         <select name="AlbumCredits[@j].CompanyId" data-qa-options="company" class="@fieldClasses">
                             <option value="">-- انتخاب --</option>
@@ -488,8 +488,8 @@
                     </div>
                     <div>
                         <div class="flex items-center justify-between mb-1">
-                            <label class="block text-xs font-medium text-gray-600">ساز</label>
-                            <button type="button" class="btn-quick-add text-blue-600 hover:text-blue-800 text-xs" data-qa-target="instrument" title="افزودن ساز جدید"><i class="fas fa-plus"></i></button>
+                            <label class="block text-xs font-medium text-ink-secondary">ساز</label>
+                            <button type="button" class="btn-quick-add text-accent hover:text-accent-hover text-xs min-w-11 min-h-11 inline-flex items-center justify-center" data-qa-target="instrument" title="افزودن ساز جدید"><i aria-hidden="true" class="fas fa-plus"></i></button>
                         </div>
                         <select name="AlbumCredits[@j].InstrumentId" data-qa-options="instrument" class="@fieldClasses">
                             <option value="">-- انتخاب --</option>
@@ -500,29 +500,29 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-gray-600 mb-1">ترتیب نمایش</label>
+                        <label class="block text-xs font-medium text-ink-secondary mb-1">ترتیب نمایش</label>
                         <input type="number" name="AlbumCredits[@j].DisplayOrder" value="@credit.DisplayOrder" class="@fieldClasses" />
                     </div>
                     <div class="flex items-end gap-3 pb-1">
                         <label class="inline-flex items-center gap-1 cursor-pointer">
-                            <input type="checkbox" name="AlbumCredits[@j].IsPrimary" value="true" @(credit.IsPrimary ? "checked" : "") class="rounded border-gray-300 text-blue-600" />
-                            <span class="text-xs text-gray-600">اصلی</span>
+                            <input type="checkbox" name="AlbumCredits[@j].IsPrimary" value="true" @(credit.IsPrimary ? "checked" : "") class="rounded border-rule-strong text-accent" />
+                            <span class="text-xs text-ink-secondary">اصلی</span>
                         </label>
                     </div>
                     <div class="flex items-end pb-1">
-                        <button type="button" class="remove-credit text-red-600 hover:text-red-800 text-xs"><i class="fas fa-times me-1"></i>حذف</button>
+                        <button type="button" class="remove-credit text-error hover:text-error-hover text-xs"><i aria-hidden="true" class="fas fa-times me-1"></i>حذف</button>
                     </div>
                     <div class="md:col-span-4">
-                        <label class="block text-xs font-medium text-gray-600 mb-1">یادداشت‌ها</label>
+                        <label class="block text-xs font-medium text-ink-secondary mb-1">یادداشت‌ها</label>
                         <input type="text" name="AlbumCredits[@j].Notes" value="@credit.Notes" class="@fieldClasses" />
                     </div>
                 </div>
             }
         </div>
         <template id="tpl-album-credit">
-            <div class="credit-row grid grid-cols-2 md:grid-cols-4 gap-3 p-3 bg-gray-50 rounded-md border border-gray-200">
+            <div class="credit-row grid grid-cols-2 md:grid-cols-4 gap-3 p-3 bg-paper rounded-md border border-rule">
                 <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">نقش</label>
+                    <label class="block text-xs font-medium text-ink-secondary mb-1">نقش</label>
                     <select name="__P__[0].CreditRoleId" class="@fieldClasses">
                         <option value="">-- انتخاب --</option>
                         @foreach (var item in Model.CreditRoleOptions)
@@ -532,7 +532,7 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">حوزه</label>
+                    <label class="block text-xs font-medium text-ink-secondary mb-1">حوزه</label>
                     <select name="__P__[0].RoleScopeTypeId" class="@fieldClasses">
                         <option value="">-- انتخاب --</option>
                         @foreach (var item in Model.RoleScopeTypeOptions)
@@ -543,8 +543,8 @@
                 </div>
                 <div>
                     <div class="flex items-center justify-between mb-1">
-                        <label class="block text-xs font-medium text-gray-600">شخص</label>
-                        <button type="button" class="btn-quick-add text-blue-600 hover:text-blue-800 text-xs" data-qa-target="person" title="افزودن شخص جدید"><i class="fas fa-plus"></i></button>
+                        <label class="block text-xs font-medium text-ink-secondary">شخص</label>
+                        <button type="button" class="btn-quick-add text-accent hover:text-accent-hover text-xs min-w-11 min-h-11 inline-flex items-center justify-center" data-qa-target="person" title="افزودن شخص جدید"><i aria-hidden="true" class="fas fa-plus"></i></button>
                     </div>
                     <select name="__P__[0].PersonId" data-qa-options="person" class="@fieldClasses">
                         <option value="">-- انتخاب --</option>
@@ -556,8 +556,8 @@
                 </div>
                 <div>
                     <div class="flex items-center justify-between mb-1">
-                        <label class="block text-xs font-medium text-gray-600">شرکت</label>
-                        <button type="button" class="btn-quick-add text-blue-600 hover:text-blue-800 text-xs" data-qa-target="company" title="افزودن شرکت جدید"><i class="fas fa-plus"></i></button>
+                        <label class="block text-xs font-medium text-ink-secondary">شرکت</label>
+                        <button type="button" class="btn-quick-add text-accent hover:text-accent-hover text-xs min-w-11 min-h-11 inline-flex items-center justify-center" data-qa-target="company" title="افزودن شرکت جدید"><i aria-hidden="true" class="fas fa-plus"></i></button>
                     </div>
                     <select name="__P__[0].CompanyId" data-qa-options="company" class="@fieldClasses">
                         <option value="">-- انتخاب --</option>
@@ -569,8 +569,8 @@
                 </div>
                 <div>
                     <div class="flex items-center justify-between mb-1">
-                        <label class="block text-xs font-medium text-gray-600">ساز</label>
-                        <button type="button" class="btn-quick-add text-blue-600 hover:text-blue-800 text-xs" data-qa-target="instrument" title="افزودن ساز جدید"><i class="fas fa-plus"></i></button>
+                        <label class="block text-xs font-medium text-ink-secondary">ساز</label>
+                        <button type="button" class="btn-quick-add text-accent hover:text-accent-hover text-xs min-w-11 min-h-11 inline-flex items-center justify-center" data-qa-target="instrument" title="افزودن ساز جدید"><i aria-hidden="true" class="fas fa-plus"></i></button>
                     </div>
                     <select name="__P__[0].InstrumentId" data-qa-options="instrument" class="@fieldClasses">
                         <option value="">-- انتخاب --</option>
@@ -581,20 +581,20 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">ترتیب نمایش</label>
+                    <label class="block text-xs font-medium text-ink-secondary mb-1">ترتیب نمایش</label>
                     <input type="number" name="__P__[0].DisplayOrder" value="0" class="@fieldClasses" />
                 </div>
                 <div class="flex items-end gap-3 pb-1">
                     <label class="inline-flex items-center gap-1 cursor-pointer">
-                        <input type="checkbox" name="__P__[0].IsPrimary" value="true" class="rounded border-gray-300 text-blue-600" />
-                        <span class="text-xs text-gray-600">اصلی</span>
+                        <input type="checkbox" name="__P__[0].IsPrimary" value="true" class="rounded border-rule-strong text-accent" />
+                        <span class="text-xs text-ink-secondary">اصلی</span>
                     </label>
                 </div>
                 <div class="flex items-end pb-1">
-                    <button type="button" class="remove-credit text-red-600 hover:text-red-800 text-xs"><i class="fas fa-times me-1"></i>حذف</button>
+                    <button type="button" class="remove-credit text-error hover:text-error-hover text-xs"><i aria-hidden="true" class="fas fa-times me-1"></i>حذف</button>
                 </div>
                 <div class="md:col-span-4">
-                    <label class="block text-xs font-medium text-gray-600 mb-1">یادداشت‌ها</label>
+                    <label class="block text-xs font-medium text-ink-secondary mb-1">یادداشت‌ها</label>
                     <input type="text" name="__P__[0].Notes" class="@fieldClasses" />
                 </div>
             </div>
@@ -604,43 +604,43 @@
     <!-- ============================================================
          Step 5 — Tags, links & related albums
          ============================================================ -->
-    <section class="wizard-step bg-white rounded-lg shadow-sm border border-gray-200 p-5 mb-6 hidden" data-step="5">
-        <h2 class="text-lg font-semibold text-gray-900 mb-4"><i class="fas fa-hashtag text-blue-500 me-2"></i>برچسب‌ها و پیوندها</h2>
+    <section class="wizard-step bg-surface rounded-lg shadow-sm border border-rule p-5 mb-6 hidden" data-step="5">
+        <h2 class="text-lg font-semibold text-ink mb-4"><i aria-hidden="true" class="fas fa-hashtag text-accent me-2"></i>برچسب‌ها و پیوندها</h2>
 
         <div>
             <div class="flex items-center justify-between mb-2">
-                <label class="block text-sm font-medium text-gray-700">برچسب‌ها</label>
-                <button type="button" class="btn-quick-add text-blue-600 hover:text-blue-800 text-xs" data-qa-target="tag" title="افزودن برچسب جدید"><i class="fas fa-plus me-1"></i>جدید</button>
+                <label class="block text-sm font-medium text-ink-secondary">برچسب‌ها</label>
+                <button type="button" class="btn-quick-add text-accent hover:text-accent-hover text-xs" data-qa-target="tag" title="افزودن برچسب جدید"><i aria-hidden="true" class="fas fa-plus me-1"></i>جدید</button>
             </div>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-1 max-h-48 overflow-y-auto border border-gray-200 rounded-md p-2" data-qa-options="tag">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-1 max-h-48 overflow-y-auto border border-rule rounded-md p-2" data-qa-options="tag">
                 @foreach (var item in Model.TagOptions)
                 {
-                    <label class="flex items-center gap-2 text-xs text-gray-700 cursor-pointer">
-                        <input type="checkbox" name="TagIds" value="@item.TagId" @(Model.TagIds.Contains(item.TagId) ? "checked" : "") class="rounded border-gray-300 text-blue-600" />
+                    <label class="flex items-center gap-2 text-xs text-ink-secondary cursor-pointer">
+                        <input type="checkbox" name="TagIds" value="@item.TagId" @(Model.TagIds.Contains(item.TagId) ? "checked" : "") class="rounded border-rule-strong text-accent" />
                         @item.Name
                     </label>
                 }
             </div>
         </div>
 
-        <div class="mt-6 border-t border-gray-100 pt-4">
+        <div class="mt-6 border-t border-rule-light pt-4">
             <div class="flex items-center justify-between mb-3">
-                <label class="text-sm font-medium text-gray-700">پیوندهای خارجی</label>
-                <button type="button" id="btnAddLink" class="px-3 py-1.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-                    <i class="fas fa-plus me-1"></i>افزودن پیوند
+                <label class="text-sm font-medium text-ink-secondary">پیوندهای خارجی</label>
+                <button type="button" id="btnAddLink" class="px-3 py-1.5 text-xs bg-accent text-on-accent rounded-md hover:bg-accent-hover transition-colors">
+                    <i aria-hidden="true" class="fas fa-plus me-1"></i>افزودن پیوند
                 </button>
             </div>
             <div class="link-rows space-y-2">
                 @for (var j = 0; j < Model.Links.Count; j++)
                 {
                     var link = Model.Links[j];
-                    <div class="link-row grid grid-cols-1 md:grid-cols-4 gap-3 p-3 bg-gray-50 rounded-md border border-gray-200">
+                    <div class="link-row grid grid-cols-1 md:grid-cols-4 gap-3 p-3 bg-paper rounded-md border border-rule">
                         <div class="md:col-span-2">
-                            <label class="block text-xs font-medium text-gray-600 mb-1">URL</label>
+                            <label class="block text-xs font-medium text-ink-secondary mb-1">URL</label>
                             <input type="url" name="Links[@j].Url" value="@link.Url" dir="ltr" class="@fieldClasses" />
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-gray-600 mb-1">نوع پیوند</label>
+                            <label class="block text-xs font-medium text-ink-secondary mb-1">نوع پیوند</label>
                             <select name="Links[@j].LinkTypeId" class="@fieldClasses">
                                 <option value="">-- انتخاب --</option>
                                 @foreach (var item in Model.LinkTypeOptions)
@@ -651,22 +651,22 @@
                         </div>
                         <div class="flex items-end gap-3">
                             <div class="flex-1">
-                                <label class="block text-xs font-medium text-gray-600 mb-1">عنوان</label>
+                                <label class="block text-xs font-medium text-ink-secondary mb-1">عنوان</label>
                                 <input type="text" name="Links[@j].Label" value="@link.Label" class="@fieldClasses" />
                             </div>
-                            <button type="button" class="remove-link text-red-600 hover:text-red-800 text-xs"><i class="fas fa-times"></i></button>
+                            <button type="button" class="remove-link text-error hover:text-error-hover text-xs min-w-11 min-h-11 inline-flex items-center justify-center" aria-label="حذف"><i aria-hidden="true" class="fas fa-times"></i></button>
                         </div>
                     </div>
                 }
             </div>
             <template id="tpl-link">
-                <div class="link-row grid grid-cols-1 md:grid-cols-4 gap-3 p-3 bg-gray-50 rounded-md border border-gray-200">
+                <div class="link-row grid grid-cols-1 md:grid-cols-4 gap-3 p-3 bg-paper rounded-md border border-rule">
                     <div class="md:col-span-2">
-                        <label class="block text-xs font-medium text-gray-600 mb-1">URL</label>
+                        <label class="block text-xs font-medium text-ink-secondary mb-1">URL</label>
                         <input type="url" name="__P__[0].Url" dir="ltr" class="@fieldClasses" />
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-gray-600 mb-1">نوع پیوند</label>
+                        <label class="block text-xs font-medium text-ink-secondary mb-1">نوع پیوند</label>
                         <select name="__P__[0].LinkTypeId" class="@fieldClasses">
                             <option value="">-- انتخاب --</option>
                             @foreach (var item in Model.LinkTypeOptions)
@@ -677,29 +677,29 @@
                     </div>
                     <div class="flex items-end gap-3">
                         <div class="flex-1">
-                            <label class="block text-xs font-medium text-gray-600 mb-1">عنوان</label>
+                            <label class="block text-xs font-medium text-ink-secondary mb-1">عنوان</label>
                             <input type="text" name="__P__[0].Label" class="@fieldClasses" />
                         </div>
-                        <button type="button" class="remove-link text-red-600 hover:text-red-800 text-xs"><i class="fas fa-times"></i></button>
+                        <button type="button" class="remove-link text-error hover:text-error-hover text-xs min-w-11 min-h-11 inline-flex items-center justify-center" aria-label="حذف"><i aria-hidden="true" class="fas fa-times"></i></button>
                     </div>
                 </div>
             </template>
         </div>
 
-        <div class="mt-6 border-t border-gray-100 pt-4">
+        <div class="mt-6 border-t border-rule-light pt-4">
             <div class="flex items-center justify-between mb-3">
-                <label class="text-sm font-medium text-gray-700">آلبوم‌های مرتبط</label>
-                <button type="button" id="btnAddRelation" class="px-3 py-1.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-                    <i class="fas fa-plus me-1"></i>افزودن رابطه
+                <label class="text-sm font-medium text-ink-secondary">آلبوم‌های مرتبط</label>
+                <button type="button" id="btnAddRelation" class="px-3 py-1.5 text-xs bg-accent text-on-accent rounded-md hover:bg-accent-hover transition-colors">
+                    <i aria-hidden="true" class="fas fa-plus me-1"></i>افزودن رابطه
                 </button>
             </div>
             <div class="relation-rows space-y-2">
                 @for (var j = 0; j < Model.RelatedAlbums.Count; j++)
                 {
                     var relation = Model.RelatedAlbums[j];
-                    <div class="relation-row grid grid-cols-1 md:grid-cols-3 gap-3 p-3 bg-gray-50 rounded-md border border-gray-200">
+                    <div class="relation-row grid grid-cols-1 md:grid-cols-3 gap-3 p-3 bg-paper rounded-md border border-rule">
                         <div>
-                            <label class="block text-xs font-medium text-gray-600 mb-1">آلبوم</label>
+                            <label class="block text-xs font-medium text-ink-secondary mb-1">آلبوم</label>
                             <select name="RelatedAlbums[@j].AlbumId" class="@fieldClasses">
                                 <option value="">-- انتخاب آلبوم --</option>
                                 @foreach (var item in Model.AlbumOptions)
@@ -709,7 +709,7 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-medium text-gray-600 mb-1">نوع رابطه</label>
+                            <label class="block text-xs font-medium text-ink-secondary mb-1">نوع رابطه</label>
                             <select name="RelatedAlbums[@j].AlbumRelationTypeId" class="@fieldClasses">
                                 <option value="">-- انتخاب --</option>
                                 @foreach (var item in Model.AlbumRelationTypeOptions)
@@ -719,15 +719,15 @@
                             </select>
                         </div>
                         <div class="flex items-end pb-1">
-                            <button type="button" class="remove-relation text-red-600 hover:text-red-800 text-xs"><i class="fas fa-times me-1"></i>حذف</button>
+                            <button type="button" class="remove-relation text-error hover:text-error-hover text-xs"><i aria-hidden="true" class="fas fa-times me-1"></i>حذف</button>
                         </div>
                     </div>
                 }
             </div>
             <template id="tpl-relation">
-                <div class="relation-row grid grid-cols-1 md:grid-cols-3 gap-3 p-3 bg-gray-50 rounded-md border border-gray-200">
+                <div class="relation-row grid grid-cols-1 md:grid-cols-3 gap-3 p-3 bg-paper rounded-md border border-rule">
                     <div>
-                        <label class="block text-xs font-medium text-gray-600 mb-1">آلبوم</label>
+                        <label class="block text-xs font-medium text-ink-secondary mb-1">آلبوم</label>
                         <select name="__P__[0].AlbumId" class="@fieldClasses">
                             <option value="">-- انتخاب آلبوم --</option>
                             @foreach (var item in Model.AlbumOptions)
@@ -737,7 +737,7 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-gray-600 mb-1">نوع رابطه</label>
+                        <label class="block text-xs font-medium text-ink-secondary mb-1">نوع رابطه</label>
                         <select name="__P__[0].AlbumRelationTypeId" class="@fieldClasses">
                             <option value="">-- انتخاب --</option>
                             @foreach (var item in Model.AlbumRelationTypeOptions)
@@ -747,7 +747,7 @@
                         </select>
                     </div>
                     <div class="flex items-end pb-1">
-                        <button type="button" class="remove-relation text-red-600 hover:text-red-800 text-xs"><i class="fas fa-times me-1"></i>حذف</button>
+                        <button type="button" class="remove-relation text-error hover:text-error-hover text-xs"><i aria-hidden="true" class="fas fa-times me-1"></i>حذف</button>
                     </div>
                 </div>
             </template>
@@ -757,11 +757,11 @@
     <!-- ============================================================
          Step 6 — Review & submit
          ============================================================ -->
-    <section class="wizard-step bg-white rounded-lg shadow-sm border border-gray-200 p-5 mb-6 hidden" data-step="6">
-        <h2 class="text-lg font-semibold text-gray-900 mb-4"><i class="fas fa-check-circle text-blue-500 me-2"></i>مرور و ایجاد</h2>
-        <div id="review-summary" class="text-sm text-gray-700 space-y-1"></div>
-        <div class="mt-4 px-4 py-3 rounded-md bg-amber-50 border border-amber-200 text-amber-800 text-xs">
-            <i class="fas fa-info-circle me-1"></i>
+    <section class="wizard-step bg-surface rounded-lg shadow-sm border border-rule p-5 mb-6 hidden" data-step="6">
+        <h2 class="text-lg font-semibold text-ink mb-4"><i aria-hidden="true" class="fas fa-check-circle text-accent me-2"></i>مرور و ایجاد</h2>
+        <div id="review-summary" class="text-sm text-ink-secondary space-y-1"></div>
+        <div class="mt-4 px-4 py-3 rounded-md bg-warning-soft border border-warning-border text-warning-hover text-xs">
+            <i aria-hidden="true" class="fas fa-info-circle me-1"></i>
             با کلیک روی «ایجاد آلبوم»، آلبوم و تمام ترک‌ها و وابستگی‌های آن یک‌جا و به‌صورت اتمی ذخیره می‌شود. بارگذاری رسانه، ارجاع‌ها، ویژگی‌ها و بومی‌سازی‌ها پس از ایجاد از صفحه ویرایش آلبوم قابل انجام است.
         </div>
     </section>
@@ -769,18 +769,18 @@
     <!-- ============================================================
          Navigation
          ============================================================ -->
-    <div class="flex items-center justify-between gap-3 bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+    <div class="flex items-center justify-between gap-3 bg-surface rounded-lg shadow-sm border border-rule p-4">
         <button type="button" id="btnBack"
-                class="hidden px-5 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">
-            <i class="fas fa-arrow-right me-1"></i>قبلی
+                class="hidden px-5 py-2.5 text-sm font-medium text-ink-secondary bg-paper-muted rounded-md hover:bg-rule transition-colors">
+            <i aria-hidden="true" class="fas fa-arrow-right me-1"></i>قبلی
         </button>
         <button type="button" id="btnNext"
-                class="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors">
-            بعدی <i class="fas fa-arrow-left ms-1"></i>
+                class="px-5 py-2.5 text-sm font-medium text-on-accent bg-accent rounded-md hover:bg-accent-hover transition-colors">
+            بعدی <i aria-hidden="true" class="fas fa-arrow-left ms-1"></i>
         </button>
         <button type="submit" id="btnSubmit"
-                class="hidden px-5 py-2.5 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 transition-colors">
-            <i class="fas fa-save me-1"></i>ایجاد آلبوم
+                class="hidden px-5 py-2.5 text-sm font-medium text-on-accent bg-success rounded-md hover:bg-success-hover transition-colors">
+            <i aria-hidden="true" class="fas fa-save me-1"></i>ایجاد آلبوم
         </button>
     </div>
 </form>
@@ -789,20 +789,20 @@
      Quick-add modal (creates a person / company / poem / genre / … on the fly)
      ============================================================ -->
 <div id="qaModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="qaTitle">
-    <div class="absolute inset-0 bg-black/40" data-qa-close></div>
-    <div class="relative w-full max-w-md bg-white rounded-lg shadow-xl border border-gray-200">
-        <div class="flex items-center justify-between px-5 py-3 border-b border-gray-200">
-            <h3 id="qaTitle" class="text-base font-semibold text-gray-900">افزودن</h3>
-            <button type="button" class="text-gray-400 hover:text-gray-600" data-qa-close aria-label="بستن"><i class="fas fa-times"></i></button>
+    <div class="absolute inset-0 bg-overlay/40" data-qa-close></div>
+    <div class="relative w-full max-w-md bg-surface rounded-lg shadow-xl border border-rule">
+        <div class="flex items-center justify-between px-5 py-3 border-b border-rule">
+            <h3 id="qaTitle" class="text-base font-semibold text-ink">افزودن</h3>
+            <button type="button" class="text-ink-muted hover:text-ink-secondary min-w-11 min-h-11 inline-flex items-center justify-center" data-qa-close aria-label="بستن"><i aria-hidden="true" class="fas fa-times"></i></button>
         </div>
         <form id="qaForm" class="px-5 py-4">
             @Html.AntiForgeryToken()
             <input type="hidden" name="Target" id="qaTarget" />
             <div id="qaFields" class="space-y-3"></div>
-            <div id="qaError" class="hidden mt-3 px-3 py-2 rounded-md bg-red-50 border border-red-200 text-red-700 text-xs"></div>
+            <div id="qaError" class="hidden mt-3 px-3 py-2 rounded-md bg-error-soft border border-error-border text-error-hover text-xs"></div>
             <div class="flex items-center justify-end gap-2 mt-5">
-                <button type="button" class="px-4 py-2 text-sm text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200" data-qa-close>انصراف</button>
-                <button type="submit" class="px-4 py-2 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700"><i class="fas fa-save me-1"></i>ذخیره</button>
+                <button type="button" class="px-4 py-2 text-sm text-ink-secondary bg-paper-muted rounded-md hover:bg-rule" data-qa-close>انصراف</button>
+                <button type="submit" class="px-4 py-2 text-sm text-on-accent bg-accent rounded-md hover:bg-accent-hover"><i aria-hidden="true" class="fas fa-save me-1"></i>ذخیره</button>
             </div>
         </form>
     </div>
@@ -830,15 +830,16 @@
                 $('.wizard-step-badge').each(function () {
                     var s = +$(this).data('step');
                     $(this).find('.wizard-step-dot')
-                        .toggleClass('border-blue-600 bg-blue-600 text-white', s === current)
-                        .toggleClass('border-gray-300 bg-white text-gray-500', s !== current)
-                        .html(s < current ? '<i class="fas fa-check"></i>' : s);
+                        .toggleClass('border-accent bg-accent text-on-accent', s === current)
+                        .toggleClass('border-rule-strong bg-surface text-ink-muted', s !== current)
+                        .html(s < current ? '<i aria-hidden="true" class="fas fa-check"></i>' : s);
                 });
                 $('#btnBack').toggleClass('hidden', current === 1);
                 $('#btnNext').toggleClass('hidden', current === 6);
                 $('#btnSubmit').toggleClass('hidden', current !== 6);
                 if (current === 6) updateReview();
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
             }
 
             function validateStep() {
@@ -1019,12 +1020,12 @@
                     var f = cfg.fields[i];
                     if (f === 'code') {
                         html += '<div>'
-                            + '<label class="block text-xs font-medium text-gray-600 mb-1" for="qaCode">کد *</label>'
+                            + '<label class="block text-xs font-medium text-ink-secondary mb-1" for="qaCode">کد *</label>'
                             + '<input type="text" name="Code" id="qaCode" dir="ltr" placeholder="مثلاً studio-album" class="' + qaFieldClasses + '" />'
                             + '</div>';
                     } else if (f === 'englishName') {
                         html += '<div>'
-                            + '<label class="block text-xs font-medium text-gray-600 mb-1" for="qaEnglishName">نام انگلیسی</label>'
+                            + '<label class="block text-xs font-medium text-ink-secondary mb-1" for="qaEnglishName">نام انگلیسی</label>'
                             + '<input type="text" name="EnglishName" id="qaEnglishName" dir="ltr" class="' + qaFieldClasses + '" />'
                             + '</div>';
                     } else if (f === 'poet') {
@@ -1035,12 +1036,12 @@
                             }
                         });
                         html += '<div>'
-                            + '<label class="block text-xs font-medium text-gray-600 mb-1" for="qaPoet">شاعر</label>'
+                            + '<label class="block text-xs font-medium text-ink-secondary mb-1" for="qaPoet">شاعر</label>'
                             + '<select name="PoetId" id="qaPoet" class="' + qaFieldClasses + '">' + opts + '</select>'
                             + '</div>';
                     } else {
                         html += '<div>'
-                            + '<label class="block text-xs font-medium text-gray-600 mb-1" for="qaName">' + cfg.nameLabel + ' *</label>'
+                            + '<label class="block text-xs font-medium text-ink-secondary mb-1" for="qaName">' + cfg.nameLabel + ' *</label>'
                             + '<input type="text" name="Name" id="qaName" autofocus class="' + qaFieldClasses + '" />'
                             + '</div>';
                     }
@@ -1102,9 +1103,9 @@
                         // Checkbox-list container — clone the name of its existing boxes.
                         var $first = $el.find('input[type="checkbox"]').first();
                         var nm = $first.attr('name') || 'GenreIds';
-                        var $label = $('<label>').addClass('flex items-center gap-2 text-xs text-gray-700 cursor-pointer')
+                        var $label = $('<label>').addClass('flex items-center gap-2 text-xs text-ink-secondary cursor-pointer')
                             .append($('<input>').attr({ type: 'checkbox', name: nm, value: id })
-                                .addClass('rounded border-gray-300 text-blue-600')
+                                .addClass('rounded border-rule-strong text-accent')
                                 .prop('checked', $triggerEl.length && $el.is($triggerEl)))
                             .append(' ' + escName);
                         $el.append($label);

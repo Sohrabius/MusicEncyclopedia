@@ -11,20 +11,20 @@
 
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" dir="@dir">
     <div class="mb-8">
-        <h1 class="text-3xl md:text-4xl font-bold text-gray-900">@Localizer["Performance Events"]</h1>
-        <p class="mt-2 text-gray-600">@Localizer["Browse performance events"]</p>
+        <h1 class="text-3xl md:text-4xl font-bold text-ink">@Localizer["Performance Events"]</h1>
+        <p class="mt-2 text-ink-secondary">@Localizer["Browse performance events"]</p>
     </div>
 
     @if (items.Items.Count == 0)
     {
         <div class="text-center py-16">
-            <i class="fas fa-calendar-alt text-5xl text-gray-300 mb-4 block"></i>
-            <h3 class="text-lg font-medium text-gray-900">@Localizer["No events found"]</h3>
+            <i aria-hidden="true" class="fas fa-calendar-alt text-5xl text-ink-disabled mb-4 block"></i>
+            <h3 class="text-lg font-medium text-ink">@Localizer["No events found"]</h3>
         </div>
     }
     else
     {
-        <p class="text-sm text-gray-500 mb-4">
+        <p class="text-sm text-ink-muted mb-4">
             @Localizer["Showing {0}–{1} of {2} events",
                 ((items.Page - 1) * items.PageSize) + 1,
                 Math.Min(items.Page * items.PageSize, items.TotalItems),
@@ -33,26 +33,26 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @foreach (var evt in items.Items)
             {
-                <article class="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                <article class="bg-surface rounded-lg border border-rule overflow-hidden shadow-sm hover:shadow-md transition-shadow">
                     <a href="/@culture/events/@evt.Slug" class="block p-5">
                         <div class="flex items-center gap-2 mb-2">
                             @if (!string.IsNullOrWhiteSpace(evt.EventTypeName))
                             {
-                                <span class="inline-block bg-purple-100 text-purple-800 text-xs font-medium px-2 py-0.5 rounded-full">@evt.EventTypeName</span>
+                                <span class="inline-block bg-info-soft text-info-hover text-xs font-medium px-2 py-0.5 rounded-full">@evt.EventTypeName</span>
                             }
                             @if (evt.Date.HasValue)
                             {
-                                <span class="text-xs text-gray-500">@evt.Date.Value.ToString("yyyy-MM-dd")</span>
+                                <span class="text-xs text-ink-muted">@evt.Date.Value.ToString("yyyy-MM-dd")</span>
                             }
                         </div>
-                        <h3 class="font-semibold text-gray-900">@evt.Slug</h3>
+                        <h3 class="font-semibold text-ink">@evt.Slug</h3>
                         @if (!string.IsNullOrWhiteSpace(evt.VenueName))
                         {
-                            <p class="text-sm text-gray-500 mt-1"><i class="fas fa-map-marker-alt text-gray-400 me-1"></i> @evt.VenueName</p>
+                            <p class="text-sm text-ink-muted mt-1"><i aria-hidden="true" class="fas fa-map-marker-alt text-ink-muted me-1"></i> @evt.VenueName</p>
                         }
                         @if (!string.IsNullOrWhiteSpace(evt.PerformanceNotesPreview))
                         {
-                            <p class="text-sm text-gray-600 mt-2 line-clamp-2">@evt.PerformanceNotesPreview</p>
+                            <p class="text-sm text-ink-secondary mt-2 line-clamp-2">@evt.PerformanceNotesPreview</p>
                         }
                     </a>
                 </article>
@@ -63,12 +63,12 @@
             <nav class="mt-10 flex items-center justify-center gap-1">
                 @if (items.Page > 1)
                 {
-                    <a href="/@culture/events?page=@(items.Page - 1)" class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50" rel="prev">@Localizer["Previous"]</a>
+                    <a href="/@culture/events?page=@(items.Page - 1)" class="px-3 py-2 text-sm font-medium text-ink-secondary bg-surface border border-rule-strong rounded-md hover:bg-paper" rel="prev">@Localizer["Previous"]</a>
                 }
-                <span class="px-3 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-md">@items.Page</span>
+                <span class="px-3 py-2 text-sm font-medium text-on-accent bg-accent border border-accent rounded-md">@items.Page</span>
                 @if (items.Page < items.TotalPages)
                 {
-                    <a href="/@culture/events?page=@(items.Page + 1)" class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50" rel="next">@Localizer["Next"]</a>
+                    <a href="/@culture/events?page=@(items.Page + 1)" class="px-3 py-2 text-sm font-medium text-ink-secondary bg-surface border border-rule-strong rounded-md hover:bg-paper" rel="next">@Localizer["Next"]</a>
                 }
             </nav>
         }

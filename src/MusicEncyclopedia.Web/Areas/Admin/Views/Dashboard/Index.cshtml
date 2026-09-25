@@ -7,59 +7,59 @@
 <!-- ============================================================
      Stats Cards Row
      ============================================================ -->
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+<div class="admin-stat-grid">
     <!-- Albums -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5 flex items-center gap-4">
-        <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-xl">
-            <i class="fas fa-compact-disc"></i>
+    <div class="admin-stat-card">
+        <div class="admin-stat-card__icon admin-stat-card__icon--accent">
+            <i aria-hidden="true" class="fas fa-compact-disc"></i>
         </div>
         <div>
-            <p class="text-sm text-gray-500">آلبوم‌ها</p>
-            <p class="text-2xl font-bold text-gray-900">@Model.AlbumCount.ToString("N0")</p>
+            <p class="admin-stat-card__label">آلبوم‌ها</p>
+            <p class="admin-stat-card__value">@Model.AlbumCount.ToString("N0")</p>
         </div>
     </div>
 
     <!-- Tracks -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5 flex items-center gap-4">
-        <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-xl">
-            <i class="fas fa-music"></i>
+    <div class="admin-stat-card">
+        <div class="admin-stat-card__icon admin-stat-card__icon--teal">
+            <i aria-hidden="true" class="fas fa-music"></i>
         </div>
         <div>
-            <p class="text-sm text-gray-500">ترک‌ها</p>
-            <p class="text-2xl font-bold text-gray-900">@Model.TrackCount.ToString("N0")</p>
+            <p class="admin-stat-card__label">ترک‌ها</p>
+            <p class="admin-stat-card__value">@Model.TrackCount.ToString("N0")</p>
         </div>
     </div>
 
     <!-- People -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5 flex items-center gap-4">
-        <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 text-xl">
-            <i class="fas fa-users"></i>
+    <div class="admin-stat-card">
+        <div class="admin-stat-card__icon admin-stat-card__icon--teal">
+            <i aria-hidden="true" class="fas fa-users"></i>
         </div>
         <div>
-            <p class="text-sm text-gray-500">اشخاص</p>
-            <p class="text-2xl font-bold text-gray-900">@Model.PersonCount.ToString("N0")</p>
+            <p class="admin-stat-card__label">اشخاص</p>
+            <p class="admin-stat-card__value">@Model.PersonCount.ToString("N0")</p>
         </div>
     </div>
 
     <!-- Companies -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5 flex items-center gap-4">
-        <div class="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600 text-xl">
-            <i class="fas fa-building"></i>
+    <div class="admin-stat-card">
+        <div class="admin-stat-card__icon admin-stat-card__icon--amber">
+            <i aria-hidden="true" class="fas fa-building"></i>
         </div>
         <div>
-            <p class="text-sm text-gray-500">شرکت‌ها</p>
-            <p class="text-2xl font-bold text-gray-900">@Model.CompanyCount.ToString("N0")</p>
+            <p class="admin-stat-card__label">شرکت‌ها</p>
+            <p class="admin-stat-card__value">@Model.CompanyCount.ToString("N0")</p>
         </div>
     </div>
 
     <!-- Poems -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5 flex items-center gap-4">
-        <div class="w-12 h-12 rounded-full bg-rose-100 flex items-center justify-center text-rose-600 text-xl">
-            <i class="fas fa-feather-alt"></i>
+    <div class="admin-stat-card">
+        <div class="admin-stat-card__icon admin-stat-card__icon--error">
+            <i aria-hidden="true" class="fas fa-feather-alt"></i>
         </div>
         <div>
-            <p class="text-sm text-gray-500">شعرها</p>
-            <p class="text-2xl font-bold text-gray-900">@Model.PoemCount.ToString("N0")</p>
+            <p class="admin-stat-card__label">شعرها</p>
+            <p class="admin-stat-card__value">@Model.PoemCount.ToString("N0")</p>
         </div>
     </div>
 </div>
@@ -67,46 +67,46 @@
 <!-- ============================================================
      Quick Links (Spec 10.3 — Admin Navigation)
      ============================================================ -->
-<div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5 mb-8">
-    <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-        <i class="fas fa-link text-blue-500"></i> دسترسی سریع
+<div class="admin-card admin-form-card mb-8">
+    <h2 class="admin-card__title mb-4 flex items-center gap-2">
+        <i aria-hidden="true" class="fas fa-link text-accent"></i> دسترسی سریع
     </h2>
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-        <a href="/admin/albums" class="flex items-center gap-2 px-3 py-2 bg-gray-50 hover:bg-blue-50 rounded-md text-sm text-gray-700 hover:text-blue-600 transition-colors">
-            <i class="fas fa-compact-disc text-blue-500 w-4 text-center"></i> آلبوم‌ها
+    <div class="admin-quick-links">
+        <a href="/admin/albums" class="admin-quick-link">
+            <i aria-hidden="true" class="fas fa-compact-disc text-accent w-4 text-center"></i> آلبوم‌ها
         </a>
-        <a href="/admin/tracks" class="flex items-center gap-2 px-3 py-2 bg-gray-50 hover:bg-blue-50 rounded-md text-sm text-gray-700 hover:text-blue-600 transition-colors">
-            <i class="fas fa-music text-green-500 w-4 text-center"></i> ترک‌ها
+        <a href="/admin/tracks" class="admin-quick-link">
+            <i aria-hidden="true" class="fas fa-music text-success w-4 text-center"></i> ترک‌ها
         </a>
-        <a href="/admin/people" class="flex items-center gap-2 px-3 py-2 bg-gray-50 hover:bg-blue-50 rounded-md text-sm text-gray-700 hover:text-blue-600 transition-colors">
-            <i class="fas fa-users text-purple-500 w-4 text-center"></i> اشخاص
+        <a href="/admin/people" class="admin-quick-link">
+            <i aria-hidden="true" class="fas fa-users text-info w-4 text-center"></i> اشخاص
         </a>
-        <a href="/admin/companies" class="flex items-center gap-2 px-3 py-2 bg-gray-50 hover:bg-blue-50 rounded-md text-sm text-gray-700 hover:text-blue-600 transition-colors">
-            <i class="fas fa-building text-yellow-500 w-4 text-center"></i> شرکت‌ها
+        <a href="/admin/companies" class="admin-quick-link">
+            <i aria-hidden="true" class="fas fa-building text-warning w-4 text-center"></i> شرکت‌ها
         </a>
-        <a href="/admin/genres" class="flex items-center gap-2 px-3 py-2 bg-gray-50 hover:bg-blue-50 rounded-md text-sm text-gray-700 hover:text-blue-600 transition-colors">
-            <i class="fas fa-tag text-indigo-500 w-4 text-center"></i> سبک‌ها
+        <a href="/admin/genres" class="admin-quick-link">
+            <i aria-hidden="true" class="fas fa-tag text-info w-4 text-center"></i> سبک‌ها
         </a>
-        <a href="/admin/moods" class="flex items-center gap-2 px-3 py-2 bg-gray-50 hover:bg-blue-50 rounded-md text-sm text-gray-700 hover:text-blue-600 transition-colors">
-            <i class="fas fa-smile text-pink-500 w-4 text-center"></i> حالت‌ها
+        <a href="/admin/moods" class="admin-quick-link">
+            <i aria-hidden="true" class="fas fa-smile text-info w-4 text-center"></i> حالت‌ها
         </a>
-        <a href="/admin/instruments" class="flex items-center gap-2 px-3 py-2 bg-gray-50 hover:bg-blue-50 rounded-md text-sm text-gray-700 hover:text-blue-600 transition-colors">
-            <i class="fas fa-guitar text-orange-500 w-4 text-center"></i> سازها
+        <a href="/admin/instruments" class="admin-quick-link">
+            <i aria-hidden="true" class="fas fa-guitar text-warning w-4 text-center"></i> سازها
         </a>
-        <a href="/admin/poems" class="flex items-center gap-2 px-3 py-2 bg-gray-50 hover:bg-blue-50 rounded-md text-sm text-gray-700 hover:text-blue-600 transition-colors">
-            <i class="fas fa-feather-alt text-rose-500 w-4 text-center"></i> شعرها
+        <a href="/admin/poems" class="admin-quick-link">
+            <i aria-hidden="true" class="fas fa-feather-alt text-error w-4 text-center"></i> شعرها
         </a>
-        <a href="/admin/awards" class="flex items-center gap-2 px-3 py-2 bg-gray-50 hover:bg-blue-50 rounded-md text-sm text-gray-700 hover:text-blue-600 transition-colors">
-            <i class="fas fa-trophy text-yellow-500 w-4 text-center"></i> جوایز
+        <a href="/admin/awards" class="admin-quick-link">
+            <i aria-hidden="true" class="fas fa-trophy text-warning w-4 text-center"></i> جوایز
         </a>
-        <a href="/admin/charts" class="flex items-center gap-2 px-3 py-2 bg-gray-50 hover:bg-blue-50 rounded-md text-sm text-gray-700 hover:text-blue-600 transition-colors">
-            <i class="fas fa-chart-line text-cyan-500 w-4 text-center"></i> جدول‌ها
+        <a href="/admin/charts" class="admin-quick-link">
+            <i aria-hidden="true" class="fas fa-chart-line text-info w-4 text-center"></i> جدول‌ها
         </a>
-        <a href="/admin/citations" class="flex items-center gap-2 px-3 py-2 bg-gray-50 hover:bg-blue-50 rounded-md text-sm text-gray-700 hover:text-blue-600 transition-colors">
-            <i class="fas fa-quote-right text-teal-500 w-4 text-center"></i> ارجاع‌ها
+        <a href="/admin/citations" class="admin-quick-link">
+            <i aria-hidden="true" class="fas fa-quote-right text-info w-4 text-center"></i> ارجاع‌ها
         </a>
-        <a href="/admin/users" class="flex items-center gap-2 px-3 py-2 bg-gray-50 hover:bg-blue-50 rounded-md text-sm text-gray-700 hover:text-blue-600 transition-colors">
-            <i class="fas fa-user-shield text-gray-500 w-4 text-center"></i> کاربران
+        <a href="/admin/users" class="admin-quick-link">
+            <i aria-hidden="true" class="fas fa-user-shield text-ink-muted w-4 text-center"></i> کاربران
         </a>
     </div>
 </div>
@@ -114,22 +114,22 @@
 <!-- ============================================================
      Recent Additions
      ============================================================ -->
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+<div class="admin-grid--two mb-8">
     <!-- Recent Albums -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-        <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-            <i class="fas fa-compact-disc text-blue-500"></i> آلبوم‌های اخیر
+    <div class="admin-card admin-form-card">
+        <h2 class="admin-card__title mb-4 flex items-center gap-2">
+            <i aria-hidden="true" class="fas fa-compact-disc text-accent"></i> آلبوم‌های اخیر
         </h2>
         @if (Model.RecentAlbums.Count == 0)
         {
-            <p class="text-sm text-gray-500">هنوز آلبومی وجود ندارد.</p>
+            <p class="text-sm text-ink-muted">هنوز آلبومی وجود ندارد.</p>
         }
         else
         {
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm">
+            <div class="admin-table-wrap">
+                <table class="admin-table">
                     <thead>
-                        <tr class="text-left text-gray-500 border-b border-gray-100">
+                        <tr class="text-left text-ink-muted border-b border-rule-light">
                             <th class="pb-2 font-medium">عنوان</th>
                             <th class="pb-2 font-medium">دسته‌بندی</th>
                             <th class="pb-2 font-medium">تاریخ انتشار</th>
@@ -139,18 +139,16 @@
                     <tbody>
                         @foreach (var album in Model.RecentAlbums)
                         {
-                            <tr class="border-b border-gray-50 hover:bg-gray-50">
+                            <tr class="border-b border-rule-light hover:bg-paper">
                                 <td class="py-2">
-                                    <a href="/admin/albums/@album.AlbumId/Edit" class="text-blue-600 hover:underline font-medium">
+                                    <a href="/admin/albums/@album.AlbumId/Edit" class="text-accent hover:underline font-medium">
                                         @album.Title
                                     </a>
                                 </td>
-                                <td class="py-2 text-gray-500">@album.CategoryName</td>
-                                <td class="py-2 text-gray-500">@album.ReleaseDate?.ToString("yyyy-MM-dd")</td>
+                                <td class="py-2 text-ink-muted">@album.CategoryName</td>
+                                <td class="py-2 text-ink-muted">@album.ReleaseDate?.ToString("yyyy-MM-dd")</td>
                                 <td class="py-2 text-end">
-                                    <a href="/admin/albums/@album.AlbumId/Edit" class="text-blue-600 hover:text-blue-800" title="ویرایش">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
+                                    <a href="/admin/albums/@album.AlbumId/Edit" class="text-accent hover:text-accent-hover" title="ویرایش"><i aria-hidden="true" class="fas fa-edit"></i></a>
                                 </td>
                             </tr>
                         }
@@ -158,28 +156,28 @@
                 </table>
             </div>
             <div class="mt-3 text-end">
-                <a href="/admin/albums" class="text-sm text-blue-600 hover:underline">
-                    مشاهده همه آلبوم‌ها <i class="fas fa-arrow-right ms-1"></i>
+                <a href="/admin/albums" class="text-sm text-accent hover:underline">
+                    مشاهده همه آلبوم‌ها <i aria-hidden="true" class="fas fa-arrow-right ms-1"></i>
                 </a>
             </div>
         }
     </div>
 
     <!-- Recent Tracks -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-        <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-            <i class="fas fa-music text-green-500"></i> ترک‌های اخیر
+    <div class="admin-card admin-form-card">
+        <h2 class="admin-card__title mb-4 flex items-center gap-2">
+            <i aria-hidden="true" class="fas fa-music text-success"></i> ترک‌های اخیر
         </h2>
         @if (Model.RecentTracks.Count == 0)
         {
-            <p class="text-sm text-gray-500">هنوز ترکی وجود ندارد.</p>
+            <p class="text-sm text-ink-muted">هنوز ترکی وجود ندارد.</p>
         }
         else
         {
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm">
+            <div class="admin-table-wrap">
+                <table class="admin-table">
                     <thead>
-                        <tr class="text-left text-gray-500 border-b border-gray-100">
+                        <tr class="text-left text-ink-muted border-b border-rule-light">
                             <th class="pb-2 font-medium">عنوان</th>
                             <th class="pb-2 font-medium">آلبوم</th>
                             <th class="pb-2 font-medium">مدت</th>
@@ -189,14 +187,14 @@
                     <tbody>
                         @foreach (var track in Model.RecentTracks)
                         {
-                            <tr class="border-b border-gray-50 hover:bg-gray-50">
+                            <tr class="border-b border-rule-light hover:bg-paper">
                                 <td class="py-2">
-                                    <a href="/admin/tracks/@track.TrackId/Edit" class="text-blue-600 hover:underline font-medium">
+                                    <a href="/admin/tracks/@track.TrackId/Edit" class="text-accent hover:underline font-medium">
                                         @track.Title
                                     </a>
                                 </td>
-                                <td class="py-2 text-gray-500">@track.AlbumTitle</td>
-                                <td class="py-2 text-gray-500">
+                                <td class="py-2 text-ink-muted">@track.AlbumTitle</td>
+                                <td class="py-2 text-ink-muted">
                                     @if (track.DurationSeconds.HasValue)
                                     {
                                         var ts = TimeSpan.FromSeconds(track.DurationSeconds.Value);
@@ -204,9 +202,7 @@
                                     }
                                 </td>
                                 <td class="py-2 text-end">
-                                    <a href="/admin/tracks/@track.TrackId/Edit" class="text-blue-600 hover:text-blue-800" title="ویرایش">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
+                                    <a href="/admin/tracks/@track.TrackId/Edit" class="text-accent hover:text-accent-hover" title="ویرایش"><i aria-hidden="true" class="fas fa-edit"></i></a>
                                 </td>
                             </tr>
                         }
@@ -214,8 +210,8 @@
                 </table>
             </div>
             <div class="mt-3 text-end">
-                <a href="/admin/tracks" class="text-sm text-blue-600 hover:underline">
-                    مشاهده همه ترک‌ها <i class="fas fa-arrow-right ms-1"></i>
+                <a href="/admin/tracks" class="text-sm text-accent hover:underline">
+                    مشاهده همه ترک‌ها <i aria-hidden="true" class="fas fa-arrow-right ms-1"></i>
                 </a>
             </div>
         }

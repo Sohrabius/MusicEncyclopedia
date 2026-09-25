@@ -3,25 +3,23 @@
 }
 
 <div class="flex items-center justify-between mb-4">
-    <h3 class="text-lg font-semibold text-gray-900">ایجاد جدید منبع</h3>
-    <button type="button" onclick="closeSourceModal()" class="text-gray-400 hover:text-gray-600">
-        <i class="fas fa-times"></i>
-    </button>
+    <h3 class="text-lg font-semibold text-ink">ایجاد جدید منبع</h3>
+    <button type="button" onclick="closeSourceModal()" class="text-ink-muted hover:text-ink-secondary min-w-11 min-h-11 inline-flex items-center justify-center" aria-label="بستن"><i aria-hidden="true" class="fas fa-times"></i></button>
 </div>
 
 <form id="inline-source-form" onsubmit="event.preventDefault(); submitInlineSource();">
     @Html.AntiForgeryToken()
     <div class="space-y-4">
         <div>
-            <label for="title" class="block text-sm font-medium text-gray-700 mb-1">عنوان *</label>
+            <label for="title" class="form-label">عنوان *</label>
             <input type="text" id="title" name="title" required
-                   class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                   class="form-control"
                    placeholder="Full title از the source" />
         </div>
         <div>
-            <label for="sourceTypeId" class="block text-sm font-medium text-gray-700 mb-1">نوع منبع</label>
+            <label for="sourceTypeId" class="form-label">نوع منبع</label>
             <select id="sourceTypeId" name="sourceTypeId"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    class="form-control">
                 <option value="">-- انتخاب نوع --</option>
                 @foreach (var st in sourceTypes)
                 {
@@ -30,26 +28,26 @@
             </select>
         </div>
         <div>
-            <label for="author" class="block text-sm font-medium text-gray-700 mb-1">نویسنده</label>
+            <label for="author" class="form-label">نویسنده</label>
             <input type="text" id="author" name="author"
-                   class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                   class="form-control"
                    placeholder="نویسنده name" />
         </div>
         <div>
-            <label for="url" class="block text-sm font-medium text-gray-700 mb-1">URL</label>
+            <label for="url" class="form-label">URL</label>
             <input type="url" id="url" name="url"
-                   class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                   class="form-control"
                    placeholder="https://..." />
         </div>
     </div>
     <div class="mt-6 flex items-center gap-3 justify-end">
         <button type="button" onclick="closeSourceModal()"
-                class="px-4 py-2 text-sm text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">
+                class="px-4 py-2 text-sm text-ink-secondary bg-paper-muted rounded-md hover:bg-rule transition-colors">
             انصراف
         </button>
         <button type="submit"
-                class="px-4 py-2 text-sm text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2">
-            <i class="fas fa-save"></i> ایجاد منبع
+                class="px-4 py-2 text-sm text-on-accent bg-accent rounded-md hover:bg-accent-hover transition-colors flex items-center gap-2">
+            <i aria-hidden="true" class="fas fa-save"></i> ایجاد منبع
         </button>
     </div>
 </form>

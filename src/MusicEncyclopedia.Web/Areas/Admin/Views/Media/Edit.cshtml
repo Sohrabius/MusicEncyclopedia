@@ -24,116 +24,116 @@
     <input type="hidden" asp-for="ThumbnailUrl600" />
     <input type="hidden" asp-for="ThumbnailUrl1200" />
 
-    <div asp-validation-summary="ModelOnly" class="mb-4 px-4 py-3 rounded-md bg-red-50 border border-red-200 text-red-800 text-sm" role="alert"></div>
+    <div asp-validation-summary="ModelOnly" class="mb-4 px-4 py-3 rounded-md bg-error-soft border border-error-border text-error-hover text-sm" role="alert"></div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="lg:col-span-2 space-y-6">
             <!-- Preview -->
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">پیش‌نمایش</h2>
+            <div class="bg-surface rounded-lg shadow-sm border border-rule p-5">
+                <h2 class="text-lg font-semibold text-ink mb-4">پیش‌نمایش</h2>
                 @if (!string.IsNullOrEmpty(Model.ThumbnailUrl600))
                 {
                     <img src="@Model.ThumbnailUrl600" alt="@Model.FileName" class="max-w-full h-auto rounded-md max-h-64 object-contain" />
                 }
                 else if (!string.IsNullOrEmpty(Model.Url))
                 {
-                    <div class="bg-gray-100 rounded-md p-4 flex items-center justify-center">
-                        <a href="@Model.Url" target="_blank" rel="noopener" class="text-blue-600 hover:underline">
-                            <i class="fas fa-external-link-alt me-1"></i> مشاهده full file
+                    <div class="bg-paper-muted rounded-md p-4 flex items-center justify-center">
+                        <a href="@Model.Url" target="_blank" rel="noopener" class="text-accent hover:underline">
+                            <i aria-hidden="true" class="fas fa-external-link-alt me-1"></i> مشاهده full file
                         </a>
                     </div>
                 }
                 else
                 {
-                    <p class="text-sm text-gray-500">پیش‌نمایشی در دسترس نیست.</p>
+                    <p class="text-sm text-ink-muted">پیش‌نمایشی در دسترس نیست.</p>
                 }
             </div>
 
             <!-- Metadata -->
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">فراداده فایل</h2>
+            <div class="bg-surface rounded-lg shadow-sm border border-rule p-5">
+                <h2 class="text-lg font-semibold text-ink mb-4">فراداده فایل</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="md:col-span-2">
-                        <label asp-for="FileName" class="block text-sm font-medium text-gray-700 mb-1"></label>
-                        <input asp-for="FileName" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                        <span asp-validation-for="FileName" class="text-xs text-red-600"></span>
+                        <label asp-for="FileName" class="form-label"></label>
+                        <input asp-for="FileName" class="form-control" />
+                        <span asp-validation-for="FileName" aria-live="polite" class="field-error"></span>
                     </div>
                     <div>
-                        <label asp-for="MediaTypeId" class="block text-sm font-medium text-gray-700 mb-1"></label>
-                        <select asp-for="MediaTypeId" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <label asp-for="MediaTypeId" class="form-label"></label>
+                        <select asp-for="MediaTypeId" class="form-control">
                             <option value="">-- انتخاب نوع --</option>
                             @foreach (var mt in Model.MediaTypes)
                             {
                                 <option value="@mt.MediaTypeId">@mt.Name</option>
                             }
                         </select>
-                        <span asp-validation-for="MediaTypeId" class="text-xs text-red-600"></span>
+                        <span asp-validation-for="MediaTypeId" aria-live="polite" class="field-error"></span>
                     </div>
                     <div>
-                        <label asp-for="MimeType" class="block text-sm font-medium text-gray-700 mb-1"></label>
-                        <input asp-for="MimeType" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                        <span asp-validation-for="MimeType" class="text-xs text-red-600"></span>
+                        <label asp-for="MimeType" class="form-label"></label>
+                        <input asp-for="MimeType" class="form-control" />
+                        <span asp-validation-for="MimeType" aria-live="polite" class="field-error"></span>
                     </div>
                     <div>
-                        <label asp-for="Url" class="block text-sm font-medium text-gray-700 mb-1"></label>
-                        <input asp-for="Url" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                        <span asp-validation-for="Url" class="text-xs text-red-600"></span>
+                        <label asp-for="Url" class="form-label"></label>
+                        <input asp-for="Url" class="form-control" />
+                        <span asp-validation-for="Url" aria-live="polite" class="field-error"></span>
                     </div>
                     <div>
-                        <label asp-for="FileSize" class="block text-sm font-medium text-gray-700 mb-1"></label>
-                        <input asp-for="FileSize" type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                        <span asp-validation-for="FileSize" class="text-xs text-red-600"></span>
+                        <label asp-for="FileSize" class="form-label"></label>
+                        <input asp-for="FileSize" type="number" class="form-control" />
+                        <span asp-validation-for="FileSize" aria-live="polite" class="field-error"></span>
                     </div>
                     <div>
-                        <label asp-for="Width" class="block text-sm font-medium text-gray-700 mb-1"></label>
-                        <input asp-for="Width" type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                        <span asp-validation-for="Width" class="text-xs text-red-600"></span>
+                        <label asp-for="Width" class="form-label"></label>
+                        <input asp-for="Width" type="number" class="form-control" />
+                        <span asp-validation-for="Width" aria-live="polite" class="field-error"></span>
                     </div>
                     <div>
-                        <label asp-for="Height" class="block text-sm font-medium text-gray-700 mb-1"></label>
-                        <input asp-for="Height" type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                        <span asp-validation-for="Height" class="text-xs text-red-600"></span>
+                        <label asp-for="Height" class="form-label"></label>
+                        <input asp-for="Height" type="number" class="form-control" />
+                        <span asp-validation-for="Height" aria-live="polite" class="field-error"></span>
                     </div>
                 </div>
             </div>
 
             <!-- Replace File -->
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">جایگزینی فایل</h2>
-                <p class="text-xs text-gray-500 mb-3">فایل جدیدی برای جایگزینی فایل فعلی بارگذاری کنید. فایل قدیمی حذف خواهد شد.</p>
+            <div class="bg-surface rounded-lg shadow-sm border border-rule p-5">
+                <h2 class="text-lg font-semibold text-ink mb-4">جایگزینی فایل</h2>
+                <p class="text-xs text-ink-muted mb-3">فایل جدیدی برای جایگزینی فایل فعلی بارگذاری کنید. فایل قدیمی حذف خواهد شد.</p>
                 <div class="flex items-center gap-3">
-                    <input type="file" name="file" id="replace-file" class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm" />
-                    <button type="submit" formaction="/admin/media/@Model.MediaId/ReplaceFile" formmethod="post" class="px-4 py-2 bg-orange-600 text-white text-sm rounded-md hover:bg-orange-700 transition-colors">
-                        <i class="fas fa-exchange-alt me-1"></i> جایگزینی
+                    <input type="file" name="file" id="replace-file" class="flex-1 px-3 py-2 border border-rule-strong rounded-md text-sm" />
+                    <button type="submit" formaction="/admin/media/@Model.MediaId/ReplaceFile" formmethod="post" class="px-4 py-2 bg-warning text-on-accent text-sm rounded-md hover:bg-warning-hover transition-colors">
+                        <i aria-hidden="true" class="fas fa-exchange-alt me-1"></i> جایگزینی
                     </button>
                 </div>
             </div>
 
             <!-- Assignments -->
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">تخصیص‌های موجودیت</h2>
+            <div class="bg-surface rounded-lg shadow-sm border border-rule p-5">
+                <h2 class="text-lg font-semibold text-ink mb-4">تخصیص‌های موجودیت</h2>
                 @if (assignments.Count == 0)
                 {
-                    <p class="text-sm text-gray-500">این رسانه هنوز به هیچ موجودیتی تخصیص داده نشده است.</p>
+                    <p class="text-sm text-ink-muted">این رسانه هنوز به هیچ موجودیتی تخصیص داده نشده است.</p>
                 }
                 else
                 {
                     <div class="overflow-x-auto">
                         <table class="w-full text-xs">
                             <thead>
-                                <tr class="border-b border-gray-200">
-                                    <th class="text-start px-2 py-2 text-gray-500">نوع موجودیت</th>
-                                    <th class="text-start px-2 py-2 text-gray-500">شناسه موجودیت</th>
-                                    <th class="text-start px-2 py-2 text-gray-500">نقش</th>
-                                    <th class="text-center px-2 py-2 text-gray-500">اصلی</th>
-                                    <th class="text-center px-2 py-2 text-gray-500">ترتیب</th>
-                                    <th class="text-end px-2 py-2 text-gray-500">عملیات</th>
+                                <tr class="border-b border-rule">
+                                    <th class="text-start px-2 py-2 text-ink-muted">نوع موجودیت</th>
+                                    <th class="text-start px-2 py-2 text-ink-muted">شناسه موجودیت</th>
+                                    <th class="text-start px-2 py-2 text-ink-muted">نقش</th>
+                                    <th class="text-center px-2 py-2 text-ink-muted">اصلی</th>
+                                    <th class="text-center px-2 py-2 text-ink-muted">ترتیب</th>
+                                    <th class="text-end px-2 py-2 text-ink-muted">عملیات</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach (var a in assignments)
                                 {
-                                    <tr class="border-b border-gray-100">
+                                    <tr class="border-b border-rule-light">
                                         <td class="px-2 py-2">@a.EntityTypeId</td>
                                         <td class="px-2 py-2">@a.EntityId</td>
                                         <td class="px-2 py-2">@(a.MediaRoleType?.Name ?? "—")</td>
@@ -142,7 +142,7 @@
                                         <td class="px-2 py-2 text-end">
                                             <form method="post" action="/admin/media/RemoveAssignment/@a.MediaAssignmentId" class="inline" onsubmit="return confirm('Remove this assignment?');">
                                                 @Html.AntiForgeryToken()
-                                                <button type="submit" class="text-red-600 hover:text-red-800"><i class="fas fa-unlink"></i></button>
+                                                <button type="submit" class="text-error hover:text-error-hover min-w-11 min-h-11 inline-flex items-center justify-center" aria-label="لغو اتصال"><i aria-hidden="true" class="fas fa-unlink"></i></button>
                                             </form>
                                         </td>
                                     </tr>
@@ -152,12 +152,12 @@
                     </div>
                 }
 
-                <hr class="border-gray-200 my-4" />
-                <h3 class="text-sm font-semibold text-gray-700 mb-3">تخصیص به موجودیت</h3>
+                <hr class="border-rule my-4" />
+                <h3 class="text-sm font-semibold text-ink-secondary mb-3">تخصیص به موجودیت</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
-                        <label for="assign-entity-type" class="block text-xs font-medium text-gray-600 mb-1">نوع موجودیت</label>
-                        <select id="assign-entity-type" name="EntityTypeId" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <label for="assign-entity-type" class="block text-xs font-medium text-ink-secondary mb-1">نوع موجودیت</label>
+                        <select id="assign-entity-type" name="EntityTypeId" class="form-control">
                             <option value="">-- انتخاب --</option>
                             @foreach (var et in await _db.EntityTypes.OrderBy(e => e.Name).ToListAsync())
                             {
@@ -166,12 +166,12 @@
                         </select>
                     </div>
                     <div>
-                        <label for="assign-entity-id" class="block text-xs font-medium text-gray-600 mb-1">شناسه موجودیت</label>
-                        <input type="number" id="assign-entity-id" name="EntityId" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="شناسه موجودیت" />
+                        <label for="assign-entity-id" class="block text-xs font-medium text-ink-secondary mb-1">شناسه موجودیت</label>
+                        <input type="number" id="assign-entity-id" name="EntityId" class="form-control" placeholder="شناسه موجودیت" />
                     </div>
                     <div>
-                        <label for="assign-media-role" class="block text-xs font-medium text-gray-600 mb-1">نقش رسانه</label>
-                        <select id="assign-media-role" name="MediaRoleTypeId" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <label for="assign-media-role" class="block text-xs font-medium text-ink-secondary mb-1">نقش رسانه</label>
+                        <select id="assign-media-role" name="MediaRoleTypeId" class="form-control">
                             <option value="">-- انتخاب --</option>
                             @foreach (var mrt in await _db.MediaRoleTypes.OrderBy(m => m.Name).ToListAsync())
                             {
@@ -181,11 +181,11 @@
                     </div>
                     <div class="flex items-end gap-3">
                         <label class="inline-flex items-center gap-2 cursor-pointer">
-                            <input type="checkbox" name="IsPrimary" value="true" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
-                            <span class="text-xs text-gray-600">اصلی</span>
+                            <input type="checkbox" name="IsPrimary" value="true" class="rounded border-rule-strong text-accent focus-visible:ring-accent" />
+                            <span class="text-xs text-ink-secondary">اصلی</span>
                         </label>
-                        <button type="submit" formaction="/admin/media/Assign" formmethod="post" class="px-3 py-2 bg-blue-600 text-white text-xs rounded-md hover:bg-blue-700 transition-colors">
-                            <i class="fas fa-link me-1"></i> Assign
+                        <button type="submit" formaction="/admin/media/Assign" formmethod="post" class="px-3 py-2 bg-accent text-on-accent text-xs rounded-md hover:bg-accent-hover transition-colors">
+                            <i aria-hidden="true" class="fas fa-link me-1"></i> Assign
                         </button>
                     </div>
                     <input type="hidden" name="MediaId" value="@Model.MediaId" />
@@ -195,22 +195,22 @@
         </div>
 
         <div class="space-y-6">
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">عملیات</h2>
-                <button type="submit" class="w-full px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"><i class="fas fa-save"></i> ذخیره تغییرات</button>
-                <a href="/admin/media" class="w-full block text-center mt-3 px-4 py-2.5 text-sm text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"><i class="fas fa-arrow-left me-1"></i> بازگشت به فهرست</a>
-                <hr class="border-gray-200 my-3" />
+            <div class="bg-surface rounded-lg shadow-sm border border-rule p-5">
+                <h2 class="text-lg font-semibold text-ink mb-4">عملیات</h2>
+                <button type="submit" class="w-full px-4 py-2.5 bg-accent text-on-accent text-sm font-medium rounded-md hover:bg-accent-hover transition-colors flex items-center justify-center gap-2"><i aria-hidden="true" class="fas fa-save"></i> ذخیره تغییرات</button>
+                <a href="/admin/media" class="w-full block text-center mt-3 px-4 py-2.5 text-sm text-ink-secondary bg-paper-muted rounded-md hover:bg-rule transition-colors"><i aria-hidden="true" class="fas fa-arrow-left me-1"></i> بازگشت به فهرست</a>
+                <hr class="border-rule my-3" />
                 <form method="post" action="/admin/media/@Model.MediaId/Delete" onsubmit="return confirm('Are you sure you want to soft-delete this media file?');">
                     @Html.AntiForgeryToken()
-                    <button type="submit" class="w-full px-4 py-2 text-sm text-red-600 border border-red-200 rounded-md hover:bg-red-50 transition-colors flex items-center justify-center gap-2"><i class="fas fa-trash-alt"></i> حذف رسانه</button>
+                    <button type="submit" class="w-full px-4 py-2 text-sm text-error border border-error-border rounded-md hover:bg-error-soft transition-colors flex items-center justify-center gap-2"><i aria-hidden="true" class="fas fa-trash-alt"></i> حذف رسانه</button>
                 </form>
             </div>
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                <h2 class="text-sm font-semibold text-gray-700 mb-3">فایل اطلاعات</h2>
+            <div class="bg-surface rounded-lg shadow-sm border border-rule p-5">
+                <h2 class="text-sm font-semibold text-ink-secondary mb-3">فایل اطلاعات</h2>
                 <dl class="space-y-2 text-xs">
-                    <div class="flex justify-between"><dt class="text-gray-500">ID</dt><dd class="text-gray-900 font-mono">@Model.MediaId</dd></div>
-                    <div class="flex justify-between"><dt class="text-gray-500">Path</dt><dd class="text-gray-900 font-mono truncate max-w-[140px]" title="@Model.FilePath">@Model.FilePath</dd></div>
-                    <div class="flex justify-between"><dt class="text-gray-500">MIME</dt><dd class="text-gray-900">@Model.MimeType</dd></div>
+                    <div class="flex justify-between"><dt class="text-ink-muted">ID</dt><dd class="text-ink font-mono">@Model.MediaId</dd></div>
+                    <div class="flex justify-between"><dt class="text-ink-muted">Path</dt><dd class="text-ink font-mono truncate max-w-[140px]" title="@Model.FilePath">@Model.FilePath</dd></div>
+                    <div class="flex justify-between"><dt class="text-ink-muted">MIME</dt><dd class="text-ink">@Model.MimeType</dd></div>
                 </dl>
             </div>
         </div>

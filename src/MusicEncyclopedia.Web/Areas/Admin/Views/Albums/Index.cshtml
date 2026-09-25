@@ -7,25 +7,23 @@
 <!-- ============================================================
      Search & Actions Bar (spec 10.4)
      ============================================================ -->
-<div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
+<div class="admin-toolbar">
     <div class="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
         <!-- Search Form -->
         <form method="get" action="/admin/albums" class="flex items-center gap-2 flex-1 max-w-md">
             <div class="relative flex-1">
-                <i class="fas fa-search absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                <i aria-hidden="true" class="fas fa-search absolute start-3 top-1/2 -translate-y-1/2 text-ink-muted text-sm"></i>
                 <input type="text"
                        name="q"
                        value="@Model.SearchQuery"
                        placeholder="جستجوی آلبوم‌ها..."
-                       class="w-full ps-9 pe-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                       class="w-full ps-9 pe-3 py-2 border border-rule-strong rounded-md text-sm focus-visible:ring-2 focus-visible:ring-accent focus-visible:border-accent" />
             </div>
-            <button type="submit" class="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors">
-                <i class="fas fa-search"></i>
-            </button>
+            <button type="submit" class="px-4 py-2 bg-accent text-on-accent text-sm rounded-md hover:bg-accent-hover transition-colors min-w-11 min-h-11 inline-flex items-center justify-center" aria-label="جستجو"><i aria-hidden="true" class="fas fa-search"></i></button>
             @if (!string.IsNullOrWhiteSpace(Model.SearchQuery))
             {
-                <a href="/admin/albums" class="px-3 py-2 text-sm text-gray-600 hover:text-gray-900">
-                    <i class="fas fa-times"></i> پاک کردن
+                <a href="/admin/albums" class="px-3 py-2 text-sm text-ink-secondary hover:text-ink">
+                    <i aria-hidden="true" class="fas fa-times"></i> پاک کردن
                 </a>
             }
         </form>
@@ -34,27 +32,27 @@
             @if (Model.Deleted)
             {
                 <a href="/admin/albums"
-                   class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm rounded-md hover:bg-gray-50 transition-colors">
-                    <i class="fas fa-list"></i>
+                   class="inline-flex items-center gap-2 px-4 py-2 bg-surface border border-rule-strong text-ink-secondary text-sm rounded-md hover:bg-paper transition-colors">
+                    <i aria-hidden="true" class="fas fa-list"></i>
                     <span>آلبوم‌های فعال</span>
                 </a>
             }
             else
             {
                 <a href="/admin/albums?deleted=true"
-                   class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 text-sm rounded-md hover:bg-gray-50 transition-colors">
-                    <i class="fas fa-trash-restore"></i>
+                   class="inline-flex items-center gap-2 px-4 py-2 bg-surface border border-rule-strong text-ink-secondary text-sm rounded-md hover:bg-paper transition-colors">
+                    <i aria-hidden="true" class="fas fa-trash-restore"></i>
                     <span>آلبوم‌های حذف‌شده</span>
                 </a>
             }
             <a href="/admin/albums/wizard"
-               class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors">
-                <i class="fas fa-wand-magic-sparkles"></i>
+               class="inline-flex items-center gap-2 px-4 py-2 bg-accent text-on-accent text-sm rounded-md hover:bg-accent-hover transition-colors">
+                <i aria-hidden="true" class="fas fa-wand-magic-sparkles"></i>
                 <span>ایجاد با ویزارد</span>
             </a>
             <a href="/admin/albums/Create"
-               class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 transition-colors">
-                <i class="fas fa-plus"></i>
+               class="inline-flex items-center gap-2 px-4 py-2 bg-success text-on-accent text-sm rounded-md hover:bg-success-hover transition-colors">
+                <i aria-hidden="true" class="fas fa-plus"></i>
                 <span>ایجاد آلبوم</span>
             </a>
         </div>
@@ -64,33 +62,33 @@
 <!-- ============================================================
      Album Table (spec 10.4)
      ============================================================ -->
-<div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+<div class="admin-table-wrap">
     <div class="overflow-x-auto">
-        <table class="w-full text-sm">
-            <thead class="bg-gray-50 border-b border-gray-200">
+        <table class="admin-table">
+            <thead class="bg-paper border-b border-rule">
                 <tr>
-                    <th class="text-center px-4 py-3 font-medium text-gray-600"><input type="checkbox" id="select-all" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" title="انتخاب همه در صفحه" /></th>
-                    <th class="text-start px-4 py-3 font-medium text-gray-600">عنوان</th>
-                    <th class="text-start px-4 py-3 font-medium text-gray-600">Slug</th>
-                    <th class="text-start px-4 py-3 font-medium text-gray-600">دسته‌بندی</th>
-                    <th class="text-start px-4 py-3 font-medium text-gray-600">تاریخ انتشار</th>
-                    <th class="text-center px-4 py-3 font-medium text-gray-600">وضعیت</th>
-                    <th class="text-end px-4 py-3 font-medium text-gray-600">عملیات</th>
+                    <th class="text-center px-4 py-3 font-medium text-ink-secondary"><input type="checkbox" id="select-all" class="rounded border-rule-strong text-accent focus-visible:ring-accent" title="انتخاب همه در صفحه" /></th>
+                    <th class="text-start px-4 py-3 font-medium text-ink-secondary">عنوان</th>
+                    <th class="text-start px-4 py-3 font-medium text-ink-secondary">Slug</th>
+                    <th class="text-start px-4 py-3 font-medium text-ink-secondary">دسته‌بندی</th>
+                    <th class="text-start px-4 py-3 font-medium text-ink-secondary">تاریخ انتشار</th>
+                    <th class="text-center px-4 py-3 font-medium text-ink-secondary">وضعیت</th>
+                    <th class="text-end px-4 py-3 font-medium text-ink-secondary">عملیات</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100">
+            <tbody class="divide-y divide-rule-light">
                 @if (Model.Items.Items.Count == 0)
                 {
                     <tr>
-                        <td colspan="7" class="px-4 py-8 text-center text-gray-500">
-                            <i class="fas fa-compact-disc text-3xl text-gray-300 mb-2 block"></i>
+                        <td colspan="7" class="ui-state ui-state--empty">
+                            <i aria-hidden="true" class="fas fa-compact-disc text-3xl text-ink-disabled mb-2 block"></i>
                             @if (!string.IsNullOrWhiteSpace(Model.SearchQuery))
                             {
                                 <span>هیچ آلبومی مطابق با "<strong>@Model.SearchQuery</strong>".</span>
                             }
                             else
                             {
-                                <span>هنوز آلبومی وجود ندارد. <a href="/admin/albums/Create" class="text-blue-600 hover:underline">ایجاد کنید</a>.</span>
+                                <span>هنوز آلبومی وجود ندارد. <a href="/admin/albums/Create" class="text-accent hover:underline">ایجاد کنید</a>.</span>
                             }
                         </td>
                     </tr>
@@ -99,35 +97,35 @@
                 {
                     @foreach (var album in Model.Items.Items)
                     {
-                        <tr class="hover:bg-gray-50 transition-colors">
+                        <tr class="hover:bg-paper transition-colors">
                             <td class="px-4 py-3 text-center">
-                                <input type="checkbox" name="row-checkbox" value="@album.AlbumId" class="row-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                                <input type="checkbox" name="row-checkbox" value="@album.AlbumId" class="row-checkbox rounded border-rule-strong text-accent focus-visible:ring-accent" />
                             </td>
                             <td class="px-4 py-3">
-                                <a href="/admin/albums/@album.AlbumId/Edit" class="text-blue-600 hover:underline font-medium">
+                                <a href="/admin/albums/@album.AlbumId/Edit" class="text-accent hover:underline font-medium">
                                     @album.Title
                                 </a>
                                 @if (!string.IsNullOrEmpty(album.OriginalTitle) && album.OriginalTitle != album.Title)
                                 {
-                                    <span class="text-gray-400 text-xs ms-1">(@album.OriginalTitle)</span>
+                                    <span class="text-ink-muted text-xs ms-1">(@album.OriginalTitle)</span>
                                 }
                             </td>
-                            <td class="px-4 py-3 text-gray-500 font-mono text-xs">@album.Slug</td>
+                            <td class="px-4 py-3 text-ink-muted font-mono text-xs">@album.Slug</td>
                             <td class="px-4 py-3">
                                 @if (!string.IsNullOrEmpty(album.CategoryName))
                                 {
-                                    <span class="inline-block px-2 py-0.5 bg-blue-50 text-blue-700 text-xs rounded-full">@album.CategoryName</span>
+                                    <span class="inline-block px-2 py-0.5 bg-accent-soft text-accent-hover text-xs rounded-full">@album.CategoryName</span>
                                 }
                             </td>
-                            <td class="px-4 py-3 text-gray-500">@album.ReleaseDate?.ToString("yyyy-MM-dd")</td>
+                            <td class="px-4 py-3 text-ink-muted">@album.ReleaseDate?.ToString("yyyy-MM-dd")</td>
                             <td class="px-4 py-3 text-center">
                                 @if (album.IsDeleted)
                                 {
-                                    <span class="inline-block px-2 py-0.5 text-xs rounded-full bg-red-50 text-red-700">حذف‌شده</span>
+                                    <span class="inline-block px-2 py-0.5 text-xs rounded-full bg-error-soft text-error-hover">حذف‌شده</span>
                                 }
                                 else
                                 {
-                                    <span class="inline-block px-2 py-0.5 text-xs rounded-full bg-green-50 text-green-700">فعال</span>
+                                    <span class="inline-block px-2 py-0.5 text-xs rounded-full bg-success-soft text-success-hover">فعال</span>
                                 }
                             </td>
                             <td class="px-4 py-3 text-end">
@@ -137,27 +135,27 @@
                                         <form method="post" action="/admin/albums/@album.AlbumId/Restore" class="inline">
                                             @Html.AntiForgeryToken()
                                             <button type="submit"
-                                                    class="inline-flex items-center gap-1 px-2 py-1 text-xs text-green-600 hover:bg-green-50 rounded"
+                                                    class="inline-flex items-center gap-1 px-2 py-1 text-xs text-success hover:bg-success-soft rounded"
                                                     title="بازیابی">
-                                                <i class="fas fa-undo"></i> بازیابی
+                                                <i aria-hidden="true" class="fas fa-undo"></i> بازیابی
                                             </button>
                                         </form>
                                     }
                                     else
                                     {
                                         <a href="/admin/albums/@album.AlbumId/Edit"
-                                           class="inline-flex items-center gap-1 px-2 py-1 text-xs text-blue-600 hover:bg-blue-50 rounded"
+                                           class="inline-flex items-center gap-1 px-2 py-1 text-xs text-accent hover:bg-accent-soft rounded"
                                            title="ویرایش">
-                                            <i class="fas fa-edit"></i> ویرایش
+                                            <i aria-hidden="true" class="fas fa-edit"></i> ویرایش
                                         </a>
                                         <form method="post" action="/admin/albums/@album.AlbumId/Delete"
                                               onsubmit="return confirm('Are you sure you want to delete this album? It can be restored later.');"
                                               class="inline">
                                             @Html.AntiForgeryToken()
                                             <button type="submit"
-                                                    class="inline-flex items-center gap-1 px-2 py-1 text-xs text-red-600 hover:bg-red-50 rounded"
+                                                    class="inline-flex items-center gap-1 px-2 py-1 text-xs text-error hover:bg-error-soft rounded"
                                                     title="Soft delete">
-                                                <i class="fas fa-trash-alt"></i> حذف
+                                                <i aria-hidden="true" class="fas fa-trash-alt"></i> حذف
                                             </button>
                                         </form>
                                     }
@@ -175,8 +173,8 @@
          ============================================================ -->
     @if (Model.Items.TotalPages > 1)
     {
-        <div class="flex items-center justify-between px-4 py-3 bg-gray-50 border-t border-gray-200">
-            <p class="text-sm text-gray-500">
+        <div class="admin-pagination">
+            <p class="text-sm text-ink-muted">
                 نمایش صفحه <strong>@Model.Items.Page</strong> از <strong>@Model.Items.TotalPages</strong>
                 (@Model.Items.TotalItems total albums)
             </p>
@@ -184,15 +182,15 @@
                 @if (Model.Items.Page > 1)
                 {
                     <a href="/admin/albums?page=@(Model.Items.Page - 1)&q=@Model.SearchQuery"
-                       class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-200 rounded">
-                        <i class="fas fa-chevron-right"></i> قبلی
+                       class="admin-pagination__link">
+                        <i aria-hidden="true" class="fas fa-chevron-right"></i> قبلی
                     </a>
                 }
                 @if (Model.Items.Page < Model.Items.TotalPages)
                 {
                     <a href="/admin/albums?page=@(Model.Items.Page + 1)&q=@Model.SearchQuery"
-                       class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-200 rounded">
-                        بعدی <i class="fas fa-chevron-left"></i>
+                       class="admin-pagination__link">
+                        بعدی <i aria-hidden="true" class="fas fa-chevron-left"></i>
                     </a>
                 }
             </nav>
@@ -214,8 +212,8 @@
                 bulkCount.textContent = checked.length + ' selected';
                 bulkSubmit.disabled = checked.length === 0;
                 bulkSubmit.className = checked.length === 0
-                    ? 'inline-flex items-center gap-2 px-3 py-1.5 text-xs bg-gray-200 text-gray-500 rounded cursor-not-allowed transition-colors'
-                    : 'inline-flex items-center gap-2 px-3 py-1.5 text-xs bg-red-600 text-white rounded hover:bg-red-700 transition-colors';
+                    ? 'inline-flex items-center gap-2 px-3 py-1.5 text-xs bg-rule text-ink-muted rounded cursor-not-allowed transition-colors'
+                    : 'inline-flex items-center gap-2 px-3 py-1.5 text-xs bg-error text-on-accent rounded hover:bg-error-hover transition-colors';
                 selectAll.checked = checkboxes.length > 0 && checked.length === checkboxes.length;
                 selectAll.indeterminate = checked.length > 0 && checked.length < checkboxes.length;
             }
@@ -260,15 +258,15 @@
           action="@(Model.Deleted ? "/admin/albums/bulk-restore" : "/admin/albums/bulk-delete")"
           onsubmit="return confirm('@(Model.Deleted ? "Restore" : "Delete") the selected album(s)?');">
         @Html.AntiForgeryToken()
-        <div class="mt-4 bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-            <h3 class="text-sm font-semibold text-gray-700 mb-2">
-                <i class="fas fa-layer-group me-1 text-blue-600"></i> عملیات گروهی
+        <div class="admin-card admin-form-card mt-4">
+            <h3 class="text-sm font-semibold text-ink-secondary mb-2">
+                <i aria-hidden="true" class="fas fa-layer-group me-1 text-accent"></i> عملیات گروهی
             </h3>
             <div class="flex flex-wrap items-center gap-3">
-                <span id="bulk-count" class="text-xs text-gray-500">0 انتخاب‌شده</span>
+                <span id="bulk-count" class="text-xs text-ink-muted">0 انتخاب‌شده</span>
                 <button id="bulk-submit" type="submit" disabled
-                        class="inline-flex items-center gap-2 px-3 py-1.5 text-xs bg-gray-200 text-gray-500 rounded cursor-not-allowed transition-colors">
-                    <i class="fas @(Model.Deleted ? "fa-undo" : "fa-trash-alt")"></i>
+                        class="inline-flex items-center gap-2 px-3 py-1.5 text-xs bg-rule text-ink-muted rounded cursor-not-allowed transition-colors">
+                    <i aria-hidden="true" class="fas @(Model.Deleted ? "fa-undo" : "fa-trash-alt")"></i>
                     @(Model.Deleted ? "Bulk Restore" : "Bulk Soft Delete")
                 </button>
             </div>

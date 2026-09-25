@@ -73,17 +73,17 @@
          Breadcrumb
          ============================================================ -->
     <nav aria-label="@Localizer["Breadcrumb"]" class="mb-6">
-        <ol class="flex items-center gap-2 text-sm text-gray-500">
-            <li><a href="/@culture" class="hover:text-blue-600 transition-colors">@Localizer["Home"]</a></li>
+        <ol class="flex items-center gap-2 text-sm text-ink-muted">
+            <li><a href="/@culture" class="hover:text-accent transition-colors">@Localizer["Home"]</a></li>
             <li><span class="mx-1">/</span></li>
-            <li><a href="/@culture/poems" class="hover:text-blue-600 transition-colors">@Localizer["Poems"]</a></li>
+            <li><a href="/@culture/poems" class="hover:text-accent transition-colors">@Localizer["Poems"]</a></li>
             <li><span class="mx-1">/</span></li>
             @if (!string.IsNullOrWhiteSpace(poemSlug))
             {
-                <li><a href="/@culture/poems/@poemSlug" class="hover:text-blue-600 transition-colors">@poemTitle</a></li>
+                <li><a href="/@culture/poems/@poemSlug" class="hover:text-accent transition-colors">@poemTitle</a></li>
                 <li><span class="mx-1">/</span></li>
             }
-            <li class="text-gray-900 font-medium truncate max-w-[200px]" aria-current="page">@title</li>
+            <li class="text-ink font-medium truncate max-w-[200px]" aria-current="page">@title</li>
         </ol>
     </nav>
 
@@ -91,16 +91,16 @@
          1. Header
          ============================================================ -->
     <div class="mb-10">
-        <h1 class="text-3xl md:text-4xl font-bold text-gray-900">@title</h1>
+        <h1 class="text-3xl md:text-4xl font-bold text-ink">@title</h1>
 
         <!-- Poet -->
         @if (!string.IsNullOrWhiteSpace(poetName))
         {
-            <p class="text-lg text-gray-500 mt-1">
+            <p class="text-lg text-ink-muted mt-1">
                 @Localizer["by"]
                 @if (!string.IsNullOrWhiteSpace(poetSlug))
                 {
-                    <a href="/@culture/poets/@poetSlug" class="text-blue-600 hover:text-blue-800 font-medium">@poetName</a>
+                    <a href="/@culture/poets/@poetSlug" class="text-accent hover:text-accent-hover font-medium">@poetName</a>
                 }
                 else
                 {
@@ -113,8 +113,8 @@
         @if (!string.IsNullOrWhiteSpace(poemSlug))
         {
             <p class="mt-1">
-                <span class="text-gray-500 text-sm">@Localizer["Based on poem:"]</span>
-                <a href="/@culture/poems/@poemSlug" class="text-blue-600 hover:text-blue-800 text-sm font-medium">@poemTitle</a>
+                <span class="text-ink-muted text-sm">@Localizer["Based on poem:"]</span>
+                <a href="/@culture/poems/@poemSlug" class="text-accent hover:text-accent-hover text-sm font-medium">@poemTitle</a>
             </p>
         }
 
@@ -122,17 +122,17 @@
         <div class="flex flex-wrap items-center gap-2 mt-3">
             @if (isCanonical)
             {
-                <span class="inline-flex items-center gap-1 bg-green-100 text-green-700 text-xs font-medium px-2.5 py-1 rounded-full">
+                <span class="inline-flex items-center gap-1 bg-success-soft text-success-hover text-xs font-medium px-2.5 py-1 rounded-full">
                     @Localizer["Canonical"]
                 </span>
             }
             @if (!string.IsNullOrWhiteSpace(vocalStyleName))
             {
-                <span class="inline-flex items-center gap-1 bg-purple-100 text-purple-700 text-xs font-medium px-2.5 py-1 rounded-full">
+                <span class="inline-flex items-center gap-1 bg-info-soft text-info-hover text-xs font-medium px-2.5 py-1 rounded-full">
                     @vocalStyleName
                 </span>
             }
-            <span class="inline-block bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+            <span class="inline-block bg-info-soft text-info-hover text-xs font-medium px-2.5 py-0.5 rounded-full">
                 @Localizer["Sung Version"]
             </span>
         </div>
@@ -150,8 +150,8 @@
             @if (!string.IsNullOrWhiteSpace(text))
             {
                 <section>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["Sung Text"]</h2>
-                    <div class="prose prose-gray max-w-none text-gray-700 leading-relaxed whitespace-pre-line font-serif text-lg">
+                    <h2 class="text-2xl font-bold text-ink mb-4">@Localizer["Sung Text"]</h2>
+                    <div class="prose prose-gray max-w-none text-ink-secondary leading-relaxed whitespace-pre-line font-serif text-lg">
                         @text
                     </div>
                 </section>
@@ -163,11 +163,11 @@
             @if (!string.IsNullOrWhiteSpace(text) && !string.IsNullOrWhiteSpace(poemCanonicalText) && text != poemCanonicalText)
             {
                 <section>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["Differences from Original"]</h2>
-                    <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-amber-800">
+                    <h2 class="text-2xl font-bold text-ink mb-4">@Localizer["Differences from Original"]</h2>
+                    <div class="bg-warning-soft border border-warning-border rounded-lg p-4 text-sm text-warning-hover">
                         <p>@Localizer["The sung version text differs from the original poem canonical text."]</p>
                         <a href="/@culture/poems/@poemSlug#canonical-text"
-                           class="text-blue-600 hover:text-blue-800 font-medium mt-2 inline-block">
+                           class="text-accent hover:text-accent-hover font-medium mt-2 inline-block">
                             @Localizer["View original poem"] &rarr;
                         </a>
                     </div>
@@ -180,8 +180,8 @@
             @if (!string.IsNullOrWhiteSpace(notes))
             {
                 <section>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["Notes"]</h2>
-                    <div class="text-gray-700 leading-relaxed">@notes</div>
+                    <h2 class="text-2xl font-bold text-ink mb-4">@Localizer["Notes"]</h2>
+                    <div class="text-ink-secondary leading-relaxed">@notes</div>
                 </section>
             }
 
@@ -191,7 +191,7 @@
             @if (tracks.Count > 0)
             {
                 <section>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["Tracks Using This Version"]</h2>
+                    <h2 class="text-2xl font-bold text-ink mb-4">@Localizer["Tracks Using This Version"]</h2>
                     <div class="space-y-2">
                         @foreach (var track in tracks)
                         {
@@ -202,21 +202,21 @@
                             try { trackSlug = (string?)track.Slug; } catch { }
                             try { duration = (int?)track.DurationSeconds; } catch { }
 
-                            <div class="flex items-center justify-between bg-white rounded-lg p-3 border border-gray-200">
+                            <div class="flex items-center justify-between bg-surface rounded-lg p-3 border border-rule">
                                 @if (!string.IsNullOrWhiteSpace(trackSlug))
                                 {
                                     <a href="/@culture/tracks/@trackSlug"
-                                       class="font-medium text-blue-600 hover:text-blue-800">
+                                       class="font-medium text-accent hover:text-accent-hover">
                                         @trackTitle
                                     </a>
                                 }
                                 else
                                 {
-                                    <span class="font-medium text-gray-700">@trackTitle</span>
+                                    <span class="font-medium text-ink-secondary">@trackTitle</span>
                                 }
                                 @if (duration.HasValue)
                                 {
-                                    <span class="text-sm text-gray-400 tabular-nums">
+                                    <span class="text-sm text-ink-muted tabular-nums">
                                         @TimeSpan.FromSeconds(duration.Value).ToString(@"m\:ss")
                                     </span>
                                 }
@@ -242,11 +242,11 @@
                 }
 
                 <section>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["Media"]</h2>
+                    <h2 class="text-2xl font-bold text-ink mb-4">@Localizer["Media"]</h2>
 
                     @if (images.Count > 0)
                     {
-                        <h3 class="text-lg font-semibold text-gray-700 mb-2">@Localizer["Images"]</h3>
+                        <h3 class="text-lg font-semibold text-ink-secondary mb-2">@Localizer["Images"]</h3>
                         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-6">
                             @foreach (var img in images)
                             {
@@ -260,7 +260,7 @@
                                 <a href="@imgUrl"
                                    target="_blank"
                                    rel="noopener noreferrer"
-                                   class="block aspect-square bg-gray-100 rounded-lg overflow-hidden hover:opacity-90 transition-opacity">
+                                   class="block aspect-square bg-paper-muted rounded-lg overflow-hidden hover:opacity-90 transition-opacity">
                                     <img src="@(thumbUrl ?? imgUrl)"
                                          alt="@(imgDesc ?? "")"
                                          class="w-full h-full object-cover"
@@ -272,7 +272,7 @@
 
                     @if (videos.Count > 0)
                     {
-                        <h3 class="text-lg font-semibold text-gray-700 mb-2">@Localizer["Videos"]</h3>
+                        <h3 class="text-lg font-semibold text-ink-secondary mb-2">@Localizer["Videos"]</h3>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                             @foreach (var vid in videos)
                             {
@@ -281,7 +281,7 @@
                                 try { vidUrl = (string?)vid.Url; } catch { }
                                 try { vidDesc = (string?)vid.Description; } catch { }
 
-                                <div class="aspect-video bg-gray-100 rounded-lg overflow-hidden">
+                                <div class="aspect-video bg-paper-muted rounded-lg overflow-hidden">
                                     @if (vidUrl is not null && (vidUrl.Contains("youtube") || vidUrl.Contains("youtu.be")))
                                     {
                                         <iframe src="@vidUrl"
@@ -310,7 +310,7 @@
             @if (citations.Count > 0)
             {
                 <section>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["References"]</h2>
+                    <h2 class="text-2xl font-bold text-ink mb-4">@Localizer["References"]</h2>
                     <ol class="space-y-3 list-decimal list-inside">
                         @foreach (var citation in citations)
                         {
@@ -325,17 +325,17 @@
                             try { pageNumber = (string?)citation.PageNumber; } catch { }
                             try { citationUrl = (string?)citation.Url; } catch { }
 
-                            <li class="text-sm text-gray-700">
+                            <li class="text-sm text-ink-secondary">
                                 @if (!string.IsNullOrWhiteSpace(quote))
                                 {
                                     <span class="font-medium">"@quote"</span>
                                     <br />
                                 }
-                                <span class="text-gray-500">
+                                <span class="text-ink-muted">
                                     @if (!string.IsNullOrWhiteSpace(sourceSlug))
                                     {
                                         <a href="/@culture/sources/@sourceSlug"
-                                           class="text-blue-600 hover:text-blue-800">@sourceName</a>
+                                           class="text-accent hover:text-accent-hover">@sourceName</a>
                                     }
                                     else if (!string.IsNullOrWhiteSpace(sourceName))
                                     {
@@ -350,7 +350,7 @@
                                         <a href="@citationUrl"
                                            target="_blank"
                                            rel="noopener noreferrer"
-                                           class="text-blue-600 hover:text-blue-800 ms-1">@Localizer["Source"]</a>
+                                           class="text-accent hover:text-accent-hover ms-1">@Localizer["Source"]</a>
                                     }
                                 </span>
                             </li>
@@ -365,7 +365,7 @@
             @if (links.Count > 0)
             {
                 <section>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["External Links"]</h2>
+                    <h2 class="text-2xl font-bold text-ink mb-4">@Localizer["External Links"]</h2>
                     <ul class="space-y-1.5">
                         @foreach (var link in links)
                         {
@@ -380,12 +380,12 @@
                                 <a href="@linkUrl"
                                    target="_blank"
                                    rel="noopener noreferrer"
-                                   class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                   class="text-accent hover:text-accent-hover text-sm font-medium">
                                     @(!string.IsNullOrWhiteSpace(linkTitle) ? linkTitle : linkUrl)
                                 </a>
                                 @if (!string.IsNullOrWhiteSpace(linkType))
                                 {
-                                    <span class="text-gray-400 text-xs ms-1">[@linkType]</span>
+                                    <span class="text-ink-muted text-xs ms-1">[@linkType]</span>
                                 }
                             </li>
                         }
@@ -399,7 +399,7 @@
             @if (tags.Count > 0)
             {
                 <section>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-4">@Localizer["Tags"]</h2>
+                    <h2 class="text-2xl font-bold text-ink mb-4">@Localizer["Tags"]</h2>
                     <div class="flex flex-wrap gap-2">
                         @foreach (var tag in tags)
                         {
@@ -409,7 +409,7 @@
                             try { tagSlug = (string?)tag.Slug; } catch { }
 
                             <a href="/@culture/tags/@tagSlug"
-                               class="inline-block bg-gray-100 text-gray-700 text-xs px-2.5 py-1 rounded-full hover:bg-gray-200 transition-colors">
+                               class="inline-block bg-paper-muted text-ink-secondary text-xs px-2.5 py-1 rounded-full hover:bg-rule transition-colors">
                                 #@tagName
                             </a>
                         }
@@ -423,33 +423,33 @@
              Sidebar — Quick info
              ============================================================ -->
         <aside class="w-full lg:w-72 flex-shrink-0" role="complementary" aria-label="@Localizer["Sung version metadata"]">
-            <div class="bg-gray-50 rounded-lg border border-gray-200 p-5 space-y-4 sticky top-4">
-                <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider">@Localizer["Details"]</h3>
+            <div class="bg-paper rounded-lg border border-rule p-5 space-y-4 sticky top-4">
+                <h3 class="text-sm font-semibold text-ink-muted uppercase tracking-wider">@Localizer["Details"]</h3>
 
                 @if (!string.IsNullOrWhiteSpace(vocalStyleName))
                 {
                     <div>
-                        <h4 class="text-xs font-medium text-gray-500 uppercase">@Localizer["Vocal Style"]</h4>
-                        <p class="mt-1 text-sm text-gray-700">@vocalStyleName</p>
+                        <h4 class="text-xs font-medium text-ink-muted uppercase">@Localizer["Vocal Style"]</h4>
+                        <p class="mt-1 text-sm text-ink-secondary">@vocalStyleName</p>
                     </div>
                 }
 
                 @if (isCanonical)
                 {
                     <div>
-                        <h4 class="text-xs font-medium text-gray-500 uppercase">@Localizer["Status"]</h4>
-                        <p class="mt-1 text-sm text-green-700 font-medium">@Localizer["Canonical Version"]</p>
+                        <h4 class="text-xs font-medium text-ink-muted uppercase">@Localizer["Status"]</h4>
+                        <p class="mt-1 text-sm text-success-hover font-medium">@Localizer["Canonical Version"]</p>
                     </div>
                 }
 
                 @if (!string.IsNullOrWhiteSpace(poetName))
                 {
                     <div>
-                        <h4 class="text-xs font-medium text-gray-500 uppercase">@Localizer["Poet"]</h4>
-                        <p class="mt-1 text-sm text-gray-700">
+                        <h4 class="text-xs font-medium text-ink-muted uppercase">@Localizer["Poet"]</h4>
+                        <p class="mt-1 text-sm text-ink-secondary">
                             @if (!string.IsNullOrWhiteSpace(poetSlug))
                             {
-                                <a href="/@culture/poets/@poetSlug" class="text-blue-600 hover:text-blue-800">@poetName</a>
+                                <a href="/@culture/poets/@poetSlug" class="text-accent hover:text-accent-hover">@poetName</a>
                             }
                             else
                             {
@@ -462,11 +462,11 @@
                 @if (!string.IsNullOrWhiteSpace(poemTitle))
                 {
                     <div>
-                        <h4 class="text-xs font-medium text-gray-500 uppercase">@Localizer["Original Poem"]</h4>
-                        <p class="mt-1 text-sm text-gray-700">
+                        <h4 class="text-xs font-medium text-ink-muted uppercase">@Localizer["Original Poem"]</h4>
+                        <p class="mt-1 text-sm text-ink-secondary">
                             @if (!string.IsNullOrWhiteSpace(poemSlug))
                             {
-                                <a href="/@culture/poems/@poemSlug" class="text-blue-600 hover:text-blue-800">@poemTitle</a>
+                                <a href="/@culture/poems/@poemSlug" class="text-accent hover:text-accent-hover">@poemTitle</a>
                             }
                             else
                             {
@@ -479,8 +479,8 @@
                 @if (tracks.Count > 0)
                 {
                     <div>
-                        <h4 class="text-xs font-medium text-gray-500 uppercase">@Localizer["Tracks"]</h4>
-                        <p class="mt-1 text-sm text-gray-700">@tracks.Count</p>
+                        <h4 class="text-xs font-medium text-ink-muted uppercase">@Localizer["Tracks"]</h4>
+                        <p class="mt-1 text-sm text-ink-secondary">@tracks.Count</p>
                     </div>
                 }
             </div>

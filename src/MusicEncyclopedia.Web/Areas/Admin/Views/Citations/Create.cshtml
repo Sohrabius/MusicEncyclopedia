@@ -6,91 +6,89 @@
 
 <form method="post" action="/admin/citations/Create">
     @Html.AntiForgeryToken()
-    <div asp-validation-summary="ModelOnly" class="mb-4 px-4 py-3 rounded-md bg-red-50 border border-red-200 text-red-800 text-sm" role="alert"></div>
+    <div asp-validation-summary="ModelOnly" class="mb-4 px-4 py-3 rounded-md bg-error-soft border border-error-border text-error-hover text-sm" role="alert"></div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="lg:col-span-2 space-y-6">
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">منبع & موجودیت</h2>
+            <div class="bg-surface rounded-lg shadow-sm border border-rule p-5">
+                <h2 class="text-lg font-semibold text-ink mb-4">منبع & موجودیت</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label asp-for="EntityTypeId" class="block text-sm font-medium text-gray-700 mb-1"></label>
-                        <select asp-for="EntityTypeId" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <label asp-for="EntityTypeId" class="form-label"></label>
+                        <select asp-for="EntityTypeId" class="form-control">
                             <option value="">-- انتخاب نوع موجودیت --</option>
                             @foreach (var et in Model.EntityTypes)
                             {
                                 <option value="@et.EntityTypeId">@et.Name (@et.Code)</option>
                             }
                         </select>
-                        <span asp-validation-for="EntityTypeId" class="text-xs text-red-600"></span>
+                        <span asp-validation-for="EntityTypeId" aria-live="polite" class="field-error"></span>
                     </div>
                     <div>
-                        <label asp-for="EntityId" class="block text-sm font-medium text-gray-700 mb-1"></label>
-                        <input asp-for="EntityId" type="number" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="شناسه موجودیت" />
-                        <span asp-validation-for="EntityId" class="text-xs text-red-600"></span>
+                        <label asp-for="EntityId" class="form-label"></label>
+                        <input asp-for="EntityId" type="number" class="form-control" placeholder="شناسه موجودیت" />
+                        <span asp-validation-for="EntityId" aria-live="polite" class="field-error"></span>
                     </div>
                     <div>
-                        <label asp-for="SourceId" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                        <label asp-for="SourceId" class="form-label"></label>
                         <div class="flex gap-2">
-                            <select asp-for="SourceId" class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <select asp-for="SourceId" class="flex-1 px-3 py-2 border border-rule-strong rounded-md text-sm focus-visible:ring-2 focus-visible:ring-accent focus-visible:border-accent">
                                 <option value="">-- انتخاب منبع --</option>
                                 @foreach (var src in Model.Sources)
                                 {
                                     <option value="@src.SourceId">@src.Title</option>
                                 }
                             </select>
-                            <button type="button" id="btn-create-source" class="px-3 py-2 bg-gray-100 text-gray-600 text-sm rounded-md hover:bg-gray-200 transition-colors" title="ایجاد جدید منبع">
-                                <i class="fas fa-plus"></i>
-                            </button>
+                            <button type="button" id="btn-create-source" class="px-3 py-2 bg-paper-muted text-ink-secondary text-sm rounded-md hover:bg-rule transition-colors min-w-11 min-h-11 inline-flex items-center justify-center" title="ایجاد جدید منبع"><i aria-hidden="true" class="fas fa-plus"></i></button>
                         </div>
-                        <span asp-validation-for="SourceId" class="text-xs text-red-600"></span>
+                        <span asp-validation-for="SourceId" aria-live="polite" class="field-error"></span>
                     </div>
                     <div>
-                        <label asp-for="FieldName" class="block text-sm font-medium text-gray-700 mb-1"></label>
-                        <input asp-for="FieldName" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="مثلاً عنوان, توضیحات" />
-                        <span asp-validation-for="FieldName" class="text-xs text-red-600"></span>
+                        <label asp-for="FieldName" class="form-label"></label>
+                        <input asp-for="FieldName" class="form-control" placeholder="مثلاً عنوان, توضیحات" />
+                        <span asp-validation-for="FieldName" aria-live="polite" class="field-error"></span>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">ارجاع جزئیات</h2>
+            <div class="bg-surface rounded-lg shadow-sm border border-rule p-5">
+                <h2 class="text-lg font-semibold text-ink mb-4">ارجاع جزئیات</h2>
                 <div class="space-y-4">
                     <div>
-                        <label asp-for="Quote" class="block text-sm font-medium text-gray-700 mb-1"></label>
-                        <textarea asp-for="Quote" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Exact quote from the source..."></textarea>
-                        <span asp-validation-for="Quote" class="text-xs text-red-600"></span>
+                        <label asp-for="Quote" class="form-label"></label>
+                        <textarea asp-for="Quote" rows="4" class="form-control" placeholder="Exact quote from the source..."></textarea>
+                        <span asp-validation-for="Quote" aria-live="polite" class="field-error"></span>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
-                            <label asp-for="PageNumber" class="block text-sm font-medium text-gray-700 mb-1"></label>
-                            <input asp-for="PageNumber" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="مثلاً 42" />
-                            <span asp-validation-for="PageNumber" class="text-xs text-red-600"></span>
+                            <label asp-for="PageNumber" class="form-label"></label>
+                            <input asp-for="PageNumber" class="form-control" placeholder="مثلاً 42" />
+                            <span asp-validation-for="PageNumber" aria-live="polite" class="field-error"></span>
                         </div>
                         <div>
-                            <label asp-for="AccessedDate" class="block text-sm font-medium text-gray-700 mb-1"></label>
-                            <input asp-for="AccessedDate" type="date" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                            <span asp-validation-for="AccessedDate" class="text-xs text-red-600"></span>
+                            <label asp-for="AccessedDate" class="form-label"></label>
+                            <input asp-for="AccessedDate" type="date" class="form-control" />
+                            <span asp-validation-for="AccessedDate" aria-live="polite" class="field-error"></span>
                         </div>
                         <div>
-                            <label asp-for="Url" class="block text-sm font-medium text-gray-700 mb-1"></label>
-                            <input asp-for="Url" type="url" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="https://..." />
-                            <span asp-validation-for="Url" class="text-xs text-red-600"></span>
+                            <label asp-for="Url" class="form-label"></label>
+                            <input asp-for="Url" type="url" class="form-control" placeholder="https://..." />
+                            <span asp-validation-for="Url" aria-live="polite" class="field-error"></span>
                         </div>
                     </div>
                     <div>
-                        <label asp-for="Notes" class="block text-sm font-medium text-gray-700 mb-1"></label>
-                        <textarea asp-for="Notes" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Additional notes about this citation..."></textarea>
-                        <span asp-validation-for="Notes" class="text-xs text-red-600"></span>
+                        <label asp-for="Notes" class="form-label"></label>
+                        <textarea asp-for="Notes" rows="3" class="form-control" placeholder="Additional notes about this citation..."></textarea>
+                        <span asp-validation-for="Notes" aria-live="polite" class="field-error"></span>
                     </div>
                 </div>
             </div>
         </div>
         <div class="space-y-6">
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">انتشار</h2>
-                <button type="submit" class="w-full px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"><i class="fas fa-save"></i> ایجاد ارجاع</button>
-                <a href="/admin/citations" class="w-full block text-center mt-3 px-4 py-2.5 text-sm text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">انصراف</a>
+            <div class="bg-surface rounded-lg shadow-sm border border-rule p-5">
+                <h2 class="text-lg font-semibold text-ink mb-4">انتشار</h2>
+                <button type="submit" class="w-full px-4 py-2.5 bg-accent text-on-accent text-sm font-medium rounded-md hover:bg-accent-hover transition-colors flex items-center justify-center gap-2"><i aria-hidden="true" class="fas fa-save"></i> ایجاد ارجاع</button>
+                <a href="/admin/citations" class="w-full block text-center mt-3 px-4 py-2.5 text-sm text-ink-secondary bg-paper-muted rounded-md hover:bg-rule transition-colors">انصراف</a>
             </div>
         </div>
     </div>
@@ -99,13 +97,13 @@
 <!-- Create Source Modal -->
 <div id="create-source-modal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
     <div class="flex items-center justify-center min-h-screen p-4">
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-50 transition-opacity" onclick="closeSourceModal()"></div>
-        <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+        <div class="fixed inset-0 bg-ink-muted bg-opacity-50 transition-opacity" onclick="closeSourceModal()"></div>
+        <div class="relative bg-surface rounded-lg shadow-xl max-w-md w-full p-6">
             <div id="modal-content">
                 <!-- Loaded via AJAX -->
                 <div class="text-center py-4">
-                    <i class="fas fa-spinner fa-spin text-gray-400 text-2xl"></i>
-                    <p class="text-sm text-gray-500 mt-2">در حال بارگذاری…</p>
+                    <i aria-hidden="true" class="fas fa-spinner fa-spin text-ink-muted text-2xl"></i>
+                    <p class="ui-state--loading text-sm text-ink-muted mt-2" role="status">در حال بارگذاری…</p>
                 </div>
             </div>
         </div>
@@ -138,7 +136,7 @@
                     document.getElementById('modal-content').innerHTML = html;
                 })
                 .catch(function () {
-                    document.getElementById('modal-content').innerHTML = '<p class="text-red-500 text-sm">بارگذاری فرم ناموفق بود.</p>';
+                    document.getElementById('modal-content').innerHTML = '<p class="text-error text-sm">بارگذاری فرم ناموفق بود.</p>';
                 });
         }
 

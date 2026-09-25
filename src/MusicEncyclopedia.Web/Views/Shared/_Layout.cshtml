@@ -35,6 +35,7 @@
 
     <!-- Tailwind (utility layer, kept for legacy view classes) -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="~/js/tailwind-theme.js"></script>
 
     <!-- Styles -->
     <link rel="stylesheet" href="~/css/site.css" />
@@ -43,6 +44,7 @@
 </head>
 
 <body class="min-h-screen bg-[var(--color-paper)] text-[var(--color-ink)] font-[var(--font-body)] antialiased">
+    <a href="#main-content" class="skip-link">پرش به محتوای اصلی</a>
 
     <!-- Nav · sticky top bar -->
     <nav class="nav" aria-label="@L["Nav.MainNavigation"]">
@@ -80,7 +82,7 @@
     </nav>
 
     <!-- Mobile Nav -->
-    <div class="nav__mobile" id="mobile-nav">
+    <div class="nav__mobile" id="mobile-nav" aria-hidden="true" inert>
         <button class="nav__mobile-close" aria-label="@L["Nav.CloseMenu"]">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
@@ -92,7 +94,7 @@
         <a href="/@culture/search">@L["Nav.Search"]</a>
     </div>
 
-    <main class="min-h-[60vh]">
+    <main id="main-content" class="min-h-[60vh]" tabindex="-1">
         @await Html.PartialAsync("_Alerts")
         @RenderBody()
     </main>

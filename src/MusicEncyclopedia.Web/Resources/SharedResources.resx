@@ -126,9 +126,6 @@
   <data name="Register" xml:space="preserve">
     <value>Register</value>
   </data>
-  <data name="Create a new account" xml:space="preserve">
-    <value>Create a new account</value>
-  </data>
   <data name="sign in to your existing account" xml:space="preserve">
     <value>sign in to your existing account</value>
   </data>

@@ -20,8 +20,8 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" dir="@dir">
     <!-- Page Header -->
     <div class="mb-8">
-        <h1 class="text-3xl md:text-4xl font-bold text-gray-900">@Localizer["Tracks"]</h1>
-        <p class="mt-2 text-gray-600">@Localizer["Browse the complete track catalog"]</p>
+        <h1 class="text-3xl md:text-4xl font-bold text-ink">@Localizer["Tracks"]</h1>
+        <p class="mt-2 text-ink-secondary">@Localizer["Browse the complete track catalog"]</p>
     </div>
 
     <div class="flex flex-col lg:flex-row gap-8">
@@ -29,49 +29,49 @@
              Filter Sidebar
              ============================================================ -->
         <aside class="w-full lg:w-64 flex-shrink-0" role="complementary" aria-label="@Localizer["Filters"]">
-            <form method="get" action="/@culture/tracks" class="space-y-5 bg-white rounded-lg border border-gray-200 p-5 sticky top-4">
+            <form method="get" action="/@culture/tracks" class="space-y-5 bg-surface rounded-lg border border-rule p-5 sticky top-4">
 
                 <!-- Search -->
                 <div>
-                    <label for="search" class="block text-sm font-medium text-gray-700 mb-1">@Localizer["Search"]</label>
+                    <label for="search" class="form-label">@Localizer["Search"]</label>
                     <input type="text"
                            id="search"
                            name="q"
                            value="@Model.CurrentFilters.SearchQuery"
                            placeholder="@Localizer["Search tracks..."]"
-                           class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm px-3 py-2 border" />
+                           class="w-full rounded-md border-rule-strong shadow-sm focus-visible:border-accent focus-visible:ring-accent text-sm px-3 py-2 border" />
                 </div>
 
                 <!-- Genre filter -->
                 <div>
-                    <label for="genre" class="block text-sm font-medium text-gray-700 mb-1">@Localizer["Genre"]</label>
+                    <label for="genre" class="form-label">@Localizer["Genre"]</label>
                     <input type="text"
                            id="genre"
                            name="genre"
                            value="@Model.CurrentFilters.GenreSlug"
                            placeholder="@Localizer["Genre slug..."]"
-                           class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm px-3 py-2 border" />
+                           class="w-full rounded-md border-rule-strong shadow-sm focus-visible:border-accent focus-visible:ring-accent text-sm px-3 py-2 border" />
                 </div>
 
                 <!-- Artist filter -->
                 <div>
-                    <label for="artist" class="block text-sm font-medium text-gray-700 mb-1">@Localizer["Artist"]</label>
+                    <label for="artist" class="form-label">@Localizer["Artist"]</label>
                     <input type="text"
                            id="artist"
                            name="artist"
                            value="@Model.CurrentFilters.ArtistSlug"
                            placeholder="@Localizer["Artist slug..."]"
-                           class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm px-3 py-2 border" />
+                           class="w-full rounded-md border-rule-strong shadow-sm focus-visible:border-accent focus-visible:ring-accent text-sm px-3 py-2 border" />
                 </div>
 
                 <!-- Filter Actions -->
                 <div class="flex gap-2">
                     <button type="submit"
-                            class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                            class="flex-1 bg-accent text-on-accent px-4 py-2 rounded-md text-sm font-medium hover:bg-accent-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2">
                         @Localizer["Apply Filters"]
                     </button>
                     <a href="/@culture/tracks"
-                       class="flex-1 text-center bg-gray-100 text-gray-700 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-200 transition-colors">
+                       class="flex-1 text-center bg-paper-muted text-ink-secondary px-4 py-2 rounded-md text-sm font-medium hover:bg-rule transition-colors">
                         @Localizer["Clear"]
                     </a>
                 </div>
@@ -86,14 +86,14 @@
             {
                 <!-- Empty state -->
                 <div class="text-center py-16">
-                    <svg class="mx-auto h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="mx-auto h-16 w-16 text-ink-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                               d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z" />
                     </svg>
-                    <h3 class="mt-4 text-lg font-medium text-gray-900">@Localizer["No tracks found"]</h3>
-                    <p class="mt-2 text-gray-500">@Localizer["Try adjusting your filters or search query."]</p>
+                    <h3 class="mt-4 text-lg font-medium text-ink">@Localizer["No tracks found"]</h3>
+                    <p class="mt-2 text-ink-muted">@Localizer["Try adjusting your filters or search query."]</p>
                     <a href="/@culture/tracks"
-                       class="mt-4 inline-block text-blue-600 hover:text-blue-800 font-medium">
+                       class="mt-4 inline-block text-accent hover:text-accent-hover font-medium">
                         @Localizer["Clear all filters"]
                     </a>
                 </div>
@@ -101,7 +101,7 @@
             else
             {
                 <!-- Result count -->
-                <p class="text-sm text-gray-500 mb-4">
+                <p class="text-sm text-ink-muted mb-4">
                     @Localizer["Showing {0}–{1} of {2} tracks",
                         ((items.Page - 1) * items.PageSize) + 1,
                         Math.Min(items.Page * items.PageSize, items.TotalItems),
@@ -112,37 +112,37 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
                     @foreach (var track in items.Items)
                     {
-                        <article class="group bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                        <article class="group bg-surface rounded-lg border border-rule overflow-hidden shadow-sm hover:shadow-md transition-shadow">
                             <a href="/@culture/tracks/@track.Slug" class="block p-4">
                                 <!-- Title -->
-                                <h3 class="font-semibold text-gray-900 text-base leading-tight mb-1 line-clamp-2">
+                                <h3 class="font-semibold text-ink text-base leading-tight mb-1 line-clamp-2">
                                     @track.Title
                                 </h3>
 
                                 @if (!string.IsNullOrWhiteSpace(track.OriginalTitle) && track.OriginalTitle != track.Title)
                                 {
-                                    <p class="text-sm text-gray-500 line-clamp-1" dir="auto">@track.OriginalTitle</p>
+                                    <p class="text-sm text-ink-muted line-clamp-1" dir="auto">@track.OriginalTitle</p>
                                 }
 
                                 <!-- Badges row -->
                                 <div class="flex flex-wrap items-center gap-1.5 mt-2">
                                     @if (track.IsInstrumental)
                                     {
-                                        <span class="inline-block bg-purple-100 text-purple-700 text-xs px-2 py-0.5 rounded-full"
+                                        <span class="inline-block bg-info-soft text-info-hover text-xs px-2 py-0.5 rounded-full"
                                               title="@Localizer["Instrumental"]">
                                             @Localizer["Instrumental"]
                                         </span>
                                     }
                                     @if (track.IsExplicit)
                                     {
-                                        <span class="inline-block bg-red-100 text-red-700 text-xs px-2 py-0.5 rounded-full font-bold"
+                                        <span class="inline-block bg-error-soft text-error-hover text-xs px-2 py-0.5 rounded-full font-bold"
                                               title="@Localizer["Explicit"]">
                                             E
                                         </span>
                                     }
                                     @if (!string.IsNullOrWhiteSpace(track.LyricsAvailabilityName) && track.LyricsAvailabilityName != "NONE")
                                     {
-                                        <span class="inline-block @(track.LyricsAvailabilityName == "PUBLIC" ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700") text-xs px-2 py-0.5 rounded-full"
+                                        <span class="inline-block @(track.LyricsAvailabilityName == "PUBLIC" ? "bg-success-soft text-success-hover" : "bg-warning-soft text-warning-hover") text-xs px-2 py-0.5 rounded-full"
                                               title="@Localizer["Lyrics"]">
                                             @if (track.LyricsAvailabilityName == "PUBLIC")
                                             {
@@ -159,7 +159,7 @@
                                 <!-- Duration -->
                                 @if (track.DurationSeconds.HasValue)
                                 {
-                                    <p class="text-sm text-gray-500 mt-2 tabular-nums">
+                                    <p class="text-sm text-ink-muted mt-2 tabular-nums">
                                         @TimeSpan.FromSeconds(track.DurationSeconds.Value).ToString(@"m\:ss")
                                     </p>
                                 }
@@ -170,13 +170,13 @@
                                     <div class="flex flex-wrap gap-1 mt-2">
                                         @foreach (var genre in track.Genres.Take(3))
                                         {
-                                            <span class="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-0.5 rounded-full">
+                                            <span class="inline-block bg-paper-muted text-ink-secondary text-xs px-2 py-0.5 rounded-full">
                                                 @genre.Name
                                             </span>
                                         }
                                         @if (track.Genres.Count > 3)
                                         {
-                                            <span class="text-xs text-gray-400">+@(track.Genres.Count - 3)</span>
+                                            <span class="text-xs text-ink-muted">+@(track.Genres.Count - 3)</span>
                                         }
                                     </div>
                                 }
@@ -187,13 +187,13 @@
                                     <div class="flex flex-wrap gap-1 mt-1">
                                         @foreach (var mood in track.Moods.Take(2))
                                         {
-                                            <span class="inline-block bg-indigo-50 text-indigo-700 text-xs px-2 py-0.5 rounded-full">
+                                            <span class="inline-block bg-info-soft text-info-hover text-xs px-2 py-0.5 rounded-full">
                                                 @mood.Name
                                             </span>
                                         }
                                         @if (track.Moods.Count > 2)
                                         {
-                                            <span class="text-xs text-gray-400">+@(track.Moods.Count - 2)</span>
+                                            <span class="text-xs text-ink-muted">+@(track.Moods.Count - 2)</span>
                                         }
                                     </div>
                                 }
@@ -208,7 +208,7 @@
                                 }
                                 @if (releaseYear > 0)
                                 {
-                                    <p class="text-xs text-gray-400 mt-2">@releaseYear</p>
+                                    <p class="text-xs text-ink-muted mt-2">@releaseYear</p>
                                 }
                             </a>
                         </article>
@@ -224,14 +224,14 @@
                         @if (items.Page > 1)
                         {
                             <a href="@GetPageUrl(items.Page - 1)"
-                               class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                               class="px-3 py-2 text-sm font-medium text-ink-secondary bg-surface border border-rule-strong rounded-md hover:bg-paper transition-colors"
                                rel="prev">
                                 @Localizer["Previous"]
                             </a>
                         }
                         else
                         {
-                            <span class="px-3 py-2 text-sm font-medium text-gray-400 bg-gray-50 border border-gray-200 rounded-md cursor-not-allowed">
+                            <span class="px-3 py-2 text-sm font-medium text-ink-muted bg-paper border border-rule rounded-md cursor-not-allowed">
                                 @Localizer["Previous"]
                             </span>
                         }
@@ -241,22 +241,22 @@
                             var endPage = Math.Min(items.TotalPages, items.Page + 2);
                             if (startPage > 1)
                             {
-                                <a href="@GetPageUrl(1)" class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">1</a>
+                                <a href="@GetPageUrl(1)" class="px-3 py-2 text-sm font-medium text-ink-secondary bg-surface border border-rule-strong rounded-md hover:bg-paper">1</a>
                                 if (startPage > 2)
                                 {
-                                    <span class="px-2 py-2 text-sm text-gray-400">...</span>
+                                    <span class="px-2 py-2 text-sm text-ink-muted">...</span>
                                 }
                             }
                             for (var p = startPage; p <= endPage; p++)
                             {
                                 if (p == items.Page)
                                 {
-                                    <span class="px-3 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-md">@p</span>
+                                    <span class="px-3 py-2 text-sm font-medium text-on-accent bg-accent border border-accent rounded-md">@p</span>
                                 }
                                 else
                                 {
                                     <a href="@GetPageUrl(p)"
-                                       class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                                       class="px-3 py-2 text-sm font-medium text-ink-secondary bg-surface border border-rule-strong rounded-md hover:bg-paper">
                                         @p
                                     </a>
                                 }
@@ -265,10 +265,10 @@
                             {
                                 if (endPage < items.TotalPages - 1)
                                 {
-                                    <span class="px-2 py-2 text-sm text-gray-400">...</span>
+                                    <span class="px-2 py-2 text-sm text-ink-muted">...</span>
                                 }
                                 <a href="@GetPageUrl(items.TotalPages)"
-                                   class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                                   class="px-3 py-2 text-sm font-medium text-ink-secondary bg-surface border border-rule-strong rounded-md hover:bg-paper">
                                     @items.TotalPages
                                 </a>
                             }
@@ -277,14 +277,14 @@
                         @if (items.Page < items.TotalPages)
                         {
                             <a href="@GetPageUrl(items.Page + 1)"
-                               class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                               class="px-3 py-2 text-sm font-medium text-ink-secondary bg-surface border border-rule-strong rounded-md hover:bg-paper transition-colors"
                                rel="next">
                                 @Localizer["Next"]
                             </a>
                         }
                         else
                         {
-                            <span class="px-3 py-2 text-sm font-medium text-gray-400 bg-gray-50 border border-gray-200 rounded-md cursor-not-allowed">
+                            <span class="px-3 py-2 text-sm font-medium text-ink-muted bg-paper border border-rule rounded-md cursor-not-allowed">
                                 @Localizer["Next"]
                             </span>
                         }

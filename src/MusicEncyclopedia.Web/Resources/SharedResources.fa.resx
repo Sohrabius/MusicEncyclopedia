@@ -81,9 +81,6 @@
   <data name="Register" xml:space="preserve">
     <value>ثبت‌نام</value>
   </data>
-  <data name="Create a new account" xml:space="preserve">
-    <value>ایجاد حساب جدید</value>
-  </data>
   <data name="sign in to your existing account" xml:space="preserve">
     <value>ورود به حساب کاربری موجود</value>
   </data>

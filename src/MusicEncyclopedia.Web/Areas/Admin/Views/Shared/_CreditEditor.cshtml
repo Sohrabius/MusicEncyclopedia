@@ -6,31 +6,31 @@
 
 <div class="credit-editor" data-entity-type-id="@Model.EntityTypeId" data-entity-id="@Model.EntityId">
     <div class="flex items-center justify-between mb-3">
-        <h3 class="text-sm font-semibold text-gray-700">عوامل</h3>
-        <button type="button" class="btn-add-credit px-3 py-1.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-            <i class="fas fa-plus"></i> افزودن Credit
+        <h3 class="text-sm font-semibold text-ink-secondary">عوامل</h3>
+        <button type="button" class="btn-add-credit px-3 py-1.5 text-xs bg-accent text-on-accent rounded-md hover:bg-accent-hover transition-colors">
+            <i aria-hidden="true" class="fas fa-plus"></i> افزودن Credit
         </button>
     </div>
 
-    <div class="overflow-x-auto">
-        <table class="w-full text-sm">
-            <thead class="bg-gray-50 border-b border-gray-200">
+    <div class="admin-table-wrap">
+        <table class="admin-table">
+            <thead class="bg-paper border-b border-rule">
                 <tr>
-                    <th class="text-start px-3 py-2 font-medium text-gray-600">نقش</th>
-                    <th class="text-start px-3 py-2 font-medium text-gray-600">حوزه</th>
-                    <th class="text-start px-3 py-2 font-medium text-gray-600">شخص</th>
-                    <th class="text-start px-3 py-2 font-medium text-gray-600">شرکت</th>
-                    <th class="text-start px-3 py-2 font-medium text-gray-600">ساز</th>
-                    <th class="text-center px-3 py-2 font-medium text-gray-600">ترتیب</th>
-                    <th class="text-center px-3 py-2 font-medium text-gray-600">اصلی</th>
-                    <th class="text-end px-3 py-2 font-medium text-gray-600">عملیات</th>
+                    <th class="text-start px-3 py-2 font-medium text-ink-secondary">نقش</th>
+                    <th class="text-start px-3 py-2 font-medium text-ink-secondary">حوزه</th>
+                    <th class="text-start px-3 py-2 font-medium text-ink-secondary">شخص</th>
+                    <th class="text-start px-3 py-2 font-medium text-ink-secondary">شرکت</th>
+                    <th class="text-start px-3 py-2 font-medium text-ink-secondary">ساز</th>
+                    <th class="text-center px-3 py-2 font-medium text-ink-secondary">ترتیب</th>
+                    <th class="text-center px-3 py-2 font-medium text-ink-secondary">اصلی</th>
+                    <th class="text-end px-3 py-2 font-medium text-ink-secondary">عملیات</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100">
+            <tbody class="divide-y divide-rule-light">
                 @if (Model.Credits.Count == 0)
                 {
                     <tr class="empty-row">
-                        <td colspan="8" class="px-3 py-6 text-center text-gray-500 text-xs">
+                        <td colspan="8" class="ui-state ui-state--empty text-xs">
                             هیچ credits هنوز. Click "افزودن Credit" to add one.
                         </td>
                     </tr>
@@ -46,10 +46,10 @@
                             <td class="px-3 py-2">@credit.CompanyId</td>
                             <td class="px-3 py-2">@credit.InstrumentId</td>
                             <td class="px-3 py-2 text-center">@credit.DisplayOrder</td>
-                            <td class="px-3 py-2 text-center">@if(credit.IsPrimary){<i class="fas fa-check text-green-500"></i>}</td>
+                            <td class="px-3 py-2 text-center">@if(credit.IsPrimary){<i aria-hidden="true" class="fas fa-check text-success"></i>}</td>
                             <td class="px-3 py-2 text-end">
-                                <button type="button" class="btn-edit-credit text-blue-600 hover:text-blue-800 text-xs me-2"><i class="fas fa-edit"></i></button>
-                                <button type="button" class="btn-delete-credit text-red-600 hover:text-red-800 text-xs"><i class="fas fa-trash-alt"></i></button>
+                                <button type="button" class="btn-edit-credit text-accent hover:text-accent-hover text-xs me-2 min-w-11 min-h-11 inline-flex items-center justify-center" aria-label="ویرایش"><i aria-hidden="true" class="fas fa-edit"></i></button>
+                                <button type="button" class="btn-delete-credit text-error hover:text-error-hover text-xs min-w-11 min-h-11 inline-flex items-center justify-center" aria-label="حذف"><i aria-hidden="true" class="fas fa-trash-alt"></i></button>
                             </td>
                         </tr>
                     }
@@ -59,12 +59,12 @@
     </div>
 
     <!-- Inline edit form (hidden, shown on add/edit) -->
-    <div class="credit-form hidden mt-3 p-3 bg-gray-50 rounded-md border border-gray-200">
+    <div class="credit-form admin-inline-form hidden mt-3 p-3 bg-paper rounded-md border border-rule">
         <input type="hidden" class="credit-id" value="0" />
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
             <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">نقش</label>
-                <select class="credit-role-id w-full text-xs px-2 py-1.5 border border-gray-300 rounded">
+                <label class="block text-xs font-medium text-ink-secondary mb-1">نقش</label>
+                <select class="credit-role-id w-full text-xs px-2 py-1.5 border border-rule-strong rounded">
                     <option value="">-- انتخاب --</option>
                     @foreach (var role in Model.CreditRoles)
                     {
@@ -73,8 +73,8 @@
                 </select>
             </div>
             <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">حوزه</label>
-                <select class="role-scope-type-id w-full text-xs px-2 py-1.5 border border-gray-300 rounded">
+                <label class="block text-xs font-medium text-ink-secondary mb-1">حوزه</label>
+                <select class="role-scope-type-id w-full text-xs px-2 py-1.5 border border-rule-strong rounded">
                     <option value="">-- انتخاب --</option>
                     @foreach (var scope in Model.RoleScopeTypes)
                     {
@@ -83,8 +83,8 @@
                 </select>
             </div>
             <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">شخص</label>
-                <select class="person-id w-full text-xs px-2 py-1.5 border border-gray-300 rounded">
+                <label class="block text-xs font-medium text-ink-secondary mb-1">شخص</label>
+                <select class="person-id w-full text-xs px-2 py-1.5 border border-rule-strong rounded">
                     <option value="">-- انتخاب --</option>
                     @foreach (var person in Model.People)
                     {
@@ -93,8 +93,8 @@
                 </select>
             </div>
             <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">شرکت</label>
-                <select class="company-id w-full text-xs px-2 py-1.5 border border-gray-300 rounded">
+                <label class="block text-xs font-medium text-ink-secondary mb-1">شرکت</label>
+                <select class="company-id w-full text-xs px-2 py-1.5 border border-rule-strong rounded">
                     <option value="">-- انتخاب --</option>
                     @foreach (var company in Model.Companies)
                     {
@@ -103,8 +103,8 @@
                 </select>
             </div>
             <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">ساز</label>
-                <select class="instrument-id w-full text-xs px-2 py-1.5 border border-gray-300 rounded">
+                <label class="block text-xs font-medium text-ink-secondary mb-1">ساز</label>
+                <select class="instrument-id w-full text-xs px-2 py-1.5 border border-rule-strong rounded">
                     <option value="">-- انتخاب --</option>
                     @foreach (var inst in Model.Instruments)
                     {
@@ -113,23 +113,23 @@
                 </select>
             </div>
             <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">ترتیب نمایش</label>
-                <input type="number" class="display-order w-full text-xs px-2 py-1.5 border border-gray-300 rounded" value="0" />
+                <label class="block text-xs font-medium text-ink-secondary mb-1">ترتیب نمایش</label>
+                <input type="number" class="display-order w-full text-xs px-2 py-1.5 border border-rule-strong rounded" value="0" />
             </div>
             <div class="flex items-end pb-1">
                 <label class="inline-flex items-center gap-1 cursor-pointer">
-                    <input type="checkbox" class="is-primary rounded border-gray-300 text-blue-600" />
-                    <span class="text-xs text-gray-600">اصلی</span>
+                    <input type="checkbox" class="is-primary rounded border-rule-strong text-accent" />
+                    <span class="text-xs text-ink-secondary">اصلی</span>
                 </label>
             </div>
         </div>
         <div class="mt-2">
-            <label class="block text-xs font-medium text-gray-600 mb-1">یادداشت‌ها</label>
-            <input type="text" class="notes w-full text-xs px-2 py-1.5 border border-gray-300 rounded" />
+            <label class="block text-xs font-medium text-ink-secondary mb-1">یادداشت‌ها</label>
+            <input type="text" class="notes w-full text-xs px-2 py-1.5 border border-rule-strong rounded" />
         </div>
         <div class="flex items-center gap-2 mt-3">
-            <button type="button" class="btn-save-credit px-3 py-1.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700">ذخیره</button>
-            <button type="button" class="btn-cancel-credit px-3 py-1.5 text-xs text-gray-600 bg-gray-200 rounded-md hover:bg-gray-300">انصراف</button>
+            <button type="button" class="btn-save-credit px-3 py-1.5 text-xs bg-accent text-on-accent rounded-md hover:bg-accent-hover">ذخیره</button>
+            <button type="button" class="btn-cancel-credit px-3 py-1.5 text-xs text-ink-secondary bg-rule rounded-md hover:bg-rule-strong">انصراف</button>
         </div>
     </div>
 </div>

@@ -4,45 +4,45 @@
     ViewData["ActiveMenu"] = "Roles";
 }
 
-<div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
+<div class="bg-surface rounded-lg shadow-sm border border-rule p-4 mb-6">
     <div class="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
-        <p class="text-sm text-gray-500">تعریف نقش‌ها و مجوزهای اعطاشده به هر نقش. کاربران مجوزهای نقش را هنگام ورود به ارث می‌برند.</p>
-        <a href="/admin/roles/Create" class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 transition-colors"><i class="fas fa-plus"></i> <span>ایجاد نقش</span></a>
+        <p class="text-sm text-ink-muted">تعریف نقش‌ها و مجوزهای اعطاشده به هر نقش. کاربران مجوزهای نقش را هنگام ورود به ارث می‌برند.</p>
+        <a href="/admin/roles/Create" class="inline-flex items-center gap-2 px-4 py-2 bg-success text-on-accent text-sm rounded-md hover:bg-success-hover transition-colors"><i aria-hidden="true" class="fas fa-plus"></i> <span>ایجاد نقش</span></a>
     </div>
 </div>
 
-<div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+<div class="bg-surface rounded-lg shadow-sm border border-rule overflow-hidden">
     <div class="overflow-x-auto">
         <table class="w-full text-sm">
-            <thead class="bg-gray-50 border-b border-gray-200">
+            <thead class="bg-paper border-b border-rule">
                 <tr>
-                    <th class="text-start px-4 py-3 font-medium text-gray-600">نام</th>
-                    <th class="text-center px-4 py-3 font-medium text-gray-600">کاربران</th>
-                    <th class="text-center px-4 py-3 font-medium text-gray-600">دسترسی‌ها</th>
-                    <th class="text-end px-4 py-3 font-medium text-gray-600">عملیات</th>
+                    <th class="text-start px-4 py-3 font-medium text-ink-secondary">نام</th>
+                    <th class="text-center px-4 py-3 font-medium text-ink-secondary">کاربران</th>
+                    <th class="text-center px-4 py-3 font-medium text-ink-secondary">دسترسی‌ها</th>
+                    <th class="text-end px-4 py-3 font-medium text-ink-secondary">عملیات</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100">
+            <tbody class="divide-y divide-rule-light">
                 @if (Model.Items.Count == 0)
                 {
-                    <tr><td colspan="4" class="px-4 py-8 text-center text-gray-500"><i class="fas fa-shield-alt text-3xl text-gray-300 mb-2 block"></i>هنوز نقشی وجود ندارد. <a href="/admin/roles/Create" class="text-blue-600 hover:underline">ایجاد کنید</a>.</td></tr>
+                    <tr><td colspan="4" class="ui-state ui-state--empty"><i aria-hidden="true" class="fas fa-shield-alt text-3xl text-ink-disabled mb-2 block"></i>هنوز نقشی وجود ندارد. <a href="/admin/roles/Create" class="text-accent hover:underline">ایجاد کنید</a>.</td></tr>
                 }
                 else
                 {
                     @foreach (var item in Model.Items)
                     {
-                        <tr class="hover:bg-gray-50 transition-colors">
+                        <tr class="hover:bg-paper transition-colors">
                             <td class="px-4 py-3">
-                                <a href="/admin/roles/@item.Id/Edit" class="text-blue-600 hover:underline font-medium">@item.Name</a>
-                                @if (string.Equals(item.Name, "Administrator", StringComparison.OrdinalIgnoreCase)) { <span class="ms-2 inline-block px-2 py-0.5 text-xs rounded-full bg-purple-50 text-purple-700">محافظت‌شده</span> }
+                                <a href="/admin/roles/@item.Id/Edit" class="text-accent hover:underline font-medium">@item.Name</a>
+                                @if (string.Equals(item.Name, "Administrator", StringComparison.OrdinalIgnoreCase)) { <span class="ms-2 inline-block px-2 py-0.5 text-xs rounded-full bg-info-soft text-info-hover">محافظت‌شده</span> }
                             </td>
                             <td class="px-4 py-3 text-center">@item.UserCount</td>
                             <td class="px-4 py-3 text-center">@item.PermissionCount</td>
                             <td class="px-4 py-3 text-end">
-                                <a href="/admin/roles/@item.Id/Edit" class="inline-flex items-center gap-1 px-2 py-1 text-xs text-blue-600 hover:bg-blue-50 rounded"><i class="fas fa-edit"></i> ویرایش</a>
+                                <a href="/admin/roles/@item.Id/Edit" class="inline-flex items-center gap-1 px-2 py-1 text-xs text-accent hover:bg-accent-soft rounded"><i aria-hidden="true" class="fas fa-edit"></i> ویرایش</a>
                                 @if (!string.Equals(item.Name, "Administrator", StringComparison.OrdinalIgnoreCase))
                                 {
-                                    <form method="post" action="/admin/roles/@item.Id/Delete" onsubmit="return confirm('Are you sure you want to delete this role?');" class="inline">@Html.AntiForgeryToken()<button type="submit" class="inline-flex items-center gap-1 px-2 py-1 text-xs text-red-600 hover:bg-red-50 rounded"><i class="fas fa-trash-alt"></i> حذف</button></form>
+                                    <form method="post" action="/admin/roles/@item.Id/Delete" onsubmit="return confirm('Are you sure you want to delete this role?');" class="inline">@Html.AntiForgeryToken()<button type="submit" class="inline-flex items-center gap-1 px-2 py-1 text-xs text-error hover:bg-error-soft rounded"><i aria-hidden="true" class="fas fa-trash-alt"></i> حذف</button></form>
                                 }
                             </td>
                         </tr>

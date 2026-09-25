@@ -72,9 +72,9 @@
     function initBackToTop() {
         var btn = document.createElement('button');
         btn.innerHTML = '<svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>';
-        btn.setAttribute('aria-label', 'Back to top');
+        btn.setAttribute('aria-label', 'بازگشت به بالای صفحه');
         btn.className = 'no-print';
-        btn.style.cssText = 'position:fixed;bottom:1.5rem;inset-inline-end:1.5rem;width:36px;height:36px;border-radius:8px;background:var(--color-ink);color:var(--color-accent-ink);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px oklch(20% 0.01 60 / 0.1);opacity:0;visibility:hidden;transition:opacity 220ms ease,visibility 220ms ease;z-index:50;';
+        btn.style.cssText = 'position:fixed;bottom:1.5rem;inset-inline-end:1.5rem;width:44px;height:44px;border-radius:8px;background:var(--color-ink);color:var(--color-accent-ink);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px oklch(20% 0.01 60 / 0.1);opacity:0;visibility:hidden;transition:opacity 220ms ease,visibility 220ms ease;z-index:50;';
         document.body.appendChild(btn);
 
         window.addEventListener('scroll', function () {
@@ -88,7 +88,8 @@
         });
 
         btn.addEventListener('click', function () {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
         });
     }
 
@@ -101,6 +102,8 @@
         var toggle = document.querySelector('.nav__toggle');
         if (mobile) {
             mobile.classList.toggle('is-open', open);
+            mobile.setAttribute('aria-hidden', open ? 'false' : 'true');
+            mobile.inert = !open;
         }
         if (toggle) {
             toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
@@ -113,13 +116,19 @@
         if (!toggle || !mobile) return;
 
         toggle.addEventListener('click', function () {
-            setMobileNav(!mobile.classList.contains('is-open'));
+            var open = !mobile.classList.contains('is-open');
+            setMobileNav(open);
+            if (open) {
+                var firstControl = mobile.querySelector('button, a');
+                if (firstControl) firstControl.focus();
+            }
         });
 
         var close = document.querySelector('.nav__mobile-close');
         if (close) {
             close.addEventListener('click', function () {
                 setMobileNav(false);
+                toggle.focus();
             });
         }
 
@@ -127,6 +136,7 @@
         mobile.querySelectorAll('a').forEach(function (link) {
             link.addEventListener('click', function () {
                 setMobileNav(false);
+                toggle.focus();
             });
         });
 
@@ -134,12 +144,26 @@
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape' && mobile.classList.contains('is-open')) {
                 setMobileNav(false);
+                toggle.focus();
+            }
+            if (e.key === 'Tab' && mobile.classList.contains('is-open')) {
+                var focusable = Array.from(mobile.querySelectorAll('button, a'));
+                var first = focusable[0];
+                var last = focusable[focusable.length - 1];
+                if (e.shiftKey && document.activeElement === first) {
+                    e.preventDefault();
+                    last.focus();
+                } else if (!e.shiftKey && document.activeElement === last) {
+                    e.preventDefault();
+                    first.focus();
+                }
             }
         });
 
         mobile.addEventListener('click', function (e) {
             if (e.target === mobile) {
                 setMobileNav(false);
+                toggle.focus();
             }
         });
     }

@@ -11,20 +11,20 @@
 
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" dir="@dir">
     <div class="mb-8">
-        <h1 class="text-3xl md:text-4xl font-bold text-gray-900">@Localizer["Locations"]</h1>
-        <p class="mt-2 text-gray-600">@Localizer["Browse locations"]</p>
+        <h1 class="text-3xl md:text-4xl font-bold text-ink">@Localizer["Locations"]</h1>
+        <p class="mt-2 text-ink-secondary">@Localizer["Browse locations"]</p>
     </div>
 
     @if (items.Items.Count == 0)
     {
         <div class="text-center py-16">
-            <i class="fas fa-map-marker-alt text-5xl text-gray-300 mb-4 block"></i>
-            <h3 class="text-lg font-medium text-gray-900">@Localizer["No locations found"]</h3>
+            <i aria-hidden="true" class="fas fa-map-marker-alt text-5xl text-ink-disabled mb-4 block"></i>
+            <h3 class="text-lg font-medium text-ink">@Localizer["No locations found"]</h3>
         </div>
     }
     else
     {
-        <p class="text-sm text-gray-500 mb-4">
+        <p class="text-sm text-ink-muted mb-4">
             @Localizer["Showing {0}–{1} of {2} locations",
                 ((items.Page - 1) * items.PageSize) + 1,
                 Math.Min(items.Page * items.PageSize, items.TotalItems),
@@ -33,22 +33,22 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @foreach (var location in items.Items)
             {
-                <article class="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                <article class="bg-surface rounded-lg border border-rule overflow-hidden shadow-sm hover:shadow-md transition-shadow">
                     <a href="/@culture/locations/@location.Slug" class="block p-5">
-                        <h3 class="font-semibold text-gray-900 text-lg">@location.Name</h3>
+                        <h3 class="font-semibold text-ink text-lg">@location.Name</h3>
                         <div class="flex flex-wrap gap-2 mt-2">
                             @if (!string.IsNullOrWhiteSpace(location.LocationTypeName))
                             {
-                                <span class="inline-block bg-green-100 text-green-800 text-xs font-medium px-2 py-0.5 rounded-full">@location.LocationTypeName</span>
+                                <span class="inline-block bg-success-soft text-success-hover text-xs font-medium px-2 py-0.5 rounded-full">@location.LocationTypeName</span>
                             }
                             @if (!string.IsNullOrWhiteSpace(location.CountryName))
                             {
-                                <span class="text-xs text-gray-500"><i class="fas fa-globe text-gray-400 me-1"></i>@location.CountryName</span>
+                                <span class="text-xs text-ink-muted"><i aria-hidden="true" class="fas fa-globe text-ink-muted me-1"></i>@location.CountryName</span>
                             }
                         </div>
                         @if (!string.IsNullOrWhiteSpace(location.ParentLocationName))
                         {
-                            <p class="text-sm text-gray-500 mt-1">@location.ParentLocationName</p>
+                            <p class="text-sm text-ink-muted mt-1">@location.ParentLocationName</p>
                         }
                     </a>
                 </article>
@@ -59,12 +59,12 @@
             <nav class="mt-10 flex items-center justify-center gap-1">
                 @if (items.Page > 1)
                 {
-                    <a href="/@culture/locations?page=@(items.Page - 1)" class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50" rel="prev">@Localizer["Previous"]</a>
+                    <a href="/@culture/locations?page=@(items.Page - 1)" class="px-3 py-2 text-sm font-medium text-ink-secondary bg-surface border border-rule-strong rounded-md hover:bg-paper" rel="prev">@Localizer["Previous"]</a>
                 }
-                <span class="px-3 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-md">@items.Page</span>
+                <span class="px-3 py-2 text-sm font-medium text-on-accent bg-accent border border-accent rounded-md">@items.Page</span>
                 @if (items.Page < items.TotalPages)
                 {
-                    <a href="/@culture/locations?page=@(items.Page + 1)" class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50" rel="next">@Localizer["Next"]</a>
+                    <a href="/@culture/locations?page=@(items.Page + 1)" class="px-3 py-2 text-sm font-medium text-ink-secondary bg-surface border border-rule-strong rounded-md hover:bg-paper" rel="next">@Localizer["Next"]</a>
                 }
             </nav>
         }

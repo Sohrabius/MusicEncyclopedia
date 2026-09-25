@@ -6,46 +6,46 @@
 
 <div class="album-tracklist-editor" id="@editorId" data-album-id="@Model.AlbumId">
     <div class="flex items-center justify-between mb-3">
-        <h3 class="text-sm font-semibold text-gray-700">فهرست ترک‌ها</h3>
-        <span class="tl-count text-xs text-gray-500">@Model.Rows.Count tracks</span>
+        <h3 class="text-sm font-semibold text-ink-secondary">فهرست ترک‌ها</h3>
+        <span class="tl-count text-xs text-ink-muted">@Model.Rows.Count tracks</span>
     </div>
 
     @if (Model.Rows.Count == 0)
     {
-        <p class="tl-empty text-xs text-gray-500 mb-3">
-            <i class="fas fa-info-circle text-blue-400 me-1"></i>
+        <p class="tl-empty text-xs text-ink-muted mb-3">
+            <i aria-hidden="true" class="fas fa-info-circle text-accent me-1"></i>
             هیچ tracks on this album هنوز. افزودن an existing track or create a new one inline.
         </p>
     }
 
-    <div class="overflow-x-auto mb-3">
-        <table class="w-full text-sm">
-            <thead class="bg-gray-50 border-b border-gray-200">
+    <div class="admin-table-wrap mb-3">
+        <table class="admin-table">
+            <thead class="bg-paper border-b border-rule">
                 <tr>
-                    <th class="text-start px-2 py-2 font-medium text-gray-600 w-8"></th>
-                    <th class="text-start px-2 py-2 font-medium text-gray-600 w-16">دیسک</th>
-                    <th class="text-start px-2 py-2 font-medium text-gray-600 w-16">#</th>
-                    <th class="text-start px-2 py-2 font-medium text-gray-600">ترک</th>
-                    <th class="text-start px-2 py-2 font-medium text-gray-600 w-24">عنوان جایگزین</th>
-                    <th class="text-start px-2 py-2 font-medium text-gray-600 w-20">مدت (ثانیه)</th>
-                    <th class="text-center px-2 py-2 font-medium text-gray-600 w-16">آهنگ جایزه</th>
-                    <th class="text-end px-2 py-2 font-medium text-gray-600 w-32">عملیات</th>
+                    <th class="text-start px-2 py-2 font-medium text-ink-secondary w-8"></th>
+                    <th class="text-start px-2 py-2 font-medium text-ink-secondary w-16">دیسک</th>
+                    <th class="text-start px-2 py-2 font-medium text-ink-secondary w-16">#</th>
+                    <th class="text-start px-2 py-2 font-medium text-ink-secondary">ترک</th>
+                    <th class="text-start px-2 py-2 font-medium text-ink-secondary w-24">عنوان جایگزین</th>
+                    <th class="text-start px-2 py-2 font-medium text-ink-secondary w-20">مدت (ثانیه)</th>
+                    <th class="text-center px-2 py-2 font-medium text-ink-secondary w-16">آهنگ جایزه</th>
+                    <th class="text-end px-2 py-2 font-medium text-ink-secondary w-32">عملیات</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100">
+            <tbody class="divide-y divide-rule-light">
                 @foreach (var row in Model.Rows)
                 {
                     <tr data-album-track-id="@row.AlbumTrackId">
-                        <td class="px-2 py-2 text-gray-400">
-                            <button type="button" class="tl-move-up hover:text-blue-600 me-1" title="Move up" data-id="@row.AlbumTrackId"><i class="fas fa-chevron-up text-xs"></i></button>
-                            <button type="button" class="tl-move-down hover:text-blue-600" title="Move down" data-id="@row.AlbumTrackId"><i class="fas fa-chevron-down text-xs"></i></button>
+                        <td class="px-2 py-2 text-ink-muted">
+                            <button type="button" class="tl-move-up hover:text-accent me-1 min-w-11 min-h-11 inline-flex items-center justify-center" title="Move up" data-id="@row.AlbumTrackId"><i aria-hidden="true" class="fas fa-chevron-up text-xs"></i></button>
+                            <button type="button" class="tl-move-down hover:text-accent min-w-11 min-h-11 inline-flex items-center justify-center" title="Move down" data-id="@row.AlbumTrackId"><i aria-hidden="true" class="fas fa-chevron-down text-xs"></i></button>
                         </td>
-                        <td class="px-2 py-2"><input type="number" class="tl-disc w-14 text-xs px-1.5 py-1 border border-gray-300 rounded" value="@row.DiscNumber" /></td>
-                        <td class="px-2 py-2"><input type="number" class="tl-track-no w-14 text-xs px-1.5 py-1 border border-gray-300 rounded" value="@row.TrackNumber" /></td>
-                        <td class="px-2 py-2 text-gray-800">
+                        <td class="px-2 py-2"><input type="number" class="tl-disc w-14 text-xs px-1.5 py-1 border border-rule-strong rounded" value="@row.DiscNumber" /></td>
+                        <td class="px-2 py-2"><input type="number" class="tl-track-no w-14 text-xs px-1.5 py-1 border border-rule-strong rounded" value="@row.TrackNumber" /></td>
+                        <td class="px-2 py-2 text-ink">
                             @if (!string.IsNullOrWhiteSpace(row.TitleOverride))
                             {
-                                <span class="line-through text-gray-400">@row.TrackTitle</span>
+                                <span class="line-through text-ink-muted">@row.TrackTitle</span>
                                 <span class="ms-1">@row.TitleOverride</span>
                             }
                             else
@@ -53,14 +53,14 @@
                                 @row.TrackTitle
                             }
                         </td>
-                        <td class="px-2 py-2"><input type="text" class="tl-title-override w-full text-xs px-1.5 py-1 border border-gray-300 rounded" value="@row.TitleOverride" placeholder="override" /></td>
-                        <td class="px-2 py-2"><input type="number" class="tl-duration w-16 text-xs px-1.5 py-1 border border-gray-300 rounded" value="@row.DurationOverrideSeconds" /></td>
+                        <td class="px-2 py-2"><input type="text" class="tl-title-override w-full text-xs px-1.5 py-1 border border-rule-strong rounded" value="@row.TitleOverride" placeholder="override" /></td>
+                        <td class="px-2 py-2"><input type="number" class="tl-duration w-16 text-xs px-1.5 py-1 border border-rule-strong rounded" value="@row.DurationOverrideSeconds" /></td>
                         <td class="px-2 py-2 text-center">
-                            <input type="checkbox" class="tl-bonus rounded border-gray-300 text-blue-600" @(row.IsBonus ? "checked" : "") />
+                            <input type="checkbox" class="tl-bonus rounded border-rule-strong text-accent" @(row.IsBonus ? "checked" : "") />
                         </td>
                         <td class="px-2 py-2 text-end">
-                            <button type="button" class="tl-save text-blue-600 hover:text-blue-800 text-xs me-2" data-id="@row.AlbumTrackId"><i class="fas fa-save"></i></button>
-                            <button type="button" class="tl-remove text-red-600 hover:text-red-800 text-xs" data-id="@row.AlbumTrackId"><i class="fas fa-trash-alt"></i></button>
+                            <button type="button" class="tl-save text-accent hover:text-accent-hover text-xs me-2 min-w-11 min-h-11 inline-flex items-center justify-center" data-id="@row.AlbumTrackId" aria-label="ذخیره"><i aria-hidden="true" class="fas fa-save"></i></button>
+                            <button type="button" class="tl-remove text-error hover:text-error-hover text-xs min-w-11 min-h-11 inline-flex items-center justify-center" data-id="@row.AlbumTrackId" aria-label="حذف"><i aria-hidden="true" class="fas fa-trash-alt"></i></button>
                         </td>
                     </tr>
                 }
@@ -71,8 +71,8 @@
     <!-- Add existing track -->
     <div class="flex flex-wrap items-end gap-2 mb-2">
         <div class="flex-1 min-w-[200px]">
-            <label class="block text-xs font-medium text-gray-600 mb-1">افزودن ترک موجود</label>
-            <select class="tl-track-option w-full text-xs px-2 py-1.5 border border-gray-300 rounded">
+            <label class="block text-xs font-medium text-ink-secondary mb-1">افزودن ترک موجود</label>
+            <select class="tl-track-option w-full text-xs px-2 py-1.5 border border-rule-strong rounded">
                 <option value="">-- انتخاب ترک --</option>
                 @foreach (var option in Model.AvailableTracks)
                 {
@@ -81,46 +81,46 @@
             </select>
         </div>
         <div class="w-20">
-            <label class="block text-xs font-medium text-gray-600 mb-1">دیسک</label>
-            <input type="number" class="tl-new-disc w-full text-xs px-2 py-1.5 border border-gray-300 rounded" value="1" />
+            <label class="block text-xs font-medium text-ink-secondary mb-1">دیسک</label>
+            <input type="number" class="tl-new-disc w-full text-xs px-2 py-1.5 border border-rule-strong rounded" value="1" />
         </div>
         <div class="w-20">
-            <label class="block text-xs font-medium text-gray-600 mb-1">#</label>
-            <input type="number" class="tl-new-no w-full text-xs px-2 py-1.5 border border-gray-300 rounded" value="0" placeholder="auto" />
+            <label class="block text-xs font-medium text-ink-secondary mb-1">#</label>
+            <input type="number" class="tl-new-no w-full text-xs px-2 py-1.5 border border-rule-strong rounded" value="0" placeholder="auto" />
         </div>
-        <button type="button" class="tl-add-existing px-3 py-1.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-            <i class="fas fa-plus"></i> افزودن
+        <button type="button" class="tl-add-existing px-3 py-1.5 text-xs bg-accent text-on-accent rounded-md hover:bg-accent-hover transition-colors">
+            <i aria-hidden="true" class="fas fa-plus"></i> افزودن
         </button>
     </div>
 
     <!-- Create inline -->
     <details class="tl-create-inline mb-2">
-        <summary class="cursor-pointer text-xs text-blue-600 hover:text-blue-800">+ ایجاد ترک جدید درجا</summary>
+        <summary class="cursor-pointer text-xs text-accent hover:text-accent-hover">+ ایجاد ترک جدید درجا</summary>
         <div class="flex flex-wrap items-end gap-2 mt-2">
             <div class="flex-1 min-w-[200px]">
-                <label class="block text-xs font-medium text-gray-600 mb-1">عنوان</label>
-                <input type="text" class="tl-new-title w-full text-xs px-2 py-1.5 border border-gray-300 rounded" />
+                <label class="block text-xs font-medium text-ink-secondary mb-1">عنوان</label>
+                <input type="text" class="tl-new-title w-full text-xs px-2 py-1.5 border border-rule-strong rounded" />
             </div>
             <div class="w-20">
-                <label class="block text-xs font-medium text-gray-600 mb-1">دیسک</label>
-                <input type="number" class="tl-new-disc-inline w-full text-xs px-2 py-1.5 border border-gray-300 rounded" value="1" />
+                <label class="block text-xs font-medium text-ink-secondary mb-1">دیسک</label>
+                <input type="number" class="tl-new-disc-inline w-full text-xs px-2 py-1.5 border border-rule-strong rounded" value="1" />
             </div>
             <div class="w-20">
-                <label class="block text-xs font-medium text-gray-600 mb-1">#</label>
-                <input type="number" class="tl-new-no-inline w-full text-xs px-2 py-1.5 border border-gray-300 rounded" value="0" placeholder="auto" />
+                <label class="block text-xs font-medium text-ink-secondary mb-1">#</label>
+                <input type="number" class="tl-new-no-inline w-full text-xs px-2 py-1.5 border border-rule-strong rounded" value="0" placeholder="auto" />
             </div>
             <div class="w-24">
-                <label class="block text-xs font-medium text-gray-600 mb-1">مدت (ثانیه)</label>
-                <input type="number" class="tl-new-duration w-full text-xs px-2 py-1.5 border border-gray-300 rounded" />
+                <label class="block text-xs font-medium text-ink-secondary mb-1">مدت (ثانیه)</label>
+                <input type="number" class="tl-new-duration w-full text-xs px-2 py-1.5 border border-rule-strong rounded" />
             </div>
-            <button type="button" class="tl-create px-3 py-1.5 text-xs bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">
-                <i class="fas fa-plus"></i> ایجاد
+            <button type="button" class="tl-create px-3 py-1.5 text-xs bg-success text-on-accent rounded-md hover:bg-success-hover transition-colors">
+                <i aria-hidden="true" class="fas fa-plus"></i> ایجاد
             </button>
         </div>
     </details>
 
-    <div class="tl-error mt-2 hidden">
-        <p class="text-xs text-red-600 bg-red-50 border border-red-200 rounded px-2 py-1.5"></p>
+    <div class="tl-error ui-state--error mt-2 hidden">
+        <p class="text-xs text-error bg-error-soft border border-error-border rounded px-2 py-1.5"></p>
     </div>
 </div>
 

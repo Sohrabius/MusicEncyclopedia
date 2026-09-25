@@ -4,20 +4,20 @@
     ViewData["ActiveMenu"] = "Attributes";
 }
 
-<div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
+<div class="bg-surface rounded-lg shadow-sm border border-rule p-4 mb-6">
     <form method="post" action="/admin/attributes/create" class="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
         @Html.AntiForgeryToken()
-        <div><label class="block text-xs font-medium text-gray-600 mb-1">نوع موجودیت</label><select name="EntityTypeId" required class="w-full px-3 py-2 border rounded-md text-sm">@foreach (var type in Model.EntityTypes) { <option value="@type.EntityTypeId">@type.Name</option> }</select></div>
-        <div><label class="block text-xs font-medium text-gray-600 mb-1">نام</label><input name="Name" required maxlength="255" class="w-full px-3 py-2 border rounded-md text-sm" /></div>
-        <div><label class="block text-xs font-medium text-gray-600 mb-1">نوع داده</label><select name="DataTypeCode" class="w-full px-3 py-2 border rounded-md text-sm">@foreach (var dataType in Model.DataTypes) { <option value="@dataType">@dataType</option> }</select></div>
+        <div><label class="block text-xs font-medium text-ink-secondary mb-1">نوع موجودیت</label><select name="EntityTypeId" required class="w-full px-3 py-2 border rounded-md text-sm">@foreach (var type in Model.EntityTypes) { <option value="@type.EntityTypeId">@type.Name</option> }</select></div>
+        <div><label class="block text-xs font-medium text-ink-secondary mb-1">نام</label><input name="Name" required maxlength="255" class="w-full px-3 py-2 border rounded-md text-sm" /></div>
+        <div><label class="block text-xs font-medium text-ink-secondary mb-1">نوع داده</label><select name="DataTypeCode" class="w-full px-3 py-2 border rounded-md text-sm">@foreach (var dataType in Model.DataTypes) { <option value="@dataType">@dataType</option> }</select></div>
         <label class="flex items-center gap-2 pb-2 text-sm"><input type="checkbox" name="IsRequired" value="true" /> الزامی</label>
-        <button class="px-4 py-2 bg-green-600 text-white rounded-md text-sm" type="submit"><i class="fas fa-plus"></i> افزودن</button>
+        <button class="px-4 py-2 bg-success text-on-accent rounded-md text-sm" type="submit"><i aria-hidden="true" class="fas fa-plus"></i> افزودن</button>
     </form>
 </div>
 
-<div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-x-auto">
+<div class="bg-surface rounded-lg shadow-sm border border-rule overflow-x-auto">
     <table class="w-full text-sm">
-        <thead class="bg-gray-50"><tr><th class="text-start px-3 py-3">نوع موجودیت</th><th class="text-start px-3 py-3">نام</th><th class="text-start px-3 py-3">نوع داده</th><th class="px-3 py-3">الزامی</th><th class="px-3 py-3">عملیات</th></tr></thead>
+        <thead class="bg-paper"><tr><th class="text-start px-3 py-3">نوع موجودیت</th><th class="text-start px-3 py-3">نام</th><th class="text-start px-3 py-3">نوع داده</th><th class="px-3 py-3">الزامی</th><th class="px-3 py-3">عملیات</th></tr></thead>
         <tbody class="divide-y">
         @foreach (var item in Model.Items)
         {
@@ -30,14 +30,14 @@
                             <input name="Name" value="@item.Name" required maxlength="255" class="flex-1 min-w-40 px-2 py-1 border rounded" />
                             <select name="DataTypeCode" class="px-2 py-1 border rounded">@foreach (var dataType in Model.DataTypes) { <option value="@dataType" selected="@(dataType == item.DataTypeCode)">@dataType</option> }</select>
                             <label class="text-xs"><input type="checkbox" name="IsRequired" value="true" checked="@item.IsRequired" /> الزامی</label>
-                            <button type="submit" class="px-2 py-1 text-blue-600"><i class="fas fa-save"></i></button>
+                            <button type="submit" class="px-2 py-1 text-accent min-w-11 min-h-11 inline-flex items-center justify-center" aria-label="ذخیره"><i aria-hidden="true" class="fas fa-save"></i></button>
                         </form>
-                        <form method="post" action="/admin/attributes/delete/@item.AttributeDefinitionId" class="inline" onsubmit="return confirm('Delete this definition?');">@Html.AntiForgeryToken()<button class="px-2 py-1 text-red-600"><i class="fas fa-trash"></i></button></form>
+                        <form method="post" action="/admin/attributes/delete/@item.AttributeDefinitionId" class="inline" onsubmit="return confirm('Delete this definition?');">@Html.AntiForgeryToken()<button class="px-2 py-1 text-error min-w-11 min-h-11 inline-flex items-center justify-center" aria-label="حذف"><i aria-hidden="true" class="fas fa-trash"></i></button></form>
                     </div>
                 </td>
             </tr>
         }
-        @if (Model.Items.Count == 0) { <tr><td colspan="5" class="px-4 py-8 text-center text-gray-500">هنوز تعریفی وجود ندارد.</td></tr> }
+        @if (Model.Items.Count == 0) { <tr><td colspan="5" class="ui-state ui-state--empty">هنوز تعریفی وجود ندارد.</td></tr> }
         </tbody>
     </table>
 </div>

@@ -6,74 +6,72 @@
 
 <form method="post" action="/admin/media/Upload" enctype="multipart/form-data">
     @Html.AntiForgeryToken()
-    <div asp-validation-summary="ModelOnly" class="mb-4 px-4 py-3 rounded-md bg-red-50 border border-red-200 text-red-800 text-sm" role="alert"></div>
+    <div asp-validation-summary="ModelOnly" class="mb-4 px-4 py-3 rounded-md bg-error-soft border border-error-border text-error-hover text-sm" role="alert"></div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="lg:col-span-2 space-y-6">
             <!-- File Upload Area -->
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">انتخاب فایل</h2>
-                <div id="drop-zone" class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition-colors cursor-pointer" onclick="document.getElementById('file-input').click()">
-                    <i class="fas fa-cloud-upload-alt text-4xl text-gray-300 mb-3 block"></i>
-                    <p class="text-sm text-gray-500 mb-1">فایل را اینجا بکشید و رها کنید، یا برای انتخاب کلیک کنید</p>
-                    <p class="text-xs text-gray-400">مجاز: JPEG، PNG، GIF، WebP، SVG، MP3، WAV، FLAC، AAC، MP4، WebM، PDF (حداکثر ۲۰۰ مگابایت)</p>
+            <div class="bg-surface rounded-lg shadow-sm border border-rule p-5">
+                <h2 class="text-lg font-semibold text-ink mb-4">انتخاب فایل</h2>
+                <div id="drop-zone" class="border-2 border-dashed border-rule-strong rounded-lg p-8 text-center hover:border-accent transition-colors cursor-pointer" onclick="document.getElementById('file-input').click()">
+                    <i aria-hidden="true" class="fas fa-cloud-upload-alt text-4xl text-ink-disabled mb-3 block"></i>
+                    <p class="text-sm text-ink-muted mb-1">فایل را اینجا بکشید و رها کنید، یا برای انتخاب کلیک کنید</p>
+                    <p class="text-xs text-ink-muted">مجاز: JPEG، PNG، GIF، WebP، SVG، MP3، WAV، FLAC، AAC، MP4، WebM، PDF (حداکثر ۲۰۰ مگابایت)</p>
                     <input type="file" id="file-input" asp-for="File" class="hidden" onchange="handleFileSelect(event)" />
-                    <span asp-validation-for="File" class="text-xs text-red-600"></span>
+                    <span asp-validation-for="File" aria-live="polite" class="field-error"></span>
                 </div>
-                <div id="file-preview" class="hidden mt-4 p-3 bg-gray-50 rounded-md">
+                <div id="file-preview" class="hidden mt-4 p-3 bg-paper rounded-md">
                     <div class="flex items-center gap-3">
-                        <i class="fas fa-file text-2xl text-blue-500"></i>
+                        <i aria-hidden="true" class="fas fa-file text-2xl text-accent"></i>
                         <div class="flex-1 min-w-0">
-                            <p id="file-name" class="text-sm font-medium text-gray-900 truncate"></p>
-                            <p id="file-size" class="text-xs text-gray-500"></p>
+                            <p id="file-name" class="text-sm font-medium text-ink truncate"></p>
+                            <p id="file-size" class="text-xs text-ink-muted"></p>
                         </div>
-                        <button type="button" onclick="clearFileSelection()" class="text-red-500 hover:text-red-700">
-                            <i class="fas fa-times"></i>
-                        </button>
+                        <button type="button" onclick="clearFileSelection()" class="text-error hover:text-error-hover min-w-11 min-h-11 inline-flex items-center justify-center" aria-label="پاک کردن انتخاب"><i aria-hidden="true" class="fas fa-times"></i></button>
                     </div>
                 </div>
             </div>
 
             <!-- Metadata -->
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">رسانه فراداده</h2>
+            <div class="bg-surface rounded-lg shadow-sm border border-rule p-5">
+                <h2 class="text-lg font-semibold text-ink mb-4">رسانه فراداده</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label asp-for="MediaTypeId" class="block text-sm font-medium text-gray-700 mb-1"></label>
-                        <select asp-for="MediaTypeId" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <label asp-for="MediaTypeId" class="form-label"></label>
+                        <select asp-for="MediaTypeId" class="form-control">
                             <option value="">-- تشخیص خودکار --</option>
                             @foreach (var mt in Model.MediaTypes)
                             {
                                 <option value="@mt.MediaTypeId">@mt.Name</option>
                             }
                         </select>
-                        <span asp-validation-for="MediaTypeId" class="text-xs text-red-600"></span>
+                        <span asp-validation-for="MediaTypeId" aria-live="polite" class="field-error"></span>
                     </div>
                     <div>
-                        <label asp-for="FileName" class="block text-sm font-medium text-gray-700 mb-1"></label>
-                        <input asp-for="FileName" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Leave empty to use original name" />
-                        <span asp-validation-for="FileName" class="text-xs text-red-600"></span>
+                        <label asp-for="FileName" class="form-label"></label>
+                        <input asp-for="FileName" class="form-control" placeholder="Leave empty to use original name" />
+                        <span asp-validation-for="FileName" aria-live="polite" class="field-error"></span>
                     </div>
                     <div class="md:col-span-2">
-                        <label asp-for="AltText" class="block text-sm font-medium text-gray-700 mb-1"></label>
-                        <input asp-for="AltText" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Descriptive text for accessibility" />
-                        <span asp-validation-for="AltText" class="text-xs text-red-600"></span>
+                        <label asp-for="AltText" class="form-label"></label>
+                        <input asp-for="AltText" class="form-control" placeholder="Descriptive text for accessibility" />
+                        <span asp-validation-for="AltText" aria-live="polite" class="field-error"></span>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="space-y-6">
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">بارگذاری</h2>
-                <button type="submit" id="btn-upload" class="w-full px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
-                    <i class="fas fa-upload"></i> بارگذاری فایل
+            <div class="bg-surface rounded-lg shadow-sm border border-rule p-5">
+                <h2 class="text-lg font-semibold text-ink mb-4">بارگذاری</h2>
+                <button type="submit" id="btn-upload" class="w-full px-4 py-2.5 bg-accent text-on-accent text-sm font-medium rounded-md hover:bg-accent-hover transition-colors flex items-center justify-center gap-2">
+                    <i aria-hidden="true" class="fas fa-upload"></i> بارگذاری فایل
                 </button>
-                <a href="/admin/media" class="w-full block text-center mt-3 px-4 py-2.5 text-sm text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors">انصراف</a>
+                <a href="/admin/media" class="w-full block text-center mt-3 px-4 py-2.5 text-sm text-ink-secondary bg-paper-muted rounded-md hover:bg-rule transition-colors">انصراف</a>
             </div>
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                <h2 class="text-sm font-semibold text-gray-700 mb-2">راهنمای بارگذاری</h2>
-                <ul class="text-xs text-gray-500 space-y-1 list-disc list-inside">
+            <div class="bg-surface rounded-lg shadow-sm border border-rule p-5">
+                <h2 class="text-sm font-semibold text-ink-secondary mb-2">راهنمای بارگذاری</h2>
+                <ul class="text-xs text-ink-muted space-y-1 list-disc list-inside">
                     <li>حداکثر حجم فایل: ۲۰۰ مگابایت</li>
                     <li>فرمت‌های تصویری پشتیبانی‌شده: JPEG، PNG، GIF، WebP، SVG</li>
                     <li>فرمت‌های صوتی پشتیبانی‌شده: MP3، WAV، FLAC، AAC</li>
@@ -101,19 +99,19 @@
         dropZone.addEventListener('dragover', function (e) {
             e.preventDefault();
             e.stopPropagation();
-            this.classList.add('border-blue-500', 'bg-blue-50');
+            this.classList.add('border-accent', 'bg-accent-soft');
         });
 
         dropZone.addEventListener('dragleave', function (e) {
             e.preventDefault();
             e.stopPropagation();
-            this.classList.remove('border-blue-500', 'bg-blue-50');
+            this.classList.remove('border-accent', 'bg-accent-soft');
         });
 
         dropZone.addEventListener('drop', function (e) {
             e.preventDefault();
             e.stopPropagation();
-            this.classList.remove('border-blue-500', 'bg-blue-50');
+            this.classList.remove('border-accent', 'bg-accent-soft');
             if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
                 fileInput.files = e.dataTransfer.files;
                 updatePreview(e.dataTransfer.files[0]);

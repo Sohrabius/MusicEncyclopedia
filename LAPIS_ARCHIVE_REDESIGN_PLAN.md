@@ -2,7 +2,7 @@
 
 ## Status and scope
 
-**Status:** Approved design direction; ready to implement after the banner image is selected.
+**Status:** Approved design direction; Phases 2 and 4 are in progress. The Phase 0 banner asset decision remains open.
 
 This plan replaces the visual direction of the completed minimal blue UI work without changing public URLs, Razor view models, controllers, search behavior, SEO metadata, JSON-LD, or the Persian (`fa`) RTL launch scope.
 

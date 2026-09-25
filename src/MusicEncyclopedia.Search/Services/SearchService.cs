@@ -19,12 +19,6 @@ public sealed class SearchService : ISearchService
     private readonly string _connectionString;
     private readonly ICacheService? _cache;
 
-    // Process-wide memo of whether the SQL Server database has full-text
-    // indexes. Probed lazily on the first search and cached; a probe failure
-    // (e.g. Full-Text Search component not installed) resolves to "not available".
-    private static bool _fullTextProbeAttempted;
-    private static bool _fullTextAvailable;
-
     public SearchService(string connectionString, ICacheService? cache = null)
     {
         _connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
@@ -70,44 +64,46 @@ public sealed class SearchService : ISearchService
 
     /// <summary>
     /// Determines whether the SQL Server database can answer FREETEXTTABLE
-    /// queries. The result is memoized process-wide after the first probe
-    /// (an empty result set is itself a failure signal).
+    /// queries. Every search probes the service and all tables used by the
+    /// union query. This lets a running application begin using FTS after an
+    /// operator applies the indexes, and prevents a partial deployment from
+    /// issuing FREETEXTTABLE against an unindexed table.
     /// </summary>
     private async Task<bool> CanUseFullTextAsync(
         IDbConnection connection, CancellationToken cancellationToken)
     {
-        if (_fullTextProbeAttempted)
-        {
-            return _fullTextAvailable;
-        }
-
         try
         {
             const string probeSql = """
-                SELECT COUNT(*) FROM sys.fulltext_indexes
-                WHERE object_id IN (
-                    OBJECT_ID(N'Album'), OBJECT_ID(N'Track'), OBJECT_ID(N'Person'),
-                    OBJECT_ID(N'Company'), OBJECT_ID(N'Poem'), OBJECT_ID(N'SungVersion'),
-                    OBJECT_ID(N'Genre'), OBJECT_ID(N'Mood'), OBJECT_ID(N'Instrument'),
-                    OBJECT_ID(N'Source'), OBJECT_ID(N'Location'), OBJECT_ID(N'Publication'),
-                    OBJECT_ID(N'RecordingSession'), OBJECT_ID(N'PerformanceEvent'))
+                SELECT CASE
+                    WHEN COALESCE(FULLTEXTSERVICEPROPERTY('IsFullTextInstalled'), 0) = 1
+                     AND COALESCE(FULLTEXTSERVICEPROPERTY('IsFullTextEnabled'), 0) = 1
+                     AND (
+                        SELECT COUNT(*)
+                        FROM sys.fulltext_indexes
+                        WHERE is_enabled = 1
+                          AND object_id IN (
+                            OBJECT_ID(N'dbo.Album'), OBJECT_ID(N'dbo.Track'), OBJECT_ID(N'dbo.Person'),
+                            OBJECT_ID(N'dbo.Company'), OBJECT_ID(N'dbo.Poem'), OBJECT_ID(N'dbo.SungVersion'),
+                            OBJECT_ID(N'dbo.Genre'), OBJECT_ID(N'dbo.Mood'), OBJECT_ID(N'dbo.Instrument'),
+                            OBJECT_ID(N'dbo.Source'), OBJECT_ID(N'dbo.Location'), OBJECT_ID(N'dbo.Publication'),
+                            OBJECT_ID(N'dbo.RecordingSession'), OBJECT_ID(N'dbo.PerformanceEvent')
+                          )
+                     ) = 14
+                    THEN 1
+                    ELSE 0
+                END
                 """;
-            var indexCount = await connection.ExecuteScalarAsync<int>(
+            var isReady = await connection.ExecuteScalarAsync<int>(
                 probeSql, commandTimeout: 10);
-            _fullTextAvailable = indexCount > 0;
+            return isReady == 1;
         }
         catch
         {
-            // Full-Text Search component not installed (or permission denied) —
-            // fall back to LIKE for the lifetime of this process.
-            _fullTextAvailable = false;
+            // Full-Text Search component not installed (or permission denied).
+            // Keep portable search available instead of failing the request.
+            return false;
         }
-        finally
-        {
-            _fullTextProbeAttempted = true;
-        }
-
-        return _fullTextAvailable;
     }
 
     private async Task<PagedResult<SearchResultDto>> SearchCoreAsync(
